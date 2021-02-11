@@ -1,0 +1,170 @@
+<div dir="ltr">
+    <table cellspacing="0" cellpadding="0" dir="ltr" border="1" style="table-layout:fixed; font-size:10pt; font-family:Arial; width:0px; border-collapse:collapse; border:none">
+        <colgroup>
+          <col width="150"> <col width="110"> <col width="120"> <col width="120"> <col width="140"> <col width="130"> <col width="120"> <col width="130"> 
+        </colgroup>
+        <tbody>
+          <!-- JPS Header -->
+          <tr style="height:68px">
+              <td style="width:149px; height:68px; overflow:hidden; vertical-align:middle; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:visible; padding:2px 0px; vertical-align:middle; background-color:rgb(121,188,240); font-size:18pt; font-weight:bold; color:rgb(18,49,91); border:0px">
+                  <div style="white-space:nowrap;overflow:hidden;width:460px; border:0px">
+                      <div style="float:left">JPS Summary of Incoming Submissions</div>
+                  </div>
+              </td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+          </tr>
+          <!-- Header -->
+          <tr style="height:21px">
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">Area</td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">DS Assigned</td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">Job Number</td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">Timestamp</td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">Email Address</td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">Student Name</td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">Student ID</td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(183,211,236); font-size:11pt; font-weight:bold; color:rgb(0,0,0); border:1px solid rgb(204,204,204)">Project Name</td>
+          </tr>
+          <!--  Body -->
+          <? for(var i = 2; i < items.length; i++) { ?>
+            <tr style="height:10px">
+              <? if (items[i].status == 'Ultimaker') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Ultimaker</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Laser Cutter') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Laser Cutter</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Waterjet') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Waterjet</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Fablight') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Fablight</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Advanced Lab') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Advanced Lab</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Shopbot') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Shopbot</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Haas & Tormach') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Haas & Tormach</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Vinyl Cutter') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Vinyl Cutter</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Othermill') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Othermill</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Other Tools') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Other Tools</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Creaform') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Creaform</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <? if (items[i].status == 'Canon Plotter') { ?>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px; font-weight:bold">Canon Plotter</td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+                  <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(121,188,240); border:0px"></td>
+              <? } ?>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= items[i].status ?></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= items[i].ds ?></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= items[i].jobnum ?></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= Utilities.formatDate(new Date(items[i].timestamp), 'PST', "yyyy-MM-dd' 'HH:mm:ss") ?></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= items[i].email ?></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= items[i].name ?></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= items[i].sid ?></td>
+              <td style="overflow:hidden; padding:2px 3px; vertical-align:bottom; background-color:rgb(250,250,250); font-size:10pt; text-align:center; border:1px solid rgb(110,110,110)"><?= items[i].project ?></td>
+            </tr>
+          <? } ?>
+        </tbody>
+    </table>
+</div>

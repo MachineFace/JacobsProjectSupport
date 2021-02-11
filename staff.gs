@@ -1,0 +1,111 @@
+
+
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Design Specialist Class function 
+ * @param {string} name
+ * @param {string} fullname
+ * @param {string} email
+ */
+var DesignSpecialist = function (name, fullname, email) {
+    this.name = name;
+    this.fullname = fullname;
+    this.email = email;
+    this.emailLink = '<a href = "' + email + '">' + email + '</a>';
+}
+
+
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Turn an email address into a link
+ * @param {string} email
+ * @returns {string} link
+ */
+function MakeLink(email) {
+    return '<a href="mailto:' + email + '">' + email + '</a>';
+}
+
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Return Staff Email as a string.
+ */
+var StaffEmailAsString = function () {
+    var stafflist = sheetDict.staff;
+    var last = stafflist.getLastRow();
+    var emaillist = stafflist.getRange(2, 3, last - 1, 1).getValues();
+    return emaillist.toString();
+}
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Invoke Design Specialist properties
+ * @param {string} name
+ * @param {string} property
+ * @returns {string} fullname, email, or email link
+ */
+var InvokeDS = function (name, property) {
+    var stafflist = sheetDict.staff;
+    var last = stafflist.getLastRow();
+    var staffrange = stafflist.getRange(2, 1, last, 4).getValues();
+
+    for (var i in staffrange) {
+        var _name = staffrange[i][0];
+        var _fullname = staffrange[i][1];
+        var _email = staffrange[i][2];
+        var _emailLink = staffrange[i][3];
+        //Logger.log('name = %s, fullname = %s,  email = %s, emaillink = %s',_name,_fullname,_email,_emailLink);
+
+        switch (property) {
+            case "fullname":
+                // @ts-ignore
+                if (staffrange[i][0] == name) return _fullname;
+            case "email":
+                // @ts-ignore
+                if (staffrange[i][0] == name) return _email;
+            case "emaillink":
+                // @ts-ignore
+                if (staffrange[i][0] == name) return _emailLink;
+        }
+    }
+}
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Create a Design Specialist from spreadsheet and return a list
+ * @returns {[string]} DSList
+ */
+var CreateDS = function () {
+    var stafflist = sheetDict.staff;
+    var last = stafflist.getLastRow();
+    var staffrange = stafflist.getRange(2, 1, last, 4).getValues();
+
+    var DSList = [];
+    for (var i = 0; i < staffrange.length - 1; i++) {
+        var _name = staffrange[i][0];
+        var _fullname = staffrange[i][1];
+        var _email = staffrange[i][2];
+        var _emailLink = staffrange[i][3];
+
+        if (_emailLink == null || _emailLink == undefined || _emailLink == "" && _email != null) {
+            // @ts-ignore
+            _emailLink = MakeLink(_email);
+            stafflist.getRange(last, 4).setValue(_emailLink);
+        }
+        // @ts-ignore
+        var DS = new DesignSpecialist(_name, _fullname, _email);  //Make a new DS
+        DSList.push(DS);  //Push to List
+    }
+    DSList.forEach(element => Logg(element));
+    // @ts-ignore
+    return DSList;
+}
+
+
