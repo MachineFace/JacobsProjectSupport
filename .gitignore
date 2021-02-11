@@ -1,0 +1,32 @@
+
+# ignore all .a files
+*.js
+*.json
+*.html
+
+# but do track lib.a, even though you're ignoring .a files above
+!appsscript.json
+!automation.js
+!calculate.js
+!Code.js
+!CP-Prototypes.js
+!message.js
+!misc.js
+!shopify.js
+!staff.js
+!summary.js
+!tabletemplate.html
+!test.js
+!ui.js
+
+# only ignore the TODO file in the current directory, not subdir/TODO
+/TODO
+
+# ignore all files in any directory named build
+node_modules/
+
+# ignore doc/notes.txt, but not doc/server/arch.txt
+*.txt
+
+# ignore all .pdf files in the doc/ directory and any of its subdirectories
+**/*.pdf
