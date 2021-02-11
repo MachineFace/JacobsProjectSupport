@@ -7,18 +7,18 @@
 
 # BUT do track THESE FILES, even though you're ignoring ABOVE files
 !appsscript.json
-!automation.js
-!calculate.js
-!Code.js
-!CP-Prototypes.js
-!message.js
-!misc.js
-!shopify.js
-!staff.js
-!summary.js
+!automation.gs
+!calculate.gs
+!Code.gs
+!CP-Prototypes.gs
+!message.gs
+!misc.gs
+!shopify.gs
+!staff.gs
+!summary.gs
 !tabletemplate.html
-!test.js
-!ui.js
+!test.gs
+!ui.gs
 
 # BUT do track THESE FILES, even though you're ignoring ABOVE files
 !automation.gs
