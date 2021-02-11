@@ -1,10 +1,11 @@
 
-# ignore all .a files
-*.js
-*.json
-*.html
+# Ignore all files in all directories and subdirectories
+**/*.gs
+**/*.js
+**/*.json
+**/*.html
 
-# but do track lib.a, even though you're ignoring .a files above
+# BUT do track THESE FILES, even though you're ignoring ABOVE files
 !appsscript.json
 !automation.js
 !calculate.js
@@ -19,6 +20,20 @@
 !test.js
 !ui.js
 
+# BUT do track THESE FILES, even though you're ignoring ABOVE files
+!automation.gs
+!calculate.gs
+!Code.gs
+!CP-Prototypes.gs
+!message.gs
+!misc.gs
+!shopify.gs
+!staff.gs
+!summary.gs
+!tabletemplate.html
+!test.gs
+!ui.gs
+
 # only ignore the TODO file in the current directory, not subdir/TODO
 /TODO
 
@@ -26,7 +41,7 @@
 node_modules/
 
 # ignore doc/notes.txt, but not doc/server/arch.txt
-*.txt
+**/*.txt
 
 # ignore all .pdf files in the doc/ directory and any of its subdirectories
 **/*.pdf
