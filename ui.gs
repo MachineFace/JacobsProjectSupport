@@ -143,7 +143,7 @@ function BillFromSelected() {
                 if(customer == undefined || customer == null) {
                     //msg "Customer not found"
                     let boxMsg = "The Shopify customer was not found";
-                    Browser.msgBox("Shopify error", boxMsg); 
+                    Browser.msgBox("Shopify error", boxMsg, Browser.Buttons.OK); 
                 } else {
                     var package = new PackageMaterials(material1Name, material1Quantity, material2Name, material2Quantity, material3Name, material3Quantity, material4Name, material4Quantity, material5Name, material5Quantity);
                     var formattedMats = new MakeLineItems(package);
