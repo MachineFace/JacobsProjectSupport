@@ -32,7 +32,7 @@ function MaterialMenu() {
 function PopupCountUsers() {
     let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime Message';
-    let msg = 'Students Currently Using JPS: \\n';
+    let msg = 'Students Currently Using JPS:' +  '\\n';
     let count = CountActiveUsers();
     ui.alert(title, msg + count, ui.ButtonSet.OK);
 }
