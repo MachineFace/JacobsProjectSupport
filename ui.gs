@@ -140,7 +140,7 @@ function BillFromSelected() {
                 //Fetch Customer and Products
                 var customer = GetShopifyCustomerByEmail(email);
 
-                if(customer == undefined || user == null) {
+                if(customer == undefined || customer == null) {
                     //msg "Customer not found"
                     let boxMsg = "The Shopify customer was not found";
                     Browser.msgBox("Shopify error", boxMsg); 
