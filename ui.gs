@@ -139,54 +139,61 @@ function BillFromSelected() {
 
                 //Fetch Customer and Products
                 var customer = GetShopifyCustomerByEmail(email);
-                var package = new PackageMaterials(material1Name, material1Quantity, material2Name, material2Quantity, material3Name, material3Quantity, material4Name, material4Quantity, material5Name, material5Quantity);
-                var formattedMats = new MakeLineItems(package);
+
+                if(user == undefined || user == null) {
+                    //msg "Customer not found"
+                    let boxMsg = "The Shopify customer was not found";
+                    Browser.msgBox("Shopify error", boxMsg); 
+                } else {
+                    var package = new PackageMaterials(material1Name, material1Quantity, material2Name, material2Quantity, material3Name, material3Quantity, material4Name, material4Quantity, material5Name, material5Quantity);
+                    var formattedMats = new MakeLineItems(package);
 
 
-                var boxTitle = 'Generate Bill to Shopify';
-                var boxMsg = 'Would you like to Generate a Bill to: \\n\\n';
-                boxMsg += 'Customer Name : ' + customer.first_name + ' ' + customer.last_name + '\\n';
-                boxMsg += 'Job Number : ' + jobnumber + '\\n';
-                boxMsg += 'Shopify ID : ' + customer.id + '\\n';
-                boxMsg += 'For Materials : \\n\\n';
+                    var boxTitle = 'Generate Bill to Shopify';
+                    var boxMsg = 'Would you like to Generate a Bill to: \\n\\n';
+                    boxMsg += 'Customer Name : ' + customer.first_name + ' ' + customer.last_name + '\\n';
+                    boxMsg += 'Job Number : ' + jobnumber + '\\n';
+                    boxMsg += 'Shopify ID : ' + customer.id + '\\n';
+                    boxMsg += 'For Materials : \\n\\n';
 
-                //Lists (Pushing at the same time ensures the lists are the same size.)
-                let materialList = [material1Name, material2Name, material3Name, material4Name, material5Name];
-                let quantityList = [material1Quantity, material2Quantity, material3Quantity, material4Quantity, material5Quantity];
+                    //Lists (Pushing at the same time ensures the lists are the same size.)
+                    let materialList = [material1Name, material2Name, material3Name, material4Name, material5Name];
+                    let quantityList = [material1Quantity, material2Quantity, material3Quantity, material4Quantity, material5Quantity];
 
-                //Remove when Those are empty / null / undefined
-                for(let i = 0; i <= materialList.length + 1; i++) {
-                    if(materialList[i] == null || materialList[i] == undefined || materialList[i] == '' || materialList[i] == ' ') {
-                        materialList.splice(i);
-                        quantityList.splice(i);
+                    //Remove when Those are empty / null / undefined
+                    for(let i = 0; i <= materialList.length + 1; i++) {
+                        if(materialList[i] == null || materialList[i] == undefined || materialList[i] == '' || materialList[i] == ' ') {
+                            materialList.splice(i);
+                            quantityList.splice(i);
+                        }
                     }
-                }
-                for(let i = 0; i < materialList.length; i++) {
-                    boxMsg += i+1 + '.   ' + quantityList[i] + ' of ' + materialList[i] + '\\n';
-                }
+                    for(let i = 0; i < materialList.length; i++) {
+                        boxMsg += i+1 + '.   ' + quantityList[i] + ' of ' + materialList[i] + '\\n';
+                    }
 
-                //Make a nessage box
-                try {
-                    response = Browser.msgBox(boxTitle, boxMsg, Browser.Buttons.YES_NO_CANCEL);
-                    if (response == "yes") {
-                        Logger.log('User clicked "Yes".');
-                        var order = new CreateShopifyOrder(customer, jobnumber, package, formattedMats);
-                        //ss.getRange('AZ' + thisRow).setValue(false);
-                        ss.getRange('A' + thisRow).setValue('Billed');
-                        Logger.log(order.toString());
-                        Browser.msgBox(boxTitle, 'Student has been successfully billed on Shopify!\\n' + GetLastShopifyOrder(), Browser.Buttons.OK);
+                    //Make a nessage box
+                    try {
+                        response = Browser.msgBox(boxTitle, boxMsg, Browser.Buttons.YES_NO_CANCEL);
+                        if (response == "yes") {
+                            Logger.log('User clicked "Yes".');
+                            var order = new CreateShopifyOrder(customer, jobnumber, package, formattedMats);
+                            //ss.getRange('AZ' + thisRow).setValue(false);
+                            ss.getRange('A' + thisRow).setValue('Billed');
+                            Logger.log(order.toString());
+                            Browser.msgBox(boxTitle, 'Student has been successfully billed on Shopify!\\n' + GetLastShopifyOrder(), Browser.Buttons.OK);
+                        }
+                        else {
+                            Logger.log('User clicked "No / Cancel".');
+                            Logger.log('Order NOT Created.');
+                            //ss.getRange('AZ' + thisRow).setValue(false);
+                        }
                     }
-                    else {
-                        Logger.log('User clicked "No / Cancel".');
-                        Logger.log('Order NOT Created.');
-                        //ss.getRange('AZ' + thisRow).setValue(false);
+                    catch(err) {
+                        Logger.log(err + ' : Could not generate a message box to gather info.');
                     }
-                }
-                catch(err) {
-                    Logger.log(err + ' : Could not generate a message box to gather info.');
-                }
-                finally {
-                    ss.getRange('AZ' + thisRow).setValue(false);
+                    finally {
+                        ss.getRange('AZ' + thisRow).setValue(false);
+                    }
                 }
 
             }
