@@ -474,8 +474,8 @@ function onEdit(e) {
     var shippingQuestion = ss.getRange(thisRow, 23).getValue();
     var cost = ss.getRange(thisRow, 45).getValue();
     */
-    var status = getByHeader("(INTERNAL) Status", thisRow);   
-    
+    const status = getByHeader("(INTERNAL) Status", thisRow);   
+
     var designspecialist = getByHeader("(INTERNAL): DS Assigned", thisRow); 
     var priority = getByHeader("(INTERNAL): Priority", thisRow);
     var jobnumber = getByHeader("(INTERNAL AUTO) Job Number", thisRow);
@@ -490,27 +490,25 @@ function onEdit(e) {
     var cost = getByHeader("Estimate", thisRow); 
 
     //Materials
-    var material1Quantity = ss.getRange(thisRow, 13).getValue();
-    var material1Name = ss.getRange(thisRow, 14).getValue();
-    var material1URL = new LookupProductID(material1Name).link;
+    const material1Quantity = ss.getRange(thisRow, 13).getValue();
+    const material1Name = ss.getRange(thisRow, 14).getValue();
+    const material1URL = new LookupProductID(material1Name).link;
 
-    var material2Quantity = ss.getRange(thisRow, 15).getValue();
-    var material2Name = ss.getRange(thisRow, 16).getValue();
-    var material2URL = new LookupProductID(material2Name).link;
+    const material2Quantity = ss.getRange(thisRow, 15).getValue();
+    const material2Name = ss.getRange(thisRow, 16).getValue();
+    const material2URL = new LookupProductID(material2Name).link;
 
-    //Use the right Column Later once we decide on location.
+    const material3Quantity = ss.getRange(thisRow, 17).getValue();
+    const material3Name = ss.getRange(thisRow, 18).getValue();
+    const material3URL = new LookupProductID(material3Name).link;
 
-    var material3Quantity = ss.getRange(thisRow, 17).getValue();
-    var material3Name = ss.getRange(thisRow, 18).getValue();
-    var material3URL = new LookupProductID(material3Name).link;
+    const material4Quantity = ss.getRange(thisRow, 19).getValue();
+    const material4Name = ss.getRange(thisRow, 20).getValue();
+    const material4URL = new LookupProductID(material4Name).link;
 
-    var material4Quantity = ss.getRange(thisRow, 19).getValue();
-    var material4Name = ss.getRange(thisRow, 20).getValue();
-    var material4URL = new LookupProductID(material4Name).link;
-
-    var material5Name = ss.getRange(thisRow, 22).getValue();
-    var material5Quantity = ss.getRange(thisRow, 21).getValue(); 
-    var material5URL = new LookupProductID(material5Name).link;
+    const material5Quantity = ss.getRange(thisRow, 21).getValue(); 
+    const material5Name = ss.getRange(thisRow, 22).getValue();
+    const material5URL = new LookupProductID(material5Name).link;
 
 
     if (material1Name != "") var mat1 = true;
@@ -523,18 +521,6 @@ function onEdit(e) {
     else mat4 = false;
     if (material5Name != "") var mat5 = true;
     else mat5 = false;
-
-
-/*
-    if (thisSheetName=="Advanced Lab") {
-      material3Quantity = ss.getRange(thisRow, 20).getValue();
-      material3Name = ss.getRange(thisRow, 21).getValue();
-      material3URL = new LookupProductID(material2Name).link;
-      //if (material3Name != "") numofMaterials += 1;
-      //material4Quantity = ss.getRange(thisRow, 17).getValue();  //No columns for 4th material until we get rid of the blank columns
-      //material4Name = ss.getRange(thisRow, 17).getValue();
-    }*/
-
 
 
     //Log submission info to sheet
