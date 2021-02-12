@@ -30,11 +30,11 @@ function MaterialMenu() {
 }
 
 function PopupCountUsers() {
+    let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime Message';
-    let msg = 'Students Currently Using JPS: \\n \\n';
+    let msg = 'Students Currently Using JPS: \\n';
     let count = CountActiveUsers();
-    SpreadsheetApp.getUi()
-      .alert(title, msg + count, ui.ButtonSet.OK);
+    ui.alert(title, msg + count, ui.ButtonSet.OK);
 }
 
 
@@ -43,7 +43,7 @@ function BarMenu() {
       .createMenu('JPS Menu')
       .addItem('Generate Bill to Selected Student', 'BillFromSelected')
       .addSeparator()
-      .addItem('Count Users', 'PopupCountUsers')
+      .addItem('Count Active Users', 'PopupCountUsers')
       .addSubMenu(SpreadsheetApp.getUi().createMenu('Calculate')
           .addItem('Generate Metrics', 'Metrics')
           .addItem('Generate Distribution', 'CalculateDistribution')
