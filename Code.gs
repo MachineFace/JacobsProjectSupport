@@ -146,7 +146,7 @@ function onFormSubmit(e) {
     var timestamp;*/
 
     //Values
-    
+    SpreadsheetApp.flush();
     var name = e.namedValues['What is your name?'][0]; 
     var email = e.namedValues['Email Address'][0];
     var sid = e.namedValues['Your Student ID Number?'][0];
