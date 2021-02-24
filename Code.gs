@@ -135,18 +135,7 @@ function onFormSubmit(e) {
     }
 
 
-    //Parse Functions for shipping / variables
-    /*
-    var name;
-    var sid;
-    var email;
-    var studentType;
-    var projectname;
-    var shipping;
-    var timestamp;*/
-
-    //Values
-    SpreadsheetApp.flush();
+    //Parse Functions for shipping / variables 
     var name = e.namedValues['What is your name?'][0]; 
     var email = e.namedValues['Email Address'][0];
     var sid = e.namedValues['Your Student ID Number?'][0];
@@ -155,56 +144,7 @@ function onFormSubmit(e) {
     var shipping = e.namedValues['Do you need your parts shipped to you?'][0];
     var timestamp = e.namedValues['Timestamp'][0];
     
-
     var values = e.namedValues;
-    
- /*  The old method of establishing variables from the form response
-
-    for (Key in values) {
-        var label = Key;
-        var data = values[Key];
-
-        switch (label) {
-            case 'What is your name':
-            case 'What is your name?':
-            case 'Your Name?':
-            case 'Name':
-                if (data != undefined || data != null) {
-                    name = data;
-                }
-                break;
-            case 'Your Student ID Number?':
-                if (data != undefined || data != null) {
-                    sid = data;
-                }
-                break;
-            case 'Email Address':
-                if (data != undefined || data != null) {
-                    email = data;
-                }
-                break;
-            case 'What is your affiliation to the Jacobs Institute?':
-                if (data != undefined || data != null) {
-                    studentType = data;
-                }
-                break;
-            case 'Project Name':
-                if (data != undefined || data != null) {
-                    projectname = data;
-                }
-                break;
-            case 'Do you need your parts shipped to you?':
-                if (data != undefined || data != null) {
-                    shipping = data;
-                }
-                break;
-            case 'Timestamp':
-                if (data != undefined || data != null) {
-                    timestamp = data;
-                }
-                break;
-        }
-    };*/
 
     Logger.log("Name : " + name + ", SID : " + sid + ", Email : " + email + "Student Type : " + studentType + ", Project : " + projectname + ", Needs Shipping : " + shipping + ', Timestamp : ' + timestamp);
     Logg("Name = " + name + ", SID : " + sid + ", Email : " + email + "Student Type : " + studentType + ", Project : " + projectname + ", Needs Shipping : " + shipping + ', Timestamp : ' + timestamp);
@@ -359,10 +299,15 @@ function onFormSubmit(e) {
 
 
     //Check again
+    jobnumber = (jobnumber !== null && jobnumber !== undefined) ? jobnumber : CreateJobNumber(timestamp);
+    sheet.getRange("F" + lastRow).setValue(jobnumber);
+
+    /*
     if (jobnumber == undefined || jobnumber == null) {
         jobnumber = CreateJobNumber(timestamp);
         sheet.getRange("F" + lastRow).setValue(jobnumber);
     }
+    */
 
     //Fix wrapping issues
     let driveloc = sheet.getRange('D' + lastRow);
@@ -961,10 +906,14 @@ function CreateApprovalForm(name, jobnumber, cost) {
  */
 var CreateJobNumber = function (date) {
     //var date = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Ultimaker').getRange('H135').getValue();
+    //date = sheetDict.othertools.getRange('G7').getValue();
+
+    //Check that it's a date
+    let testedDate = isValidDate(date);
 
     var jobnumber;
     try {
-        if (date == undefined || date == null || date == '') {
+        if (date == undefined || date == null || date == '' || testedDate == false) {
             jobnumber = +Utilities.formatDate(new Date(), "PST", "yyyyMMddHHmmss");
             Logg('Set Jobnumber to a new time because timestamp was missing.');
         }
@@ -976,81 +925,13 @@ var CreateJobNumber = function (date) {
     catch (err) {
         Logg(err + ' : Couldnt fix jobnumber.');
     }
-    if (jobnumber == undefined) {
+    if (jobnumber == undefined || testedDate == false) {
         jobnumber = +Utilities.formatDate(new Date(), "PST", "yyyyMMddHHmmss");
     }
-    Logg('Returned Job Number: ' + jobnumber);
+    Logger.log('Returned Job Number: ' + jobnumber);
     return jobnumber.toString();
 }
 
-
-
-
-
-//
-var CreateProducts = function (materialslist) {
-
-  var materialsList = materialslist;
-
-   /*
-  //Test variables for isolated prototyping
-  var materialsList = [];
-  var sub1 = [];
-  sub1.push("Objet Polyjet FullCure720");
-  sub1.push("12");
-  var sub2 = [];
-  sub2.push("Objet Polyjet Soluble Material SUP705");
-  sub2.push("14");
-  var sub3 = [];
-  sub3.push("");
-  sub3.push("");
-  //var sub4 = [];
-  //sub4.push("material4Name");
-  //sub4.push("234");
-  materialsList.push(sub1);
-  materialsList.push(sub2);
-  materialsList.push(sub3);
-  */
-
-  Logger.log("materials list uncleaned = " + materialsList);
-  var productsList = [];
-
-
-  for (var row = 0; row < materialsList.length; row++) {
-    var sub = materialsList[row];
-    var name = sub[0];
-    //Logger.log("row " + row + " name = " + name);
-    var quant = sub[1];
-    //Logger.log("row " + row + " quant = " + quant);
-    if (name != "" & name !=undefined) {
-
-      var newSub = [];
-
-      try {
-        var pID = new LookupProductID(name).productID;
-        var product = new GetShopifyProductByID(pID);
-        newSub.push(product);
-        newSub.push(quant);
-        productsList.push(newSub);
-      }
-      catch(err) {
-        Logger.log(err + ' : Couldnt find product');
-      }
-
-      //Logger.log("pushing " + newSub);
-    } else {
-      //var newSub = [];
-      //newSub.push("");
-      //newSub.push("");
-      //productsList.push(newSub);
-    }
-  }
-
-  //Logger.log("Materials after cleaning = " + materialsListNew);
-
-    return productsList;
-
-}
 
 
 
@@ -1104,33 +985,33 @@ var CreateTicket = function (e,
     var notes = [];
     if (sheetname == 'Ultimaker') {
         thisSheet = sheetDict.ultimaker;
-        mat.push('Needs Breakaway Removed:', thisSheet.getRange(thisRow, 26).getValue().toString());
-        partcount.push('Part Count:', thisSheet.getRange(thisRow, 21).getValue().toString());
-        notes.push('Notes:', thisSheet.getRange(thisRow, 24).getValue().toString());
+        mat.push('Needs Breakaway Removed:', thisSheet.getRange('AD' + thisRow).getValue().toString());
+        partcount.push('Part Count:', thisSheet.getRange('Y' + thisRow).getValue().toString());
+        notes.push('Notes:', thisSheet.getRange('AE' + thisRow).getValue().toString());
     }
     if (sheetname == 'Laser Cutter') {
         thisSheet = sheetDict.laser;
-        mat.push('Rough Dimensions:', thisSheet.getRange('V' + thisRow).getValue().toString());
-        partcount.push('Part Count:', thisSheet.getRange('U' + thisRow).getValue().toString());
-        notes.push('Notes:', thisSheet.getRange('Y' + thisRow).getValue().toString());
+        mat.push('Rough Dimensions:', thisSheet.getRange('AA' + thisRow).getValue().toString());
+        partcount.push('Part Count:', thisSheet.getRange('Y' + thisRow).getValue().toString());
+        notes.push('Notes:', thisSheet.getRange('AC' + thisRow).getValue().toString());
     }
     if (sheetname == 'Fablight') {
         thisSheet = sheetDict.fablight;
-        mat.push('Rough Dimensions:', thisSheet.getRange('W' + thisRow).getValue().toString());
-        partcount.push('Part Count:', thisSheet.getRange('X' + thisRow).getValue().toString());
-        notes.push('Notes:', thisSheet.getRange('Y' + thisRow).getValue().toString());
+        mat.push('Rough Dimensions:', thisSheet.getRange('AA' + thisRow).getValue().toString());
+        partcount.push('Part Count:', thisSheet.getRange('AB' + thisRow).getValue().toString());
+        notes.push('Notes:', thisSheet.getRange('AC' + thisRow).getValue().toString());
     }
     if (sheetname == 'Waterjet') {
         thisSheet = sheetDict.waterjet;
-        mat.push('Rough Dimensions:', thisSheet.getRange('W' + thisRow).getValue().toString());
-        partcount.push('Part Count:', thisSheet.getRange('X' + thisRow).getValue().toString());
-        notes.push('Notes:', thisSheet.getRange('Z' + thisRow).getValue().toString());
+        mat.push('Rough Dimensions:', thisSheet.getRange('AA' + thisRow).getValue().toString());
+        partcount.push('Part Count:', thisSheet.getRange('AB' + thisRow).getValue().toString());
+        notes.push('Notes:', thisSheet.getRange('AD' + thisRow).getValue().toString());
     }
     if (sheetname == 'Advanced Lab') {
         thisSheet = sheetDict.advancedlab;
-        mat.push('Rough Dimensions:', thisSheet.getRange('AD' + thisRow).getValue().toString());
-        partcount.push('Part Count:', thisSheet.getRange('U' + thisRow).getValue().toString());
-        notes.push('Notes:', thisSheet.getRange('AF' + thisRow).getValue().toString());
+        mat.push('Which Printer:', thisSheet.getRange('Z' + thisRow).getValue().toString());
+        partcount.push('Part Count:', thisSheet.getRange('Y' + thisRow).getValue().toString());
+        notes.push('Notes:', thisSheet.getRange('AJ' + thisRow).getValue().toString());
     }
     else {
         mat.push('Materials: ', '');

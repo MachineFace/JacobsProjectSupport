@@ -100,7 +100,7 @@ class CreateMessage
     }
     get inProgressMessage() {
         let message = '<p>Hi ' + this.name + ',</p>';
-            message += '<p>Thank you for choosing Jacobs Project Support. Your project has been approved. <br />';
+            message += '<p>Thank you for choosing Jacobs Project Support. Your project has started. <br />';
             message += 'Your job number: <i>' + this.jobnumber + '</i>.<br/>';
             message += 'The part or parts requested for your project, <b><i>' + this.projectname + '</i></b> has been started by ' + this.designspecialist + '.<br/>';
             message += 'Please email ' + this.designspecialistemaillink + ' for further details.<br/>';
