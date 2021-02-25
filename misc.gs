@@ -419,6 +419,7 @@ function TimeDiff(start, end) {
           resolve(formatted);
           Logger.log(formatted);
         })
+        
     }
     catch (err) {
         Logg(err + " : Calculating the duration has failed for some reason.");

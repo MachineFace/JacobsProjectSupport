@@ -233,11 +233,15 @@ function onFormSubmit(e) {
 
     //Fix "Received" Status Issue
     let stat = sheet.getRange("A" + lastRow).getValue();
+    stat = stat ? stat : sheet.getRange("A" + lastRow).setValue("Received");
+    Logger.log("Status refixed to 'Received'.");
+
+    /*
     if(stat == undefined || stat == null || stat == "") {
         sheet.getRange("A" + lastRow).setValue("Received");
         Logger.log("Status refixed to 'Received'.");
     }
-
+    */
 
     //"Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
     var shippingbody = message.shippingMessage;
@@ -404,21 +408,6 @@ function onEdit(e) {
 
     //----------------------------------------------------------------------------------------------------------------
     //Parse Data
-    /*
-    var status = ss.getRange(thisRow, 1).getValue();
-    var designspecialist = ss.getRange(thisRow, 2).getValue();
-    var priority = ss.getRange(thisRow, 3).getValue();
-    var jobnumber = ss.getRange(thisRow, 6).getValue();
-    var studentApproval = ss.getRange(thisRow, 7).getValue();
-    var submissiontime = ss.getRange(thisRow, 8).getValue();
-    var email = ss.getRange(thisRow, 9).getValue();
-    var name = ss.getRange(thisRow, 10).getValue();
-    var sid = ss.getRange(thisRow, 11).getValue();
-    var studentType = ss.getRange(thisRow, 20).getValue();
-    var projectname = ss.getRange(thisRow, 12).getValue();
-    var shippingQuestion = ss.getRange(thisRow, 23).getValue();
-    var cost = ss.getRange(thisRow, 45).getValue();
-    */
     const status = getByHeader("(INTERNAL) Status", thisRow);   
 
     var designspecialist = getByHeader("(INTERNAL): DS Assigned", thisRow); 
@@ -475,11 +464,9 @@ function onEdit(e) {
     //Fix Job Number if it's missing
     try {
         if (status == "Received" || status == "In-Progress") {
-            if (jobnumber == "" || jobnumber == undefined || jobnumber == " " || jobnumber == null) {
-                var jnum = CreateJobNumber(submissiontime);
-                ss.getRange(thisRow, 6).setValue(jnum);
-                Logg('Job Number was missing, so the script fixed it.');
-            }
+            jobnumber = jobnumber ? jobnumber : CreateJobNumber(submissiontime);
+            ss.getRange(thisRow, 6).setValue(jobnumber);
+            Logg('Job Number was missing, so the script fixed it.');
         }
     }
     catch (err) {
@@ -490,8 +477,8 @@ function onEdit(e) {
     //----------------------------------------------------------------------------------------------------------------
     //Fix empty variables
     try {
-        if (designspecialist == "") designspecialist = "a Design Specialist";
-        if (projectname == "") projectname = "Your Project";
+        designspecialist = designspecialist ? designspecialist : "a Design Specialist";
+        projectname = projectname ? projectname : "Your Project";
     }
     catch (err) {
         Logg(err + " : Fixing empty or corrupted variables has failed for some reason.");
