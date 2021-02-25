@@ -92,9 +92,10 @@ var CalculateAverageTurnaround = function (sheet) {
  */
 var CalculateDuration = function (start, end) {
     try {
-        if (end == null || end == '' || end == undefined || end == ' ' || end == NaN || end == '[]') end = new Date(); //if supplied with nothing, set end time to now
-        if (start == null || start == '' || start == undefined || start == ' ' || start == NaN || start == '[]') start = new Date(end - 86400000); //if supplied with nothing, set start time to now minus 24 hours. 
-        let timeDiff = (end - start) / 1000; //Milliseconds to sec
+        end = end ? end : new Date();  //if supplied with nothing, set end time to now
+        start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
+
+        let timeDiff = Math.abs((end - start) / 1000); //Abs Value Milliseconds to sec
 
         let secs = Math.floor(timeDiff % 60); //Calc seconds
         timeDiff = Math.floor(timeDiff / 60); //Difference seconds to minutes

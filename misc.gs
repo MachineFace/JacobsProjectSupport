@@ -381,3 +381,65 @@ var isValidDate = function (d) {
 
 
 
+/**
+ * 
+ * Test Async
+ */
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Calculate Turnaround Time
+ * @param {time} start
+ * @param {time} end
+ * @returns {duration} formatted time
+ */
+function TimeDiff(start, end) {
+    try {
+        end = end ? end : new Date();  //if supplied with nothing, set end time to now
+        start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
+
+        let timeDiff = Math.abs((end - start) / 1000); //Milliseconds to sec
+
+        let secs = Math.floor(timeDiff % 60); //Calc seconds
+        timeDiff = Math.floor(timeDiff / 60); //Difference seconds to minutes
+        let secondsAsString = secs < 10 ? "0" + secs : secs + ""; //Pad with a zero
+
+        let mins = timeDiff % 60; //Calc mins 
+        timeDiff = Math.floor(timeDiff / 60); //Difference mins to hrs
+        let minutesAsString = mins < 10 ? "0" + mins : mins + ""; //Pad with a zero
+
+        let hrs = timeDiff % 24; //Calc hrs
+        timeDiff = Math.floor(timeDiff / 24); //Difference hrs to days
+        let days = timeDiff;
+
+        //Write
+        let formatted = days + ' ' + hrs + ':' + minutesAsString + ':' + secondsAsString;
+        Logger.log("Duration = " + formatted);
+
+        return new Promise(resolve => {
+          resolve(formatted);
+          Logger.log(formatted);
+        })
+    }
+    catch (err) {
+        Logg(err + " : Calculating the duration has failed for some reason.");
+    }
+}
+
+
+async function test() {
+    let first = await TimeDiff();
+    let second = await TimeDiff( new Date(1996,6,5), new Date(1941,2,9) );
+    Logger.log(first);
+    Logger.log(second);  
+
+    /*
+    //Paralell Processing
+    await Promise.all([
+        (async() => await TimeDiff())(),
+        (async() => await TimeDiff( new Date(1996,6,5), new Date(1941,2,9) ))(),
+    ])
+    */
+}
+
+
+
