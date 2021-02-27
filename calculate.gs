@@ -265,6 +265,166 @@ function CalculateDistribution() {
 }
 
 
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Calculate the Distribution in the JPS population
+ * Writes the distribution to a sheet, and returns the top ten most active users
+ * @returns {[string]} names
+ */
+function CalcDistributionByID() {
+    let sheets = SpreadsheetApp.getActiveSpreadsheet();
+    let emails = [];
+    let names = [];
+    let ids = [];
+
+    let pageRange = 'I4:K';
+    
+    //Get it all and push to lists
+    let plotter = sheetDict.plotter.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let other = sheetDict.othertools.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let creaform = sheetDict.creaform.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let othermill = sheetDict.othermill.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let vinyl = sheetDict.vinyl.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let haas = sheetDict.haas.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let shopbot = sheetDict.shopbot.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let adv = sheetDict.advancedlab.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let waterjet = sheetDict.waterjet.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let fablight = sheetDict.fablight.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let ultimaker = sheetDict.ultimaker.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+    let laser = sheetDict.laser.getRange(pageRange).getValues().filter(n => n[0])
+        .forEach((item,index) => {
+          emails.push( [index, item[0]] );
+          names.push( [index, item[1]] );
+          ids.push( [index, item[2].toString()] );
+    });
+
+    //Logger.log(emails);
+    //Logger.log(names);
+    //Logger.log(ids);
+
+    idList = [];
+    ids.forEach( item => {
+        idList.push(item[1]);
+    });
+    
+    let distribution = {}, max = 0, result = [];
+
+    idList.forEach(a => {
+        distribution[a] = (distribution[a] || 0) + 1;
+        if (distribution[a] > max) {
+            max = distribution[a];
+            result = [a];
+            return;
+        }
+        if (distribution[a] === max) {
+            result.push(a);
+        }
+    });
+  
+
+    //Fetch Top 10 Power Users
+    // Create items array
+    var counts = [];
+    var items = Object.keys(distribution).map(function (key) {
+        if (key != "" || key != undefined || key != null) {
+            counts.push(distribution[key]);
+            return [key, distribution[key]];
+        }
+    });
+
+    //Sort
+    counts.sort((a, b) => a - b);
+
+    // Sort the array based on the second element
+    items.sort(function (first, second) {
+        return second[1] - first[1];
+    });
+    Logger.log(items);
+    
+    // Create a new array with only the first 10 items and remove Tests
+    var chop = items.slice(0, 11);
+    //Logger.log(chop);
+    var loc;
+    chop.forEach(function(item) {
+        item.forEach(function(pair) {
+            if(pair == 'Test')  loc = chop.indexOf(item);
+        })
+    });
+    chop.splice(loc,1);
+
+    //Match IDS to emails write to sheet
+    let approvedEmails = [];
+    let studentList = sheetDict.approved.getRange('C2:C').getValues();
+    chop.forEach(item => {
+        let index = studentList.findIndex(item[0]);
+        let email = sheetDict.approved.getRange('B' + index).getValue();
+        approvedEmails.push(email);
+    });
+
+    //Query Store and return how much spent
+    
+    Logger.log(chop);
+    Logger.log(emails);
+    
+    return chop;
+    
+}
+
 
 
 /**

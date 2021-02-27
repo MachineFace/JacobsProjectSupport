@@ -525,17 +525,17 @@ function onEdit(e) {
                 material2Quantity, material2Name, shippingQuestion);
         }
         catch (err) {
-            Logg(err + " : Couldn't generate a ticket. Check docUrl / id and repair.");
+            Logger.log(err + " : Couldn't generate a ticket. Check docUrl / id and repair.");
         }
         try {
             var id = Ticket.getId();
             var doc = DocumentApp.openById(id);
             var docUrl = doc.getUrl();
             ss.getRange(thisRow, 5).setValue(docUrl);  //Push to cell
-            Logg("Ticket Created.");
+            Logger.log("Ticket Created.");
         }
         catch (err) {
-            Logg(err + " : Couldn't push ticket to the cell.");
+            Logger.log(err + " : Couldn't push ticket to the cell.");
         }
     }
 
@@ -1057,6 +1057,9 @@ var CreateTicket = function (e,
     }
     //Return Document to use later
     return doc;
+    // return new Promise(resolve => {
+    //       resolve(doc);
+    //     })
 }
 
 
