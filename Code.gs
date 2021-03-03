@@ -962,6 +962,12 @@ var CreateTicket = function (e,
         Logg(err + " : Could not fetch doc folder, or make ticket, or get body or docId.");
     }
 
+    try{
+        var barcode = GenerateBarCode(jobnumber);
+    } catch(err) {
+        Logger.log(err + ' : Couldnt create barcode for some reason.');
+    }
+
     //Parse for Individual Sheets
     var sheetname = SpreadsheetApp.getActiveSheet().getSheetName();
 
@@ -1009,11 +1015,13 @@ var CreateTicket = function (e,
     //Append Document with Info
     if (doc != undefined || doc != null || doc != NaN) {
         try {
+            
             body.insertHorizontalRule(0);
-            let header = body.insertParagraph(1, 'Name: ' + name.toString());
-            header.setHeading(DocumentApp.ParagraphHeading.HEADING1);
-            let sname = body.insertParagraph(2, 'Job Number: ' + +jobnumber.toString());
-            sname.setHeading(DocumentApp.ParagraphHeading.HEADING2);
+            body.insertParagraph(1, 'Name: ' + name.toString())
+                .setHeading(DocumentApp.ParagraphHeading.HEADING1);
+            body.insertParagraph(2, 'Job Number: ' + +jobnumber.toString())
+                .setHeading(DocumentApp.ParagraphHeading.HEADING2);
+            body.appendImage(barcode).setAltTitle("Barcode");
 
             // Create a two-dimensional array containing the cell contents.
             let cells = [
@@ -1041,6 +1049,7 @@ var CreateTicket = function (e,
             var docFile = DriveApp.getFileById(docId);
             DriveApp.removeFile(docFile);
             folder.next().addFile(docFile);
+            folder.next().addFile(barcode);
         }
         catch (err) {
             Logg(err + ": Couldn't delete the file from the drive folder. Sheet is still linked");
