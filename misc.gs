@@ -487,8 +487,36 @@ var CheckMissingAccessStudents = () => {
     catch(err) {
         Logger.log(err + ' : Couldnt check priority.');
     }
-    
 
+    //Return the names of the missing students
+    return names;
 }
 
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * 
+ */
+function Help() {
+    //go to some kind of help file that breaks down using JPS, step by step.
+    let info = [
+      "Note : All status changes trigger an email to the student except for 'CLOSED' status",
+      "1. New Project comes into a sheet and status will automatically be set to 'Received'.",
+      "Assign yourself as the DS / SS and fill in the materials as best you can.",
+      "2. Change the status to 'In-Progress' when you're ready to start the project.",
+      "Wait 30 seconds for the printable ticket to generate, and print it.",
+      "3. Fabricate the project.",
+      "4. When it's done, bag the project + staple the ticket to the bag and change the status to 'Completed'.",
+      "5. Select any cell in the row and choose 'Generate Bill' to bill the student. The status will change itself to 'Billed'.",
+      "6. If you don't need to bill the student, choose 'CLOSED' status.",
+      "7. If you need to cancel the job, choose 'Cancelled'. ",
+      "8. If the project can't be fabricated at all, choose 'FAILED', and email the student why it failed.",
+      "9. If you need student approval before proceeding, choose 'Pending Approval'. ",
+      "10. 'Missing Access' will be set automatically, and you should not choose this as an option.",
+      "11. If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. ",
+      "See Cody or Chris for additional help + protips."
+    ]
+    return info;
+}
 

@@ -37,13 +37,30 @@ function PopupCountUsers() {
     ui.alert(title, msg + count, ui.ButtonSet.OK);
 }
 
+function PopupCheckMissingAccessStudents() {
+    let ui = SpreadsheetApp.getUi();
+    let title = 'JPS Runtime Message';
+    let msg = 'Checking Missing Access Students on All Sheets : \\n';
+    let names = CheckMissingAccessStudents();
+    names.join(', ');
+    ui.alert(title, msg + names, ui.ButtonSet.OK);
+}
+
+function PopupHelp() {
+    let ui = SpreadsheetApp.getUi();
+    let title = 'JPS Runtime Message';
+    let msg = 'Help : \\n';
+    let info = Help();
+    ui.alert(title, msg + info, ui.ButtonSet.OK);
+}
+
 
 function BarMenu() {
     let ui = SpreadsheetApp.getUi()
       .createMenu('JPS Menu')
       .addItem('Generate Bill to Selected Student', 'BillFromSelected')
       .addSeparator()
-      .addItem('Check All Missing Access Students', 'CheckMissingAccessStudents')
+      .addItem('Check All Missing Access Students', 'PopupCheckMissingAccessStudents')
       .addSeparator()
       .addItem('Count Active Users', 'PopupCountUsers')
       .addSubMenu(SpreadsheetApp.getUi().createMenu('Calculate')
@@ -51,7 +68,7 @@ function BarMenu() {
           .addItem('Generate Distribution', 'CalculateDistribution')
           .addItem('Generate Standard Deviation', 'CalculateStandardDeviation'))
           .addSeparator()
-          .addItem('How to use JPS', 'helpJPS')
+          .addItem('How to use JPS : HELP', 'PopupHelp')
       //.addSeparator()
       //.addSubMenu(SpreadsheetApp.getUi().createMenu('Chris + Cody ONLY')
       //    .addItem('ENABLE JPS', 'EnableJPS')
@@ -215,6 +232,3 @@ function BillFromSelected() {
     Logger.log('Completed BillFromSelected');
 }
 
-function helpJPS() {
-    //go to some kind of help file that breaks down using JPS, step by step.
-}
