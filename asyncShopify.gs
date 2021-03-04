@@ -460,7 +460,7 @@ var AsyncGetShopifyOrdersList = async () => {
  * Unit Tests
  * This function tests all the above functions with default known values
  */
-var unitTest = async () => {
+var _unitTest = async () => {
 
     //Test Variables
     let materialsList = [ 'Fortus Red ABS-M30', 'Objet Polyjet VeroMagenta RGD851', null, 'Stratasys Dimension Soluble Support Material P400SR', null ];

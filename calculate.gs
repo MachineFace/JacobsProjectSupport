@@ -6,7 +6,7 @@
  * @param {spreadsheet} sheet
  * @returns {duration} formatted time
  */
-var CalculateAverageTurnaround = function (sheet) {
+var CalculateAverageTurnaround = (sheet) => {
 
     //Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
 
@@ -90,7 +90,7 @@ var CalculateAverageTurnaround = function (sheet) {
  * @param {time} end
  * @returns {duration} formatted time
  */
-var CalculateDuration = function (start, end) {
+var CalculateDuration = (start, end) => {
     try {
         end = end ? end : new Date();  //if supplied with nothing, set end time to now
         start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.

@@ -1,4 +1,6 @@
-//Build HTML for MaterialMenu()
+/**
+ * Build HTML for MaterialMenu()
+ */
 function BuildHTMLMenu() {
     let last = materialDict.advlab.getLastRow() - 1;
     let materialList = materialDict.advlab.getRange(2, 1, last, 1).getValues();
@@ -16,7 +18,9 @@ function BuildHTMLMenu() {
     return html;
 }
 
-//Popup for Materials
+/**
+ * Popup for Materials
+ */
 function MaterialMenu() {
 
     let ui = SpreadsheetApp.getUi();
@@ -29,6 +33,9 @@ function MaterialMenu() {
 
 }
 
+/**
+ * Creates a pop-up for counting users.
+ */
 function PopupCountUsers() {
     let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime Message';
@@ -37,6 +44,9 @@ function PopupCountUsers() {
     ui.alert(title, msg + count, ui.ButtonSet.OK);
 }
 
+/**
+ * Create a pop-up to check for missing students
+ */
 function PopupCheckMissingAccessStudents() {
     let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime Message';
@@ -47,21 +57,31 @@ function PopupCheckMissingAccessStudents() {
 }
 
 
-
+/**
+ * Builds HTML file for the modal pop-up from the help list.
+ */
 function BuildHTMLHELP() {
     let items = Help();
-    let html = '<h2><b> HELP MENU </b></h2><br/>';
+    let html = '<h2 style="text-align:center"><b> HELP MENU </b></h2>';
+        html += '<h3 style="font-family:Roboto">How to Use JPS : </h3>'
         html += '<hr>';
-        html += '<h3>How to Use JPS : </h3>'
-        html += '<ul style="font-family: Roboto">';
-        items.forEach(item => {
-            html += '<li>' + item + '</li>';
+        html += '<p>' + items[0] + '</p>';
+        html += '<ol style="font-family:Roboto font-size:10">';
+        items.forEach( (item, index) => {
+          if(index > 0 && index < items.length - 1) {
+              html += '<li>' + item + '</li>';
+          }
         })
-        html += '</ul>'
+        html += '</ol>'
+        html += '<p>' + items[items.length - 1] + '</p>';
+
     Logger.log(html);
     return html;
 }
 
+/**
+ * Creates a modal pop-up for the help text.
+ */
 function PopupHelp() {
     let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime HELP';
@@ -72,7 +92,9 @@ function PopupHelp() {
     let modal = ui.showModalDialog(htmlOutput, title);
 }
 
-
+/**
+ * Builds our JPS Menu and sets functions.
+ */
 function BarMenu() {
     let ui = SpreadsheetApp.getUi()
       .createMenu('JPS Menu')
@@ -86,7 +108,7 @@ function BarMenu() {
           .addItem('Generate Distribution', 'CalculateDistribution')
           .addItem('Generate Standard Deviation', 'CalculateStandardDeviation'))
           .addSeparator()
-          .addItem('How to use JPS : HELP', 'PopupHelp')
+          .addItem('Help', 'PopupHelp')
       //.addSeparator()
       //.addSubMenu(SpreadsheetApp.getUi().createMenu('Chris + Cody ONLY')
       //    .addItem('ENABLE JPS', 'EnableJPS')
@@ -94,6 +116,12 @@ function BarMenu() {
       .addToUi();
 }
 
+
+
+
+/**
+ * Bill from a selected line
+ */
 function BillFromSelected() {    
     
     //Could use a couple checks.  Cant be row 1 that is selected, and cant be more than one row selected.

@@ -51,7 +51,25 @@ var GenerateBarCode = (jobnumber) => {
     Logger.log(barcode);
     return barcode;
 
-    
-    
-
 }
+
+let _BarcodeUnitTest = () => {
+    try {
+        jobnumber = "20210301140515";   //Known working Test JobNumber
+        if(GenerateBarCode(jobnumber) !== null) {
+            Logger.log('PASSED');
+        }
+        if(GenerateBarCode('123kjnb345kjb3') !== null) {
+            Logger.log('PASSED');
+        }
+        if(GenerateBarCode('#@$%%$^*^&R@#$G') !== null) {
+            Logger.log('PASSED');
+        }
+    }
+    catch(err) {
+        Logger.log(err + ' : Failed Test')
+    }
+}
+
+
+
