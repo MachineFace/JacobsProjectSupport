@@ -43,6 +43,8 @@ function BarMenu() {
       .createMenu('JPS Menu')
       .addItem('Generate Bill to Selected Student', 'BillFromSelected')
       .addSeparator()
+      .addItem('Check All Missing Access Students', 'CheckMissingAccessStudents')
+      .addSeparator()
       .addItem('Count Active Users', 'PopupCountUsers')
       .addSubMenu(SpreadsheetApp.getUi().createMenu('Calculate')
           .addItem('Generate Metrics', 'Metrics')

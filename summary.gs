@@ -82,7 +82,7 @@ var DocToHtml = function (docId) {
  * Create Summary Email
  * This generates a summary email to all the Design Specialists (triggered daily at 6am)
  */
-var CreateSummaryEmail = function () {
+var CreateSummaryEmail = () => {
     //Fetch Summary Table
     var summarySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Summary');
     var last = summarySheet.getLastRow();

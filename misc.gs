@@ -444,3 +444,51 @@ async function test() {
 
 
 
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Check Students with Missing Access for their Priority Number if it exists.
+ */
+var CheckMissingAccessStudents = () => {
+    let accessPool = {
+        'Ultimaker' : sheetDict.ultimaker.getRange(2, 3, sheetDict.ultimaker.getLastRow() -1, 1).getValues(),
+        'Laser Cutter' : sheetDict.laser.getRange(2, 3, sheetDict.laser.getLastRow() -1, 1).getValues(),
+        'Fablight' : sheetDict.fablight.getRange(2, 3, sheetDict.fablight.getLastRow() -1, 1).getValues(),
+        'Waterjet' : sheetDict.waterjet.getRange(2, 3, sheetDict.waterjet.getLastRow() -1, 1).getValues(),
+        'Advanced Lab' : sheetDict.advancedlab.getRange(2, 3, sheetDict.advancedlab.getLastRow() -1, 1).getValues(),
+        'Shopbot' : sheetDict.shopbot.getRange(2, 3, sheetDict.shopbot.getLastRow() -1, 1).getValues(),
+        'Haas & Tormach' : sheetDict.haas.getRange(2, 3, sheetDict.haas.getLastRow() -1, 1).getValues(),
+        'Vinyl Cutter' : sheetDict.vinyl.getRange(2, 3, sheetDict.vinyl.getLastRow() -1, 1).getValues(),
+        'Othermill' : sheetDict.othermill.getRange(2, 3, sheetDict.othermill.getLastRow() -1, 1).getValues(),
+        'Other Tools' : sheetDict.othertools.getRange(2, 3, sheetDict.othertools.getLastRow() -1, 1).getValues(),
+    }
+
+    let ids = [];
+    let names = [];
+    for (let [page, values] of Object.entries(accessPool)) {
+        values.forEach( (item, index) => {
+            if(item == 'STUDENT NOT FOUND!') {
+                let i = index + 2;
+                //Logger.log('Item : ' + item  + ', Index : ' + i)
+                let id = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 11, 1, 1).getValue().toString();
+                ids.push(id);
+                let name = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 10, 1, 1).getValue().toString();
+                names.push(name);
+            }
+        })
+    }
+    Logger.log(ids)
+    Logger.log(names)
+    try {
+        ids.forEach(id => {
+            GetPriority(id);
+        });
+    }
+    catch(err) {
+        Logger.log(err + ' : Couldnt check priority.');
+    }
+    
+
+}
+
+
