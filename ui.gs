@@ -46,12 +46,30 @@ function PopupCheckMissingAccessStudents() {
     ui.alert(title, msg + names, ui.ButtonSet.OK);
 }
 
+
+
+function BuildHTMLHELP() {
+    let items = Help();
+    let html = '<h2><b> HELP MENU </b></h2><br/>';
+        html += '<hr>';
+        html += '<h3>How to Use JPS : </h3>'
+        html += '<ul style="font-family: Roboto">';
+        items.forEach(item => {
+            html += '<li>' + item + '</li>';
+        })
+        html += '</ul>'
+    Logger.log(html);
+    return html;
+}
+
 function PopupHelp() {
     let ui = SpreadsheetApp.getUi();
-    let title = 'JPS Runtime Message';
-    let msg = 'Help : \\n';
-    let info = Help();
-    ui.alert(title, msg + info, ui.ButtonSet.OK);
+    let title = 'JPS Runtime HELP';
+    var htmlOutput = HtmlService
+        .createHtmlOutput(BuildHTMLHELP())
+        .setWidth(640)
+        .setHeight(480);
+    let modal = ui.showModalDialog(htmlOutput, title);
 }
 
 
