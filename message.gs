@@ -136,6 +136,7 @@ class CreateMessage
             message += '<b>Pick-Up Hours:<br/>';
             message += 'Monday - Friday: 11am - 1pm & 5pm - 7pm.</b><br/><br/>'
             message += 'If you have any further questions or need assistance please email ' + InvokeDS("Staff", "emaillink") + '. <br/>';
+            message += '<p>Please take a moment to take our survey so we can improve JPS : <a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>';
             message += '<p>Best,<br />Jacobs Hall Staff</p>'; 
         return message;
     }
@@ -217,6 +218,7 @@ class CreateMessage
             message += '<br/>';
             message += 'If you have not picked up your parts, they can be picked up in-person.<br/><br/>';
             message += 'If you have any further questions or need assistance please email ' + InvokeDS("Staff", "emaillink") + '. <br/>';
+            message += '<p>Please take a moment to take our survey so we can improve JPS : <a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>';
             message += '<p>Best,<br />Jacobs Hall Staff</p>';
         return message;
     }
@@ -302,7 +304,11 @@ class CreateSubmissionMessage
     }
 }
 
-function testMakeMessage() {
+
+/**
+ * Unit Test for Making 'OnEdit' Messages
+ */
+let _testOnEditMessages = async () => {
   let message = new CreateMessage('Cody', 'Test Project', '101293874098', 'url',
     'material1URL', 45, 'TestPLA',
     'material2URL', 15, 'TestBreakaway',
@@ -321,18 +327,37 @@ function testMakeMessage() {
     Logger.log('FAILED' + message.failedMessage);
     Logger.log('R1' + message.rejectedByStudentMessage);
     Logger.log('BILLED' + message.billedMessage);
+
+    return Promise.resolve( message );
 }
 
-function testAnotherMessage() {
+/**
+ * Unit Test for Making 'OnformSubmit' messages
+ */
+let _testOnformSubmitMessages = async () => {
     let message = new CreateSubmissionMessage('Cody', 'SomeProject', 102938471431 );
     Logger.log('DS MESSAGE' + message.dsMessage);
     Logger.log('CREAFORM MESSAGE' + message.creaformMessage);
     Logger.log('MISSING ACCESS' + message.missingAccessMessage);
     Logger.log('SHIPPING MESSAGE' + message.shippingMessage);
+
+    return Promise.resolve( message );
 }
 
+/**
+ * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 
+ */
+let _testAllMessages = async () => {
 
-
+    Promise.all([
+        await _testOnEditMessages(),
+        await _testOnformSubmitMessages(),
+    ])
+    .then(Logger.log('Test Success'))
+    .catch(Error => {
+        Logger.log(Error + 'Failure');
+    }); 
+}
 
 
 

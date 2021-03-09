@@ -265,157 +265,64 @@ function CalculateDistribution() {
 }
 
 
+
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Calculate the Distribution in the JPS population
  * Writes the distribution to a sheet, and returns the top ten most active users
  * @returns {[string]} names
  */
-function CalcDistributionByID() {
-    let emails = [];
-    let names = [];
+var CalcDistributionByID = () => {
+    let sheets = {
+        'Ultimaker' : sheetDict.ultimaker.getRange(2, 9, sheetDict.ultimaker.getLastRow() -1, 3).getValues(),
+        'Laser Cutter' : sheetDict.laser.getRange(2, 9, sheetDict.laser.getLastRow() -1, 3).getValues(),
+        'Fablight' : sheetDict.fablight.getRange(2, 9, sheetDict.fablight.getLastRow() -1, 3).getValues(),
+        'Waterjet' : sheetDict.waterjet.getRange(2, 9, sheetDict.waterjet.getLastRow() -1, 3).getValues(),
+        'Advanced Lab' : sheetDict.advancedlab.getRange(2, 9, sheetDict.advancedlab.getLastRow() -1, 3).getValues(),
+        'Shopbot' : sheetDict.shopbot.getRange(2, 9, sheetDict.shopbot.getLastRow() -1, 3).getValues(),
+        'Haas & Tormach' : sheetDict.haas.getRange(2, 9, sheetDict.haas.getLastRow() -1, 3).getValues(),
+        'Vinyl Cutter' : sheetDict.vinyl.getRange(2, 9, sheetDict.vinyl.getLastRow() -1, 3).getValues(),
+        'Othermill' : sheetDict.othermill.getRange(2, 9, sheetDict.othermill.getLastRow() -1, 3).getValues(),
+        'Other Tools' : sheetDict.othertools.getRange(2, 9, sheetDict.othertools.getLastRow() -1, 3).getValues(),
+    }
+
     let ids = [];
+    let names = [];
+    let emails = [];
 
-    let pageRange = 'I4:K';
-    
-    //Get it all and push to lists
-    let plotter = sheetDict.plotter.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-            resolve(
-              emails.push( [index, item[0]] ),
-              names.push( [index, item[1]] ),
-              ids.push( [index, item[2].toString()] )
-            );
-          })
-    });
-    let other = sheetDict.othertools.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-            return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let creaform = sheetDict.creaform.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let othermill = sheetDict.othermill.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let vinyl = sheetDict.vinyl.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let haas = sheetDict.haas.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let shopbot = sheetDict.shopbot.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let adv = sheetDict.advancedlab.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let waterjet = sheetDict.waterjet.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let fablight = sheetDict.fablight.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let ultimaker = sheetDict.ultimaker.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
-    let laser = sheetDict.laser.getRange(pageRange).getValues().filter(n => n[0])
-        .forEach(async (item,index) => {
-          return new Promise(resolve => {
-              resolve(
-                  emails.push( [index, item[0]] ),
-                  names.push( [index, item[1]] ),
-                  ids.push( [index, item[2].toString()] ),
-              );
-            })
-    });
+    for (let [page, values] of Object.entries(sheets)) {
+        values.forEach( (item, index) => {          
+            let i = index + 2;
+            //Logger.log('Item : ' + item  + ', Index : ' + i); 
 
-    //Logger.log(emails);
-    //Logger.log(names);
-    //Logger.log(ids);
+            let email = item[0];
+            if(email !== null || email !== undefined || email != "") {
+                emails.push(email);
+            } 
+            
+
+            let name = item[1];
+            if(name !== null || name !== undefined || name != "") {
+                names.push(name);
+            }
+            
+
+            let id = item[2];
+            if(id !== null || id !== undefined || id != "" || id === typeof Number) {
+                ids.push(id.toString());
+            }
+                 
+        })
+    }
     
-    idList = [];
-    ids.forEach( async item => {
-        return new Promise(resolve => {
-              resolve(
-                  idList.push(item[1])
-              );
-            }) 
-    });
+    let cleanedIDS = ids.filter(n => n)
+    Logger.log(cleanedIDS);
+    
     
     let distribution = {}, max = 0, result = [];
 
-    idList.forEach(a => {
+    cleanedIDS.forEach(a => {
         distribution[a] = (distribution[a] || 0) + 1;
         if (distribution[a] > max) {
             max = distribution[a];
@@ -445,29 +352,25 @@ function CalcDistributionByID() {
     //Match IDS to emails
     let sortedEmails = [];
     let studentList = sheetDict.approved.getRange('C2:C').getValues();
-    chop.forEach(item => {
-        let index = studentList.findIndex(item[0]);
+    chop.forEach(async item => {
+        let index = studentList.findIndex(item[0]) + 2;
         let email = sheetDict.approved.getRange('B' + index).getValue();
-        sortedEmails.push(email);
+        return await sortedEmails.push(email);
     });
 
     //Query Store and return how much spent
     Logger.log(chop);
     Logger.log(sortedEmails);
-
+    
     let spending = [];
     sortedEmails.forEach(async email => {
-        return new Promise(resolve => {
-          resolve(
-              spending.push(GetShopifyCustomerByEmail(email).total_spent)
-          )
-        });
+        return await spending.push(GetShopifyCustomerByEmail(email).total_spent) 
     });
 
     Logger.log(spending);
     
     return chop;
-    
+  
 }
 
 

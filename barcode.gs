@@ -1,5 +1,8 @@
 
-
+/**
+ * Generate a barcode png image from a jobnumber.
+ * Documentation at "https://github.com/metafloor/bwip-js/wiki/Online-Barcode-API"
+ */
 var GenerateBarCode = (jobnumber) => {
 
     //jobnumber = "20210301140515";   //Test JobNumber

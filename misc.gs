@@ -474,19 +474,14 @@ var CheckMissingAccessStudents = () => {
                 ids.push(id);
                 let name = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 10, 1, 1).getValue().toString();
                 names.push(name);
+
+                let priority = GetPriority(id);
+                SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 3, 1, 1).setValue(priority);
             }
         })
     }
     Logger.log(ids)
     Logger.log(names)
-    try {
-        ids.forEach(id => {
-            GetPriority(id);
-        });
-    }
-    catch(err) {
-        Logger.log(err + ' : Couldnt check priority.');
-    }
 
     //Return the names of the missing students
     return names;

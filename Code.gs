@@ -519,7 +519,7 @@ function onEdit(e) {
                 priority,
                 jobnumber,
                 submissiontime,
-                name, sid,
+                name, sid, email,
                 projectname,
                 material1Quantity, material1Name,
                 material2Quantity, material2Name, shippingQuestion);
@@ -934,6 +934,7 @@ var CreateJobNumber = function (date) {
  * @param {time} submissiontime
  * @param {string} name
  * @param {number} sid
+ * @param {string} email
  * @param {string} projectname
  * @param {number} material1Quantity
  * @param {string} material1Name
@@ -947,7 +948,7 @@ var CreateTicket = function (e,
     priority,
     jobnumber,
     submissiontime,
-    name, sid,
+    name, sid, email,
     projectname,
     material1Quantity, material1Name,
     material2Quantity, material2Name, shippingQuestion) {
@@ -1070,7 +1071,6 @@ var CreateTicket = function (e,
     //       resolve(doc);
     //     })
 }
-
 
 
 
