@@ -6,17 +6,16 @@
  * @param {spreadsheet} sheet
  * @returns {duration} formatted time
  */
-var CalculateAverageTurnaround = (sheet) => {
+const CalculateAverageTurnaround = (sheet) => {
 
     //Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
-
-    var last = sheet.getLastRow();
-    var completionTimes = sheet.getRange(3, 44, last, 1).getValues(); //Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
+    let last = sheet.getLastRow();
+    let completionTimes = sheet.getRange(3, 44, last, 1).getValues(); //Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
 
     //Get list of times and remove all the Bullshit
-    var revisedTimes = [];
+    let revisedTimes = [];
     try {
-        for (var i = 0; i < completionTimes.length; i++) {
+        for (let i = 0; i < completionTimes.length; i++) {
             let time = completionTimes[i][0];
             if (time != '' || time != undefined || time != null || time != ' ' || time != NaN || time != '[]') {
                 let ds = time.replace(" ", ":");
@@ -33,9 +32,9 @@ var CalculateAverageTurnaround = (sheet) => {
     }
 
     //Convert everything to seconds
-    var totals = [];
+    let totals = [];
     try {
-        for (var i = 0; i < revisedTimes.length; i++) {
+        for (let i = 0; i < revisedTimes.length; i++) {
             //Time
             let days = (+revisedTimes[i][0] * 24 * 60); //days to hours to minutes
             let hours = (+revisedTimes[i][1] * 60); //hours to minutes
@@ -51,16 +50,16 @@ var CalculateAverageTurnaround = (sheet) => {
     }
 
     //sum all the totals
-    var totalTotal = 0;
-    for (var i = 0; i < totals.length; i++) {
+    let totalTotal = 0;
+    for (let i = 0; i < totals.length; i++) {
         totalTotal += totals[i];
     }
 
     //Average the totals (a list of times in minutes)
-    var averageMins = totalTotal / totals.length;
+    let averageMins = totalTotal / totals.length;
 
     //Recalculate average minutes into readable duration
-    var averageRecalc = averageMins;
+    let averageRecalc = averageMins;
 
     let mins = parseInt((averageRecalc % 60), 10); //Calc mins
     averageRecalc = Math.floor(averageRecalc / 60); //Difference mins to hrs
@@ -90,7 +89,7 @@ var CalculateAverageTurnaround = (sheet) => {
  * @param {time} end
  * @returns {duration} formatted time
  */
-var CalculateDuration = (start, end) => {
+const CalculateDuration = (start, end) => {
     try {
         end = end ? end : new Date();  //if supplied with nothing, set end time to now
         start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
@@ -132,7 +131,7 @@ var CalculateDuration = (start, end) => {
  * Mimic =COUNTUNIQUE('Canon Plotter'!J3:J,'Other Tools'!J3:J,Creaform!J3:J,Othermill!J3:J,'Vinyl Cutter'!J3:J,'Haas & Tormach'!J3:J,Shopbot!J5:J,'Advanced Lab'!J3:J,Waterjet!J3:J,Fablight!J3:J,Ultimaker!J3:J,'Laser Cutter'!J3:J)
  * @returns {number} count
  */
-function CountActiveUsers() {
+const CountActiveUsers = () => {
     let people = [];
     let nameRange = 'J3:J';
     let plotter = sheetDict.plotter.getRange(nameRange).getValues();
@@ -181,7 +180,7 @@ function CountActiveUsers() {
  * Writes the distribution to a sheet, and returns the top ten most active users
  * @returns {[string]} names
  */
-function CalculateDistribution() {
+const CalculateDistribution = () => {
     let sheets = SpreadsheetApp.getActiveSpreadsheet();
     let people = [];
     let nameRange = 'J3:J';
@@ -211,9 +210,9 @@ function CalculateDistribution() {
     ultimaker.forEach(item => people.push(item[0]));
     laser.forEach(item => people.push(item[0]));
 
-    var distribution = {}, max = 0, result = [];
+    let distribution = {}, max = 0, result = [];
 
-    people.forEach(function (a) {
+    people.forEach((a) => {
         distribution[a] = (distribution[a] || 0) + 1;
         if (distribution[a] > max) {
             max = distribution[a];
@@ -228,8 +227,8 @@ function CalculateDistribution() {
 
     //Fetch Top 10 Power Users
     // Create items array
-    var counts = [];
-    var items = Object.keys(distribution).map(function (key) {
+    let counts = [];
+    let items = Object.keys(distribution).map(function (key) {
         if (key != "" || key != undefined || key != null) {
             counts.push(distribution[key]);
             return [key, distribution[key]];
@@ -238,23 +237,23 @@ function CalculateDistribution() {
 
     //Log to sheet
     counts.sort((a, b) => a - b);
-    for (var i = 0; i < max; i++) {
+    for (let i = 0; i < max; i++) {
         let rownum = 2 + i;
         if (counts[i] < 2000) sheetDict.backgrounddata.getRange('V' + rownum).setValue(counts[i]);
     }
 
 
     // Sort the array based on the second element
-    items.sort(function (first, second) {
+    items.sort((first, second) => {
         return second[1] - first[1];
     });
 
     // Create a new array with only the first 10 items and remove Tests
-    var chop = items.slice(1, 12);
+    let chop = items.slice(1, 12);
     //Logger.log(chop);
-    var loc;
-    chop.forEach(function(item) {
-        item.forEach(function(pair) {
+    let loc;
+    chop.forEach((item) => {
+        item.forEach((pair) => {
             if(pair == 'Test')  loc = chop.indexOf(item);
         })
     });
