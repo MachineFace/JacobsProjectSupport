@@ -6,8 +6,8 @@
  * AUTOMATION : Update Prices
  * This function reaches out to Jacobs Store (NOT USING SHOPIFY API), fetches product prices and writes them to each 'StoreItem' sheet.
  */
-var UpdatePrices = function () {
-    var sheets = [
+const UpdatePrices = () => {
+    const sheets = [
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('AdvLabStoreItems'),
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UltimakerStoreItems'),
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FablightStoreItems'),
@@ -32,7 +32,7 @@ var UpdatePrices = function () {
  * AUTOMATION : Write the price to sheet
  * Used in "UpdatePriced()" function
  */
-var WritePrice = function (sheet) {
+const WritePrice = (sheet) => {
     let prices = [];
     let last = sheet.getLastRow() - 1;
     let sheetRange = sheet.getRange(2, 2, last, 1).getValues();
@@ -53,7 +53,7 @@ var WritePrice = function (sheet) {
  * @param {string} url
  * @return {float} price
  */
-var GetPriceFromShopify = function (url) {
+const GetPriceFromShopify = (url) => {
   var price;
   try
   {
@@ -87,8 +87,8 @@ var GetPriceFromShopify = function (url) {
 /**
  * AUTOMATION : Update Each Sheet with Product IDs : Uses FetchProductIDInProductURL()
  */
-var UpdateProductID = function () {
-    var sheets = [
+const UpdateProductID = () => {
+    const sheets = [
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('AdvLabStoreItems'),
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UltimakerStoreItems'),
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FablightStoreItems'),
@@ -110,23 +110,25 @@ var UpdateProductID = function () {
     }
     */
 }
+
+
 /**
  * AUTOMATION : Parses html to find the Product ID. (NOT USING SHOPIFY API)
  */
-var FetchProductIDInProductURL = function (sheet) {
-    var ids = [];
+const FetchProductIDInProductURL = (sheet) => {
+    let ids = [];
 
     let start = '"product":{"id":';
     let end = ',"gid":"gid:';
 
-    var headers = { "Content-Type" : "application/json", "Authorization": "Basic " };
-    var params = { "method" : "GET", "headers" : headers, "contentType" : "application/json", followRedirects : true, muteHttpExceptions : true };
+    let headers = { "Content-Type" : "application/json", "Authorization": "Basic " };
+    let params = { "method" : "GET", "headers" : headers, "contentType" : "application/json", followRedirects : true, muteHttpExceptions : true };
 
     //Loop through sheet and extract id, write to list
     let urls = sheet.getRange(2, 2, sheet.getLastRow() -1, 1).getValues();
     Logger.log(urls);
     try {
-        for(var i = 0; i < urls.length - 2; i++) {
+        for(let i = 0; i < urls.length - 2; i++) {
             let url = urls[i][0];
             let html = UrlFetchApp.fetch(url, params).getContentText();
             let searchStart = html.search(start);
@@ -139,7 +141,7 @@ var FetchProductIDInProductURL = function (sheet) {
       Logger.log('Sheet Oops');
     }
     //Write to Sheet
-    for(var i = 0; i < ids.length; i++) {
+    for(let i = 0; i < ids.length; i++) {
         sheet.getRange(2 + i, 4, 1, 1).setValue(ids[i]);
     }
 
