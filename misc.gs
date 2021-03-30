@@ -5,7 +5,7 @@
  * Delete Files older than some number of days
  * @param {number} RetentionPeriod
  */
-var DeleteOldFiles = function () {
+const DeleteOldFiles = () => {
     var folder = DriveApp.getFoldersByName("Job Forms");
 
     function processFolder(folder) {
@@ -28,7 +28,7 @@ var DeleteOldFiles = function () {
  * Format cell to fix overlap issue
  * @param {cell} cell
  */
-var formatCell = function (cell) {
+const formatCell = (cell) => {
     try {
         let strategy = SpreadsheetApp.WrapStrategy.CLIP;
         cell.setWrapStrategy(strategy);
@@ -47,7 +47,7 @@ var formatCell = function (cell) {
  * @param {string} colName
  * @param {number} row
  */
-var getByHeader = function (colName, row) {
+const getByHeader = (colName, row) => {
     var sheet = SpreadsheetApp.getActiveSheet();
     var data = sheet.getDataRange().getValues();
     var col = data[0].indexOf(colName);
@@ -63,7 +63,7 @@ var getByHeader = function (colName, row) {
  * @param {string} message
  * @returns message to specific logger sheet
  */
-var Logg = function (message) {
+const Logg = (message) => {
     let logger = sheetDict.logger;
     let thisRow = logger.getLastRow() + 1;
     let time = new Date();
@@ -83,7 +83,7 @@ var Logg = function (message) {
 /** 
 * Materials Class function
 */
-var materials = function (index, quantity, name, url) {
+const materials = (index, quantity, name, url) => {
     this.index = index;
     this.quantity = quantity;
     this.name = name;
@@ -100,7 +100,7 @@ var materials = function (index, quantity, name, url) {
  * Creates Time-Driven Triggers : ONLY RUN ONCE AFTER DELETING PREVIOUS TRIGGERS. DO NOT DELETE
  * Used in EnableJPS()
  */
-var CreateTimeDrivenTrigger = function () {
+const CreateTimeDrivenTrigger = () => {
     // Trigger every 6 hours.
     //ScriptApp.newTrigger('myFunction').timeBased().everyHours(6).create();
 
@@ -126,7 +126,7 @@ var CreateTimeDrivenTrigger = function () {
  * Remove Triggers when Disabling JPS - DO NOT DELETE
  * Used in 'DisableJPS()'
  */
-var RemoveTimedTriggers = function () {
+const RemoveTimedTriggers = () => {
     let triggers = ScriptApp.getProjectTriggers();
     try {
         for (var i = 0; i < triggers.length; i++) {
@@ -153,10 +153,10 @@ var RemoveTimedTriggers = function () {
  * Turn OFF JPS - DO NOT DELETE
  * Used in conjunction with 'EnableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
-var DisableJPS = function () {
+const DisableJPS = () => {
     //Disable Forms
     try {
-        for (var name in formDict) {
+        for (let name in formDict) {
             FormApp.openById(formDict[name]).setAcceptingResponses(false);
             Logger.log(name + ' : ', formDict[name] + ' IS NOW DISABLED.');
         }
@@ -179,10 +179,10 @@ var DisableJPS = function () {
  * Turn ON JPS - DO NOT DELETE
  * Used in conjunction with 'DisableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
-var EnableJPS = function () {
+const EnableJPS = () => {
     //Disable Forms
     try {
-        for (var name in formDict) {
+        for (let name in formDict) {
             FormApp.openById(formDict[name]).setAcceptingResponses(true);
             Logger.log(name + ' : ', formDict[name] + ' IS NOW ENABLED.');
         }
@@ -212,10 +212,10 @@ var EnableJPS = function () {
  * @param {string} column
  * @param {any} data
  */
-var FindDataInColumn = function (sheet, column, data) {
-    var indexes = [];
-    var values = sheet.getRange(column + ":" + column).getValues();  // like A:A
-    var row = 2;
+const FindDataInColumn = (sheet, column, data) => {
+    let indexes = [];
+    let values = sheet.getRange(column + ":" + column).getValues();  // like A:A
+    let row = 2;
 
     while (values[row] && values[row][0] !== data) row++;
     if (values[row][0] === data)
@@ -235,12 +235,12 @@ var FindDataInColumn = function (sheet, column, data) {
  * @param {any} data
  * @returns {[int]} column indexes
  */
-var FindDataInRow = function (sheet, data) {
-    var indexes = [];
-    var rows = sheet.getDataRange.getValues();
+const FindDataInRow = (sheet, data) => {
+    let indexes = [];
+    let rows = sheet.getDataRange.getValues();
 
     //Loop through all the rows and return a matching index
-    for (var r = 1; r < rows.length; r++) {
+    for (let r = 1; r < rows.length; r++) {
         let index = rows[r].indexOf(data) + 1;
         indexes.push(index);
         /*
@@ -261,7 +261,7 @@ var FindDataInRow = function (sheet, data) {
  * Recolors a single row on a sheet based on 'Status' ***DEFUNCT***
  * @param {row} wholerow
  */
-var Recolor = function (wholerow, status, shippingQuestion) {
+const Recolor = (wholerow, status, shippingQuestion) => {
     try {   
         switch (shippingQuestion) {
             case 'Yes':
@@ -351,11 +351,10 @@ var Recolor = function (wholerow, status, shippingQuestion) {
  * Find an index in an array
  * @param {any} search
  */
-Array.prototype.findIndex = function (search) {
+Array.prototype.findIndex = (search) => {
     if (search == "") return false;
-    for (var i = 0; i < this.length; i++)
+    for (let i = 0; i < this.length; i++)
         if (this[i].toString().indexOf(search) > -1) return i;
-
     return -1;
 }
 
@@ -367,7 +366,7 @@ Array.prototype.findIndex = function (search) {
  * @param {date} d
  * @returns {boolean} b
  */
-var isValidDate = function (d) {
+const isValidDate = (d) => {
     if (Object.prototype.toString.call(d) !== "[object Date]") return false;
     return !isNaN(d.getTime());
 }
@@ -392,7 +391,7 @@ var isValidDate = function (d) {
  * @param {time} end
  * @returns {duration} formatted time
  */
-function TimeDiff(start, end) {
+const TimeDiff = (start, end) => {
     try {
         end = end ? end : new Date();  //if supplied with nothing, set end time to now
         start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
@@ -427,7 +426,7 @@ function TimeDiff(start, end) {
 }
 
 
-async function test() {
+const _test = async () => {
     let first = await TimeDiff();
     let second = await TimeDiff( new Date(1996,6,5), new Date(1941,2,9) );
     Logger.log(first);
@@ -449,7 +448,7 @@ async function test() {
  * ----------------------------------------------------------------------------------------------------------------
  * Check Students with Missing Access for their Priority Number if it exists.
  */
-var CheckMissingAccessStudents = () => {
+const CheckMissingAccessStudents = () => {
     let accessPool = {
         'Ultimaker' : sheetDict.ultimaker.getRange(2, 3, sheetDict.ultimaker.getLastRow() -1, 1).getValues(),
         'Laser Cutter' : sheetDict.laser.getRange(2, 3, sheetDict.laser.getLastRow() -1, 1).getValues(),
@@ -493,7 +492,7 @@ var CheckMissingAccessStudents = () => {
  * ----------------------------------------------------------------------------------------------------------------
  * 
  */
-function Help() {
+const Help = () => {
     //go to some kind of help file that breaks down using JPS, step by step.
     let info = [
       "Note : All status changes trigger an email to the student except for 'CLOSED' status",

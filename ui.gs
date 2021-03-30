@@ -1,7 +1,7 @@
 /**
  * Build HTML for MaterialMenu()
  */
-function BuildHTMLMenu() {
+const BuildHTMLMenu = () => {
     let last = materialDict.advlab.getLastRow() - 1;
     let materialList = materialDict.advlab.getRange(2, 1, last, 1).getValues();
     Logger.log(materialList);
@@ -21,11 +21,11 @@ function BuildHTMLMenu() {
 /**
  * Popup for Materials
  */
-function MaterialMenu() {
+const MaterialMenu = () => {
 
     let ui = SpreadsheetApp.getUi();
     // Display a modal dialog box with custom HtmlService content.
-    var htmlOutput = HtmlService
+    let htmlOutput = HtmlService
         .createHtmlOutput(BuildHTMLMenu())
         .setWidth(640)
         .setHeight(480);
@@ -36,7 +36,7 @@ function MaterialMenu() {
 /**
  * Creates a pop-up for counting users.
  */
-function PopupCountUsers() {
+const PopupCountUsers = () => {
     let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime Message';
     let msg = 'Students Currently Using JPS : ';
@@ -47,7 +47,7 @@ function PopupCountUsers() {
 /**
  * Create a pop-up to check for missing students
  */
-function PopupCheckMissingAccessStudents() {
+const PopupCheckMissingAccessStudents = () => {
     let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime Message';
     let msg = 'Checking Missing Access Students on All Sheets : \\n';
@@ -60,7 +60,7 @@ function PopupCheckMissingAccessStudents() {
 /**
  * Builds HTML file for the modal pop-up from the help list.
  */
-function BuildHTMLHELP() {
+const BuildHTMLHELP = () => {
     let items = Help();
     let html = '<h2 style="text-align:center"><b> HELP MENU </b></h2>';
         html += '<h3 style="font-family:Roboto">How to Use JPS : </h3>'
@@ -82,10 +82,10 @@ function BuildHTMLHELP() {
 /**
  * Creates a modal pop-up for the help text.
  */
-function PopupHelp() {
+const PopupHelp = () => {
     let ui = SpreadsheetApp.getUi();
     let title = 'JPS Runtime HELP';
-    var htmlOutput = HtmlService
+    let htmlOutput = HtmlService
         .createHtmlOutput(BuildHTMLHELP())
         .setWidth(640)
         .setHeight(480);
@@ -95,7 +95,7 @@ function PopupHelp() {
 /**
  * Builds our JPS Menu and sets functions.
  */
-function BarMenu() {
+const BarMenu = () => {
     let ui = SpreadsheetApp.getUi()
       .createMenu('JPS Menu')
       .addItem('Generate Bill to Selected Student', 'BillFromSelected')
@@ -122,7 +122,7 @@ function BarMenu() {
 /**
  * Bill from a selected line
  */
-function BillFromSelected() {    
+const BillFromSelected = () => {    
     
     //Could use a couple checks.  Cant be row 1 that is selected, and cant be more than one row selected.
     //also check that its not the summary page

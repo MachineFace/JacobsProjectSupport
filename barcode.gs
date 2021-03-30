@@ -3,7 +3,7 @@
  * Generate a barcode png image from a jobnumber.
  * Documentation at "https://github.com/metafloor/bwip-js/wiki/Online-Barcode-API"
  */
-var GenerateBarCode = (jobnumber) => {
+const GenerateBarCode = (jobnumber) => {
 
     //jobnumber = "20210301140515";   //Test JobNumber
     //jobnumber = 20210224175306;
@@ -56,17 +56,17 @@ var GenerateBarCode = (jobnumber) => {
 
 }
 
-let _BarcodeUnitTest = () => {
+const _BarcodeUnitTest = () => {
     try {
         jobnumber = "20210301140515";   //Known working Test JobNumber
         if(GenerateBarCode(jobnumber) !== null) {
-            Logger.log('PASSED');
+            Logger.log('PASSED'); //Should PASS
         }
         if(GenerateBarCode('123kjnb345kjb3') !== null) {
-            Logger.log('PASSED');
+            Logger.log('PASSED'); //Should PASS
         }
         if(GenerateBarCode('#@$%%$^*^&R@#$G') !== null) {
-            Logger.log('PASSED');
+            Logger.log('PASSED'); //Should FAIL
         }
     }
     catch(err) {

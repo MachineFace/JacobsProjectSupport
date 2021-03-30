@@ -7,7 +7,7 @@
  * @param {dataRange} dataRange
  * @returns {html} htmlBody
  */
-var getEmailHtml = function (dataRange) {
+var getEmailHtml = (dataRange) => {
     var htmlTemplate = HtmlService.createTemplateFromFile("tabletemplate.html");
     htmlTemplate.items = dataRange;
     var htmlBody = htmlTemplate.evaluate().getContent();
@@ -22,11 +22,11 @@ var getEmailHtml = function (dataRange) {
  * @param {any} values
  * @returns {[any]} list
  */
-var getData = function (values) {
+var getData = (values) => {
     values.shift(); //remove headers
-    var items = [];
+    let items = [];
     values.forEach(function (value) {
-        var item = {};
+        let item = {};
         item.status = value[0];
         item.ds = value[1];
         item.approved = value[2];
@@ -64,10 +64,10 @@ var getData = function (values) {
  * @param {string} docId
  * @return {string} text 
  */
-var DocToHtml = function (docId) {
+var DocToHtml = (docId) => {
     // Downloads a Google Doc as an HTML string.
-    var url = 'https://docs.google.com/feeds/download/documents/export/Export?id=' + docId + '&exportFormat=html';
-    var param = {
+    let url = 'https://docs.google.com/feeds/download/documents/export/Export?id=' + docId + '&exportFormat=html';
+    let param = {
         method: 'get',
         headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
         muteHttpExceptions: true,
@@ -84,12 +84,12 @@ var DocToHtml = function (docId) {
  */
 var CreateSummaryEmail = () => {
     //Fetch Summary Table
-    var summarySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Summary');
-    var last = summarySheet.getLastRow();
-    var dataRange = summarySheet.getRange(1, 1, last, 22).getValues();
+    let summarySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Summary');
+    let last = summarySheet.getLastRow();
+    let dataRange = summarySheet.getRange(1, 1, last, 22).getValues();
 
     //Start of email to the Design Specialists
-    var summaryText;
+    let summaryText;
     summaryText = '<p>Hello!</p> ';
     summaryText += '<p>Here is a summary of all the recent submissions.<br />';
     summaryText += 'If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>. </p>';
@@ -98,11 +98,11 @@ var CreateSummaryEmail = () => {
     summaryText += 'SUMMARY:';
     summaryText += '<br/>';
 
-    var items = getData(dataRange);
-    var htmlBodyText = getEmailHtml(items);
+    let items = getData(dataRange);
+    let htmlBodyText = getEmailHtml(items);
 
     //Email Targets
-    //var hardcodeTarget = 'adamhutz@berkeley.edu, garygin@berkeley.edu, npanditi@berkeley.edu, joeygottbrath@berkeley.edu';
+    //let hardcodeTarget = 'adamhutz@berkeley.edu, garygin@berkeley.edu, npanditi@berkeley.edu, joeygottbrath@berkeley.edu';
 
     //Email DS
     GmailApp.sendEmail('codyglen@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
