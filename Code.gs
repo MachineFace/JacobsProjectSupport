@@ -110,7 +110,7 @@ const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of m
  * Trigger 1 - On Submission
  * @param {Event} e
  */
-function onFormSubmit(e) {
+const onFormSubmit = async (e) => {
 
     //Set status to RECEIVED on new submission
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -336,7 +336,7 @@ function onFormSubmit(e) {
  * Trigger 2 - On Edit
  * @param {Event} e
  */
-function onEdit(e) {
+const onEdit = async (e) => {
     //Fetch Data from Sheets
     var ss = e.range.getSheet();
     var spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -362,7 +362,7 @@ function onEdit(e) {
 
     //----------------------------------------------------------------------------------------------------------------
     //Count Active Users & Post to a cell / Fetch top 10
-    var users = CountActiveUsers();
+    var users = await CountActiveUsers();
     sheetDict.data.getRange('C4').setValue(users);
 
     //----------------------------------------------------------------------------------------------------------------
@@ -395,7 +395,7 @@ function onEdit(e) {
 
     //----------------------------------------------------------------------------------------------------------------
     //Check Priority
-    var priority = GetPriority(ss.getRange(thisRow, 11).getValue());
+    var priority = await GetPriority(ss.getRange(thisRow, 11).getValue());
     ss.getRange("C" + thisRow).setValue(priority);
 
 
@@ -426,23 +426,23 @@ function onEdit(e) {
     //Materials
     const material1Quantity = ss.getRange(thisRow, 13).getValue();
     const material1Name = ss.getRange(thisRow, 14).getValue();
-    const material1URL = new LookupProductID(material1Name).link;
+    const material1URL = await new LookupProductID(material1Name).link;
 
     const material2Quantity = ss.getRange(thisRow, 15).getValue();
     const material2Name = ss.getRange(thisRow, 16).getValue();
-    const material2URL = new LookupProductID(material2Name).link;
+    const material2URL = await new LookupProductID(material2Name).link;
 
     const material3Quantity = ss.getRange(thisRow, 17).getValue();
     const material3Name = ss.getRange(thisRow, 18).getValue();
-    const material3URL = new LookupProductID(material3Name).link;
+    const material3URL = await new LookupProductID(material3Name).link;
 
     const material4Quantity = ss.getRange(thisRow, 19).getValue();
     const material4Name = ss.getRange(thisRow, 20).getValue();
-    const material4URL = new LookupProductID(material4Name).link;
+    const material4URL = await new LookupProductID(material4Name).link;
 
     const material5Quantity = ss.getRange(thisRow, 21).getValue(); 
     const material5Name = ss.getRange(thisRow, 22).getValue();
-    const material5URL = new LookupProductID(material5Name).link;
+    const material5URL = await new LookupProductID(material5Name).link;
 
 
     if (material1Name != "") var mat1 = true;
@@ -514,7 +514,7 @@ function onEdit(e) {
     //Trigger for generating a "Ticket"
     if (status == "Received" || status == "In-Progress" || status == "Pending Approval") {
         try {
-            var Ticket = CreateTicket(e,
+            var Ticket = await CreateTicket(e,
                 designspecialist,
                 priority,
                 jobnumber,
@@ -545,7 +545,7 @@ function onEdit(e) {
     //Make an approval form on demand
     // Create a new form, then add a checkbox question, a multiple choice question,
     if (status == "Pending Approval") {
-        var approvalURL = CreateApprovalForm(name, jobnumber, cost);
+        var approvalURL = await CreateApprovalForm(name, jobnumber, cost);
         Logg('Approval Form generated and sent to user.');
     }
 
@@ -707,9 +707,9 @@ function onEdit(e) {
         }
 
         //Fetch Customer and Products
-        var customer = GetShopifyCustomerByEmail(email);
-        var package = new PackageMaterials(material1Name, material1Quantity, material2Name, material2Quantity, material3Name, material3Quantity, material4Name, material4Quantity, material5Name, material5Quantity);
-        var formattedMats = new MakeLineItems(package);
+        var customer = await GetShopifyCustomerByEmail(email);
+        var package = await new PackageMaterials(material1Name, material1Quantity, material2Name, material2Quantity, material3Name, material3Quantity, material4Name, material4Quantity, material5Name, material5Quantity);
+        var formattedMats = await new MakeLineItems(package);
 
 
         var boxTitle = 'Generate Bill to Shopify';
@@ -739,7 +739,7 @@ function onEdit(e) {
             response = Browser.msgBox(boxTitle, boxMsg, Browser.Buttons.YES_NO_CANCEL);
             if (response == "yes") {
                 Logger.log('User clicked "Yes".');
-                var order = new CreateShopifyOrder(customer, jobnumber, package, formattedMats);
+                var order = await new CreateShopifyOrder(customer, jobnumber, package, formattedMats);
                 ss.getRange('AZ' + thisRow).setValue(false);
                 ss.getRange('A' + thisRow).setValue('Billed');
                 Logger.log(order.toString());
@@ -762,10 +762,10 @@ function onEdit(e) {
 
     //Lastly Run these Metrics ignoring first 2 rows:
     if(thisRow > 3) {
-        Metrics();
+        await Metrics();
         Logg('Recalculated Metrics tab.');
 
-        var topten = CalculateDistribution();
+        var topten = await CalculateDistribution();
         if(topten.length >= 10){
             for (var i = 0; i < 10; i++) {
                 let thisRow = 106 + i;
