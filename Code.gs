@@ -493,7 +493,7 @@ const onEdit = async (e) => {
         if (elapsedCell == undefined || elapsedCell == null || elapsedCell == "") {
             if (status == "Completed" || status == "Billed") {
                 let endTime = new Date();
-                let time = CalculateDuration(startTime, endTime);
+                let time = await CalculateDuration(startTime, endTime);
 
                 //Write to Column - d h:mm:ss
                 ss.getRange(thisRow, 44).setValue(time);
@@ -708,7 +708,13 @@ const onEdit = async (e) => {
 
         //Fetch Customer and Products
         var customer = await GetShopifyCustomerByEmail(email);
-        var package = await new PackageMaterials(material1Name, material1Quantity, material2Name, material2Quantity, material3Name, material3Quantity, material4Name, material4Quantity, material5Name, material5Quantity);
+        var package = await new PackageMaterials(
+            material1Name, material1Quantity, 
+            material2Name, material2Quantity, 
+            material3Name, material3Quantity, 
+            material4Name, material4Quantity, 
+            material5Name, material5Quantity
+        );
         var formattedMats = await new MakeLineItems(package);
 
 
@@ -801,7 +807,7 @@ const onEdit = async (e) => {
  * @param {number} jobnumber
  * @returns {string} approval form
  */
-function CreateApprovalForm(name, jobnumber, cost) {
+var CreateApprovalForm = (name, jobnumber, cost) => {
     try {
         // Make a new approval form
         var approvalForm = FormApp.create('Approval Form');
@@ -891,7 +897,7 @@ function CreateApprovalForm(name, jobnumber, cost) {
  * @param {time} date
  * @return {number} job number
  */
-var CreateJobNumber = function (date) {
+var CreateJobNumber = (date) => {
     //var date = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Ultimaker').getRange('H135').getValue();
     //date = sheetDict.othertools.getRange('G7').getValue();
 
@@ -943,7 +949,7 @@ var CreateJobNumber = function (date) {
  * @param {bool} shippingQuestion
  * @returns {doc} doc
  */
-var CreateTicket = function (e,
+var CreateTicket = (e,
     designspecialist,
     priority,
     jobnumber,
@@ -951,7 +957,7 @@ var CreateTicket = function (e,
     name, sid, email,
     projectname,
     material1Quantity, material1Name,
-    material2Quantity, material2Name, shippingQuestion) {
+    material2Quantity, material2Name, shippingQuestion) => {
     //Create Doc
     try {
         var folder = DriveApp.getFoldersByName("Job Tickets");  //Set the correct folder
@@ -1089,7 +1095,7 @@ var CreateTicket = function (e,
  * @param {number} sid
  * @returns {number} priority number 1 - 4
  */
-var GetPriority = function (sid) {
+var GetPriority = (sid) => {
 
     //sid = 3035249023;  //test good sid
     //sid = 2323453444;//test bad sid
@@ -1122,3 +1128,5 @@ var GetPriority = function (sid) {
     //Return value
     return priority;
 }
+
+
