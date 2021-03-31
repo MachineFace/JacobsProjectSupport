@@ -146,19 +146,19 @@ const onFormSubmit = async (e) => {
     
     var values = e.namedValues;
 
-    Logger.log("Name : " + name + ", SID : " + sid + ", Email : " + email + "Student Type : " + studentType + ", Project : " + projectname + ", Needs Shipping : " + shipping + ', Timestamp : ' + timestamp);
-    Logg("Name = " + name + ", SID : " + sid + ", Email : " + email + "Student Type : " + studentType + ", Project : " + projectname + ", Needs Shipping : " + shipping + ', Timestamp : ' + timestamp);
+    Logger.log(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
+    Logg(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
 
     //Generate new Job number
-    var jobnumber = CreateJobNumber(timestamp);
+    var jobnumber = await CreateJobNumber(timestamp);
     sheet.getRange("F" + lastRow).setValue(jobnumber);
 
     //Check Priority
-    var priority = GetPriority(sid);
+    var priority = await GetPriority(sid);
     sheet.getRange("C" + lastRow).setValue(priority);
 
     //Create Messages
-    var message = new CreateSubmissionMessage(name, projectname, jobnumber);
+    var message = await new CreateSubmissionMessage(name, projectname, jobnumber);
 
     //Get DS-Specific Message
     let dsMessage = message.dsMessage;
@@ -227,7 +227,7 @@ const onFormSubmit = async (e) => {
         Logg("Design Specialist has been emailed.");
     }
     catch (err) {
-        Logg(err + " : Could not email DS. Something went wrong.");
+        Logg(`${err} : Could not email DS. Something went wrong.`);
     }
 
 
@@ -273,7 +273,7 @@ const onFormSubmit = async (e) => {
         }
     }
     catch (err) {
-        Logger.log(err + ' : Couldnt send Creaform email for some reason.');
+        Logger.log(`${err} : Couldnt send Creaform email for some reason.`);
     }
 
 
@@ -294,11 +294,11 @@ const onFormSubmit = async (e) => {
 
             //Set access to Missing Access
             sheet.getRange("A" + lastRow).setValue("Missing Access");
-            Logger.log("'Missing Access' Email sent to student and status set to 'Missing Access'.");
+            Logger.log(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
         }
     }
     catch (err) {
-        Logg(err + " : Could not find student access boolean value");
+        Logg(`${err} + " : Could not find student access boolean value`);
     }
 
 
@@ -458,7 +458,7 @@ const onEdit = async (e) => {
 
 
     //Log submission info to sheet
-    Logger.log("Submission Time = " + submissiontime + ", Name = " + name + ", Email = " + email + ", Project = " + projectname);
+    Logger.log(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
 
     //----------------------------------------------------------------------------------------------------------------
     //Fix Job Number if it's missing
@@ -466,11 +466,11 @@ const onEdit = async (e) => {
         if (status == "Received" || status == "In-Progress") {
             jobnumber = jobnumber ? jobnumber : CreateJobNumber(submissiontime);
             ss.getRange(thisRow, 6).setValue(jobnumber);
-            Logg('Job Number was missing, so the script fixed it.');
+            Logg(`Job Number was missing, so the script fixed it.`);
         }
     }
     catch (err) {
-        Logg(err + ' : Job Number failed onSubmit, and has now failed onEdit');
+        Logg(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
     }
 
 
@@ -481,7 +481,7 @@ const onEdit = async (e) => {
         projectname = projectname ? projectname : "Your Project";
     }
     catch (err) {
-        Logg(err + " : Fixing empty or corrupted variables has failed for some reason.");
+        Logg(`${err} : Fixing empty or corrupted variables has failed for some reason.`);
     }
 
 
@@ -497,7 +497,7 @@ const onEdit = async (e) => {
 
                 //Write to Column - d h:mm:ss
                 ss.getRange(thisRow, 44).setValue(time);
-                Logg("Turnaround Time = " + time);
+                Logg(`Turnaround Time = ${time}`);
 
                 //Write Completed time
                 ss.getRange(thisRow, 43).setValue(endTime);
@@ -505,7 +505,7 @@ const onEdit = async (e) => {
         }
     }
     catch (err) {
-        Logg(err + " : Calculating the turnaround time and completion time has failed for some reason.");
+        Logg(`${err} : Calculating the turnaround time and completion time has failed for some reason.`);
     }
 
 
@@ -525,17 +525,17 @@ const onEdit = async (e) => {
                 material2Quantity, material2Name, shippingQuestion);
         }
         catch (err) {
-            Logger.log(err + " : Couldn't generate a ticket. Check docUrl / id and repair.");
+            Logger.log(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.`);
         }
         try {
             var id = Ticket.getId();
             var doc = DocumentApp.openById(id);
             var docUrl = doc.getUrl();
             ss.getRange(thisRow, 5).setValue(docUrl);  //Push to cell
-            Logger.log("Ticket Created.");
+            Logger.log(`Ticket Created.`);
         }
         catch (err) {
-            Logger.log(err + " : Couldn't push ticket to the cell.");
+            Logger.log(`${err} : Couldn't push ticket to the cell.`);
         }
     }
 
@@ -546,7 +546,7 @@ const onEdit = async (e) => {
     // Create a new form, then add a checkbox question, a multiple choice question,
     if (status == "Pending Approval") {
         var approvalURL = await CreateApprovalForm(name, jobnumber, cost);
-        Logg('Approval Form generated and sent to user.');
+        Logg(`Approval Form generated and sent to user.`);
     }
 
 
@@ -769,7 +769,7 @@ const onEdit = async (e) => {
     //Lastly Run these Metrics ignoring first 2 rows:
     if(thisRow > 3) {
         await Metrics();
-        Logg('Recalculated Metrics tab.');
+        Logg(`Recalculated Metrics tab.`);
 
         var topten = await CalculateDistribution();
         if(topten.length >= 10){
@@ -779,7 +779,7 @@ const onEdit = async (e) => {
                 sheetDict.data.getRange('C' + thisRow).setValue(topten[i][1]);
             }
         }
-        Logg('Recalculated Top 10 Distribution.');
+        Logg(`Recalculated Top 10 Distribution.`);
     }
 
 
@@ -810,78 +810,81 @@ const onEdit = async (e) => {
 var CreateApprovalForm = (name, jobnumber, cost) => {
     try {
         // Make a new approval form
-        var approvalForm = FormApp.create('Approval Form');
+        let approvalForm = FormApp.create('Approval Form');
 
         //Set parent folder
         //var parentFolder = DriveApp.getFolderById("1EpvCTyuCkNzKQ4sxYrZvwPqGqzRvgtRX").addFile(approvalForm);
 
-        var sendloc = "16oCqmnW9zCUhpQLo3TXsaUSxDcSv7aareEVSE9zYtVQ";
-        var destination = approvalForm.setDestination(FormApp.DestinationType.SPREADSHEET, sendloc);
+        let sendloc = "16oCqmnW9zCUhpQLo3TXsaUSxDcSv7aareEVSE9zYtVQ";
+        let destination = approvalForm.setDestination(FormApp.DestinationType.SPREADSHEET, sendloc);
         //Form Setup
-        approvalForm.setTitle('Approval Form');
-        approvalForm.setDescription("Referrence Number: " + jobnumber);
-        approvalForm.setConfirmationMessage('Thanks for responding!');
+        approvalForm.setTitle(`Approval Form`);
+        approvalForm.setDescription(`Referrence Number: ${jobnumber}`);
+        approvalForm.setConfirmationMessage(`Thanks for responding!`);
         approvalForm.setAllowResponseEdits(false);
         approvalForm.setAcceptingResponses(true);
 
         //Ask Questions
         if (cost =="" || cost ==undefined || cost == 0) {
-          Logg("Approval form: No known cost. cost = " + cost)
-          var item = approvalForm.addMultipleChoiceItem().setRequired(true);
-          item.setTitle('For this job, the cost of materials was not specified. Please speak with a Design Specialist if you have questions. Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?');
+          Logg(`Approval form: No known cost. cost = ${cost}`);
+          let item = approvalForm.addMultipleChoiceItem().setRequired(true);
+          item.setTitle(`For this job, the cost of materials was not specified. 
+              Please speak with a Design Specialist if you have questions. 
+              Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`);
           item.setChoices([
-            item.createChoice('Yes, I approve.'),
-            item.createChoice('No. I reject.')
+            item.createChoice(`Yes, I approve.`),
+            item.createChoice(`No. I reject.`)
           ]);
         }
         else {
-          var costFormatted = Utilities.formatString( '$%.2f', cost);
-          Logg("Approval form: Known cost. cost = " + costFormatted)
-        var item = approvalForm.addMultipleChoiceItem().setRequired(true);
-        item.setTitle('For this job, the cost of materials is estimated to be: ' + costFormatted + '. Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?');
+            let costFormatted = Utilities.formatString( '$%.2f', cost);
+            Logg(`Approval form: Known cost. cost = ${costFormatted}`)
+        let item = approvalForm.addMultipleChoiceItem().setRequired(true);
+        item.setTitle(`For this job, the cost of materials is estimated to be: ${costFormatted}. 
+            Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`);
         item.setChoices([
-            item.createChoice('Yes, I approve.'),
-            item.createChoice('No. I reject.')
+            item.createChoice(`Yes, I approve.`),
+            item.createChoice(`No. I reject.`)
         ]);
         }
-        var item2 = approvalForm.addMultipleChoiceItem().setRequired(true);
-        item2.setTitle('Please select your name below.');
+        let item2 = approvalForm.addMultipleChoiceItem().setRequired(true);
+        item2.setTitle(`Please select your name below.`);
         item2.setChoices([
             item2.createChoice(name)
         ])
-        var item3 = approvalForm.addMultipleChoiceItem().setRequired(true);
-        item3.setTitle('Please select the job number below.');
+        let item3 = approvalForm.addMultipleChoiceItem().setRequired(true);
+        item3.setTitle(`Please select the job number below.`);
         item3.setChoices([
             item3.createChoice(jobnumber)
         ]);
-        var approvalURL = approvalForm.getPublishedUrl();
-        Logg("Created an Approval Form for the student.");
+        let approvalURL = approvalForm.getPublishedUrl();
+        Logg(`Created an Approval Form for the student.`);
     }
     catch (err) {
-        Logg(err + " : Couldn't generate Approval Form");
+        Logg(`${err} : Couldn't generate Approval Form`);
     }
 
     try {
         //Set folder
-        var folder = DriveApp.getFoldersByName("Job Forms");
+        let folder = DriveApp.getFoldersByName(`Job Forms`);
 
         //Remove File from root and Add that file to a specific folder
-        var id = approvalForm.getId();
-        var docFile = DriveApp.getFileById(id);
+        let id = approvalForm.getId();
+        let docFile = DriveApp.getFileById(id);
     }
     catch (err) {
-        Logg(err + " : Couldn't get the id of the file.");
+        Logg(`${err} : Couldn't get the id of the file.`);
     }
     try {
         DriveApp.removeFile(docFile);
         folder.next().addFile(docFile);
 
         //Set permissions to 'anyone can edit' for that file
-        var file = DriveApp.getFileById(id);
+        let file = DriveApp.getFileById(id);
         file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT);  //set sharing
     }
     catch (err) {
-        Logg(err + " : Couldn't delete the form in that spot. Probably still has the form linked.");
+        Logg(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.`);
     }
     return approvalURL;
 }
@@ -904,24 +907,24 @@ var CreateJobNumber = (date) => {
     //Check that it's a date
     let testedDate = isValidDate(date);
 
-    var jobnumber;
+    let jobnumber;
     try {
         if (date == undefined || date == null || date == '' || testedDate == false) {
-            jobnumber = +Utilities.formatDate(new Date(), "PST", "yyyyMMddHHmmss");
-            Logg('Set Jobnumber to a new time because timestamp was missing.');
+            jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
+            Logg(`Set Jobnumber to a new time because timestamp was missing.`);
         }
         else {
-            jobnumber = +Utilities.formatDate(date, "PST", "yyyyMMddhhmmss");
-            Logg('Input time: ' + date + ', Set Jobnumber: ' + jobnumber);
+            jobnumber = +Utilities.formatDate(date, `PST`, `yyyyMMddhhmmss`);
+            Logg(`Input time: ${date}, Set Jobnumber: ${jobnumber}`);
         }
     }
     catch (err) {
-        Logg(err + ' : Couldnt fix jobnumber.');
+        Logg(`${err} : Couldnt fix jobnumber.`);
     }
     if (jobnumber == undefined || testedDate == false) {
-        jobnumber = +Utilities.formatDate(new Date(), "PST", "yyyyMMddHHmmss");
+        jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
     }
-    Logger.log('Returned Job Number: ' + jobnumber);
+    Logger.log(`Returned Job Number: ${jobnumber}`);
     return jobnumber.toString();
 }
 
@@ -960,19 +963,19 @@ var CreateTicket = (e,
     material2Quantity, material2Name, shippingQuestion) => {
     //Create Doc
     try {
-        var folder = DriveApp.getFoldersByName("Job Tickets");  //Set the correct folder
-        var doc = DocumentApp.create('Job Ticket');  //Make Document
+        var folder = DriveApp.getFoldersByName(`Job Tickets`);  //Set the correct folder
+        var doc = DocumentApp.create(`Job Ticket`);  //Make Document
         var body = doc.getBody();
         var docId = doc.getId();
     }
     catch (err) {
-        Logg(err + " : Could not fetch doc folder, or make ticket, or get body or docId.");
+        Logg(`${err} : Could not fetch doc folder, or make ticket, or get body or docId.`);
     }
 
     try{
         var barcode = GenerateBarCode(jobnumber);
     } catch(err) {
-        Logger.log(err + ' : Couldnt create barcode for some reason.');
+        Logger.log(`${err} : Couldnt create barcode for some reason.`);
     }
 
     //Parse for Individual Sheets
@@ -1048,7 +1051,7 @@ var CreateTicket = (e,
 
         }
         catch (err) {
-            Logg(err + ": Couldn't append info to ticket. Ya dun goofed.");
+            Logg(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
         }
 
         //Remove File from root and Add that file to a specific folder
@@ -1059,7 +1062,7 @@ var CreateTicket = (e,
             folder.next().addFile(barcode);
         }
         catch (err) {
-            Logg(err + ": Couldn't delete the file from the drive folder. Sheet is still linked");
+            Logg(`${err} : Couldn't delete the file from the drive folder. Sheet is still linked`);
         }
 
         //Set permissions to 'anyone can edit' for that file
@@ -1068,14 +1071,11 @@ var CreateTicket = (e,
             file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT);  //set sharing
         }
         catch (err) {
-            Logg(err + ": Couldn't change permissions on the file. You probably have to do something else to make it work.");
+            Logg(`${err} : Couldn't change permissions on the file. You probably have to do something else to make it work.`);
         }
     }
     //Return Document to use later
     return doc;
-    // return new Promise(resolve => {
-    //       resolve(doc);
-    //     })
 }
 
 
@@ -1101,18 +1101,18 @@ var GetPriority = (sid) => {
     //sid = 2323453444;//test bad sid
 
     //Cast SID to string and remove garbage
-    var stringSID;
-    var priority;
+    let stringSID;
+    let priority;
 
     if(sid) stringSID = sid.toString().replace(/\s+/g, '');
 
     let index = 0;
 
     let last = sheetDict.approved.getLastRow() - 1;
-    var approvedList = sheetDict.approved.getRange(2, 3, last, 1).getValues(); //Column C3:C
+    let approvedList = sheetDict.approved.getRange(2, 3, last, 1).getValues(); //Column C3:C
 
     //Loop through SIDs to find a match and fetch priority number
-    for(var i = 0; i < approvedList.length; i++) {
+    for(let i = 0; i < approvedList.length; i++) {
         let item = approvedList[i][0].toString().replace(/\s+/g, '');
         if(item == stringSID) {
             index = i + 2;
@@ -1124,7 +1124,7 @@ var GetPriority = (sid) => {
         }
     }
 
-    Logger.log('Priority = ' + priority);
+    Logger.log(`Priority = ${priority}`);
     //Return value
     return priority;
 }

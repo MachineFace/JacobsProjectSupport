@@ -64,7 +64,7 @@ var getData = (values) => {
  * @param {string} docId
  * @return {string} text 
  */
-var DocToHtml = (docId) => {
+const DocToHtml = (docId) => {
     // Downloads a Google Doc as an HTML string.
     let url = 'https://docs.google.com/feeds/download/documents/export/Export?id=' + docId + '&exportFormat=html';
     let param = {
@@ -82,7 +82,7 @@ var DocToHtml = (docId) => {
  * Create Summary Email
  * This generates a summary email to all the Design Specialists (triggered daily at 6am)
  */
-var CreateSummaryEmail = () => {
+const CreateSummaryEmail = () => {
     //Fetch Summary Table
     let summarySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Summary');
     let last = summarySheet.getLastRow();
@@ -114,3 +114,5 @@ var CreateSummaryEmail = () => {
     });
     Logg('DS Team Emailed with Summary for the day.');
 }
+
+

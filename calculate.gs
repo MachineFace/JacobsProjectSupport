@@ -28,7 +28,7 @@ const CalculateAverageTurnaround = (sheet) => {
         }
     }
     catch (err) {
-        Logg(err + ' : Could not fetch list of times. Probably a sheet error.');
+        Logg(`${err} : Could not fetch list of times. Probably a sheet error.`);
     }
 
     //Convert everything to seconds
@@ -46,7 +46,7 @@ const CalculateAverageTurnaround = (sheet) => {
         }
     }
     catch (err) {
-        Logg(err + ' : Could not sum times.');
+        Logg(`${err} : Could not sum times.`);
     }
 
     //sum all the totals
@@ -116,7 +116,7 @@ const CalculateDuration = (start, end) => {
         return formatted;
     }
     catch (err) {
-        Logg(err + " : Calculating the duration has failed for some reason.");
+        Logg(`${err} : Calculating the duration has failed for some reason.`);
     }
 }
 
@@ -166,7 +166,7 @@ const CountActiveUsers = () => {
     });
 
     var count = unique.length - 1; //Removes the space.
-    Logger.log('Active JPS Users : ' + count);
+    Logger.log(`Active JPS Users : ${count}`);
     return count;
 }
 
@@ -380,7 +380,7 @@ var CalcDistributionByID = () => {
  * @param {[any]} array
  * @returns {number} standard deviation
  */
-function CalculateStandardDeviation() {
+const CalculateStandardDeviation = () => {
      
     let people = [];
     let d = sheetDict.backgrounddata.getRange('V2:V').getValues();
@@ -389,16 +389,16 @@ function CalculateStandardDeviation() {
             people.push(d[i]); 
         }
     }
-    Logger.log('People : ' + people.toString()); 
+    Logger.log(`People : ${people.toString()}`); 
     
     var n = people.length;
-    Logger.log('n = ' + n);
+    Logger.log(`n = ${n}`);
     
     var mean = people.reduce((a, b) => a + b) / n;
-    Logger.log('mean = ' + mean);
+    Logger.log(`Mean = ${mean}`);
 
     var standardDeviation = Math.sqrt(people.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-    Logger.log('Standard Deviation for Number of Submissions : ' + standardDeviation);
+    Logger.log(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
     return standardDeviation;
 }
 
@@ -409,7 +409,7 @@ function CalculateStandardDeviation() {
  * Metrics - DO NOT DELETE
  * Used to Calculate Average Turnaround times and write to 'Data/Metrics' sheet
  */
-function Metrics() {
+const Metrics = () => {
     try {
         //Return Averages to Metrics beginning at cell D26 
         var metricsTab = sheetDict.data;
@@ -452,7 +452,7 @@ function Metrics() {
         Logger.log('Recalculated Metrics');
     }
     catch (err) {
-        Logger.log(err + ' : Couldnt generate statistics on Metrics.');
+        Logger.log(`${err} : Couldnt generate statistics on Metrics.`);
     }
 
 }

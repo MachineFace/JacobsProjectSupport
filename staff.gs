@@ -35,10 +35,10 @@ const MakeLink = (email) => {
  * ----------------------------------------------------------------------------------------------------------------
  * Return Staff Email as a string.
  */
-var StaffEmailAsString = () => {
-    var stafflist = sheetDict.staff;
-    var last = stafflist.getLastRow();
-    var emaillist = stafflist.getRange(2, 3, last - 1, 1).getValues();
+const StaffEmailAsString = () => {
+    let stafflist = sheetDict.staff;
+    let last = stafflist.getLastRow();
+    let emaillist = stafflist.getRange(2, 3, last - 1, 1).getValues();
     return emaillist.toString();
 }
 
@@ -106,6 +106,25 @@ const CreateDS = () => {
     DSList.forEach(element => Logg(element));
     // @ts-ignore
     return DSList;
+}
+
+/**
+ * Unit Test
+ */
+const _testStaffFunctions = async () => {
+  try {
+      Promise.all([
+          await DesignSpecialist('Testa', 'Testa Nama', 'test@test.com'),
+          await MakeLink('test@test.com'),
+          await StaffEmailAsString(),
+          await InvokeDS('Cody', 'email'),
+          await CreateDS(),
+      ])
+      .then(`PASSED`)
+      .catch(err => Logger.log(`FAILED : ${err}`))
+  } catch(err) {
+      Logger.log(`FAILED : ${err}`)
+  } 
 }
 
 
