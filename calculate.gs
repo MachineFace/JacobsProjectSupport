@@ -384,20 +384,20 @@ const CalculateStandardDeviation = () => {
      
     let people = [];
     let d = sheetDict.backgrounddata.getRange('V2:V').getValues();
-    for(var i = 0; i < d.length; i++){ 
+    for(let i = 0; i < d.length; i++){ 
         if(d[i] != '' && d[i] != null && d[i] != undefined && d[i] != ' ') {
             people.push(d[i]); 
         }
     }
     Logger.log(`People : ${people.toString()}`); 
     
-    var n = people.length;
+    let n = people.length;
     Logger.log(`n = ${n}`);
     
-    var mean = people.reduce((a, b) => a + b) / n;
+    let mean = people.reduce((a, b) => a + b) / n;
     Logger.log(`Mean = ${mean}`);
 
-    var standardDeviation = Math.sqrt(people.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+    let standardDeviation = Math.sqrt(people.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
     Logger.log(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
     return standardDeviation;
 }
@@ -412,42 +412,42 @@ const CalculateStandardDeviation = () => {
 const Metrics = () => {
     try {
         //Return Averages to Metrics beginning at cell D26 
-        var metricsTab = sheetDict.data;
+        let metricsTab = sheetDict.data;
 
-        var laserSheet = sheetDict.laser; //Laser Sheet
+        let laserSheet = sheetDict.laser; //Laser Sheet
         metricsTab.getRange('D26').setValue(CalculateAverageTurnaround(laserSheet));
 
-        var ultimakerSheet = sheetDict.ultimaker; //Ultimaker Sheet
+        let ultimakerSheet = sheetDict.ultimaker; //Ultimaker Sheet
         metricsTab.getRange('D27').setValue(CalculateAverageTurnaround(ultimakerSheet));
 
-        var fablightSheet = sheetDict.fablight; //Fablight Sheet
+        let fablightSheet = sheetDict.fablight; //Fablight Sheet
         metricsTab.getRange('D28').setValue(CalculateAverageTurnaround(fablightSheet));
 
-        var omaxSheet = sheetDict.waterjet; //Waterjet Sheet
+        let omaxSheet = sheetDict.waterjet; //Waterjet Sheet
         metricsTab.getRange('D29').setValue(CalculateAverageTurnaround(omaxSheet));
 
-        var advLabSheet = sheetDict.advancedlab; //Advanced Lab Sheet 
+        let advLabSheet = sheetDict.advancedlab; //Advanced Lab Sheet 
         metricsTab.getRange('D30').setValue(CalculateAverageTurnaround(advLabSheet));
 
-        var shopbotSheet = sheetDict.shopbot; //Shopbot Sheet
+        let shopbotSheet = sheetDict.shopbot; //Shopbot Sheet
         metricsTab.getRange('D31').setValue(CalculateAverageTurnaround(shopbotSheet));
 
-        var haasSheet = sheetDict.haas; //Haas Sheet 
+        let haasSheet = sheetDict.haas; //Haas Sheet 
         metricsTab.getRange('D32').setValue(CalculateAverageTurnaround(haasSheet));
 
-        var vinylSheet = sheetDict.vinyl; //Vinyl Sheet
+        let vinylSheet = sheetDict.vinyl; //Vinyl Sheet
         metricsTab.getRange('D33').setValue(CalculateAverageTurnaround(vinylSheet));
 
-        var othermillSheet = sheetDict.othermill; //Othermill Sheet
+        let othermillSheet = sheetDict.othermill; //Othermill Sheet
         metricsTab.getRange('D34').setValue(CalculateAverageTurnaround(othermillSheet));
 
-        var creaformSheet = sheetDict.creaform; //Creaform Sheet
+        let creaformSheet = sheetDict.creaform; //Creaform Sheet
         metricsTab.getRange('D35').setValue(CalculateAverageTurnaround(creaformSheet));
 
-        var otherSheet = sheetDict.othertools; //Other Sheet
+        let otherSheet = sheetDict.othertools; //Other Sheet
         metricsTab.getRange('D36').setValue(CalculateAverageTurnaround(otherSheet));
 
-        var plotter = sheetDict.plotter; //Plotter Sheet
+        let plotter = sheetDict.plotter; //Plotter Sheet
         metricsTab.getRange('D37').setValue(CalculateAverageTurnaround(plotter));
         Logger.log('Recalculated Metrics');
     }
@@ -456,3 +456,55 @@ const Metrics = () => {
     }
 
 }
+
+
+
+/**
+ * Unit tests for Calcs
+ */
+const _testCalcs = async () => {
+    try{
+        let res = await CalculateAverageTurnaround(sheetDict.ultimaker);
+        Logger.log(`PASSED : Turnaround time for Ultimaker Sheet : ${res}`);
+    } catch(err) {
+        Logger.log(`FAIL : ${err}`)
+    }
+    try{
+        let res = await CalculateDuration( new Date(1992,03,27), new Date() );
+        Logger.log(`PASSED : Output : ${res}`);
+    } catch(err) {
+        Logger.log(`FAIL : ${err}`)
+    }
+    try{
+        let res = await CountActiveUsers();
+        Logger.log(`PASSED : Output : ${res}`);
+    } catch(err) {
+        Logger.log(`FAIL : ${err}`)
+    }
+    try{
+        let res = await CalculateDistribution();
+        Logger.log(`PASSED : Output : ${res}`);
+    } catch(err) {
+        Logger.log(`FAIL : ${err}`)
+    }
+    try{
+        let res = await CalculateStandardDeviation();
+        Logger.log(`PASSED : Output : ${res}`);
+    } catch(err) {
+        Logger.log(`FAIL : ${err}`)
+    }
+    try{
+        let res = await Metrics();
+        Logger.log(`PASSED : Output : ${res}`);
+    } catch(err) {
+        Logger.log(`FAIL : ${err}`)
+    }
+
+
+}
+
+
+
+
+
+

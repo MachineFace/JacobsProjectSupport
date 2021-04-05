@@ -516,3 +516,55 @@ const Help = () => {
 
 
 
+
+
+
+/**
+ * Test Get 3dPrinterOS Data from Admin. DOES NOT FETCH ACTUAL DATA
+ */
+const _testGet3dPrinterOSData = () => {
+    let url = `https://cloud.3dprinteros.com/#/org-admin/reports`;
+
+    // let api_key = '1e70652225e070b078def8bf6e154e98';
+    // let api_pass = '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';
+    
+    //Encode Header
+    // let headers = { "Authorization": "Basic " + Utilities.base64EncodeWebSafe(api_key + ":" + api_pass) };
+    let headers = { "Authorization": "Basic " };
+
+    //Stuff payload into postParams
+    let postParams = {
+        "method" : "GET",
+        "headers" : headers,
+        "contentType" : "application/json",
+        followRedirects : true,
+        muteHttpExceptions : true
+    };
+
+    //Fetch Orders
+    let html = UrlFetchApp.fetch(url, postParams);
+    Logger.log(`Response Code : ${html.getResponseCode()}`);
+    if (html.getResponseCode() == 200) {
+
+        let content = html.getContentText();
+        
+        let str = JSON.stringify(content);
+        Logger.log(str);
+
+        // let start = str.indexOf(`</head>`);
+        // let end = str.indexOf(`</body>`)
+        // Logger.log(`Start : ${start}, End : ${end}`);
+
+        // let slice = str.slice( start, end);
+        // Logger.log(slice);
+
+    } 
+
+}
+
+
+
+
+
+
+

@@ -686,9 +686,11 @@ const onEdit = async (e) => {
     var checkbox = ss.getRange('AZ' + thisRow).getValue();
 
     if(checkbox == true && (status == 'Billed' || status == 'CLOSED')) {
-        var boxMsg = 'You have already Generated a bill to this Student';
-        var boxTitle = 'Generate Bill to Shopify';
-        response = Browser.msgBox(boxTitle, boxMsg, Browser.Buttons.OK);
+        Browser.msgBox(
+            'Generate Bill to Shopify', 
+            'You have already Generated a bill to this Student', 
+            Browser.Buttons.OK
+        );
         if (response == "OK") {
             Logger.log('User clicked "OK".');
             ss.getRange('AZ' + thisRow).setValue(false);
@@ -749,7 +751,11 @@ const onEdit = async (e) => {
                 ss.getRange('AZ' + thisRow).setValue(false);
                 ss.getRange('A' + thisRow).setValue('Billed');
                 Logger.log(order.toString());
-                Browser.msgBox(boxTitle, 'Student has been successfully billed on Shopify!\\n' + GetLastShopifyOrder(), Browser.Buttons.OK);
+                Browser.msgBox(
+                    boxTitle, 
+                    'Student has been successfully billed on Shopify!\\n' + GetLastShopifyOrder(), 
+                    Browser.Buttons.OK
+                );
             }
             else {
                 Logger.log('User clicked "No / Cancel".');
@@ -977,6 +983,11 @@ var CreateTicket = (e,
     } catch(err) {
         Logger.log(`${err} : Couldnt create barcode for some reason.`);
     }
+    try{
+        var qrCode = GenerateQRCode(doc.getUrl());
+    } catch(err) {
+        Logger.log(`${err} : Couldnt create QRCode for some reason.`);
+    }
 
     //Parse for Individual Sheets
     var sheetname = SpreadsheetApp.getActiveSheet().getSheetName();
@@ -1022,16 +1033,32 @@ var CreateTicket = (e,
         notes.push('Notes: ', 'None');
     }
 
+    //Set attributes
+    let headerAtt = { 
+        [DocumentApp.Attribute.FONT_SIZE] : 18,
+        [DocumentApp.Attribute.BOLD] : true,
+    };
+    let jobnumberAtt = { 
+        [DocumentApp.Attribute.FONT_SIZE] : 12,
+        [DocumentApp.Attribute.BOLD] : true,
+    };
+    let bodyAtt = { 
+        [DocumentApp.Attribute.FONT_SIZE] : 9,
+    };
+
     //Append Document with Info
     if (doc != undefined || doc != null || doc != NaN) {
         try {
-            
+
             body.insertHorizontalRule(0);
             body.insertParagraph(1, 'Name: ' + name.toString())
-                .setHeading(DocumentApp.ParagraphHeading.HEADING1);
+                .setHeading(DocumentApp.ParagraphHeading.HEADING1)
+                .setAttributes(headerAtt);
             body.insertParagraph(2, 'Job Number: ' + +jobnumber.toString())
-                .setHeading(DocumentApp.ParagraphHeading.HEADING2);
-            body.appendImage(barcode).setAltTitle("Barcode");
+                .setHeading(DocumentApp.ParagraphHeading.HEADING2)
+                .setAttributes(jobnumberAtt);
+            // body.appendImage(barcode).setAltTitle("Barcode");
+            body.appendImage(qrCode).setAltTitle("QRCode");
 
             // Create a two-dimensional array containing the cell contents.
             let cells = [
@@ -1047,7 +1074,9 @@ var CreateTicket = (e,
             ];
 
             // Build a table from the array.
-            body.appendTable(cells);
+            body.appendTable(cells)
+                .setAttributes(bodyAtt);
+            
 
         }
         catch (err) {

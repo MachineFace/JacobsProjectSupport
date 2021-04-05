@@ -56,6 +56,55 @@ const GenerateBarCode = (jobnumber) => {
 
 }
 
+
+
+
+/**
+ * Generate a QR code from some data. Feed it a url.
+ * @param {string} url
+ * @return
+ */
+const GenerateQRCode = (url, jobnumber) => {
+
+    if(url === null || url === undefined) {
+         url = 'jps.jacobshall.org/';
+    }
+    if(jobnumber === null || jobnumber === undefined) {
+         jobnumber = Math.floor(Math.random() * 100000).toFixed();
+    }
+    Logger.log(`URL : ${url}, Jobnumber : ${jobnumber}`);
+
+    let loc = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${url}`;  //API call
+    
+    //Encode Header
+    let headers = { "Authorization" : "Basic" };
+
+    //Stuff payload into postParams
+    let postParams = {
+        "method" : "GET",
+        "headers" : headers,
+        "contentType" : "application/json",
+        followRedirects : true,
+        muteHttpExceptions : true
+    };
+
+    //Fetch QR Code
+    let qrCode;
+    let res = UrlFetchApp.fetch(loc, postParams);
+    Logger.log(`Response Code : ${res.getResponseCode()}`);
+    if (res.getResponseCode() == 200) {
+        qrCode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName('QRCode' + jobnumber ) );
+        qrCode.setTrashed(true);
+    }
+    else Logger.log('Failed to GET QRCode');
+
+    Logger.log(qrCode);
+    return qrCode;
+
+}
+
+
+
 const _BarcodeUnitTest = async () => {
     try {
         jobnumber = "20210301140515";   //Known working Test JobNumber
