@@ -36,9 +36,9 @@ const MaterialMenu = () => {
 /**
  * Creates a pop-up for counting users.
  */
-const PopupCountUsers = () => {
-    let ui = SpreadsheetApp.getUi();
-    let count = CountActiveUsers();
+const PopupCountUsers = async () => {
+    let ui = await SpreadsheetApp.getUi();
+    let count = await CountActiveUsers();
     ui.alert(
         `JPS Runtime Message`, 
         `Students Currently Using JPS : ${count}`, 
