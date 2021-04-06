@@ -69,10 +69,10 @@ const GenerateQRCode = (url, jobnumber) => {
     if(url === null || url === undefined) {
          url = 'jps.jacobshall.org/';
     }
-    if(jobnumber === null || jobnumber === undefined) {
+    if(jobnumber == null || jobnumber == undefined) {
          jobnumber = Math.floor(Math.random() * 100000).toFixed();
     }
-    Logger.log(`URL : ${url}, Jobnumber : ${jobnumber}`);
+    Logger.log(`URL : ${url}, Jobnumber || RNDNumber : ${jobnumber}`);
 
     let loc = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${url}`;  //API call
     
@@ -105,21 +105,36 @@ const GenerateQRCode = (url, jobnumber) => {
 
 
 
-const _BarcodeUnitTest = async () => {
+const _BarcodeQRCodeUnitTest = async () => {
+    // try {
+    //     jobnumber = "20210301140515";   //Known working Test JobNumber
+    //     if( await GenerateBarCode(jobnumber) !== null) {
+    //         Logger.log('PASSED'); //Should PASS
+    //     }
+    //     if( await GenerateBarCode('123kjnb345kjb3') !== null) {
+    //         Logger.log('PASSED'); //Should PASS
+    //     }
+    //     if( await GenerateBarCode('#@$%%$^*^&R@#$G') !== null) {
+    //         Logger.log('PASSED'); //Should FAIL
+    //     }
+    // }
+    // catch(err) {
+    //     Logger.log(err + ' : Failed Test')
+    // }
     try {
         jobnumber = "20210301140515";   //Known working Test JobNumber
-        if( await GenerateBarCode(jobnumber) !== null) {
+        if( await GenerateQRCode(jobnumber) !== null) {
             Logger.log('PASSED'); //Should PASS
         }
-        if( await GenerateBarCode('123kjnb345kjb3') !== null) {
+        if( await GenerateQRCode('123kjnb345kjb3') !== null) {
             Logger.log('PASSED'); //Should PASS
         }
-        if( await GenerateBarCode('#@$%%$^*^&R@#$G') !== null) {
+        if( await GenerateQRCode('#@$%%$^*^&R@#$G') !== null) {
             Logger.log('PASSED'); //Should FAIL
         }
     }
     catch(err) {
-        Logger.log(err + ' : Failed Test')
+        Logger.log(`${err} : Failed Test`)
     }
 }
 

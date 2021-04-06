@@ -38,22 +38,114 @@ const MaterialMenu = () => {
  */
 const PopupCountUsers = () => {
     let ui = SpreadsheetApp.getUi();
-    let title = 'JPS Runtime Message';
-    let msg = 'Students Currently Using JPS : ';
     let count = CountActiveUsers();
-    ui.alert(title, msg + count, ui.ButtonSet.OK);
+    ui.alert(
+        `JPS Runtime Message`, 
+        `Students Currently Using JPS : ${count}`, 
+        ui.ButtonSet.OK
+    );
 }
 
 /**
  * Create a pop-up to check for missing students
  */
-const PopupCheckMissingAccessStudents = () => {
+const PopupCheckMissingAccessStudents = async () => {
+    let ui = await SpreadsheetApp.getUi();
+    let names = await CheckMissingAccessStudents().join(', ');
+    ui.alert(
+        `JPS Runtime Message`, 
+        `Checking Missing Access Students on All Sheets : \\n ${names}`, 
+        ui.ButtonSet.OK
+    );
+}
+
+
+
+/**
+ * Create a pop-up to Create a new Ticket if one is missing.
+ */
+const PopupCreateTicket = async () => {
     let ui = SpreadsheetApp.getUi();
-    let title = 'JPS Runtime Message';
-    let msg = 'Checking Missing Access Students on All Sheets : \\n';
-    let names = CheckMissingAccessStudents();
-    names.join(', ');
-    ui.alert(title, msg + names, ui.ButtonSet.OK);
+
+    let thisSheet = SpreadsheetApp.getActiveSheet()
+    let ss = thisSheet.getActiveRange().getSheet();
+    let sheetname = thisSheet.getName();
+    let thisRow =  thisSheet.getActiveRange().getRow();
+
+    //If It is on a valid sheet
+    switch (sheetname) {
+        case "Logger":
+        case 'Master Intake Form Responses':
+        case 'Student List DONOTDELETE':
+        case "ApprovedByStudents - DO NOT DELETE":
+        case "Staff List":
+        case "AdvLabStoreItems":
+        case "UltimakerStoreItems":
+        case "FablightStoreItems":
+        case "HaasTormachStoreItems":
+        case "OthermillStoreItems":
+        case "ShopbotStoreItems":
+        case "WaterjetStoreItems":
+        case 'VinylCutterStoreItems':
+        case "LaserStoreItems":
+        case "Data Metrics":
+        case "Shipping for Gary":
+        case "Summary":
+        case "Background Data Mgmt":
+        case "Advanced Lab ReOrder":
+        case "Billing":
+            Browser.msgBox(
+                'Incorrect Sheet Active', 
+                'Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.',
+                Browser.Buttons.OK
+            );
+            return;
+    }
+
+    let status = getByHeader("(INTERNAL) Status", thisRow); 
+    let ds = getByHeader(`(INTERNAL): DS Assigned`, thisRow);
+    let priority = getByHeader(`(INTERNAL): Priority`, thisRow);
+    let jobnumber = getByHeader("(INTERNAL AUTO) Job Number", thisRow);
+    let timestamp = getByHeader(`Timestamp`, thisRow);
+    let name = getByHeader(`What is your name?`, thisRow);
+    let sid = getByHeader("Student ID Number", thisRow);
+    let email = getByHeader("Email Address", thisRow);
+    let projectname = getByHeader("Project Name", thisRow);
+
+    //Materials
+    let material1Quantity = getByHeader(`"(INTERNAL): Material 1 Quantity"`, thisRow);
+    let material1Name = getByHeader(`(INTERNAL) Item 1`, thisRow);
+    let material2Quantity = getByHeader(`(INTERNAL) Material 2 Quanity`, thisRow);
+    let material2Name = getByHeader(`(INTERNAL) Item 2`, thisRow);
+    let shippingQuestion = getByHeader(`Do you need your parts shipped to you?`, thisRow);
+
+    let ticket;
+    try {
+        ticket = await CreateTicket(
+            ds, priority, jobnumber, timestamp, name, sid, email, projectname, 
+            material1Quantity, material1Name, 
+            material2Quantity, material2Name, 
+            shippingQuestion  
+        );
+    } catch(err) {
+        Logger.log(`${err} : Couldn't create a ticket.`);
+    }
+    try {
+            var id = await ticket.getId();
+            var doc = await DocumentApp.openById(id);
+            var docUrl = await doc.getUrl();
+            await ss.getRange(thisRow, 5).setValue(docUrl);  //Push to cell
+            Logger.log(`Ticket Created.`);
+        }
+        catch (err) {
+            Logger.log(`${err} : Couldn't push ticket to the cell.`);
+        }
+
+    ui.alert(
+        `JPS Runtime Message`, 
+        `Ticket Created for : ${name}, Job Number : ${jobnumber}`, 
+        ui.ButtonSet.OK
+    );
 }
 
 
@@ -82,27 +174,28 @@ const BuildHTMLHELP = () => {
 /**
  * Creates a modal pop-up for the help text.
  */
-const PopupHelp = () => {
-    let ui = SpreadsheetApp.getUi();
+const PopupHelp = async () => {
+    let ui = await SpreadsheetApp.getUi();
     let title = 'JPS Runtime HELP';
     let htmlOutput = HtmlService
-        .createHtmlOutput(BuildHTMLHELP())
+        .createHtmlOutput(await BuildHTMLHELP())
         .setWidth(640)
         .setHeight(480);
-    let modal = ui.showModalDialog(htmlOutput, title);
+    ui.showModalDialog(htmlOutput, title);
 }
 
 /**
  * Builds our JPS Menu and sets functions.
  */
 const BarMenu = () => {
-    let ui = SpreadsheetApp.getUi()
+    SpreadsheetApp.getUi()
       .createMenu('JPS Menu')
       .addItem('Generate Bill to Selected Student', 'BillFromSelected')
       .addSeparator()
       .addItem('Check All Missing Access Students', 'PopupCheckMissingAccessStudents')
       .addSeparator()
       .addItem('Count Active Users', 'PopupCountUsers')
+      .addItem(`Create a Ticket for a User`, `PopupCreateTicket`)
       .addSubMenu(SpreadsheetApp.getUi().createMenu('Calculate')
           .addItem('Generate Metrics', 'Metrics')
           .addItem('Generate Distribution', 'CalculateDistribution')
@@ -206,7 +299,7 @@ const BillFromSelected = async () => {
     if (quantityTotal==0 || quantityTotal==undefined || quantityTotal=="") {
         Logg(`Cannot bill - no quantity recorded`);
 
-        response = Browser.msgBox(
+        Browser.msgBox(
             'Generate Bill to Shopify', 
             'No quantities entered for selected submission.', 
             Browser.Buttons.OK,

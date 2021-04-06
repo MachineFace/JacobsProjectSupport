@@ -514,7 +514,7 @@ const onEdit = async (e) => {
     //Trigger for generating a "Ticket"
     if (status == "Received" || status == "In-Progress" || status == "Pending Approval") {
         try {
-            var Ticket = await CreateTicket(e,
+            var Ticket = await CreateTicket(
                 designspecialist,
                 priority,
                 jobnumber,
@@ -958,7 +958,7 @@ var CreateJobNumber = (date) => {
  * @param {bool} shippingQuestion
  * @returns {doc} doc
  */
-var CreateTicket = (e,
+var CreateTicket = (
     designspecialist,
     priority,
     jobnumber,
@@ -991,8 +991,8 @@ var CreateTicket = (e,
 
     //Parse for Individual Sheets
     var sheetname = SpreadsheetApp.getActiveSheet().getSheetName();
+    var thisRow = SpreadsheetApp.getActiveSheet().getActiveRange().getRow();
 
-    var thisRow = e.range.getRow();
     var thisSheet;
     var mat = [];
     var partcount = [];
