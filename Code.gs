@@ -1045,11 +1045,15 @@ var CreateTicket = (
     let bodyAtt = { 
         [DocumentApp.Attribute.FONT_SIZE] : 9,
     };
+    let barcodeAtt = { 
+        [DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] : `RIGHT`,
+    };
 
     //Append Document with Info
     if (doc != undefined || doc != null || doc != NaN) {
         try {
-
+            doc.addHeader().appendImage(barcode).setAltTitle(`Barcode`);
+            doc.addFooter().appendImage(qrCode).setAltTitle("QRCode");
             body.insertHorizontalRule(0);
             body.insertParagraph(1, 'Name: ' + name.toString())
                 .setHeading(DocumentApp.ParagraphHeading.HEADING1)
@@ -1057,11 +1061,12 @@ var CreateTicket = (
             body.insertParagraph(2, 'Job Number: ' + +jobnumber.toString())
                 .setHeading(DocumentApp.ParagraphHeading.HEADING2)
                 .setAttributes(jobnumberAtt);
-            // body.appendImage(barcode).setAltTitle("Barcode");
-            body.appendImage(qrCode).setAltTitle("QRCode");
+                
+            // // body.appendImage(barcode).setAltTitle("Barcode");
+            // body.appendImage(qrCode).setAltTitle("QRCode");
 
             // Create a two-dimensional array containing the cell contents.
-            let cells = [
+            body.appendTable([
                 ['Needs Shipping:', shippingQuestion.toString()],
                 ['Design Specialist:', designspecialist.toString()],
                 ['Job Number:', jobnumber.toString()],
@@ -1070,13 +1075,8 @@ var CreateTicket = (
                 ['Materials:', material1Name.toString()],
                 [mat[0], mat[1]],
                 [partcount[0], partcount[1]],
-                [notes[0], notes[1]]
-            ];
-
-            // Build a table from the array.
-            body.appendTable(cells)
-                .setAttributes(bodyAtt);
-            
+                [notes[0], notes[1]],
+            ]).setAttributes(bodyAtt);
 
         }
         catch (err) {

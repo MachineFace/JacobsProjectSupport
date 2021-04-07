@@ -74,7 +74,7 @@ const GenerateQRCode = (url, jobnumber) => {
     }
     Logger.log(`URL : ${url}, Jobnumber || RNDNumber : ${jobnumber}`);
 
-    let loc = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${url}`;  //API call
+    let loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${url}`;  //API call
     
     //Encode Header
     let headers = { "Authorization" : "Basic" };
