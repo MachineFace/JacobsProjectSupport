@@ -1033,34 +1033,32 @@ var CreateTicket = (
         notes.push('Notes: ', 'None');
     }
 
-    //Set attributes
-    let headerAtt = { 
-        [DocumentApp.Attribute.FONT_SIZE] : 18,
-        [DocumentApp.Attribute.BOLD] : true,
-    };
-    let jobnumberAtt = { 
-        [DocumentApp.Attribute.FONT_SIZE] : 12,
-        [DocumentApp.Attribute.BOLD] : true,
-    };
-    let bodyAtt = { 
-        [DocumentApp.Attribute.FONT_SIZE] : 9,
-    };
-    let barcodeAtt = { 
-        [DocumentApp.Attribute.HORIZONTAL_ALIGNMENT] : `RIGHT`,
-    };
-
     //Append Document with Info
     if (doc != undefined || doc != null || doc != NaN) {
         try {
-            doc.addHeader().appendImage(barcode).setAltTitle(`Barcode`);
-            doc.addFooter().appendImage(qrCode).setAltTitle("QRCode");
+            let header = doc.addHeader().appendTable([
+              [ `img1` , `img2`]
+            ]).setAttributes({
+              [DocumentApp.Attribute.BORDER_WIDTH] : 0,
+              [DocumentApp.Attribute.BORDER_COLOR] : `#ffffff`,
+            })
+            ReplaceTextToImage(header, `img1`, barcode)
+            ReplaceTextToImage(header, `img2`, qrCode)
+            
+
             body.insertHorizontalRule(0);
             body.insertParagraph(1, 'Name: ' + name.toString())
-                .setHeading(DocumentApp.ParagraphHeading.HEADING1)
-                .setAttributes(headerAtt);
+            .setHeading(DocumentApp.ParagraphHeading.HEADING1)
+            .setAttributes({ 
+                [DocumentApp.Attribute.FONT_SIZE] : 18,
+                [DocumentApp.Attribute.BOLD] : true,
+            });
             body.insertParagraph(2, 'Job Number: ' + +jobnumber.toString())
-                .setHeading(DocumentApp.ParagraphHeading.HEADING2)
-                .setAttributes(jobnumberAtt);
+            .setHeading(DocumentApp.ParagraphHeading.HEADING2)
+            .setAttributes({ 
+                [DocumentApp.Attribute.FONT_SIZE] : 12,
+                [DocumentApp.Attribute.BOLD] : true,
+            });
                 
             // // body.appendImage(barcode).setAltTitle("Barcode");
             // body.appendImage(qrCode).setAltTitle("QRCode");
@@ -1076,7 +1074,10 @@ var CreateTicket = (
                 [mat[0], mat[1]],
                 [partcount[0], partcount[1]],
                 [notes[0], notes[1]],
-            ]).setAttributes(bodyAtt);
+            ])
+            .setAttributes({ 
+                [DocumentApp.Attribute.FONT_SIZE] : 9,
+            });
 
         }
         catch (err) {
@@ -1109,8 +1110,21 @@ var CreateTicket = (
 
 
 
-
-
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Replace table entries with an Image blob
+ * @param {DocumentApp.create(`doc`).getbody()} body
+ * @param {string} text
+ * @param {blob} image
+ */
+const ReplaceTextToImage = (body, searchText, image) => {
+    var next = body.findText(searchText);
+    if (!next) return;
+    var r = next.getElement();
+    r.asText().setText("");
+    var img = r.getParent().asParagraph().insertInlineImage(0, image);
+    return next;
+};
 
 
 
