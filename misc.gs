@@ -476,11 +476,6 @@ const CheckMissingAccessStudents = () => {
 
                 let priority = GetPriority(id);
                 SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 3, 1, 1).setValue(priority);
-                if(priority != null || priority != undefined || priority != "STUDENT NOT FOUND!") {
-                    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 1, 1, 1).setValue("Received");
-                } else if(priority == "STUDENT NOT FOUND!"){
-                    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 1, 1, 1).setValue("Missing Access");
-                }
             }
         })
     }

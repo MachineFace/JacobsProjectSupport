@@ -298,7 +298,7 @@ const onFormSubmit = async (e) => {
         }
     }
     catch (err) {
-        Logg(`${err} + " : Could not find student access boolean value`);
+        Logg(`${err} : Could not find student access boolean value`);
     }
 
 
@@ -397,12 +397,15 @@ const onEdit = async (e) => {
     //Check Priority
     var priority = await GetPriority(ss.getRange(thisRow, 11).getValue());
     ss.getRange("C" + thisRow).setValue(priority);
+    if(priority == "STUDENT NOT FOUND") {
+        SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange(thisRow, 1, 1, 1).setValue("Missing Access");
+    }
 
 
 
     //STATUS CHANGE TRIGGER
     //Only look at Column 1 for email trigger.... Also 52 is live.
-    if (thisCol > 1 && thisCol != 52) return;
+    if (thisCol > 1 && thisCol != 3 && thisCol != 52) return;
 
 
 
