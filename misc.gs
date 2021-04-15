@@ -462,24 +462,23 @@ const CheckMissingAccessStudents = () => {
         'Other Tools' : sheetDict.othertools.getRange(2, 3, sheetDict.othertools.getLastRow() -1, 1).getValues(),
     }
 
-    let ids = [];
+    let emails = [];
     let names = [];
     for (let [page, values] of Object.entries(accessPool)) {
         values.forEach( (item, index) => {
             if(item == 'STUDENT NOT FOUND!') {
                 let i = index + 2;
-                //Logger.log('Item : ' + item  + ', Index : ' + i)
-                let id = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 11, 1, 1).getValue().toString();
-                ids.push(id);
+                let email = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 9, 1, 1).getValue().toString();
+                emails.push(email);
                 let name = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 10, 1, 1).getValue().toString();
                 names.push(name);
 
-                let priority = GetPriority(id);
+                let priority = GetPriorityFromEmail(email);
                 SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 3, 1, 1).setValue(priority);
             }
         })
     }
-    Logger.log(ids)
+    Logger.log(emails)
     Logger.log(names)
 
     //Return the names of the missing students

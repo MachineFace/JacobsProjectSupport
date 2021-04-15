@@ -131,7 +131,7 @@ const onFormSubmit = async (e) => {
         Logg("Set status to 'Received'.");
     }
     catch (err) {
-        Logg(err + ": Could not set status to 'Received'.");
+        Logg(`${err}: Could not set status to 'Received'.`);
     }
 
 
@@ -154,7 +154,7 @@ const onFormSubmit = async (e) => {
     sheet.getRange("F" + lastRow).setValue(jobnumber);
 
     //Check Priority
-    var priority = await GetPriority(sid);
+    var priority = await GetPriorityFromEmail(email);
     sheet.getRange("C" + lastRow).setValue(priority);
 
     //Create Messages
@@ -207,8 +207,8 @@ const onFormSubmit = async (e) => {
             designspecialistemail = InvokeDS("Nicole", "email");
             break;
         case "Vinyl Cutter":
-            designspecialistemail = InvokeDS("Nicole", "email");
-            sheet.getRange("B" + lastRow).setValue("Nicole");
+            designspecialistemail = InvokeDS("Cody", "email");
+            sheet.getRange("B" + lastRow).setValue("Cody");
             break;
         case undefined:
             designspecialistemail = InvokeDS("Staff", "email");
@@ -395,7 +395,8 @@ const onEdit = async (e) => {
 
     //----------------------------------------------------------------------------------------------------------------
     //Check Priority
-    var priority = await GetPriority(ss.getRange(thisRow, 11).getValue());
+    let tempEmail = ss.getRange(thisRow, 9).getValue();
+    var priority = await GetPriorityFromEmail(tempEmail);
     ss.getRange("C" + thisRow).setValue(priority);
     if(priority == "STUDENT NOT FOUND") {
         SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange(thisRow, 1, 1, 1).setValue("Missing Access");
@@ -1174,5 +1175,44 @@ var GetPriority = (sid) => {
     //Return value
     return priority;
 }
+
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Get Priority Number from Erik's List
+ * Old Excel formula : '=ARRAYFORMULA(ISNUMBER(MATCH(Text(K2:K, "0"), Text('Student List DONOTDELETE'!C2:C500, "0"),0)))'
+ * @param {string} email
+ * @returns {number} priority number 1 - 4
+ */
+var GetPriorityFromEmail = (email) => {
+
+    //email = "saveritt@berkeley.edu";  //test good email
+    //email = "some@thing.com";    //test bad email
+
+    let priority
+
+    let last = sheetDict.approved.getLastRow() - 1
+    let approvedList = sheetDict.approved.getRange(2, 2, last, 1).getValues() 
+
+    //Loop through SIDs to find a match and fetch priority number
+    for(let i = 0; i < approvedList.length; i++) {
+        let item = approvedList[i][0].toString();
+        if(item == email) {
+            let index = i + 2;
+            priority = sheetDict.approved.getRange(index, 4).getValue()
+            break
+        }
+        else if (item != email) {
+            priority = 'STUDENT NOT FOUND!'
+        }
+    }
+
+    Logger.log(`Priority = ${priority}`)
+    return priority;
+}
+
+
+
 
 
