@@ -236,13 +236,6 @@ const onFormSubmit = async (e) => {
     stat = stat ? stat : sheet.getRange("A" + lastRow).setValue("Received");
     Logger.log("Status refixed to 'Received'.");
 
-    /*
-    if(stat == undefined || stat == null || stat == "") {
-        sheet.getRange("A" + lastRow).setValue("Received");
-        Logger.log("Status refixed to 'Received'.");
-    }
-    */
-
     //"Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
     var shippingbody = message.shippingMessage;
 
@@ -305,13 +298,6 @@ const onFormSubmit = async (e) => {
     //Check again
     jobnumber = (jobnumber !== null && jobnumber !== undefined) ? jobnumber : CreateJobNumber(timestamp);
     sheet.getRange("F" + lastRow).setValue(jobnumber);
-
-    /*
-    if (jobnumber == undefined || jobnumber == null) {
-        jobnumber = CreateJobNumber(timestamp);
-        sheet.getRange("F" + lastRow).setValue(jobnumber);
-    }
-    */
 
     //Fix wrapping issues
     let driveloc = sheet.getRange('D' + lastRow);
