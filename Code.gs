@@ -154,7 +154,7 @@ const onFormSubmit = async (e) => {
     sheet.getRange("F" + lastRow).setValue(jobnumber);
 
     //Check Priority
-    var priority = await GetPriorityFromEmail(email);
+    var priority = await GetPriorityWithEmailOrSID(email, sid);
     sheet.getRange("C" + lastRow).setValue(priority);
 
     //Create Messages
@@ -382,7 +382,8 @@ const onEdit = async (e) => {
     //----------------------------------------------------------------------------------------------------------------
     //Check Priority
     let tempEmail = ss.getRange(thisRow, 9).getValue();
-    var priority = await GetPriorityFromEmail(tempEmail);
+    let tempSID = ss.getRange(thisRow, 11).getValue();
+    var priority = await GetPriorityWithEmailOrSID(tempEmail, tempSID);
     ss.getRange("C" + thisRow).setValue(priority);
     if(priority == "STUDENT NOT FOUND") {
         SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange(thisRow, 1, 1, 1).setValue("Missing Access");
@@ -1172,7 +1173,6 @@ var GetPriority = (sid) => {
  * @returns {number} priority number 1 - 4
  */
 var GetPriorityFromEmail = (email) => {
-
     //email = "saveritt@berkeley.edu";  //test good email
     //email = "some@thing.com";    //test bad email
 
@@ -1197,6 +1197,71 @@ var GetPriorityFromEmail = (email) => {
     Logger.log(`Priority = ${priority}`)
     return priority;
 }
+
+
+
+/**
+ * @param {[string]} array to search
+ * @param {string} searchString
+ * @returns {int} index
+ */
+const Search = (values, searchString) => {
+    for(let i = 0; i < values.length; i++) {
+        if(values[i][0] == searchString) {
+          return i;
+        }
+    }
+}
+
+/**
+ * @param {string} email
+ * @param {string} SID
+ * @returns {int} priority
+ */
+const GetPriorityWithEmailOrSID = (email, sid) => {
+
+    let priority;
+
+    if(sid) stringSID = sid.toString().replace(/\s+/g, '');
+
+    let approvedListEmails = sheetDict.approved.getRange(2, 2, sheetDict.approved.getLastRow() - 1, 1).getValues() 
+    let approvedListSIDs = sheetDict.approved.getRange(2, 3, sheetDict.approved.getLastRow() - 1, 1).getValues();
+
+    let index = Search(approvedListEmails, email)
+    if(index == null || index == undefined) {
+        index = Search(approvedListSIDs, stringSID)
+    }
+    
+    if(index != null || index != undefined) {
+        index += 2
+        Logger.log(`Index on ApprovedSheet : ${index}`)
+        priority = sheetDict.approved.getRange(index, 4).getValue()
+    }
+    else return `STUDENT NOT FOUND!` 
+
+    Logger.log(`Priority = ${priority}`)
+    return priority;
+}
+
+
+
+const _testGetPriority = async () => {
+    try {
+        let test
+        test = await GetPriorityWithEmailOrSID(`wkoch@berkeley.edu`, `12093487123`)
+        Logger.log(`Good Email, Bad SID : ${test}`)
+        test = await GetPriorityWithEmailOrSID(`nmaitra@berkeley.edu`, `3033953355`)
+        Logger.log(`Bad Email, Good SID : ${test}`)
+        test = await GetPriorityWithEmailOrSID(`some@thing.com`, `3033953355`)
+        Logger.log(`Bad Email, Good SID : ${test}`)
+        test = await GetPriorityWithEmailOrSID(`some@thing.com`, `1029384712`)
+        Logger.log(`Bad Email, Bad SID : ${test}`)
+    } catch(err) {
+        Logger.log(`FAILED : ${err}`)
+    }
+}
+
+
 
 
 

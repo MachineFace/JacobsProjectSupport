@@ -470,10 +470,11 @@ const CheckMissingAccessStudents = () => {
                 let i = index + 2;
                 let email = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 9, 1, 1).getValue().toString();
                 emails.push(email);
+                let sid = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 11, 1, 1).getValue().toString();
                 let name = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 10, 1, 1).getValue().toString();
                 names.push(name);
 
-                let priority = GetPriorityFromEmail(email);
+                let priority = GetPriorityWithEmailOrSID(email, sid);
                 SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(i, 3, 1, 1).setValue(priority);
             }
         })
