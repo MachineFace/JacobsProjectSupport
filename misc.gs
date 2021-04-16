@@ -54,9 +54,6 @@ const setByHeader = (colName, row, val) => {
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
   var col = data[0].indexOf(colName);
-  //if (col != -1) {
-  //  return data[row-1][col];
-  //}
   var range = sheet.getRange(row, col);
   range.setValue(val);
 };
