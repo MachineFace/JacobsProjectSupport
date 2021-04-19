@@ -41,12 +41,13 @@ const formatCell = (cell) => {
  * @param {string} colName
  * @param {number} row
  */
-const getByHeader = (colName, row) => {
-    let data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
-    let col = data[0].indexOf(colName);
-    if (col != -1) {
-      return data[row - 1][col];
-    }
+ const getByHeader = (theSheet, colName, row) => {
+  // let data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
+  let data = theSheet.getDataRange().getValues();
+  let col = data[0].indexOf(colName);
+  if (col != -1) {
+    return data[row - 1][col];
+  }
 };
 
 
@@ -59,12 +60,12 @@ const getByHeader = (colName, row) => {
  * @param {number} row
  * @param {any} val
  */
-const setByHeader = (colName, row, val) => {
-    let sheet = SpreadsheetApp.getActiveSheet();
-    let data = sheet.getDataRange().getValues();
-    let col = data[0].indexOf(colName);
-    let range = sheet.getRange(row, col);
-    range.setValue(val);
+const setByHeader = (theSheet, colName, row, val) => {
+  //let sheet = SpreadsheetApp.getActiveSheet();
+  let data = theSheet.getDataRange().getValues();
+  let col = data[0].indexOf(colName);
+  let range = sheet.getRange(row, col);
+  range.setValue(val);
 };
 
 

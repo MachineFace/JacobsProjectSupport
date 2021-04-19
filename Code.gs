@@ -399,41 +399,62 @@ const onEdit = async (e) => {
 
     //----------------------------------------------------------------------------------------------------------------
     //Parse Data
-    const status = getByHeader("(INTERNAL) Status", thisRow);   
+    const status = getByHeader(spreadSheet, "(INTERNAL) Status", thisRow);   
 
-    var designspecialist = getByHeader("(INTERNAL): DS Assigned", thisRow); 
-    var priority = getByHeader("(INTERNAL): Priority", thisRow);
-    var jobnumber = getByHeader("(INTERNAL AUTO) Job Number", thisRow);
-    var studentApproval = getByHeader("Student Has Approved Job", thisRow);
-    var submissiontime = getByHeader("Timestamp", thisRow);
-    var email = getByHeader("Email Address", thisRow);
-    var name = getByHeader("What is your name?", thisRow); 
-    var sid = getByHeader("Student ID Number", thisRow);
-    var studentType = getByHeader("What is your affiliation to the Jacobs Institute?", thisRow);
-    var projectname = getByHeader("Project Name", thisRow);
-    var shippingQuestion = getByHeader("Do you need your parts shipped to you?", thisRow);
-    var cost = getByHeader("Estimate", thisRow); 
+    var designspecialist = getByHeader(spreadSheet, "(INTERNAL): DS Assigned", thisRow); 
+    var priority = getByHeader(spreadSheet, "(INTERNAL): Priority", thisRow);
+    var jobnumber = getByHeader(spreadSheet, "(INTERNAL AUTO) Job Number", thisRow);
+    var studentApproval = getByHeader(spreadSheet, "Student Has Approved Job", thisRow);
+    var submissiontime = getByHeader(spreadSheet, "Timestamp", thisRow);
+    var email = getByHeader(spreadSheet, "Email Address", thisRow);
+    var name = getByHeader(spreadSheet, "What is your name?", thisRow); 
+    var sid = getByHeader(spreadSheet, "Student ID Number", thisRow);
+    var studentType = getByHeader(spreadSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
+    var projectname = getByHeader(spreadSheet, "Project Name", thisRow);
+    var shippingQuestion = getByHeader(spreadSheet, "Do you need your parts shipped to you?", thisRow);
+    var cost = getByHeader(spreadSheet, "Estimate", thisRow); 
 
     //Materials
-    const material1Quantity = ss.getRange(thisRow, 13).getValue();
-    const material1Name = ss.getRange(thisRow, 14).getValue();
+    const material1Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 1 Quantity", thisRow);
+    const material1Name = getByHeader(spreadSheet, "(INTERNAL) Item 1", thisRow);
     const material1URL = await new LookupProductID(material1Name).link;
 
-    const material2Quantity = ss.getRange(thisRow, 15).getValue();
-    const material2Name = ss.getRange(thisRow, 16).getValue();
+    const material2Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
+    const material2Name = getByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
     const material2URL = await new LookupProductID(material2Name).link;
+    
+    const material3Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 3 Quantity", thisRow);
+    const material3Name = getByHeader(spreadSheet, "(INTERNAL) Item 3", thisRow);
+    const material3URL = new LookupProductID(material3Name).link;
+    
+    
+    const material4Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 4 Quantity", thisRow);
+    const material4Name = getByHeader(spreadSheet, "(INTERNAL) Item 4", thisRow);
+    const material4URL = new LookupProductID(material4Name).link;
 
-    const material3Quantity = ss.getRange(thisRow, 17).getValue();
-    const material3Name = ss.getRange(thisRow, 18).getValue();
-    const material3URL = await new LookupProductID(material3Name).link;
+    const material5Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 5 Quantity", thisRow);
+    const material5Name = getByHeader(spreadSheet, "(INTERNAL) Item 5", thisRow);
+    const material5URL = new LookupProductID(material5Name).link;
+    
+    // const material1Quantity = ss.getRange(thisRow, 13).getValue();
+    // const material1Name = ss.getRange(thisRow, 14).getValue();
+    // const material1URL = await new LookupProductID(material1Name).link;
 
-    const material4Quantity = ss.getRange(thisRow, 19).getValue();
-    const material4Name = ss.getRange(thisRow, 20).getValue();
-    const material4URL = await new LookupProductID(material4Name).link;
+    // const material2Quantity = ss.getRange(thisRow, 15).getValue();
+    // const material2Name = ss.getRange(thisRow, 16).getValue();
+    // const material2URL = await new LookupProductID(material2Name).link;
 
-    const material5Quantity = ss.getRange(thisRow, 21).getValue(); 
-    const material5Name = ss.getRange(thisRow, 22).getValue();
-    const material5URL = await new LookupProductID(material5Name).link;
+    // const material3Quantity = ss.getRange(thisRow, 17).getValue();
+    // const material3Name = ss.getRange(thisRow, 18).getValue();
+    // const material3URL = await new LookupProductID(material3Name).link;
+
+    // const material4Quantity = ss.getRange(thisRow, 19).getValue();
+    // const material4Name = ss.getRange(thisRow, 20).getValue();
+    // const material4URL = await new LookupProductID(material4Name).link;
+
+    // const material5Quantity = ss.getRange(thisRow, 21).getValue(); 
+    // const material5Name = ss.getRange(thisRow, 22).getValue();
+    // const material5URL = await new LookupProductID(material5Name).link;
 
 
     if (material1Name != "") var mat1 = true;

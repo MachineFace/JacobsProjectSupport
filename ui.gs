@@ -102,22 +102,22 @@ const PopupCreateTicket = async () => {
             return;
     }
 
-    let status = getByHeader("(INTERNAL) Status", thisRow); 
-    let ds = getByHeader(`(INTERNAL): DS Assigned`, thisRow);
-    let priority = getByHeader(`(INTERNAL): Priority`, thisRow);
-    let jobnumber = getByHeader("(INTERNAL AUTO) Job Number", thisRow);
-    let timestamp = getByHeader(`Timestamp`, thisRow);
-    let name = getByHeader(`What is your name?`, thisRow);
-    let sid = getByHeader("Student ID Number", thisRow);
-    let email = getByHeader("Email Address", thisRow);
-    let projectname = getByHeader("Project Name", thisRow);
+    let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow); 
+    let ds = getByHeader(thisSheet, `(INTERNAL): DS Assigned`, thisRow);
+    let priority = getByHeader(thisSheet, `(INTERNAL): Priority`, thisRow);
+    let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+    let timestamp = getByHeader(thisSheet, `Timestamp`, thisRow);
+    let name = getByHeader(thisSheet, `What is your name?`, thisRow);
+    let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
+    let email = getByHeader(thisSheet, "Email Address", thisRow);
+    let projectname = getByHeader(thisSheet, "Project Name", thisRow);
 
     //Materials
-    let material1Quantity = getByHeader(`"(INTERNAL): Material 1 Quantity"`, thisRow);
-    let material1Name = getByHeader(`(INTERNAL) Item 1`, thisRow);
-    let material2Quantity = getByHeader(`(INTERNAL) Material 2 Quanity`, thisRow);
-    let material2Name = getByHeader(`(INTERNAL) Item 2`, thisRow);
-    let shippingQuestion = getByHeader(`Do you need your parts shipped to you?`, thisRow);
+    let material1Quantity = getByHeader(thisSheet, `(INTERNAL) Material 1 Quantity`, thisRow);
+    let material1Name = getByHeader(thisSheet, `(INTERNAL) Item 1`, thisRow);
+    let material2Quantity = getByHeader(thisSheet, `(INTERNAL) Material 2 Quanity`, thisRow);
+    let material2Name = getByHeader(thisSheet, `(INTERNAL) Item 2`, thisRow);
+    let shippingQuestion = getByHeader(thisSheet, `Do you need your parts shipped to you?`, thisRow);
 
     let ticket;
     try {
@@ -258,39 +258,52 @@ const BillFromSelected = async () => {
     }
  
 
-    let status = getByHeader("(INTERNAL) Status", thisRow); 
+    let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow); 
     await Logg(`Status of billed row = ${status}`);  
-    let jobnumber = getByHeader("(INTERNAL AUTO) Job Number", thisRow);
-    let email = getByHeader("Email Address", thisRow);
-    let name = getByHeader("What is your name?", thisRow); 
-    //let sid = getByHeader("Student ID Number", thisRow);
-    //let projectname = getByHeader("Project Name", thisRow);
+    let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+    let email = getByHeader(thisSheet, "Email Address", thisRow);
+    let name = getByHeader(thisSheet, "What is your name?", thisRow); 
+    //let sid = getByHeader(spreadSheet, "Student ID Number", thisRow);
+    //let projectname = getByHeader(spreadSheet, "Project Name", thisRow);
 
     //Materials
-    let material1Quantity = ss.getRange(thisRow, 13).getValue();
-    let material1Name = ss.getRange(thisRow, 14).getValue();
-    let material1URL = await new LookupProductID(material1Name).link;
+    // let material1Quantity = ss.getRange(thisRow, 13).getValue();
+    // let material1Name = ss.getRange(thisRow, 14).getValue();
+    // let material1URL = await new LookupProductID(material1Name).link;
+    let material1Quantity = getByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
+    let material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
+    //let material1URL = await new LookupProductID(material1Name).link;
 
-    let material2Quantity = ss.getRange(thisRow, 15).getValue();
-    let material2Name = ss.getRange(thisRow, 16).getValue();
-    if(material2Name !== null || material2Name !== 'undefined') {
-        let material2URL = await new LookupProductID(material2Name).link;
-    }
+    // let material2Quantity = ss.getRange(thisRow, 15).getValue();
+    // let material2Name = ss.getRange(thisRow, 16).getValue();
+    let material2Quantity = getByHeader(thisSheet, "(INTERNAL) Material 2 Quantity", thisRow);
+    let material2Name = getByHeader(thisSheet, "(INTERNAL) Item 2", thisRow);
+    
+    //if(material2Name !== null || material2Name !== 'undefined') {
+    //   let material2URL = await new LookupProductID(material2Name).link;
+    //}
 
     //Use the right Column Later once we decide on location.
 
-    let material3Quantity = ss.getRange(thisRow, 17).getValue();
-    let material3Name = ss.getRange(thisRow, 18).getValue();
+    // let material3Quantity = ss.getRange(thisRow, 17).getValue();
+    // let material3Name = ss.getRange(thisRow, 18).getValue();
+    let material3Quantity = getByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
+    let material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
+   
     if(material3Name !== null || material3Name !== 'undefined') {
     }
     //let material3URL = new LookupProductID(material3Name).link;
 
-    let material4Quantity = ss.getRange(thisRow, 19).getValue();
-    let material4Name = ss.getRange(thisRow, 20).getValue();
+    // let material4Quantity = ss.getRange(thisRow, 19).getValue();
+    // let material4Name = ss.getRange(thisRow, 20).getValue();
+    let material4Quantity = getByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
+    let material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
     //let material4URL = new LookupProductID(material4Name).link;
 
-    let material5Name = ss.getRange(thisRow, 22).getValue();
-    let material5Quantity = ss.getRange(thisRow, 21).getValue(); 
+    // let material5Name = ss.getRange(thisRow, 22).getValue();
+    // let material5Quantity = ss.getRange(thisRow, 21).getValue(); 
+    let material5Quantity = getByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
+    let material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
     //var material5URL = new LookupProductID(material5Name).link;
     
     //Add total quantities - if there are none then cancel billing
