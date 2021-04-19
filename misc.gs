@@ -18,19 +18,21 @@ const DeleteOldFiles = () => {
   }
 };
 
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Format cell to fix overlap issue
  * @param {cell} cell
  */
 const formatCell = (cell) => {
-  try {
-    let strategy = SpreadsheetApp.WrapStrategy.CLIP;
-    cell.setWrapStrategy(strategy);
-  } catch (err) {
-    Logger.log(err + " : Cell failed to be clipped.");
-  }
+    try {
+        let strategy = SpreadsheetApp.WrapStrategy.CLIP;
+        cell.setWrapStrategy(strategy);
+    } catch (err) {
+        Logger.log(`${err} : Cell failed to be clipped.`);
+    }
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -65,6 +67,7 @@ const setByHeader = (colName, row, val) => {
     range.setValue(val);
 };
 
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Custom Logger function - Writes to the tab called "Logger" for debugging purposes
@@ -72,27 +75,29 @@ const setByHeader = (colName, row, val) => {
  * @returns message to specific logger sheet
  */
 const Logg = (message) => {
-  let logger = sheetDict.logger;
-  let thisRow = logger.getLastRow() + 1;
-  let time = new Date();
-  try {
-    logger.getRange(thisRow, 1).setValue(time);
-    logger.getRange(thisRow, 2).setValue("INFO");
-    logger.getRange(thisRow, 3).setValue(message);
-  } catch (err) {
-    Logger.log(err + " : Couldnt log messages to sheet for whatever reason.");
-  }
+    let logger = sheetDict.logger;
+    let thisRow = logger.getLastRow() + 1;
+    let time = new Date();
+    try {
+        logger.getRange(thisRow, 1).setValue(time);
+        logger.getRange(thisRow, 2).setValue("INFO");
+        logger.getRange(thisRow, 3).setValue(message);
+    } catch (err) {
+        Logger.log(`${err} : Couldnt log messages to sheet for whatever reason.`);
+    }
 };
+
 
 /**
  * Materials Class function
  */
 const materials = (index, quantity, name, url) => {
-  this.index = index;
-  this.quantity = quantity;
-  this.name = name;
-  this.url = url;
+    this.index = index;
+    this.quantity = quantity;
+    this.name = name;
+    this.url = url;
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -132,9 +137,10 @@ const CreateTimeDrivenTrigger = () => {
       .atHour(timetoEmail)
       .create();
   } catch (err) {
-    Logg(err + " : Could not create triggers");
+    Logg(`${err} : Could not create triggers`);
   }
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -142,23 +148,24 @@ const CreateTimeDrivenTrigger = () => {
  * Used in 'DisableJPS()'
  */
 const RemoveTimedTriggers = () => {
-  let triggers = ScriptApp.getProjectTriggers();
-  try {
-    for (var i = 0; i < triggers.length; i++) {
-      if (triggers[i].getEventType() == ScriptApp.EventType.ON_EDIT)
-        Logger.log("OnEdit Trigger : " + triggers[i].getUniqueId()); //KEEP THIS TRIGGER
-      if (triggers[i].getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
-        Logger.log("OnFormSubmit Trigger : " + triggers[i].getUniqueId()); //KEEP THIS TRIGGER
-      if (triggers[i].getEventType() == ScriptApp.EventType.CLOCK) {
-        Logger.log("TimeBased Trigger : " + triggers[i].getUniqueId());
-        ScriptApp.deleteTrigger(triggers[i]);
-      }
+    let triggers = ScriptApp.getProjectTriggers();
+    try {
+        for (var i = 0; i < triggers.length; i++) {
+            if (triggers[i].getEventType() == ScriptApp.EventType.ON_EDIT)
+                Logger.log(`OnEdit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
+            if (triggers[i].getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
+                Logger.log(`OnFormSubmit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
+            if (triggers[i].getEventType() == ScriptApp.EventType.CLOCK) {
+                Logger.log(`TimeBased Trigger : ${triggers[i].getUniqueId()}`);
+                ScriptApp.deleteTrigger(triggers[i]);
+            }
+        }
+        Logger.log(`Removed Triggers for Summary Emails`);
+    } catch (err) {
+        Logger.log(`${err} : Couldnt remove triggers for whatever reason.`);
     }
-    Logger.log("Removed Triggers for Summary Emails");
-  } catch (err) {
-    Logger.log(err + " : Couldnt remove triggers for whatever reason.");
-  }
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -168,20 +175,19 @@ const RemoveTimedTriggers = () => {
 const DisableJPS = () => {
   //Disable Forms
   try {
-    for (let name in formDict) {
-      FormApp.openById(formDict[name]).setAcceptingResponses(false);
-      Logger.log(name + " : ", formDict[name] + " IS NOW DISABLED.");
-    }
-    Logger.log(
-      "Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK."
-    );
+      for (let name in formDict) {
+          FormApp.openById(formDict[name]).setAcceptingResponses(false);
+          Logger.log(`${name} : ${formDict[name]} IS NOW DISABLED.`);
+      }
+      Logger.log(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
   } catch (err) {
-    Logger.log(err + " : Couldnt disable Accepting Responses on Forms");
+      Logger.log(`${err} : Couldnt disable Accepting Responses on Forms`);
   }
 
   //Delete Timebased Triggers for Daily Emails
   RemoveTimedTriggers();
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -191,25 +197,24 @@ const DisableJPS = () => {
 const EnableJPS = () => {
   //Disable Forms
   try {
-    for (let name in formDict) {
-      FormApp.openById(formDict[name]).setAcceptingResponses(true);
-      Logger.log(name + " : ", formDict[name] + " IS NOW ENABLED.");
-    }
-    Logger.log(
-      "Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!"
-    );
+      for (let name in formDict) {
+          FormApp.openById(formDict[name]).setAcceptingResponses(true);
+          Logger.log(`${name} : ${formDict[name]} IS NOW ENABLED.`);
+      }
+      Logger.log(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
   } catch (err) {
-    Logger.log(err + " : Couldnt enable Accepting Responses on Forms");
+      Logger.log(err + " : Couldnt enable Accepting Responses on Forms");
   }
 
   //Create Triggers
   try {
-    CreateTimeDrivenTrigger();
-    Logger.log("Created Daily Summary Email Triggers.");
+      CreateTimeDrivenTrigger();
+      Logger.log("Created Daily Summary Email Triggers.");
   } catch (err) {
-    Logger.log(err + " : Couldnt install triggers for whatever reason.");
+      Logger.log(`${err} : Couldnt install triggers for whatever reason.`);
   }
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -217,17 +222,19 @@ const EnableJPS = () => {
  * @param {spreadsheet} sheet
  * @param {string} column
  * @param {any} data
+ * @returns {int} indexes
  */
 const FindDataInColumn = (sheet, column, data) => {
-  let indexes = [];
-  let values = sheet.getRange(column + ":" + column).getValues(); // like A:A
-  let row = 2;
+    let indexes = [];
+    let values = sheet.getRange(column + ":" + column).getValues(); // like A:A
+    let row = 2;
 
-  while (values[row] && values[row][0] !== data) row++;
-  if (values[row][0] === data) indexes.push(row + 1);
-  else return -1;
-  return indexes;
+    while (values[row] && values[row][0] !== data) row++;
+    if (values[row][0] === data) indexes.push(row + 1);
+    else return -1;
+    return indexes;
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -253,6 +260,7 @@ const FindDataInRow = (sheet, data) => {
   }
   return indexes;
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -336,21 +344,24 @@ const Recolor = (wholerow, status, shippingQuestion) => {
         break;
     }
   } catch (err) {
-    Logg(err + " : Cant change row color for some reason. ");
+      Logg(`${err} : Cant change row color for some reason. `);
   }
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Find an index in an array
  * @param {any} search
+ * @returns {int} index
  */
 Array.prototype.findIndex = (search) => {
-  if (search == "") return false;
-  for (let i = 0; i < this.length; i++)
-    if (this[i].toString().indexOf(search) > -1) return i;
-  return -1;
+    if (search == "") return false;
+    for (let i = 0; i < this.length; i++)
+        if (this[i].toString().indexOf(search) > -1) return i;
+    return -1;
 };
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -362,6 +373,7 @@ const isValidDate = (d) => {
   if (Object.prototype.toString.call(d) !== "[object Date]") return false;
   return !isNaN(d.getTime());
 };
+
 
 /**
  *
@@ -499,6 +511,7 @@ const CheckMissingAccessStudents = () => {
   return names;
 };
 
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  *
@@ -524,6 +537,8 @@ const Help = () => {
   ];
   return info;
 };
+
+
 
 /**
  * Test Get 3dPrinterOS Data from Admin. DOES NOT FETCH ACTUAL DATA
