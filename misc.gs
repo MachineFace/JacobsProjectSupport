@@ -35,27 +35,34 @@ const formatCell = (cell) => {
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Return the value of a cell by column name and row number
- *
  * Tested and confirmed
- *
  * @param {string} colName
  * @param {number} row
  */
 const getByHeader = (colName, row) => {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  var col = data[0].indexOf(colName);
-  if (col != -1) {
-    return data[row - 1][col];
-  }
+    let data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
+    let col = data[0].indexOf(colName);
+    if (col != -1) {
+      return data[row - 1][col];
+    }
 };
 
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Set the value of a cell by column name and row number
+ * Tested and confirmed
+ * @param {string} colName
+ * @param {number} row
+ * @param {any} val
+ */
 const setByHeader = (colName, row, val) => {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  var col = data[0].indexOf(colName);
-  var range = sheet.getRange(row, col);
-  range.setValue(val);
+    let sheet = SpreadsheetApp.getActiveSheet();
+    let data = sheet.getDataRange().getValues();
+    let col = data[0].indexOf(colName);
+    let range = sheet.getRange(row, col);
+    range.setValue(val);
 };
 
 /**
