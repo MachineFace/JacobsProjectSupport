@@ -144,8 +144,8 @@ const onFormSubmit = async (e) => {
         break;
       }
     }
-    //sheet.getRange("A" + lastRow).setValue("Received");
-    setByHeader(sheet, "(INTERNAL) Status", thisRow, "Received");
+    sheet.getRange("A" + lastRow).setValue("Received");
+    //setByHeader(sheet, "(INTERNAL) Status", thisRow, "Received");
     Logg("Set status to 'Received'.");
   } catch (err) {
     Logg(`${err}: Could not set status to 'Received'.`);
@@ -172,13 +172,13 @@ const onFormSubmit = async (e) => {
 
   //Generate new Job number
   var jobnumber = await CreateJobNumber(timestamp);
-  //sheet.getRange("F" + lastRow).setValue(jobnumber);
-  setByHeader(sheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
+  sheet.getRange("F" + lastRow).setValue(jobnumber);
+  //setByHeader(sheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
 
   //Check Priority
   var priority = await GetPriorityWithEmailOrSID(email, sid);
-  //sheet.getRange("C" + lastRow).setValue(priority);
-  setByHeader(sheet, "(INTERNAL): Priority", thisRow, priority);
+  sheet.getRange("C" + lastRow).setValue(priority);
+  //setByHeader(sheet, "(INTERNAL): Priority", thisRow, priority);
 
   //Create Messages
   var message = await new CreateSubmissionMessage(name, projectname, jobnumber);
@@ -204,27 +204,27 @@ const onFormSubmit = async (e) => {
     case "Othermill":
     case "Shopbot":
       designspecialistemail = InvokeDS("Adam", "email");
-      //sheet.getRange("B" + lastRow).setValue("Adam");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Adam");
+      sheet.getRange("B" + lastRow).setValue("Adam");
+      //setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Adam");
       break;
     case "Advanced Lab":
     case "Creaform":
       designspecialistemail = InvokeDS("Chris", "email");
-      //sheet.getRange("B" + lastRow).setValue("Chris");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Chris");
+      sheet.getRange("B" + lastRow).setValue("Chris");
+      // setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Chris");
       break;
     case "Canon Plotter":
     case "Fablight":
     case "Haas & Tormach":
       designspecialistemail = InvokeDS("Cody", "email");
-      //sheet.getRange("B" + lastRow).setValue("Cody");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Cody");
+      sheet.getRange("B" + lastRow).setValue("Cody");
+      // setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Cody");
       break;
     case "Waterjet":
     case "Other Tools":
       designspecialistemail = InvokeDS("Gary", "email");
-      //sheet.getRange("B" + lastRow).setValue("Gary");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Gary");
+      sheet.getRange("B" + lastRow).setValue("Gary");
+      // setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Gary");
       break;
     case "Laser Cutter":
       //Nobody assigned / Everyone assigned.
@@ -234,13 +234,13 @@ const onFormSubmit = async (e) => {
       break;
     case "Vinyl Cutter":
       designspecialistemail = InvokeDS("Cody", "email");
-      //sheet.getRange("B" + lastRow).setValue("Cody");
-      setByHeader(sheet, "(INTERNAL): DS Assigned",  thisRow, "Cody");
+      sheet.getRange("B" + lastRow).setValue("Cody");
+      // setByHeader(sheet, "(INTERNAL): DS Assigned",  thisRow, "Cody");
       break;
     case undefined:
       designspecialistemail = InvokeDS("Staff", "email");
-      //sheet.getRange("B" + lastRow).setValue("Staff");
-      setByHeader(sheet, "(INTERNAL): DS Assigned",  thisRow, "Staff");
+      sheet.getRange("B" + lastRow).setValue("Staff");
+      // setByHeader(sheet, "(INTERNAL): DS Assigned",  thisRow, "Staff");
       break;
   }
 
@@ -264,8 +264,8 @@ const onFormSubmit = async (e) => {
 
   //Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
-  stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status",  thisRow, "Received"); 
-  //sheet.getRange("A" + lastRow).setValue("Received");
+  stat = stat ? stat : sheet.getRange("A" + lastRow).setValue("Received"); //setByHeader(sheet, "(INTERNAL) Status",  thisRow, "Received"); 
+  
   Logger.log("Status refixed to 'Received'.");
 
   //"Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
@@ -321,8 +321,8 @@ const onFormSubmit = async (e) => {
       });
 
       //Set access to Missing Access
-      //sheet.getRange("A" + lastRow).setValue("Missing Access");
-      setByHeader(sheet, "(INTERNAL) Status", thisRow, "Missing Access");
+      sheet.getRange("A" + lastRow).setValue("Missing Access");
+      //setByHeader(sheet, "(INTERNAL) Status", thisRow, "Missing Access");
       Logger.log(
         `'Missing Access' Email sent to student and status set to 'Missing Access'.`
       );
@@ -336,8 +336,8 @@ const onFormSubmit = async (e) => {
     jobnumber !== null && jobnumber !== undefined
       ? jobnumber
       : CreateJobNumber(timestamp);
-  //sheet.getRange("F" + lastRow).setValue(jobnumber);
-  setByHeader(sheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
+  sheet.getRange("F" + lastRow).setValue(jobnumber);
+  //setByHeader(sheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
   
 
   //Fix wrapping issues
