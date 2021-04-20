@@ -1,60 +1,90 @@
+/**
+ * Load GasT for Testing
+ * See : https://github.com/huan/gast for instructions
+ */
+if ((typeof GasTap)==='undefined') { 
+  eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+} 
+const test = new GasTap()
 
 /**
- * Barcode UnitTests
+ * Test with GasT
  */
-const _testGenerateBarcodeQRCode = async () => {
-    try {
-        jobnumber = "20210301140515";   //Known working Test JobNumber
-        if( await GenerateBarCode(jobnumber) !== null) {
-            Logger.log('PASSED'); //Should PASS
-        }
-        if( await GenerateBarCode('123kjnb345kjb3') !== null) {
-            Logger.log('PASSED'); //Should PASS
-        }
-        if( await GenerateBarCode('#@$%%$^*^&R@#$G') !== null) {
-            Logger.log('PASSED'); //Should FAIL
-        }
-    }
-    catch(err) {
-        Logger.log(err + ' : Failed Test')
-    }
-    try {
-        jobnumber = "20210301140515";   //Known working Test JobNumber
-        if( await GenerateQRCode(jobnumber) !== null) {
-            Logger.log('PASSED'); //Should PASS
-        }
-        if( await GenerateQRCode('123kjnb345kjb3') !== null) {
-            Logger.log('PASSED'); //Should PASS
-        }
-        if( await GenerateQRCode('#@$%%$^*^&R@#$G') !== null) {
-            Logger.log('PASSED'); //Should FAIL
-        }
-    }
-    catch(err) {
-        Logger.log(`${err} : Failed Test`)
-    }
+const _gastTestRunner = async () => {
+  // await test(`Checking...`, (t) => {    
+  //     let i = 3 + 4
+  //     t.equal(i, 7, `Calc : 3 + 4 = 7  : Correct`)
+  // })
+
+  await test(`Generate Barcode: `, (t) => {
+      let jobnumber = `20210301140515`
+      let x = GenerateBarCode(jobnumber)
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Generate QRCode: `, (t) => {
+      let jobnumber = `20210301140515`
+      let x = GenerateQRCode(jobnumber)
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Staff Functions`, (t) => {
+      let x = new DesignSpecialist(`Testa`, `Testa Nama`, `some@thing.com`)
+      StaffEmailAsString()
+      InvokeDS(`Cody`,`email`)
+      CreateDS()
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Staff Functions`, (t) => {
+      let x = MakeLink(`some@thing.com`)
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Calcs`, (t) => {
+      let x = CalculateAverageTurnaround(sheetDict.ultimaker)
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Calcs`, (t) => {
+      let x = CalculateDuration( new Date(1992,03,27), new Date() )
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Calcs`, (t) => {
+      let x = CountActiveUsers()
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Calcs`, (t) => {
+      let x = CalculateDistribution()
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Calcs`, (t) => {
+      let x = CalculateStandardDeviation()
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Calcs`, (t) => {
+      let x = Metrics()
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+
+  test.finish()
 }
 
-
-
-/**
- * Unit Test
- */
-const _testStaffFunctions = async () => {
-  try {
-      Promise.all([
-          await DesignSpecialist('Testa', 'Testa Nama', 'test@test.com'),
-          await MakeLink('test@test.com'),
-          await StaffEmailAsString(),
-          await InvokeDS('Cody', 'email'),
-          await CreateDS(),
-      ])
-      .then(`PASSED`)
-      .catch(err => Logger.log(`FAILED : ${err}`))
-  } catch(err) {
-      Logger.log(`FAILED : ${err}`)
-  } 
-}
 
 
 /**

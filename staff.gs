@@ -9,13 +9,89 @@
  * @param {string} fullname
  * @param {string} email
  */
-var DesignSpecialist = (name, fullname, email) => {
-    this.name = name;
-    this.fullname = fullname;
-    this.email = email;
-    this.emailLink = '<a href = "' + email + '">' + email + '</a>';
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Design Specialist Class
+ */
+class DesignSpecialist
+{
+  constructor(name, fullname, email)
+  {
+    this._name = name;
+    this._fullname = fullname;
+    this._email = email;
+    var link;
+    this._type = 'Design Specialist';
+    this._admin = true;
+  }
+  get name() { return this._name; }
+  set name(x) { this._name = x; }
+  get fullname() { return this._fullname; }
+  set fullname(x) { this._fullname = x; }
+  get email() { return this._email; }
+  set email(x) { this._email = x; }
+  get link() { return '<a href = "' + this._email + '">' + this._email + '</a>'; }
+  get type() { return this._type; }
+  get admin() { return this._admin; }
 }
 
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * SS Class - child of DS Class
+ */
+class StudentSupervisor extends DesignSpecialist
+{
+  constructor(name, fullname, email)
+  {
+    // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
+    super(name, fullname, email);
+    // Note: In derived classes, super() must be called before you can use 'this'. Leaving this out will cause a reference error.
+    this._name = name;
+    this._fullname = fullname;
+    this._email = email;
+    var link;
+    this._type = 'Student Supervisor';
+    this._admin = false;
+  }
+  get name() { return this._name; }
+  set name(x) { this._name = x; }
+  get fullname() { return this._fullname; }
+  set fullname(x) { this._fullname = x; }
+  get email() { return this._email; }
+  set email(x) { this._email = x; }
+  get link() { return '<a href = "' + this._email + '">' + this._email + '</a>'; }
+  get type() { return this._type; }
+  get admin() { return this._admin; }
+}
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Manager Class - child of DS Class
+ */
+class Manager extends DesignSpecialist 
+{ 
+  constructor(name, fullname, email) 
+  {
+    super(name, fullname, email);
+    this._name = name;
+    this._fullname = fullname;
+    this._email = email;
+    var link;
+    this._type = 'Manager';
+    this._admin = true;
+  }
+  get name() { return this._name; }
+  set name(x) { this._name = x; }
+  get fullname() { return this._fullname; }
+  set fullname(x) { this._fullname = x; }
+  get email() { return this._email; }
+  set email(x) { this._email = x; }
+  get link() { return '<a href = "' + this._email + '">' + this._email + '</a>'; }
+  get type() { return this._type; }
+  get admin() { return this._admin; }
+}
 
 
 
