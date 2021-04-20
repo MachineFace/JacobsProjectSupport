@@ -145,7 +145,7 @@ const onFormSubmit = async (e) => {
       }
     }
     //sheet.getRange("A" + lastRow).setValue("Received");
-    setByHeader(sheet, "(INTERNAL) Status", "Received");
+    setByHeader(sheet, "(INTERNAL) Status", thisRow, "Received");
     Logg("Set status to 'Received'.");
   } catch (err) {
     Logg(`${err}: Could not set status to 'Received'.`);
@@ -173,12 +173,12 @@ const onFormSubmit = async (e) => {
   //Generate new Job number
   var jobnumber = await CreateJobNumber(timestamp);
   //sheet.getRange("F" + lastRow).setValue(jobnumber);
-  setByHeader(sheet, "(INTERNAL AUTO) Job Number", jobnumber);
+  setByHeader(sheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
 
   //Check Priority
   var priority = await GetPriorityWithEmailOrSID(email, sid);
   //sheet.getRange("C" + lastRow).setValue(priority);
-  setByHeader(sheet, "(INTERNAL): Priority", priority);
+  setByHeader(sheet, "(INTERNAL): Priority", thisRow, priority);
 
   //Create Messages
   var message = await new CreateSubmissionMessage(name, projectname, jobnumber);
@@ -205,42 +205,42 @@ const onFormSubmit = async (e) => {
     case "Shopbot":
       designspecialistemail = InvokeDS("Adam", "email");
       //sheet.getRange("B" + lastRow).setValue("Adam");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", "Adam");
+      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Adam");
       break;
     case "Advanced Lab":
     case "Creaform":
       designspecialistemail = InvokeDS("Chris", "email");
       //sheet.getRange("B" + lastRow).setValue("Chris");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", "Chris");
+      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Chris");
       break;
     case "Canon Plotter":
     case "Fablight":
     case "Haas & Tormach":
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", "Cody");
+      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Cody");
       break;
     case "Waterjet":
     case "Other Tools":
       designspecialistemail = InvokeDS("Gary", "email");
       //sheet.getRange("B" + lastRow).setValue("Gary");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", "Gary");
+      setByHeader(sheet, "(INTERNAL): DS Assigned", thisRow, "Gary");
       break;
     case "Laser Cutter":
       //Nobody assigned / Everyone assigned.
       break;
     case "Ultimaker":
-      designspecialistemail = InvokeDS("Nicole", "email");
+      designspecialistemail = InvokeDS("Nicole", thisRow, "email");
       break;
     case "Vinyl Cutter":
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", "Cody");
+      setByHeader(sheet, "(INTERNAL): DS Assigned",  thisRow, "Cody");
       break;
     case undefined:
       designspecialistemail = InvokeDS("Staff", "email");
       //sheet.getRange("B" + lastRow).setValue("Staff");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", "Staff");
+      setByHeader(sheet, "(INTERNAL): DS Assigned",  thisRow, "Staff");
       break;
   }
 
@@ -264,7 +264,8 @@ const onFormSubmit = async (e) => {
 
   //Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
-  stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status", "Received"); //sheet.getRange("A" + lastRow).setValue("Received");
+  stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status",  thisRow, "Received"); 
+  //sheet.getRange("A" + lastRow).setValue("Received");
   Logger.log("Status refixed to 'Received'.");
 
   //"Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
@@ -320,7 +321,8 @@ const onFormSubmit = async (e) => {
       });
 
       //Set access to Missing Access
-      sheet.getRange("A" + lastRow).setValue("Missing Access");
+      //sheet.getRange("A" + lastRow).setValue("Missing Access");
+      setByHeader(sheet, "(INTERNAL) Status", thisRow, "Missing Access");
       Logger.log(
         `'Missing Access' Email sent to student and status set to 'Missing Access'.`
       );
@@ -334,7 +336,9 @@ const onFormSubmit = async (e) => {
     jobnumber !== null && jobnumber !== undefined
       ? jobnumber
       : CreateJobNumber(timestamp);
-  sheet.getRange("F" + lastRow).setValue(jobnumber);
+  //sheet.getRange("F" + lastRow).setValue(jobnumber);
+  setByHeader(sheet, "(INTERNAL AUTO) Job Number", jobnumber);
+  
 
   //Fix wrapping issues
   let driveloc = sheet.getRange("D" + lastRow);
@@ -414,16 +418,20 @@ const onEdit = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   //Check Priority
-  let tempEmail = ss.getRange(thisRow, 9).getValue();
-  let tempSID = ss.getRange(thisRow, 11).getValue();
+  // let tempEmail = ss.getRange(thisRow, 9).getValue();
+  // let tempSID = ss.getRange(thisRow, 11).getValue();
+  let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
+  let tempSID = getByHeader(thisSheet, "(INTERNAL): Priority", thisRow);
+
   var priority = await GetPriorityWithEmailOrSID(tempEmail, tempSID);
   //ss.getRange("C" + thisRow).setValue(priority);
-  setByHeader(thisSheet, "(INTERNAL): Priority", priority);
+  setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, priority);
   if (priority == "STUDENT NOT FOUND") {
-    SpreadsheetApp.getActiveSpreadsheet()
+    /*SpreadsheetApp.getActiveSpreadsheet()
       .getActiveSheet()
       .getRange(thisRow, 1, 1, 1)
-      .setValue("Missing Access");
+      .setValue("Missing Access");*/
+      setByHeader(thisSheet, "(INTERNAL) Status", thisRow, "Missing Access");
   }
 
   //STATUS CHANGE TRIGGER
@@ -546,7 +554,7 @@ const onEdit = async (e) => {
     if (status == "Received" || status == "In-Progress") {
       jobnumber = jobnumber ? jobnumber : CreateJobNumber(submissiontime);
       //ss.getRange(thisRow, 6).setValue(jobnumber);
-      setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", jobnumber);
+      setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", , thisRow, jobnumber);
       Logg(`Job Number was missing, so the script fixed it.`);
     }
   } catch (err) {
@@ -578,7 +586,7 @@ const onEdit = async (e) => {
 
         //Write to Column - d h:mm:ss
         //ss.getRange(thisRow, 44).setValue(time);
-        setByHeader(thisSheet, "Elapsed Time", time);
+        setByHeader(thisSheet, "Elapsed Time", thisRow, time);
 
         Logg(`Turnaround Time = ${time}`);
 
@@ -626,7 +634,7 @@ const onEdit = async (e) => {
       var doc = DocumentApp.openById(id);
       var docUrl = doc.getUrl();
       //ss.getRange(thisRow, 5).setValue(docUrl); //Push to cell
-      setByHeader(thisSheet, "Printable Ticket", docUrl);
+      setByHeader(thisSheet, "Printable Ticket", thisRow, docUrl);
       Logger.log(`Ticket Created.`);
     } catch (err) {
       Logger.log(`${err} : Couldn't push ticket to the cell.`);
