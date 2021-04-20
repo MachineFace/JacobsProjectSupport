@@ -61,7 +61,7 @@ const formatCell = (cell) => {
  * @param {any} val
  */
 const setByHeader = (theSheet, colName, row, val) => {
-  let theSheet = SpreadsheetApp.getActiveSheet();
+  //let theSheet = SpreadsheetApp.getActiveSheet();
   let data = theSheet.getDataRange().getValues();
   let col = data[0].indexOf(colName);
   let range = theSheet.getRange(row, col);
