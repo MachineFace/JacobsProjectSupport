@@ -64,7 +64,7 @@ const setByHeader = (theSheet, colName, row, val) => {
   //let theSheet = SpreadsheetApp.getActiveSheet();
   let data = theSheet.getDataRange().getValues();
   let col = data[0].indexOf(colName);
-  let range = theSheet.getRange(row+1, col);
+  let range = theSheet.getRange(row, col+1);
   range.setValue(val);
 };
 
