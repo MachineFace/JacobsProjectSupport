@@ -459,49 +459,6 @@ const Metrics = () => {
 
 
 
-/**
- * Unit tests for Calcs
- */
-const _testCalcs = async () => {
-    try{
-        let res = await CalculateAverageTurnaround(sheetDict.ultimaker);
-        Logger.log(`PASSED : Turnaround time for Ultimaker Sheet : ${res}`);
-    } catch(err) {
-        Logger.log(`FAIL : ${err}`)
-    }
-    try{
-        let res = await CalculateDuration( new Date(1992,03,27), new Date() );
-        Logger.log(`PASSED : Output : ${res}`);
-    } catch(err) {
-        Logger.log(`FAIL : ${err}`)
-    }
-    try{
-        let res = await CountActiveUsers();
-        Logger.log(`PASSED : Output : ${res}`);
-    } catch(err) {
-        Logger.log(`FAIL : ${err}`)
-    }
-    try{
-        let res = await CalculateDistribution();
-        Logger.log(`PASSED : Output : ${res}`);
-    } catch(err) {
-        Logger.log(`FAIL : ${err}`)
-    }
-    try{
-        let res = await CalculateStandardDeviation();
-        Logger.log(`PASSED : Output : ${res}`);
-    } catch(err) {
-        Logger.log(`FAIL : ${err}`)
-    }
-    try{
-        let res = await Metrics();
-        Logger.log(`PASSED : Output : ${res}`);
-    } catch(err) {
-        Logger.log(`FAIL : ${err}`)
-    }
-
-
-}
 
 
 
