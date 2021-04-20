@@ -337,7 +337,7 @@ const onFormSubmit = async (e) => {
       ? jobnumber
       : CreateJobNumber(timestamp);
   //sheet.getRange("F" + lastRow).setValue(jobnumber);
-  setByHeader(sheet, "(INTERNAL AUTO) Job Number", jobnumber);
+  setByHeader(sheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
   
 
   //Fix wrapping issues
@@ -592,7 +592,7 @@ const onEdit = async (e) => {
 
         //Write Completed time
         //ss.getRange(thisRow, 43).setValue(endTime);
-        setByHeader(thisSheet, "Date Completed", endTime);
+        setByHeader(thisSheet, "Date Completed", thisRow, endTime);
       }
     }
   } catch (err) {
@@ -942,7 +942,7 @@ const onEdit = async (e) => {
         );
         ss.getRange("AZ" + thisRow).setValue(false);
         //ss.getRange("A" + thisRow).setValue("Billed");
-        setByHeader(thisSheet, "(INTERNAL) Status", "Billed");
+        setByHeader(thisSheet, "(INTERNAL) Status", thisRow, "Billed");
         Logger.log(order.toString());
         Browser.msgBox(
           boxTitle,
