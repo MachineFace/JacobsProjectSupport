@@ -105,38 +105,5 @@ const GenerateQRCode = (url, jobnumber) => {
 
 
 
-const _BarcodeQRCodeUnitTest = async () => {
-    // try {
-    //     jobnumber = "20210301140515";   //Known working Test JobNumber
-    //     if( await GenerateBarCode(jobnumber) !== null) {
-    //         Logger.log('PASSED'); //Should PASS
-    //     }
-    //     if( await GenerateBarCode('123kjnb345kjb3') !== null) {
-    //         Logger.log('PASSED'); //Should PASS
-    //     }
-    //     if( await GenerateBarCode('#@$%%$^*^&R@#$G') !== null) {
-    //         Logger.log('PASSED'); //Should FAIL
-    //     }
-    // }
-    // catch(err) {
-    //     Logger.log(err + ' : Failed Test')
-    // }
-    try {
-        jobnumber = "20210301140515";   //Known working Test JobNumber
-        if( await GenerateQRCode(jobnumber) !== null) {
-            Logger.log('PASSED'); //Should PASS
-        }
-        if( await GenerateQRCode('123kjnb345kjb3') !== null) {
-            Logger.log('PASSED'); //Should PASS
-        }
-        if( await GenerateQRCode('#@$%%$^*^&R@#$G') !== null) {
-            Logger.log('PASSED'); //Should FAIL
-        }
-    }
-    catch(err) {
-        Logger.log(`${err} : Failed Test`)
-    }
-}
-
 
 

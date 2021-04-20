@@ -108,23 +108,5 @@ const CreateDS = () => {
     return DSList;
 }
 
-/**
- * Unit Test
- */
-const _testStaffFunctions = async () => {
-  try {
-      Promise.all([
-          await DesignSpecialist('Testa', 'Testa Nama', 'test@test.com'),
-          await MakeLink('test@test.com'),
-          await StaffEmailAsString(),
-          await InvokeDS('Cody', 'email'),
-          await CreateDS(),
-      ])
-      .then(`PASSED`)
-      .catch(err => Logger.log(`FAILED : ${err}`))
-  } catch(err) {
-      Logger.log(`FAILED : ${err}`)
-  } 
-}
 
 
