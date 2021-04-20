@@ -554,7 +554,7 @@ const onEdit = async (e) => {
     if (status == "Received" || status == "In-Progress") {
       jobnumber = jobnumber ? jobnumber : CreateJobNumber(submissiontime);
       //ss.getRange(thisRow, 6).setValue(jobnumber);
-      setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", , thisRow, jobnumber);
+      setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
       Logg(`Job Number was missing, so the script fixed it.`);
     }
   } catch (err) {
