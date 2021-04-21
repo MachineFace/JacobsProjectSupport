@@ -48,9 +48,11 @@ const formatCell = (cell) => {
     let col = data[0].indexOf(colName);
     if (col != -1) {
       return data[row - 1][col];
+      //Logg(`Value of col: ${colName} row: ${row} is ${data[row - 1][col]}`);
     }
   } catch (err) {
-    Logger.log(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
+    //Logger.log(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
+    Logg(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
   }
 };
 
@@ -73,7 +75,8 @@ const setByHeader = (theSheet, colName, row, val) => {
     range.setValue(val);
     //Logger.log(`Value of row: ${row} col: ${col} set to ${val}`);
   } catch (err) {
-    Logger.log(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
+    //Logger.log(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
+    Logg(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
   }
 };
 
