@@ -1228,12 +1228,8 @@ const GetPriorityWithEmailOrSID = (email, sid) => {
 
   if (sid) stringSID = sid.toString().replace(/\s+/g, "");
 
-  let approvedListEmails = sheetDict.approved
-    .getRange(2, 2, sheetDict.approved.getLastRow() - 1, 1)
-    .getValues();
-  let approvedListSIDs = sheetDict.approved
-    .getRange(2, 3, sheetDict.approved.getLastRow() - 1, 1)
-    .getValues();
+  let approvedListEmails = sheetDict.approved.getRange(2, 2, sheetDict.approved.getLastRow() - 1, 1).getValues();
+  let approvedListSIDs = sheetDict.approved.getRange(2, 3, sheetDict.approved.getLastRow() - 1, 1).getValues();
 
   let index = Search(approvedListEmails, email);
   if (index == null || index == undefined) {
@@ -1255,10 +1251,7 @@ const _testGetPriority = async () => {
     let test;
     test = await GetPriorityWithEmailOrSID(`wkoch@berkeley.edu`, `12093487123`);
     Logger.log(`Good Email, Bad SID : ${test}`);
-    test = await GetPriorityWithEmailOrSID(
-      `nmaitra@berkeley.edu`,
-      `3033953355`
-    );
+    test = await GetPriorityWithEmailOrSID(`nmaitra@berkeley.edu`, `3033953355` );
     Logger.log(`Bad Email, Good SID : ${test}`);
     test = await GetPriorityWithEmailOrSID(`some@thing.com`, `3033953355`);
     Logger.log(`Bad Email, Good SID : ${test}`);
