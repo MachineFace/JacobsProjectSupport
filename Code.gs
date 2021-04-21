@@ -30,35 +30,25 @@ const gmailName = "Jacobs Project Support";
  * Example: Calling 'sheetDict.laser' returns value sheet.
  */
 const sheetDict = {
-  summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Summary"), //Summary Sheet
-  laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
-  ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), //Ultimaker Sheet
-  fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), //Fablight Sheet
-  waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), //Waterjet Sheet
-  advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "Advanced Lab"
-  ), //Advanced Lab Sheet
-  shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), //Shopbot Sheet
-  haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), //Haas Sheet
-  vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), //Vinyl Sheet
-  othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), //Othermill Sheet
-  creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), //Creaform Sheet
-  othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "Other Tools"
-  ), //Other Sheet
-  plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "Canon Plotter"
-  ), //Plotter Sheet
-  approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "Student List DONOTDELETE"
-  ), //Approved Sheet DONOTDELETE **
-  staff: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Staff List"), //Staff List Sheet **
-  logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Logger"), //Logger Sheet **
-  data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Metrics"), //Data Metrics Sheet **
-  backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "Background Data Mgmt"
-  ), //Background Data Mgmt Sheet **
-  billing: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Billing"), //Billing Sheet **
+    summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Summary"), //Summary Sheet
+    laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
+    ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), //Ultimaker Sheet
+    fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), //Fablight Sheet
+    waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), //Waterjet Sheet
+    advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced Lab"), //Advanced Lab Sheet
+    shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), //Shopbot Sheet
+    haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), //Haas Sheet
+    vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), //Vinyl Sheet
+    othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), //Othermill Sheet
+    creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), //Creaform Sheet
+    othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Other Tools"), //Other Sheet
+    plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), //Plotter Sheet
+    approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Student List DONOTDELETE"), //Approved Sheet DONOTDELETE **
+    staff: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Staff List"), //Staff List Sheet **
+    logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Logger"), //Logger Sheet **
+    data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Metrics"), //Data Metrics Sheet **
+    backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Background Data Mgmt"), //Background Data Mgmt Sheet **
+    billing: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Billing"), //Billing Sheet **
 };
 
 /**
@@ -67,33 +57,15 @@ const sheetDict = {
  * Example: Calling 'materialDict.laser' returns value materialSheet.
  */
 const materialDict = {
-  advlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "AdvLabStoreItems"
-  ),
-  ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "UltimakerStoreItems"
-  ),
-  fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "FablightStoreItems"
-  ),
-  haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "HaasTormachStoreItems"
-  ),
-  shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "ShopbotStoreItems"
-  ),
-  waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "WaterjetStoreItems"
-  ),
-  vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "VinylCutterStoreItems"
-  ),
-  laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "LaserStoreItems"
-  ),
-  othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "OthermillStoreItems"
-  ),
+    advlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AdvLabStoreItems"),
+    ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("UltimakerStoreItems"),
+    fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FablightStoreItems"),
+    haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("HaasTormachStoreItems"),
+    shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ShopbotStoreItems"),
+    waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("WaterjetStoreItems"),
+    vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("VinylCutterStoreItems"),
+    laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("LaserStoreItems"),
+    othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("OthermillStoreItems"),
 };
 
 /**
@@ -102,18 +74,18 @@ const materialDict = {
  * Example: Calling 'formDict.laser' returns value string.
  */
 const formDict = {
-  ultimaker: "1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8",
-  laser: "1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w",
-  fablight: "1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA",
-  waterjet: "1dNLAlC8Wg0DLLkBboRMgztPqP-fMmUqyGt5xqtg8TKk",
-  advancedlab: "1okWAdclqrleQ5ktyXbSIRoY6hrL_v2OYYAhaeb0f1jQ",
-  shopbot: "1RFuhGCtQrcA9gbpEStaksK5eYeIAo0dzn5NIcxVngH4",
-  haas: "1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk",
-  vinyl: "1WTh9nDQ4C_3HyQvCNMIxRFbJk1FH4dZeYeAkiXkItKw",
-  othermill: "1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI",
-  creaform: "1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc",
-  othertools: "1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38",
-  plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
+    ultimaker: "1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8",
+    laser: "1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w",
+    fablight: "1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA",
+    waterjet: "1dNLAlC8Wg0DLLkBboRMgztPqP-fMmUqyGt5xqtg8TKk",
+    advancedlab: "1okWAdclqrleQ5ktyXbSIRoY6hrL_v2OYYAhaeb0f1jQ",
+    shopbot: "1RFuhGCtQrcA9gbpEStaksK5eYeIAo0dzn5NIcxVngH4",
+    haas: "1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk",
+    vinyl: "1WTh9nDQ4C_3HyQvCNMIxRFbJk1FH4dZeYeAkiXkItKw",
+    othermill: "1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI",
+    creaform: "1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc",
+    othertools: "1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38",
+    plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
 };
 
 const DaysRetentionNumber = 15; //How many days to hold a file
@@ -155,20 +127,15 @@ const onFormSubmit = async (e) => {
   var name = e.namedValues["What is your name?"][0];
   var email = e.namedValues["Email Address"][0];
   var sid = e.namedValues["Your Student ID Number?"][0];
-  var studentType =
-    e.namedValues["What is your affiliation to the Jacobs Institute?"][0];
+  var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0];
   var projectname = e.namedValues["Project Name"][0];
   var shipping = e.namedValues["Do you need your parts shipped to you?"][0];
   var timestamp = e.namedValues["Timestamp"][0];
 
   var values = e.namedValues;
 
-  Logger.log(
-    `Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`
-  );
-  Logg(
-    `Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`
-  );
+  Logger.log(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
+  Logg(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
 
   //Generate new Job number
   var jobnumber = await CreateJobNumber(timestamp);
@@ -246,17 +213,12 @@ const onFormSubmit = async (e) => {
 
   //Email each DS
   try {
-    GmailApp.sendEmail(
-      designspecialistemail,
-      "Jacobs Project Support Notification",
-      "",
-      {
+    GmailApp.sendEmail(designspecialistemail, "Jacobs Project Support Notification", "", {
         htmlBody: dsMessage,
         from: supportAlias,
         bcc: InvokeDS("Chris", "email"),
         name: gmailName,
-      }
-    );
+    });
     Logg("Design Specialist has been emailed.");
   } catch (err) {
     Logg(`${err} : Could not email DS. Something went wrong.`);
@@ -265,7 +227,6 @@ const onFormSubmit = async (e) => {
   //Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
   stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status",  lastRow, "Received"); 
-  // sheet.getRange("A" + lastRow).setValue("Received"); 
   Logger.log("Status refixed to 'Received'.");
 
   //"Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
@@ -288,17 +249,12 @@ const onFormSubmit = async (e) => {
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == "Creaform") {
       //Email
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Creaform Part Drop-off Instructions",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Creaform Part Drop-off Instructions", "", {
           htmlBody: creaformMessage,
           from: supportAlias,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       Logger.log("Creaform instruction email sent.");
     }
   } catch (err) {
@@ -323,19 +279,14 @@ const onFormSubmit = async (e) => {
       //Set access to Missing Access
       //sheet.getRange("A" + lastRow).setValue("Missing Access");
       setByHeader(sheet, "(INTERNAL) Status", lastRow, "Missing Access");
-      Logger.log(
-        `'Missing Access' Email sent to student and status set to 'Missing Access'.`
-      );
+      Logger.log(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
     Logg(`${err} : Could not find student access boolean value`);
   }
 
   //Check again
-  jobnumber =
-    jobnumber !== null && jobnumber !== undefined
-      ? jobnumber
-      : CreateJobNumber(timestamp);
+  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : CreateJobNumber(timestamp);
   //sheet.getRange("F" + lastRow).setValue(jobnumber);
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
   
