@@ -2,15 +2,16 @@
  * Load GasT for Testing
  * See : https://github.com/huan/gast for instructions
  */
-if ((typeof GasTap)==='undefined') { 
-  eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-} 
-const test = new GasTap()
+
 
 /**
  * Test with GasT
  */
 const _gastTestRunner = async () => {
+  if ((typeof GasTap)==='undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap()
   // await test(`Checking...`, (t) => {    
   //     let i = 3 + 4
   //     t.equal(i, 7, `Calc : 3 + 4 = 7  : Correct`)

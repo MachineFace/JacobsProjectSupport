@@ -822,6 +822,7 @@ const onEdit = async (e) => {
  * FUNCTIONS
  */
 
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Create Approval Form
@@ -838,10 +839,7 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
     //var parentFolder = DriveApp.getFolderById("1EpvCTyuCkNzKQ4sxYrZvwPqGqzRvgtRX").addFile(approvalForm);
 
     let sendloc = "16oCqmnW9zCUhpQLo3TXsaUSxDcSv7aareEVSE9zYtVQ";
-    let destination = approvalForm.setDestination(
-      FormApp.DestinationType.SPREADSHEET,
-      sendloc
-    );
+    let destination = approvalForm.setDestination( FormApp.DestinationType.SPREADSHEET, sendloc );
     //Form Setup
     approvalForm.setTitle(`Approval Form`);
     approvalForm.setDescription(`Referrence Number: ${jobnumber}`);
@@ -901,12 +899,13 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
     let file = DriveApp.getFileById(id);
     file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
   } catch (err) {
-    Logg(
-      `${err} : Couldn't delete the form in that spot. Probably still has the form linked.`
-    );
+    Logg(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
   }
   return approvalURL;
 };
+
+
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -923,12 +922,7 @@ var CreateJobNumber = (date) => {
 
   let jobnumber;
   try {
-    if (
-      date == undefined ||
-      date == null ||
-      date == "" ||
-      testedDate == false
-    ) {
+    if ( date == undefined || date == null || date == "" || testedDate == false ) {
       jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
       Logg(`Set Jobnumber to a new time because timestamp was missing.`);
     } else {
@@ -944,6 +938,10 @@ var CreateJobNumber = (date) => {
   Logger.log(`Returned Job Number: ${jobnumber}`);
   return jobnumber.toString();
 };
+
+
+
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -986,9 +984,7 @@ var CreateTicket = (
     var body = doc.getBody();
     var docId = doc.getId();
   } catch (err) {
-    Logg(
-      `${err} : Could not fetch doc folder, or make ticket, or get body or docId.`
-    );
+    Logg( `${err} : Could not fetch doc folder, or make ticket, or get body or docId.` );
   }
 
   try {
@@ -1012,123 +1008,33 @@ var CreateTicket = (
   var notes = [];
   if (sheetname == "Ultimaker") {
     thisSheet = sheetDict.ultimaker;
-    mat.push(
-      "Needs Breakaway Removed:",
-      thisSheet
-        .getRange("AD" + thisRow)
-        .getValue()
-        .toString()
-    );
-    partcount.push(
-      "Part Count:",
-      thisSheet
-        .getRange("Y" + thisRow)
-        .getValue()
-        .toString()
-    );
-    notes.push(
-      "Notes:",
-      thisSheet
-        .getRange("AE" + thisRow)
-        .getValue()
-        .toString()
-    );
+    mat.push( "Needs Breakaway Removed:", thisSheet.getRange("AD" + thisRow).getValue().toString());
+    partcount.push( "Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString());
+    notes.push( "Notes:", thisSheet.getRange("AE" + thisRow).getValue().toString());
   }
   if (sheetname == "Laser Cutter") {
     thisSheet = sheetDict.laser;
-    mat.push(
-      "Rough Dimensions:",
-      thisSheet
-        .getRange("AA" + thisRow)
-        .getValue()
-        .toString()
-    );
-    partcount.push(
-      "Part Count:",
-      thisSheet
-        .getRange("Y" + thisRow)
-        .getValue()
-        .toString()
-    );
-    notes.push(
-      "Notes:",
-      thisSheet
-        .getRange("AC" + thisRow)
-        .getValue()
-        .toString()
-    );
+    mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
+    partcount.push("Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString() );
+    notes.push( "Notes:", thisSheet.getRange("AC" + thisRow).getValue().toString() );
   }
   if (sheetname == "Fablight") {
     thisSheet = sheetDict.fablight;
-    mat.push(
-      "Rough Dimensions:",
-      thisSheet
-        .getRange("AA" + thisRow)
-        .getValue()
-        .toString()
-    );
-    partcount.push(
-      "Part Count:",
-      thisSheet
-        .getRange("AB" + thisRow)
-        .getValue()
-        .toString()
-    );
-    notes.push(
-      "Notes:",
-      thisSheet
-        .getRange("AC" + thisRow)
-        .getValue()
-        .toString()
-    );
+    mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
+    partcount.push( "Part Count:", thisSheet.getRange("AB" + thisRow).getValue().toString() );
+    notes.push( "Notes:", thisSheet.getRange("AC" + thisRow).getValue().toString() );
   }
   if (sheetname == "Waterjet") {
     thisSheet = sheetDict.waterjet;
-    mat.push(
-      "Rough Dimensions:",
-      thisSheet
-        .getRange("AA" + thisRow)
-        .getValue()
-        .toString()
-    );
-    partcount.push(
-      "Part Count:",
-      thisSheet
-        .getRange("AB" + thisRow)
-        .getValue()
-        .toString()
-    );
-    notes.push(
-      "Notes:",
-      thisSheet
-        .getRange("AD" + thisRow)
-        .getValue()
-        .toString()
-    );
+    mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
+    partcount.push( "Part Count:", thisSheet.getRange("AB" + thisRow).getValue().toString() );
+    notes.push( "Notes:", thisSheet.getRange("AD" + thisRow).getValue().toString() );
   }
   if (sheetname == "Advanced Lab") {
     thisSheet = sheetDict.advancedlab;
-    mat.push(
-      "Which Printer:",
-      thisSheet
-        .getRange("Z" + thisRow)
-        .getValue()
-        .toString()
-    );
-    partcount.push(
-      "Part Count:",
-      thisSheet
-        .getRange("Y" + thisRow)
-        .getValue()
-        .toString()
-    );
-    notes.push(
-      "Notes:",
-      thisSheet
-        .getRange("AJ" + thisRow)
-        .getValue()
-        .toString()
-    );
+    mat.push( "Which Printer:", thisSheet.getRange("Z" + thisRow).getValue().toString() );
+    partcount.push( "Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString() );
+    notes.push( "Notes:", thisSheet.getRange("AJ" + thisRow).getValue().toString() );
   } else {
     mat.push("Materials: ", "");
     partcount.push("Part Count: ", "1");
@@ -1149,15 +1055,13 @@ var CreateTicket = (
       ReplaceTextToImage(header, `img2`, qrCode);
 
       body.insertHorizontalRule(0);
-      body
-        .insertParagraph(1, "Name: " + name.toString())
+      body.insertParagraph(1, "Name: " + name.toString())
         .setHeading(DocumentApp.ParagraphHeading.HEADING1)
         .setAttributes({
           [DocumentApp.Attribute.FONT_SIZE]: 18,
           [DocumentApp.Attribute.BOLD]: true,
         });
-      body
-        .insertParagraph(2, "Job Number: " + +jobnumber.toString())
+      body.insertParagraph(2, "Job Number: " + +jobnumber.toString())
         .setHeading(DocumentApp.ParagraphHeading.HEADING2)
         .setAttributes({
           [DocumentApp.Attribute.FONT_SIZE]: 12,
@@ -1168,8 +1072,7 @@ var CreateTicket = (
       // body.appendImage(qrCode).setAltTitle("QRCode");
 
       // Create a two-dimensional array containing the cell contents.
-      body
-        .appendTable([
+      body.appendTable([
           ["Needs Shipping:", shippingQuestion.toString()],
           ["Design Specialist:", designspecialist.toString()],
           ["Job Number:", jobnumber.toString()],
@@ -1194,9 +1097,7 @@ var CreateTicket = (
       folder.next().addFile(docFile);
       folder.next().addFile(barcode);
     } catch (err) {
-      Logg(
-        `${err} : Couldn't delete the file from the drive folder. Sheet is still linked`
-      );
+      Logg( `${err} : Couldn't delete the file from the drive folder. Sheet is still linked` );
     }
 
     //Set permissions to 'anyone can edit' for that file
@@ -1204,9 +1105,7 @@ var CreateTicket = (
       var file = DriveApp.getFileById(docId);
       file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
     } catch (err) {
-      Logg(
-        `${err} : Couldn't change permissions on the file. You probably have to do something else to make it work.`
-      );
+      Logg( `${err} : Couldn't change permissions on the file. You probably have to do something else to make it work.` );
     }
   }
   //Return Document to use later
@@ -1268,6 +1167,8 @@ var GetPriority = (sid) => {
   return priority;
 };
 
+
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Get Priority Number from Erik's List
@@ -1300,6 +1201,8 @@ var GetPriorityFromEmail = (email) => {
   return priority;
 };
 
+
+
 /**
  * @param {[string]} array to search
  * @param {string} searchString
@@ -1312,6 +1215,8 @@ const Search = (values, searchString) => {
     }
   }
 };
+
+
 
 /**
  * @param {string} email
