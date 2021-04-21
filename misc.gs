@@ -43,10 +43,14 @@ const formatCell = (cell) => {
  */
  const getByHeader = (theSheet, colName, row) => {
   // let data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
-  let data = theSheet.getDataRange().getValues();
-  let col = data[0].indexOf(colName);
-  if (col != -1) {
-    return data[row - 1][col];
+  try {
+    let data = theSheet.getDataRange().getValues();
+    let col = data[0].indexOf(colName);
+    if (col != -1) {
+      return data[row - 1][col];
+    }
+  } catch (err) {
+    Logger.log(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
   }
 };
 
@@ -62,10 +66,15 @@ const formatCell = (cell) => {
  */
 const setByHeader = (theSheet, colName, row, val) => {
   //let theSheet = SpreadsheetApp.getActiveSheet();
-  let data = theSheet.getDataRange().getValues();
-  let col = data[0].indexOf(colName);
-  let range = theSheet.getRange(row, col+1);
-  range.setValue(val);
+  try {
+    let data = theSheet.getDataRange().getValues();
+    let col = data[0].indexOf(colName);
+    let range = theSheet.getRange(row, col+1);
+    range.setValue(val);
+    //Logger.log(`Value of row: ${row} col: ${col} set to ${val}`);
+  } catch (err) {
+    Logger.log(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
+  }
 };
 
 

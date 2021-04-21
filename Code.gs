@@ -555,7 +555,7 @@ const onEdit = async (e) => {
       jobnumber = jobnumber ? jobnumber : CreateJobNumber(submissiontime);
       //ss.getRange(thisRow, 6).setValue(jobnumber);
       setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
-      Logg(`Job Number was missing, so the script fixed it.`);
+      Logg(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
     Logg(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
