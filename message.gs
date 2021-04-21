@@ -305,61 +305,61 @@ class CreateSubmissionMessage
 }
 
 
-/**
- * Unit Test for Making 'OnEdit' Messages
- */
-let _testOnEditMessages = async () => {
-  let message = new CreateMessage('Cody', 'Test Project', '101293874098', 'url',
-    'material1URL', 45, 'TestPLA',
-    'material2URL', 15, 'TestBreakaway',
-    'mat3URL', 23, 'Steel',
-    'mat4URL', 24, 'Aluminum',
-    'mat5URL', 75, 'Plastic',
-    'designspecialist', 'cody@glen.com', 45.50);
+// /**
+//  * Unit Test for Making 'OnEdit' Messages
+//  */
+// let _testOnEditMessages = async () => {
+//   let message = new CreateMessage('Cody', 'Test Project', '101293874098', 'url',
+//     'material1URL', 45, 'TestPLA',
+//     'material2URL', 15, 'TestBreakaway',
+//     'mat3URL', 23, 'Steel',
+//     'mat4URL', 24, 'Aluminum',
+//     'mat5URL', 75, 'Plastic',
+//     'designspecialist', 'cody@glen.com', 45.50);
 
-    Logger.log('DEFAULT' + message.defaultMessage);
-    Logger.log('RECEIVED' + message.receivedMessage);
-    Logger.log('PENDING' + message.pendingMessage);
-    Logger.log('IN-PROGRESS' + message.inProgressMessage);
-    Logger.log('COMPLETED' + message.completedMessage);
-    Logger.log('SHIPPING QUESTION' + message.shippingQuestion);
-    Logger.log('SHIPPED' + message.shippedMessage);
-    Logger.log('FAILED' + message.failedMessage);
-    Logger.log('R1' + message.rejectedByStudentMessage);
-    Logger.log('BILLED' + message.billedMessage);
+//     Logger.log('DEFAULT' + message.defaultMessage);
+//     Logger.log('RECEIVED' + message.receivedMessage);
+//     Logger.log('PENDING' + message.pendingMessage);
+//     Logger.log('IN-PROGRESS' + message.inProgressMessage);
+//     Logger.log('COMPLETED' + message.completedMessage);
+//     Logger.log('SHIPPING QUESTION' + message.shippingQuestion);
+//     Logger.log('SHIPPED' + message.shippedMessage);
+//     Logger.log('FAILED' + message.failedMessage);
+//     Logger.log('R1' + message.rejectedByStudentMessage);
+//     Logger.log('BILLED' + message.billedMessage);
 
-    return Promise.resolve( message );
-}
+//     return Promise.resolve( message );
+// }
 
 
 
-/**
- * Unit Test for Making 'OnformSubmit' messages
- */
-let _testOnformSubmitMessages = async () => {
-    let message = new CreateSubmissionMessage('Cody', 'SomeProject', 102938471431 );
-    Logger.log('DS MESSAGE' + message.dsMessage);
-    Logger.log('CREAFORM MESSAGE' + message.creaformMessage);
-    Logger.log('MISSING ACCESS' + message.missingAccessMessage);
-    Logger.log('SHIPPING MESSAGE' + message.shippingMessage);
+// /**
+//  * Unit Test for Making 'OnformSubmit' messages
+//  */
+// let _testOnformSubmitMessages = async () => {
+//     let message = new CreateSubmissionMessage('Cody', 'SomeProject', 102938471431 );
+//     Logger.log('DS MESSAGE' + message.dsMessage);
+//     Logger.log('CREAFORM MESSAGE' + message.creaformMessage);
+//     Logger.log('MISSING ACCESS' + message.missingAccessMessage);
+//     Logger.log('SHIPPING MESSAGE' + message.shippingMessage);
 
-    return Promise.resolve( message );
-}
+//     return Promise.resolve( message );
+// }
 
-/**
- * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 
- */
-let _testAllMessages = async () => {
+// /**
+//  * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 
+//  */
+// let _testAllMessages = async () => {
 
-    Promise.all([
-        await _testOnEditMessages(),
-        await _testOnformSubmitMessages(),
-    ])
-    .then(Logger.log('Test Success'))
-    .catch(Error => {
-        Logger.log(Error + 'Failure');
-    }); 
-}
+//     Promise.all([
+//         await _testOnEditMessages(),
+//         await _testOnformSubmitMessages(),
+//     ])
+//     .then(Logger.log('Test Success'))
+//     .catch(Error => {
+//         Logger.log(Error + 'Failure');
+//     }); 
+// }
 
 
 
