@@ -378,10 +378,7 @@ const onEdit = async (e) => {
   //ss.getRange("C" + thisRow).setValue(priority);
   setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, priority);
   if (priority == "STUDENT NOT FOUND") {
-    /*SpreadsheetApp.getActiveSpreadsheet()
-      .getActiveSheet()
-      .getRange(thisRow, 1, 1, 1)
-      .setValue("Missing Access");*/
+      // SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange(thisRow, 1, 1, 1).setValue("Missing Access");
       setByHeader(thisSheet, "(INTERNAL) Status", thisRow, "Missing Access");
   }
 
@@ -393,73 +390,37 @@ const onEdit = async (e) => {
   //Parse Data
   const status = getByHeader(spreadSheet, "(INTERNAL) Status", thisRow);
 
-  var designspecialist = getByHeader(
-    thisSheet,
-    "(INTERNAL): DS Assigned",
-    thisRow
-  );
+  var designspecialist = getByHeader(thisSheet, "(INTERNAL): DS Assigned", thisRow);
   var priority = getByHeader(thisSheet, "(INTERNAL): Priority", thisRow);
   var jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  var studentApproval = getByHeader(
-    thisSheet,
-    "Student Has Approved Job",
-    thisRow
-  );
+  var studentApproval = getByHeader(thisSheet, "Student Has Approved Job", thisRow);
   var submissiontime = getByHeader(thisSheet, "Timestamp", thisRow);
   var email = getByHeader(thisSheet, "Email Address", thisRow);
   var name = getByHeader(thisSheet, "What is your name?", thisRow);
   var sid = getByHeader(thisSheet, "Student ID Number", thisRow);
-  var studentType = getByHeader(
-    thisSheet,
-    "What is your affiliation to the Jacobs Institute?",
-    thisRow
-  );
+  var studentType = getByHeader(thisSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
   var projectname = getByHeader(thisSheet, "Project Name", thisRow);
-  var shippingQuestion = getByHeader(
-    thisSheet,
-    "Do you need your parts shipped to you?",
-    thisRow
-  );
+  var shippingQuestion = getByHeader(thisSheet, "Do you need your parts shipped to you?", thisRow);
   var cost = getByHeader(thisSheet, "Estimate", thisRow);
 
   //Materials
-  const material1Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 1 Quantity",
-    thisRow
-  );
+  const material1Quantity = getByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
   const material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
   const material1URL = await new LookupProductID(material1Name).link;
 
-  const material2Quantity = getByHeader(
-    spreadSheet,
-    "(INTERNAL) Material 2 Quantity",
-    thisRow
-  );
+  const material2Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
   const material2Name = getByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
   const material2URL = await new LookupProductID(material2Name).link;
 
-  const material3Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 3 Quantity",
-    thisRow
-  );
+  const material3Quantity = getByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
   const material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
   const material3URL = new LookupProductID(material3Name).link;
 
-  const material4Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 4 Quantity",
-    thisRow
-  );
+  const material4Quantity = getByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
   const material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
   const material4URL = new LookupProductID(material4Name).link;
 
-  const material5Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 5 Quantity",
-    thisRow
-  );
+  const material5Quantity = getByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
   const material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
   const material5URL = new LookupProductID(material5Name).link;
 
@@ -495,9 +456,7 @@ const onEdit = async (e) => {
   else mat5 = false;
 
   //Log submission info to sheet
-  Logger.log(
-    `Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`
-  );
+  Logger.log(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
 
   //----------------------------------------------------------------------------------------------------------------
   //Fix Job Number if it's missing
@@ -515,14 +474,10 @@ const onEdit = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   //Fix empty variables
   try {
-    designspecialist = designspecialist
-      ? designspecialist
-      : "a Design Specialist";
+    designspecialist = designspecialist ? designspecialist : "a Design Specialist";
     projectname = projectname ? projectname : "Your Project";
   } catch (err) {
-    Logg(
-      `${err} : Fixing empty or corrupted variables has failed for some reason.`
-    );
+    Logg( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -547,18 +502,12 @@ const onEdit = async (e) => {
       }
     }
   } catch (err) {
-    Logg(
-      `${err} : Calculating the turnaround time and completion time has failed for some reason.`
-    );
+    Logg( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
   //Trigger for generating a "Ticket"
-  if (
-    status == "Received" ||
-    status == "In-Progress" ||
-    status == "Pending Approval"
-  ) {
+  if ( status == "Received" || status == "In-Progress" || status == "Pending Approval" ) {
     try {
       var Ticket = await CreateTicket(
         designspecialist,
@@ -576,9 +525,7 @@ const onEdit = async (e) => {
         shippingQuestion
       );
     } catch (err) {
-      Logger.log(
-        `${err} : Couldn't generate a ticket. Check docUrl / id and repair.`
-      );
+      Logger.log( `${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
     }
     try {
       var id = Ticket.getId();
@@ -643,103 +590,68 @@ const onEdit = async (e) => {
       });
       break;
     case "Pending Approval":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Needs Your Approval",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Needs Your Approval", "", {
           htmlBody: Message.pendingMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "In-Progress":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Project Started",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project Started", "", {
           htmlBody: Message.inProgressMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "Completed":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Project Completed",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project Completed", "", {
           htmlBody: Message.completedMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "Shipped":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Project Shipped",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project Shipped", "", {
           htmlBody: Message.shippedMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "FAILED":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Project has Failed",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project has Failed", "", {
           htmlBody: Message.failedMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "Rejected by Student":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Project has been Declined",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project has been Declined", "", {
           htmlBody: Message.rejectedByStudentMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "Rejected by Staff":
     case "Cancelled":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Project has been Cancelled",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project has been Cancelled", "", {
           htmlBody: Message.rejectedByStaffMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "Billed":
       GmailApp.sendEmail(email, "Jacobs Project Support : Project Closed", "", {
@@ -751,35 +663,25 @@ const onEdit = async (e) => {
       });
       break;
     case "Waitlist":
-      GmailApp.sendEmail(
-        email,
-        "Jacobs Project Support : Project Waitlisted",
-        "",
-        {
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project Waitlisted", "", {
           htmlBody: Message.waitlistMessage,
           from: supportAlias,
           cc: designspecialistemail,
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
-        }
-      );
+      });
       break;
     case "Missing Access":
       // @ts-ignore
       if (priority == false) break;
       else {
-        GmailApp.sendEmail(
-          email,
-          "Jacobs Project Support : Missing Access",
-          "",
-          {
+        GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
             htmlBody: Message.noAccessMessage,
             from: supportAlias,
             cc: designspecialistemail,
             bcc: InvokeDS("Chris", "email"),
             name: gmailName,
-          }
-        );
+        });
         break;
       }
     case "":
@@ -806,9 +708,7 @@ const onEdit = async (e) => {
     var response;
 
     //Check for Staff
-    let staffEmails = sheetDict.staff
-      .getRange(2, 3, sheetDict.staff.getLastRow() - 1, 1)
-      .getValues();
+    let staffEmails = sheetDict.staff.getRange(2, 3, sheetDict.staff.getLastRow() - 1, 1).getValues();
     for (var i = 0; i < staffEmails.length; i++) {
       if (email == staffEmails[i]) {
         email = "JacobsInstituteStore@gmail.com";
@@ -832,17 +732,12 @@ const onEdit = async (e) => {
     );
     var formattedMats = await new MakeLineItems(package);
 
-    var boxTitle = "Generate Bill to Shopify";
-    var boxMsg = "Would you like to Generate a Bill to: \\n";
-    boxMsg +=
-      "Customer Name : " +
-      customer.first_name +
-      " " +
-      customer.last_name +
-      "\\n";
-    boxMsg += "Job Number : " + jobnumber + "\\n";
-    boxMsg += "Shopify ID : " + customer.id + "\\n";
-    boxMsg += "For Materials : \\n";
+    var boxTitle = `Generate Bill to Shopify`;
+    var boxMsg = `Would you like to Generate a Bill to: \\n`;
+    boxMsg += `Customer Name : ${customer.first_name} ${customer.last_name} \\n`;
+    boxMsg += `Job Number : ${jobnumber} \\n`;
+    boxMsg += `Shopify ID : ${customer.id} \\n`;
+    boxMsg += `For Materials : \\n`;
 
     //Lists (Pushing at the same time ensures the lists are the same size.)
     let materialList = [
@@ -862,12 +757,7 @@ const onEdit = async (e) => {
 
     //Remove when Those are empty / null / undefined
     for (let i = 0; i <= materialList.length + 1; i++) {
-      if (
-        materialList[i] == null ||
-        materialList[i] == undefined ||
-        materialList[i] == "" ||
-        materialList[i] == " "
-      ) {
+      if (materialList[i] == null || materialList[i] == undefined || materialList[i] == "" || materialList[i] == " " ) {
         materialList.splice(i);
         quantityList.splice(i);
       }
@@ -885,12 +775,7 @@ const onEdit = async (e) => {
       );
       if (response == "yes") {
         Logger.log('User clicked "Yes".');
-        var order = await new CreateShopifyOrder(
-          customer,
-          jobnumber,
-          package,
-          formattedMats
-        );
+        var order = await new CreateShopifyOrder( customer, jobnumber, package, formattedMats);
         ss.getRange("AZ" + thisRow).setValue(false);
         //ss.getRange("A" + thisRow).setValue("Billed");
         setByHeader(thisSheet, "(INTERNAL) Status", thisRow, "Billed");
