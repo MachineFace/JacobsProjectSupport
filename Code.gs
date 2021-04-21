@@ -57,15 +57,15 @@ const sheetDict = {
  * Example: Calling 'materialDict.laser' returns value materialSheet.
  */
 const materialDict = {
-    advlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AdvLabStoreItems"),
-    ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("UltimakerStoreItems"),
-    fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FablightStoreItems"),
-    haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("HaasTormachStoreItems"),
-    shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ShopbotStoreItems"),
-    waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("WaterjetStoreItems"),
-    vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("VinylCutterStoreItems"),
-    laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("LaserStoreItems"),
-    othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("OthermillStoreItems"),
+    advlab:     SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AdvLabStoreItems"),
+    ultimaker:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("UltimakerStoreItems"),
+    fablight:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FablightStoreItems"),
+    haas:       SpreadsheetApp.getActiveSpreadsheet().getSheetByName("HaasTormachStoreItems"),
+    shopbot:    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ShopbotStoreItems"),
+    waterjet:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("WaterjetStoreItems"),
+    vinyl:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("VinylCutterStoreItems"),
+    laser:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("LaserStoreItems"),
+    othermill:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("OthermillStoreItems"),
 };
 
 /**
@@ -266,7 +266,6 @@ const onFormSubmit = async (e) => {
 
   var access;
   try {
-    // @ts-ignore
     if (priority == "STUDENT NOT FOUND!" || priority == false) {
       //Email
       GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
@@ -324,12 +323,7 @@ const onEdit = async (e) => {
   var stafflist = sheetDict.staff;
   var sLink = stafflist.getRange(thisRow, 4).getValue();
   if (thisRow > 2) {
-    if (
-      sLink == undefined ||
-      sLink == null ||
-      (sLink == "" && stafflist.getRange(thisRow, 3).getValue() != "")
-    ) {
-      // @ts-ignore
+    if ( sLink == undefined || sLink == null || (sLink == "" && stafflist.getRange(thisRow, 3).getValue() != "") ) {
       var l = MakeLink(stafflist.getRange(thisRow, 3).getValue());
       stafflist.getRange(thisRow, 4).setValue(l);
     }
@@ -552,7 +546,6 @@ const onEdit = async (e) => {
   var designspecialistemail = InvokeDS(designspecialist, "email");
 
   //Create a Message and Return Appropriate Responses.
-  // @ts-ignore
   var Message = new CreateMessage(
     name,
     projectname,
@@ -672,7 +665,6 @@ const onEdit = async (e) => {
       });
       break;
     case "Missing Access":
-      // @ts-ignore
       if (priority == false) break;
       else {
         GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
