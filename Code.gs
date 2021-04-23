@@ -304,9 +304,10 @@ const onSubmission = async (e) => {
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Trigger 2 - On Edit
+ * Reserved word: onEdit() cannot be used here because it's reserved for simple triggers.
  * @param {Event} e
  */
-const onEdit = async (e) => {
+const onChange = async (e) => {
   //Fetch Data from Sheets
   var ss = e.range.getSheet();
   var spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
