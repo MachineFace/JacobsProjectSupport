@@ -18,6 +18,7 @@ const _gastTestRunner = async () => {
   //     t.equal(i, 7, `Calc : 3 + 4 = 7  : Correct`)
   // })
 
+
   await test(`Generate Barcode: `, (t) => {
       let jobnumber = `20210301140515`
       let x = GenerateBarCode(jobnumber)
@@ -47,55 +48,55 @@ const _gastTestRunner = async () => {
       t.fail(`Bad`)
   })
 
-  await test(`Calcs`, (t) => {
+  await test(`Calc Average Turnaround`, (t) => {
       let x = CalculateAverageTurnaround(sheetDict.ultimaker)
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Calcs`, (t) => {
+  await test(`Calc Duration`, (t) => {
       let x = CalculateDuration( new Date(1992,03,27), new Date() )
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Calcs`, (t) => {
+  await test(`Count Active Users`, (t) => {
       let x = CountActiveUsers()
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Calcs`, (t) => {
+  await test(`Calc Distribution`, (t) => {
       let x = CalculateDistribution()
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Calcs`, (t) => {
+  await test(`Calc Standard Deviation`, (t) => {
       let x = CalculateStandardDeviation()
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Calcs`, (t) => {
+  await test(`Calc Metrics`, (t) => {
       let x = Metrics()
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Shopify Functions`, (t) => {
+  await test(`Get Last Shopify Order`, (t) => {
       let x = GetLastShopifyOrder()
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Shopify Functions`, (t) => {
+  await test(`Get Shopify Orders List`, (t) => {
       let x = GetShopifyOrdersList()
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
 
-  await test(`Shopify Functions`, (t) => {
+  await test(`Shopify Lookup Product ID`, (t) => {
       let x = LookupProductID(`Fortus Red ABS-M30`)
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
@@ -148,9 +149,34 @@ const _gastTestRunner = async () => {
       t.fail(`Bad`)
   })
 
+  await test(`Priority With Email or SID`, (t) => {
+      let goodEmailBadSID = GetPriorityWithEmailOrSID(`wkoch@berkeley.edu`, `12093487123`)
+      let badEmailGoodSID = GetPriorityWithEmailOrSID(`nmaitra@berkeley.edu`, `3033953355` )
+      let badEmailGoodSID2 = GetPriorityWithEmailOrSID(`some@thing.com`, `1029384712`)
+      t.pass(`Good : ${goodEmailBadSID}, ${badEmailGoodSID}, ${badEmailGoodSID2}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Priority From Email`, (t) => {
+      let x = GetPriorityFromEmail(`saveritt@berkeley.edu`)
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`Priority`, (t) => {
+      let x = GetPriority(`3035249023`)
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
+  await test(`JobNumber`, (t) => {
+      let x = CreateJobNumber(new Date())
+      t.pass(`Good : ${x}`)
+      t.fail(`Bad`)
+  })
+
   test.finish()
 }
-
 
 
 

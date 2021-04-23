@@ -1216,40 +1216,29 @@ const Search = (values, searchString) => {
  * @returns {int} priority
  */
 const GetPriorityWithEmailOrSID = (email, sid) => {
-  let priority;
+  let priority
 
-  if (sid) stringSID = sid.toString().replace(/\s+/g, "");
+  let stringSID = sid
+  if (sid) {
+      stringSID = sid.toString().replace(/\s+/g, "")
+  }
 
-  let approvedListEmails = sheetDict.approved.getRange(2, 2, sheetDict.approved.getLastRow() - 1, 1).getValues();
-  let approvedListSIDs = sheetDict.approved.getRange(2, 3, sheetDict.approved.getLastRow() - 1, 1).getValues();
+  let approvedListEmails = sheetDict.approved.getRange(2, 2, sheetDict.approved.getLastRow() - 1, 1).getValues()
+  let approvedListSIDs = sheetDict.approved.getRange(2, 3, sheetDict.approved.getLastRow() - 1, 1).getValues()
 
-  let index = Search(approvedListEmails, email);
+  let index = Search(approvedListEmails, email)
   if (index == null || index == undefined) {
-    index = Search(approvedListSIDs, stringSID);
+      index = Search(approvedListSIDs, stringSID)
   }
 
   if (index != null || index != undefined) {
-    index += 2;
-    Logger.log(`Index on ApprovedSheet : ${index}`);
-    priority = sheetDict.approved.getRange(index, 4).getValue();
-  } else return `STUDENT NOT FOUND!`;
+      index += 2
+      Logger.log(`Index on ApprovedSheet : ${index}`)
+      priority = sheetDict.approved.getRange(index, 4).getValue()
+  } else return `STUDENT NOT FOUND!`
 
-  Logger.log(`Priority = ${priority}`);
-  return priority;
+  Logger.log(`Priority = ${priority}`)
+  return priority
 };
 
-const _testGetPriority = async () => {
-  try {
-    let test;
-    test = await GetPriorityWithEmailOrSID(`wkoch@berkeley.edu`, `12093487123`);
-    Logger.log(`Good Email, Bad SID : ${test}`);
-    test = await GetPriorityWithEmailOrSID(`nmaitra@berkeley.edu`, `3033953355` );
-    Logger.log(`Bad Email, Good SID : ${test}`);
-    test = await GetPriorityWithEmailOrSID(`some@thing.com`, `3033953355`);
-    Logger.log(`Bad Email, Good SID : ${test}`);
-    test = await GetPriorityWithEmailOrSID(`some@thing.com`, `1029384712`);
-    Logger.log(`Bad Email, Bad SID : ${test}`);
-  } catch (err) {
-    Logger.log(`FAILED : ${err}`);
-  }
-};
+
