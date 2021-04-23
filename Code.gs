@@ -99,9 +99,10 @@ const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of m
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Trigger 1 - On Submission
+ * Reserved word: onFormSubmit() cannot be used here because it's reserved for simple triggers.
  * @param {Event} e
  */
-const onFormSubmit = async (e) => {
+const onSubmission = async (e) => {
   //Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var sheetName = e.range.getSheet().getName();
