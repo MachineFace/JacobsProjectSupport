@@ -594,3 +594,47 @@ const _testGet3dPrinterOSData = () => {
     // Logger.log(slice);
   }
 };
+
+
+const CountTotalEmailsSent = async () => {
+    const supportAlias = GmailApp.getAliases()[0];
+    let labelName = "JPS Notifications";
+   
+
+
+
+    let now = new Date();
+    let oldest = now;
+    let pageSize = 50;
+    let start = 0;
+    let threads;
+
+    do {
+      threads = await GmailApp.getInboxThreads(start, pageSize);
+      threads.forEach((thread) => {
+          oldest = thread.getLastMessageDate() < oldest ? thread.getLastMessageDate() : oldest;
+      });
+
+      start += pageSize;
+      Utilities.sleep(1000);
+    } while(threads.length > 0);
+    
+    // calculate age of oldest messag in days
+    let ageOfOldest = Math.round((datetimeToDate(now) - datetimeToDate(oldest)) / (1000 * 60 * 60 * 24))
+
+    // get all threads in inbox as an array in order to count 
+    var threadsCount = GmailApp.getInboxThreads();
+    
+    // Add a row of the spreadsheet's first sheet and include the following data:
+    // current date & time | username / email address | # of message threads in inbox | Age in days of oldest message
+    Logger.log(`Time Now : ${now}, Number of Emails in Inbox : ${threadsCount.length}, Oldest Email : ${ageOfOldest}`);
+}
+
+const datetimeToDate = (d) => {
+  return new Date(d.getYear(), d.getMonth(), d.getDate());
+}
+
+
+
+
+
