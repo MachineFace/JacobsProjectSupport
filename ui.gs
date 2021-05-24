@@ -108,7 +108,7 @@ const PopupCreateTicket = async () => {
   let timestamp = getByHeader(thisSheet, `Timestamp`, thisRow);
   let name = getByHeader(thisSheet, `What is your name?`, thisRow);
   let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
-  let email = getByHeader(thisSheet, "Email Address", thisRow);
+  let email = getByHeader(thisSheet, "Email", thisRow);
   let projectname = getByHeader(thisSheet, "Project Name", thisRow);
 
   //Materials
@@ -279,7 +279,7 @@ const BillFromSelected = async () => {
   let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
   await Logg(`Status of billed row = ${status}`);
   let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  let email = getByHeader(thisSheet, "Email Address", thisRow);
+  let email = getByHeader(thisSheet, "Email", thisRow);
   let name = getByHeader(thisSheet, "What is your name?", thisRow);
   //let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
   //let projectname = getByHeader(thisSheet, "Project Name", thisRow);
@@ -326,31 +326,18 @@ const BillFromSelected = async () => {
 
   // let material4Quantity = ss.getRange(thisRow, 19).getValue();
   // let material4Name = ss.getRange(thisRow, 20).getValue();
-  let material4Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 4 Quantity",
-    thisRow
-  );
+  let material4Quantity = getByHeader( thisSheet, "(INTERNAL) Material 4 Quantity", thisRow );
   let material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
   //let material4URL = new LookupProductID(material4Name).link;
 
   // let material5Name = ss.getRange(thisRow, 22).getValue();
   // let material5Quantity = ss.getRange(thisRow, 21).getValue();
-  let material5Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 5 Quantity",
-    thisRow
-  );
+  let material5Quantity = getByHeader( thisSheet, "(INTERNAL) Material 5 Quantity", thisRow );
   let material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
   //var material5URL = new LookupProductID(material5Name).link;
 
   //Add total quantities - if there are none then cancel billing
-  let quantityTotal =
-    material1Quantity +
-    material2Quantity +
-    material3Quantity +
-    material4Quantity +
-    material5Quantity;
+  let quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
 
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
     Logg(`Cannot bill - no quantity recorded`);
@@ -374,16 +361,16 @@ const BillFromSelected = async () => {
     } else if (status != "Billed") {
       let response;
 
-      //Check for Staff
-      let staffEmails = sheetDict.staff
-        .getRange(2, 3, sheetDict.staff.getLastRow() - 1, 1)
-        .getValues();
-      for (let i = 0; i < staffEmails.length; i++) {
-        if (email == staffEmails[i]) {
-          email = "JacobsInstituteStore@gmail.com";
-          break;
-        }
-      }
+      // //Check for Staff
+      // let staffEmails = sheetDict.staff
+      //   .getRange(2, 3, sheetDict.staff.getLastRow() - 1, 1)
+      //   .getValues();
+      // for (let i = 0; i < staffEmails.length; i++) {
+      //   if (email == staffEmails[i]) {
+      //     email = "JacobsInstituteStore@gmail.com";
+      //     break;
+      //   }
+      // }
 
       //Fetch Customer and Products
       var customer = await GetShopifyCustomerByEmail(email);

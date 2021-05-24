@@ -578,20 +578,22 @@ const _testGet3dPrinterOSData = () => {
   };
 
   //Fetch Orders
-  let html = UrlFetchApp.fetch(url, postParams);
-  Logger.log(`Response Code : ${html.getResponseCode()}`);
+  let html = UrlFetchApp.fetch(url, postParams)
+  let responseCode = html.getResponseCode()
+  Logger.log(`Response Code : ${responseCode}`)
+
   if (html.getResponseCode() == 200) {
     let content = html.getContentText();
 
     let str = JSON.stringify(content);
-    Logger.log(str);
+    // Logger.log(str);
 
     // let start = str.indexOf(`</head>`);
     // let end = str.indexOf(`</body>`)
-    // Logger.log(`Start : ${start}, End : ${end}`);
-
-    // let slice = str.slice( start, end);
-    // Logger.log(slice);
+    // Logger.log(`Start : ${start}, End : ${end}`)
+    // let slice = str.slice( start, end)
+    // Logger.log(slice)
+    
   }
 };
 
@@ -599,9 +601,12 @@ const _testGet3dPrinterOSData = () => {
 const CountTotalEmailsSent = async () => {
     const supportAlias = GmailApp.getAliases()[0];
     let labelName = "JPS Notifications";
-   
 
-
+    var labels = GmailApp.getUserLabels();
+    // labels.forEach(label => {
+    //     let name = label.getName()
+    //     Logger.log(`Labels : ${name}`)
+    // })
 
     let now = new Date();
     let oldest = now;
@@ -610,7 +615,8 @@ const CountTotalEmailsSent = async () => {
     let threads;
 
     do {
-      threads = await GmailApp.getInboxThreads(start, pageSize);
+      threads = await GmailApp.search(`label:jacobs-project-support-jps-notifications `, start, pageSize);
+      // threads = await GmailApp.getInboxThreads(start, pageSize);
       threads.forEach((thread) => {
           oldest = thread.getLastMessageDate() < oldest ? thread.getLastMessageDate() : oldest;
       });

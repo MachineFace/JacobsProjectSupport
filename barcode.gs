@@ -58,7 +58,6 @@ const GenerateBarCode = (jobnumber) => {
 
 
 
-
 /**
  * Generate a QR code from some data. Feed it a url.
  * @param {string} url
@@ -70,7 +69,7 @@ const GenerateQRCode = (url, jobnumber) => {
          url = 'jps.jacobshall.org/';
     }
     if(jobnumber == null || jobnumber == undefined) {
-         jobnumber = Math.floor(Math.random() * 100000).toFixed();
+         jobnumber = Math.floor(Math.random() * 100000).toFixed()
     }
     Logger.log(`URL : ${url}, Jobnumber || RNDNumber : ${jobnumber}`);
 

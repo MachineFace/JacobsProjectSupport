@@ -456,3 +456,87 @@ var GetShopifyOrdersList = function() {
 }
 
 
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Create sales reports
+ * @return {string} reports
+ */
+const CreateShopifySalesReport = async () => {
+    
+    let root = `https://jacobs-student-store.myshopify.com/admin/api/2021-04/reports.json`
+    let api_key = `1e70652225e070b078def8bf6e154e98`
+    let api_pass = `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`
+
+    let ql = {
+      "report": {
+        "name": "Last 6 months of Sales",
+        "shopify_ql": "SHOW total_sales BY order_id FROM sales SINCE -6m UNTIL -1d ORDER BY total_sales",
+      }
+    }
+
+    // Params
+    let params = {
+        "method" : "POST",
+        "headers" : { "Authorization" : "Basic " + Utilities.base64Encode(api_key + ":" + api_pass) },
+        "contentType" : "application/json",
+        "payload" : ql,
+        followRedirects : true,
+        muteHttpExceptions : true,
+    }
+    Logger.log(params)
+    
+    // Fetch Reports
+    let html = await UrlFetchApp.fetch(root, params)
+    let responseCode = html.getResponseCode()
+    Logger.log(`Response Code : ${responseCode}`)
+
+    if (responseCode == 200) {
+        let content = html.getContentText()
+        Logger.log(`Reports : ${content}`)
+
+        return content 
+    }
+    else return null
+}
+
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * GET sales reports
+ * @return {string} reports
+ */
+const GetShopifySalesReport = async () => {
+    
+    let root = `https://jacobs-student-store.myshopify.com/admin/api/2021-04/reports.json`
+    let api_key = `1e70652225e070b078def8bf6e154e98`
+    let api_pass = `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`
+
+    // Params
+    let params = {
+        "method" : "GET",
+        "headers" : { "Authorization" : "Basic " + Utilities.base64Encode(api_key + ":" + api_pass) },
+        "contentType" : "application/json",
+        followRedirects : true,
+        muteHttpExceptions : true,
+    };
+    
+    // Fetch Reports
+    let html = await UrlFetchApp.fetch(root, params);
+    let responseCode = html.getResponseCode()
+    Logger.log(`Response Code : ${responseCode}`)
+
+    if (responseCode == 200) {
+        let content = html.getContentText();
+        Logger.log(`Reports : ${content.toString()}`)
+
+        return content;  
+    }
+    else return null;
+}
+
+
+
+

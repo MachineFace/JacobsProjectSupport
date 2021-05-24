@@ -126,7 +126,7 @@ const onSubmission = async (e) => {
 
   //Parse Functions for shipping / variables
   var name = e.namedValues["What is your name?"][0];
-  var email = e.namedValues["Email Address"][0];
+  var email = await e.namedValues["Email"][0];
   var sid = e.namedValues["Your Student ID Number?"][0];
   var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0];
   var projectname = e.namedValues["Project Name"][0];
@@ -367,8 +367,8 @@ const onChange = async (e) => {
   //Check Priority
   // let tempEmail = ss.getRange(thisRow, 9).getValue();
   // let tempSID = ss.getRange(thisRow, 11).getValue();
-  let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
-  let tempSID = getByHeader(thisSheet, "(INTERNAL): Priority", thisRow);
+  let tempEmail = getByHeader(thisSheet, "Email", thisRow);
+  let tempSID = getByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
   var priority = await GetPriorityWithEmailOrSID(tempEmail, tempSID);
   //ss.getRange("C" + thisRow).setValue(priority);
@@ -391,7 +391,7 @@ const onChange = async (e) => {
   var jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
   var studentApproval = getByHeader(thisSheet, "Student Has Approved Job", thisRow);
   var submissiontime = getByHeader(thisSheet, "Timestamp", thisRow);
-  var email = getByHeader(thisSheet, "Email Address", thisRow);
+  var email = getByHeader(thisSheet, "Email", thisRow);
   var name = getByHeader(thisSheet, "What is your name?", thisRow);
   var sid = getByHeader(thisSheet, "Student ID Number", thisRow);
   var studentType = getByHeader(thisSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
@@ -1110,9 +1110,12 @@ const Search = (values, searchString) => {
  * @returns {int} priority
  */
 const GetPriorityWithEmailOrSID = (email, sid) => {
+  if(email != null) email = email.toLowerCase()
+  Logger.log(`Email : ${email}, SID : ${sid}`)
+
   let priority
 
-  let stringSID = sid
+  let stringSID = sid.toString()
   if (sid) {
       stringSID = sid.toString().replace(/\s+/g, "")
   }
@@ -1120,7 +1123,15 @@ const GetPriorityWithEmailOrSID = (email, sid) => {
   let approvedListEmails = sheetDict.approved.getRange(2, 2, sheetDict.approved.getLastRow() - 1, 1).getValues()
   let approvedListSIDs = sheetDict.approved.getRange(2, 3, sheetDict.approved.getLastRow() - 1, 1).getValues()
 
-  let index = Search(approvedListEmails, email)
+  let casefixedList = []
+  approvedListEmails.forEach(email => {
+      if(email[0] != null || email[0] != undefined) {
+          casefixedList.push(email[0].toString().toLowerCase())
+      }
+      else casefixedList.push(email[0].toString())
+  })
+
+  let index = Search(casefixedList, email)
   if (index == null || index == undefined) {
       index = Search(approvedListSIDs, stringSID)
   }
@@ -1129,10 +1140,16 @@ const GetPriorityWithEmailOrSID = (email, sid) => {
       index += 2
       Logger.log(`Index on ApprovedSheet : ${index}`)
       priority = sheetDict.approved.getRange(index, 4).getValue()
-  } else return `STUDENT NOT FOUND!`
+  } else priority = `STUDENT NOT FOUND!`
 
   Logger.log(`Priority = ${priority}`)
   return priority
 };
+
+
+const _testGetPriority = async () => {
+    let priority = await GetPriorityWithEmailOrSID(`laxbop@berkeley.edu`,3036051329)
+    Logger.log(`Priority : ${priority}`)
+}
 
 
