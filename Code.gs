@@ -102,7 +102,7 @@ const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of m
  * Reserved word: onFormSubmit() cannot be used here because it's reserved for simple triggers.
  * @param {Event} e
  */
-const onSubmission = async (e) => {
+const onSubmission =  (e) => {
   //Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var sheetName = e.range.getSheet().getName();
@@ -144,17 +144,17 @@ const onSubmission = async (e) => {
   Logg(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
 
   //Generate new Job number
-  var jobnumber = await CreateJobNumber(timestamp);
+  var jobnumber =  CreateJobNumber(timestamp);
   //sheet.getRange("F" + lastRow).setValue(jobnumber);
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
   //Check Priority
-  var priority = await GetPriorityWithEmailOrSID(email, sid);
+  var priority =  GetPriorityWithEmailOrSID(email, sid);
   //sheet.getRange("C" + lastRow).setValue(priority);
   setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority);
 
   //Create Messages
-  var message = await new CreateSubmissionMessage(name, projectname, jobnumber);
+  var message =  new CreateSubmissionMessage(name, projectname, jobnumber);
 
   //Get DS-Specific Message
   let dsMessage = message.dsMessage;
