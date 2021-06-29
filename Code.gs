@@ -125,9 +125,11 @@ const onSubmission = async (e) => {
   }
 
   SpreadsheetApp.flush();
-  //Parse Functions for shipping / variables
+  // var email = e.namedValues["Email"][0]   // version that results in error
+
+  // Parse Functions for shipping / variables
   var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : e.getRange(`J${lastRow}`).getValue();
-  var email = e.namedValues["Email"][0] ? e.namedValues["Email"][0] : e.getRange(`I${lastRow}`).getValue();
+  var email = e.getRange(`I${lastRow}`).getValue();
   var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : e.getRange(`K${lastRow}`).getValue();
   var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0];
   var projectname = e.namedValues["Project Name"][0];
