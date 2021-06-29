@@ -124,6 +124,7 @@ const onSubmission = async (e) => {
     Logg(`${err}: Could not set status to 'Received'.`);
   }
 
+  SpreadsheetApp.flush();
   //Parse Functions for shipping / variables
   var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : e.getRange(`J${lastRow}`).getValue();
   var email = e.namedValues["Email"][0] ? e.namedValues["Email"][0] : e.getRange(`I${lastRow}`).getValue();
