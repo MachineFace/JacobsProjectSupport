@@ -129,9 +129,9 @@ const onSubmission = async (e) => {
   // Parse Functions for shipping / variables
   var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : e.getRange(`J${lastRow}`).getValue();
   var email = e.namedValues["Email"][0]   // version that results in error
-  Logg('email');
+  Logg(`email: ${email}`);
   var email2 = e.getRange(`I${lastRow}`).getValue();
-  Logg('email2');
+  Logg(`email2: ${email2}`);
   var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : e.getRange(`K${lastRow}`).getValue();
   var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0];
   var projectname = e.namedValues["Project Name"][0];
