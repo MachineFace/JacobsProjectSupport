@@ -134,7 +134,7 @@ class CreateMessage
             message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall South side - Room 110 Side Doors<br/>'; 
             message += '2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>';
             message += '<b>Pick-Up Hours:<br/>';
-            message += 'Monday - Friday: 11am - 1pm & 5pm - 7pm.</b><br/><br/>'
+            message += 'Monday - Friday: 11am - 1pm</b><br/><br/>'
             message += 'If you have any further questions or need assistance please email ' + InvokeDS("Staff", "emaillink") + '. <br/>';
             message += '<p>Please take a moment to take our survey so we can improve JPS : <a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>';
             message += '<p>Best,<br />Jacobs Hall Staff</p>'; 
@@ -281,7 +281,7 @@ class CreateSubmissionMessage
             message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall South side - Room 110 Side Doors<br/>'; 
             message += '2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>';
             message += '<b>Drop-off Hours:<br/>';
-            message += 'Monday - Friday: 11am - 1pm & 5pm - 7pm.</b><br/><br/>'
+            message += 'Monday - Friday: 11am - 1pm</b><br/><br/>'
             message += 'Please email ' + InvokeDS("Chris", "fullname") + ' at ' + InvokeDS("Chris", "emaillink") + ' for further details.<br/>';
             message += 'If you have any further questions or need assistance please email ' + InvokeDS("Staff", "emaillink") + '. <br/>';
             message += '<p>Best,<br />Jacobs Hall Staff</p>';

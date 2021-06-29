@@ -241,6 +241,7 @@ var GetShopifyCustomerByEmail = function(email){
     let api_pass = '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';
     
     //email = 'eli_lee@berkeley.edu'; //Test Name
+    // email = "thomaspdevlin@berkeley.edu";
 
     let fields = '&fields=id,first_name,last_name,total_spent';
     let scope = 'customers/search.json?query=email:' + email;
@@ -269,8 +270,8 @@ var GetShopifyCustomerByEmail = function(email){
           Logger.log('User Shopify Account Does Not Exist. Please make a User Account on Shopify.');
           return user;
         }
-        //Logger.log(user);
-        //Logger.log('ID: ' + user['id'] + ', Name : ' + user['first_name'] + ' ' + user['last_name'] + ', Total Spent : ' + user['total_spent']);
+        Logger.log(user);
+        Logger.log('ID: ' + user['id'] + ', Name : ' + user['first_name'] + ' ' + user['last_name'] + ', Total Spent : ' + user['total_spent']);
 
         this.id = user['id'];
         this.first_name = user['first_name'];

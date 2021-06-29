@@ -283,6 +283,7 @@ const BillFromSelected = async () => {
   let name = getByHeader(thisSheet, "What is your name?", thisRow);
   //let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
   //let projectname = getByHeader(thisSheet, "Project Name", thisRow);
+  Logger.log(`STATUS : ${status}, JOBNUMBER : ${jobnumber}, EMAIL : ${email}, NAME : ${name}`)
 
   //Materials
   // let material1Quantity = ss.getRange(thisRow, 13).getValue();

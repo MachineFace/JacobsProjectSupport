@@ -249,7 +249,7 @@ const CalculateDistribution = () => {
     });
 
     // Create a new array with only the first 10 items and remove Tests
-    let chop = items.slice(1, 12);
+    let chop = items.slice(0, 11);
     //Logger.log(chop);
     let loc;
     chop.forEach((item) => {
@@ -258,7 +258,14 @@ const CalculateDistribution = () => {
         })
     });
     chop.splice(loc,1);
-    Logger.log(chop);
+    // Logger.log(chop);
+
+    chop.forEach((pair, index) => {
+      Logger.log(`${pair[0]} -----> ${pair[1]}`)
+      sheetDict.data.getRange(106+index,2,1,1).setValue(pair[0])
+      sheetDict.data.getRange(106+index,3,1,1).setValue(pair[1])
+    })
+
     return chop;
 
 }
