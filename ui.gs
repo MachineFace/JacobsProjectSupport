@@ -277,7 +277,7 @@ const BillFromSelected = async () => {
   }
 
   let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-  await Logg(`Status of billed row = ${status}`);
+  Logg(`Status of billed row = ${status}`);
   let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
   let email = getByHeader(thisSheet, "Email", thisRow);
   let name = getByHeader(thisSheet, "What is your name?", thisRow);
@@ -374,8 +374,7 @@ const BillFromSelected = async () => {
       // }
 
       //Fetch Customer and Products
-      var customer = await GetShopifyCustomerByEmail(email);
-
+      const customer = await GetShopifyCustomerByEmail(email);
       if (customer == undefined || customer == null) {
         Browser.msgBox(
           "Shopify Error",
@@ -383,7 +382,7 @@ const BillFromSelected = async () => {
           Browser.Buttons.OK
         );
       } else {
-        var package = await new PackageMaterials(
+        const package = await new PackageMaterials(
           material1Name,
           material1Quantity,
           material2Name,
@@ -395,7 +394,7 @@ const BillFromSelected = async () => {
           material5Name,
           material5Quantity
         );
-        var formattedMats = await new MakeLineItems(package);
+        const formattedMats = await new MakeLineItems(package);
 
         var boxTitle = `Generate Bill to Shopify`;
         var boxMsg = `Would you like to Generate a Bill to: \\n\\n`;
@@ -445,7 +444,7 @@ const BillFromSelected = async () => {
           );
           if (response == "yes") {
             Logger.log('User clicked "Yes".');
-            var order = await new CreateShopifyOrder(
+            const order = await new CreateShopifyOrder(
               customer,
               jobnumber,
               package,

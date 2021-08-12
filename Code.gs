@@ -124,17 +124,12 @@ const onSubmission = async (e) => {
     Logg(`${err}: Could not set status to 'Received'.`);
   }
 
-  SpreadsheetApp.flush();
-  
-  // Parse Functions for shipping / variables
-  var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : e.getRange(`J${lastRow}`).getValue();
-  var email = e.namedValues["Email"][0]   // version that results in error
-  Logg(`email: ${email}`);
-  var email2 = e.getRange(`I${lastRow}`).getValue();
-  Logg(`email2: ${email2}`);
-  var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : e.getRange(`K${lastRow}`).getValue();
-  var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0];
-  var projectname = e.namedValues["Project Name"][0];
+  //Parse Functions for shipping / variables
+  var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : getByHeader(sheet, "What is your name?", lastRow);
+  var email = e.namedValues["Email"][0] ? e.namedValues["Email"][0] : getByHeader(sheet, "Email", lastRow);
+  var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : getByHeader(sheet, "Your Student ID Number?", lastRow);
+  var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0] ? e.namedValues["What is your affiliation to the Jacobs Institute?"][0] : getByHeader(sheet, "What is your affiliation to the Jacobs Institute?", lastRow);
+  var projectname = e.namedValues["Project Name"][0] ? e.namedValues["Project Name"][0] : getByHeader(sheet, "Project Name", lastRow);
   var shipping = e.namedValues["Do you need your parts shipped to you?"][0];
   var timestamp = e.namedValues["Timestamp"][0];
 
