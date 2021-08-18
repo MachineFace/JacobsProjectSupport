@@ -511,9 +511,9 @@ const CreateShopifySalesReport = async () => {
  */
 const GetShopifySalesReport = async () => {
     
-    let root = `https://jacobs-student-store.myshopify.com/admin/api/2021-04/reports.json`
-    let api_key = `1e70652225e070b078def8bf6e154e98`
-    let api_pass = `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`
+    let root = `https://jacobs-student-store.myshopify.com/admin/api/2021-04/reports.json`;
+    let api_key = `1e70652225e070b078def8bf6e154e98`;
+    let api_pass = `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`;
 
     // Params
     let params = {
