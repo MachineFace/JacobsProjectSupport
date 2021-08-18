@@ -255,13 +255,16 @@ const PrinterOS_GetAdminReport = async (session, fromDate, toDate ) => {
  * Try it out.
  */
 const PrinterOS_Get = async () => {
+  let session;
   try {
     const { responseCode, headers, response } = await PrinterOS_Login();
     if(responseCode != 200) {
       const { responseCode, headers, response } = await PrinterOS_ClassicLogin();
     }
-
-    // const printers = PrinterOS_GetPrinters(session)
+    if(response) { 
+      session = response;
+    }
+    const printers = PrinterOS_GetPrinters(session)
 
     // printers.forEach(printer => {
     //   let jobslist = PrinterOS_GetPrintersJobList(session, printer)
