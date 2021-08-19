@@ -2,7 +2,7 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Code Enumerations
  */
-const responseCodes = {
+const RESPONSECODES = {
 	200 : `OK`,
 	201 : `Created`,
 	202 : `Accepted`,
@@ -69,4 +69,22 @@ const responseCodes = {
 	511 : `Network Authentication Required`,
 	598 : `Network read timeout error`,
 	599 : `Network connect timeout error`,
- }
+}
+
+const STATUS = [
+  "Received",
+  "Pending Approval",
+  "In-Progress",
+  "Completed",
+  "Picked Up",
+  "Waitlist",
+  "Billed",
+  "FAILED",
+  "Cancelled",
+  "Missing Access",
+  "CLOSED",
+]
+
+
+
+

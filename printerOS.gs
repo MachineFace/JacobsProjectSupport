@@ -22,7 +22,7 @@ const PrinterOS_ClassicLogin = async () => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`HEADERS ---> ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -31,6 +31,7 @@ const PrinterOS_ClassicLogin = async () => {
     response : html.getContentText()
   }
 }
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -50,7 +51,7 @@ const PrinterOS_Login = async () => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`Headers ---> ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -59,6 +60,7 @@ const PrinterOS_Login = async () => {
     response : html.getContentText()
   }
 }
+
 
 /**
  * Check PrinterOS Session
@@ -77,7 +79,7 @@ const PrinterOS_CheckSession = async (session) => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -87,6 +89,7 @@ const PrinterOS_CheckSession = async (session) => {
   }
 
 }
+
 
 /**
  * Get Organizations Printers
@@ -108,7 +111,7 @@ const PrinterOS_GetPrinters = async (session) => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -119,10 +122,48 @@ const PrinterOS_GetPrinters = async (session) => {
 
 }
 
+
+/**
+ * Get Printer List
+ * @required {obj} session
+ * @param {string} printer_type (optional, printer short type, ex. K_PORTRAIT)
+ * @param {int} printer_id (optional, printer id)
+ */
+const PrinterOS_GetPrinterList = async (session, printer_type, printer_id) => {
+  const repo = "/apiglobal/get_printers_list";
+  const payload = {
+    "session" : session,
+    "printer_type" : printer_type,
+    "printer_id" : printer_id,
+  }
+  const params = {
+    "method" : "POST",
+    "headers" : { "Authorization": "Basic " + Utilities.base64Encode(api_key + ":" + api_pass) },
+    "contentType" : "application/json",
+    "payload" : payload,
+    followRedirects : true,
+    muteHttpExceptions : true
+  };
+  const html = await UrlFetchApp.fetch(root + repo, params);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
+  Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
+  Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
+  return {
+    responseCode : html.getResponseCode(),
+    headers : html.getHeaders(),
+    response : html.getContentText()
+  }
+}
+
+
 /**
  * Get a Specific Printer's Job List
- * @param {obj} session
- * @param {int} printerID
+ * @required {obj} session
+ * @required {int} printerID
+ * @param {int} limit (optional, default 20) - max job count in response
+ * @param {int} offset (optional, default 0) - offset for pagination
+ * @param {int} prev_time (optional, parameter for live update. Can be used to get only changed jobs between two requests. For first request need to send add prev_time: 0, and you will have “time” parameter in   
+ * response. You need to send prev_time: “time” in next request to get only live updates)
  */
 const PrinterOS_GetPrintersJobList = async (session, printerID) => {
   const repo = "/apiglobal/get_printer_jobs";
@@ -139,7 +180,7 @@ const PrinterOS_GetPrintersJobList = async (session, printerID) => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -170,7 +211,7 @@ const PrinterOS_GetJobInfo = async (session, jobID) => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -201,7 +242,31 @@ const PrinterOS_GetUsersByWorkgroup = async (session, workgroupID) => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
+  Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
+  Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
+  return {
+    responseCode : html.getResponseCode(),
+    headers : html.getHeaders(),
+    response : html.getContentText()
+  }
+}
+
+
+/**
+ * Get Printers in Cloud - No input params
+ */
+const PrinterOS_GetPrintersInCloud = async () => {
+  const repo = "/apiglobal/get_printer_types_detailed";
+  const params = {
+    "method" : "POST",
+    "headers" : { "Authorization": "Basic " + Utilities.base64Encode(api_key + ":" + api_pass) },
+    "contentType" : "application/json",
+    followRedirects : true,
+    muteHttpExceptions : true
+  };
+  const html = await UrlFetchApp.fetch(root + repo, params);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -240,7 +305,7 @@ const PrinterOS_GetAdminReport = async (session, fromDate, toDate ) => {
     muteHttpExceptions : true
   };
   const html = await UrlFetchApp.fetch(root + repo, params);
-  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${responseCodes[html.getResponseCode()]}`);
+  Logger.log(`Response Code ---> : ${html.getResponseCode()} : ${RESPONSECODES[html.getResponseCode()]}`);
   Logger.log(`HEADERS ---> : ${JSON.stringify(html.getHeaders())}`);
   Logger.log(`Response ---> : ${JSON.stringify(html.getContentText())}`);
   return {
@@ -264,7 +329,8 @@ const PrinterOS_Get = async () => {
     if(response) { 
       session = response;
     }
-    const printers = PrinterOS_GetPrinters(session)
+    // const printers = PrinterOS_GetPrinters(session);
+    // const { responseCode, headers, response } = PrinterOS_GetPrintersInCloud();
 
     // printers.forEach(printer => {
     //   let jobslist = PrinterOS_GetPrintersJobList(session, printer)
