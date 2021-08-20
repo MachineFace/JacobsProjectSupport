@@ -131,7 +131,7 @@ class CreateMessage
             message += '<br/>';
             message += 'Completed projects can be picked up in-person, unless otherwise noted with your instructor, or unless you have elected to have your parts shipped.<br/><br/>';
             message += '<b>Pick-Up Location:<br/>';
-            message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>'; 
+            message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby. <br/>'; 
             message += '2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>';
             message += '<b>Pick-Up Hours:<br/>';
             message += 'Monday - Friday: 11am - 1pm</b><br/><br/>'
