@@ -127,30 +127,31 @@ const StaffEmailAsString = () => {
  * @returns {string} fullname, email, or email link
  */
 const InvokeDS = (name, property) => {
-    let stafflist = sheetDict.staff;
-    let last = stafflist.getLastRow();
-    let staffrange = stafflist.getRange(2, 1, last, 4).getValues();
+  let stafflist = sheetDict.staff;
+  let last = stafflist.getLastRow();
+  let staffrange = stafflist.getRange(2, 1, last, 4).getValues();
 
-    for (let i in staffrange) {
-        let _name = staffrange[i][0];
-        let _fullname = staffrange[i][1];
-        let _email = staffrange[i][2];
-        let _emailLink = staffrange[i][3];
-        //Logger.log('name = %s, fullname = %s,  email = %s, emaillink = %s',_name,_fullname,_email,_emailLink);
+  for (let i in staffrange) {
+    let _name = staffrange[i][0];
+    let _fullname = staffrange[i][1];
+    let _email = staffrange[i][2];
+    let _emailLink = staffrange[i][3];
+    //Logger.log('name = %s, fullname = %s,  email = %s, emaillink = %s',_name,_fullname,_email,_emailLink);
 
-        switch (property) {
-            case "fullname":
-                // @ts-ignore
-                if (staffrange[i][0] == name) return _fullname;
-            case "email":
-                // @ts-ignore
-                if (staffrange[i][0] == name) return _email;
-            case "emaillink":
-                // @ts-ignore
-                if (staffrange[i][0] == name) return _emailLink;
-        }
+    switch (property) {
+        case "fullname":
+          // @ts-ignore
+          if (staffrange[i][0] == name) return _fullname;
+        case "email":
+          // @ts-ignore
+          if (staffrange[i][0] == name) return _email;
+        case "emaillink":
+          // @ts-ignore
+          if (staffrange[i][0] == name) return _emailLink;
     }
+  }
 }
+
 
 
 /**

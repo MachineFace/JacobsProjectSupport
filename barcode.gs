@@ -75,13 +75,10 @@ const GenerateQRCode = (url, jobnumber) => {
 
     let loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${url}`;  //API call
     
-    //Encode Header
-    let headers = { "Authorization" : "Basic" };
-
     //Stuff payload into postParams
     let postParams = {
         "method" : "GET",
-        "headers" : headers,
+        "headers" : { "Authorization" : "Basic" },
         "contentType" : "application/json",
         followRedirects : true,
         muteHttpExceptions : true

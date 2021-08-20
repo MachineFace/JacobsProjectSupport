@@ -341,3 +341,119 @@ const PrinterOS_Get = async () => {
 }
 
 
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Create a PrinterOS Ticket to Print
+ * @param {string} designspecialist
+ * @param {time} submissiontime
+ * @param {string} name
+ * @param {number} sid
+ * @param {string} email
+ * @param {string} projectname
+ * @param {number} material1Quantity
+ * @param {string} material1Name
+ * @param {number} material2Quantity
+ * @param {string} material2Name
+ * @returns {doc} doc
+ */
+const PrinterOS_CreateTicket = ( designspecialist, submissiontime, name, email, projectname, material1Quantity, material1Name, material2Quantity, material2Name, ) => {
+
+  // Create JobNumber
+  try {
+    const jobnumber = CreateJobNumber(submissiontime);
+  } catch (err) {
+    Logger.log(`${err} : Couldn't generate a job number.`)
+  }
+
+  // Create Doc
+  try {
+    var folder = DriveApp.getFoldersByName(`Job Tickets`); //Set the correct folder
+    var doc = DocumentApp.create(`Job Ticket`); //Make Document
+    var body = doc.getBody();
+    var docId = doc.getId();
+  } catch (err) {
+    Logger.log( `${err} : Couldn't fetch doc folder, or make ticket, or get body or docId.` );
+  }
+
+  // Create BarCode
+  try {
+    var barcode = GenerateBarCode(jobnumber);
+  } catch (err) {
+    Logger.log(`${err} : Couldnt create barcode for some reason.`);
+  }
+
+  // Create QR Code
+  try {
+    var qrCode = GenerateQRCode(doc.getUrl());
+  } catch (err) {
+    Logger.log(`${err} : Couldnt create QRCode for some reason.`);
+  }
+
+  // Append Document with Info
+  if (doc != undefined || doc != null || doc != NaN) {
+    try {
+      let header = doc
+        .addHeader()
+        .appendTable([[`img1`, `img2`]])
+        .setAttributes({
+          [DocumentApp.Attribute.BORDER_WIDTH]: 0,
+          [DocumentApp.Attribute.BORDER_COLOR]: `#ffffff`,
+        });
+      ReplaceTextToImage(header, `img1`, barcode);
+      ReplaceTextToImage(header, `img2`, qrCode);
+
+      body.insertHorizontalRule(0);
+      body.insertParagraph(1, "Name: " + name.toString())
+        .setHeading(DocumentApp.ParagraphHeading.HEADING1)
+        .setAttributes({
+          [DocumentApp.Attribute.FONT_SIZE]: 18,
+          [DocumentApp.Attribute.BOLD]: true,
+        });
+      body.insertParagraph(2, "Job Number: " + +jobnumber.toString())
+        .setHeading(DocumentApp.ParagraphHeading.HEADING2)
+        .setAttributes({
+          [DocumentApp.Attribute.FONT_SIZE]: 12,
+          [DocumentApp.Attribute.BOLD]: true,
+        });
+
+      // Create a two-dimensional array containing the cell contents.
+      body.appendTable([
+          ["Design Specialist:", designspecialist.toString()],
+          ["Job Number:", jobnumber.toString()],
+          ["Student Name:", name.toString()],
+          ["Project Name:", projectname.toString()],
+          ["Materials:", material1Name.toString()],
+          [mat[0], mat[1]],
+          [partcount[0], partcount[1]],
+        ])
+        .setAttributes({
+          [DocumentApp.Attribute.FONT_SIZE]: 9,
+        });
+    } catch (err) {
+      Logger.log(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
+    }
+
+    // Remove File from root and Add that file to a specific folder
+    try {
+      var docFile = DriveApp.getFileById(docId);
+      DriveApp.removeFile(docFile);
+      folder.next().addFile(docFile);
+      folder.next().addFile(barcode);
+    } catch (err) {
+      Logger.log( `${err} : Couldn't delete the file from the drive folder. Sheet is still linked` );
+    }
+
+    // Set permissions to 'anyone can edit' for that file
+    try {
+      var file = DriveApp.getFileById(docId);
+      file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
+    } catch (err) {
+      Logg( `${err} : Couldn't change permissions on the file. You probably have to do something else to make it work.` );
+    }
+  }
+  //Return Document to use later
+  return doc;
+};
+

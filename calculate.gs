@@ -28,7 +28,7 @@ const CalculateAverageTurnaround = (sheet) => {
         }
     }
     catch (err) {
-        Logg(`${err} : Could not fetch list of times. Probably a sheet error.`);
+        Logger.log(`${err} : Could not fetch list of times. Probably a sheet error.`);
     }
 
     //Convert everything to seconds
@@ -46,7 +46,7 @@ const CalculateAverageTurnaround = (sheet) => {
         }
     }
     catch (err) {
-        Logg(`${err} : Could not sum times.`);
+        Logger.log(`${err} : Could not sum times.`);
     }
 
     //sum all the totals

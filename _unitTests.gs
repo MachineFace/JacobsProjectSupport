@@ -124,16 +124,18 @@ const _gastTestRunner = async () => {
         'mat5URL', 75, 'Plastic',
         'designspecialist', 'cody@glen.com', 45.50)
 
-      Logger.log('DEFAULT' + message.defaultMessage);
-      Logger.log('RECEIVED' + message.receivedMessage);
-      Logger.log('PENDING' + message.pendingMessage);
-      Logger.log('IN-PROGRESS' + message.inProgressMessage);
-      Logger.log('COMPLETED' + message.completedMessage);
-      Logger.log('SHIPPING QUESTION' + message.shippingQuestion);
-      Logger.log('SHIPPED' + message.shippedMessage);
-      Logger.log('FAILED' + message.failedMessage);
-      Logger.log('R1' + message.rejectedByStudentMessage);
-      Logger.log('BILLED' + message.billedMessage);
+      Logger.log(`DEFAULT ${message.defaultMessage}`);
+      Logger.log(`RECEIVED ${message.receivedMessage}`);
+      Logger.log(`PENDING ${message.pendingMessage}`);
+      Logger.log(`IN-PROGRESS ${message.inProgressMessage}`);
+      Logger.log(`COMPLETED ${message.completedMessage}`);
+      Logger.log(`SHIPPING QUESTION ${message.shippingQuestion}`);
+      Logger.log(`SHIPPED ${message.shippedMessage}`);
+      Logger.log(`FAILED ${message.failedMessage}`);
+      Logger.log(`REJECTED BY STUDENT ${message.rejectedByStudentMessage}`);
+      Logger.log(`REJECTED BY STAFF ${message.rejectedByStaffMessage}`);
+      Logger.log(`BILLED ${message.billedMessage}`);
+      Logger.log(`PICKED UP ${message.pickedUpMessage}`);
 
       t.pass(`Good : ${JSON.stringify(message)}`)
       t.fail(`Bad`)
@@ -210,6 +212,64 @@ const _gastTestRunner = async () => {
 //       } catch(err) {
 //           Logger.log(`${err} : Whoops`)
 //       }
+// }
+
+
+// /**
+//  * Unit Test for Making 'OnEdit' Messages
+//  */
+// const _testOnEditMessages = async () => {
+//   const message = new CreateMessage('Cody', 'Test Project', '101293874098', 'url',
+//     'material1URL', 45, 'TestPLA',
+//     'material2URL', 15, 'TestBreakaway',
+//     'mat3URL', 23, 'Steel',
+//     'mat4URL', 24, 'Aluminum',
+//     'mat5URL', 75, 'Plastic',
+//     'designspecialist', 'cody@glen.com', 45.50);
+
+//     Logger.log('DEFAULT' + message.defaultMessage);
+//     Logger.log('RECEIVED' + message.receivedMessage);
+//     Logger.log('PENDING' + message.pendingMessage);
+//     Logger.log('IN-PROGRESS' + message.inProgressMessage);
+//     Logger.log('COMPLETED' + message.completedMessage);
+//     Logger.log('PICKEDUP' + message.pickedUpMessage);
+//     Logger.log('SHIPPING QUESTION' + message.shippingQuestion);
+//     Logger.log('SHIPPED' + message.shippedMessage);
+//     Logger.log('FAILED' + message.failedMessage);
+//     Logger.log('REJECTED' + message.rejectedByStudentMessage);
+//     Logger.log('BILLED' + message.billedMessage);
+
+//     return Promise.resolve( message );
+// }
+
+
+
+// /**
+//  * Unit Test for Making 'OnformSubmit' messages
+//  */
+// const _testOnformSubmitMessages = async () => {
+//     const message = new CreateSubmissionMessage('Cody', 'SomeProject', 102938471431 );
+//     Logger.log('DS MESSAGE' + message.dsMessage);
+//     Logger.log('CREAFORM MESSAGE' + message.creaformMessage);
+//     Logger.log('MISSING ACCESS' + message.missingAccessMessage);
+//     Logger.log('SHIPPING MESSAGE' + message.shippingMessage);
+
+//     return Promise.resolve( message );
+// }
+
+// /**
+//  * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 
+//  */
+// const _testAllMessages = async () => {
+
+//     Promise.all([
+//         await _testOnEditMessages(),
+//         await _testOnformSubmitMessages(),
+//     ])
+//     .then(Logger.log('Test Success'))
+//     .catch(Error => {
+//         Logger.log(Error + 'Failure');
+//     }); 
 // }
 
 

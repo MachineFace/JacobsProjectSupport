@@ -1,12 +1,32 @@
-/**  TESTES
+/**
+ * MISC FUNCTIONS
  * ----------------------------------------------------------------------------------------------------------------
+ */
+
+
+/**
+ * Search an Array for a Specific Value
+ * @required {[string]} array to search
+ * @required {string} searchString
+ * @returns {int} index
+ */
+const Search = (values, searchString) => {
+  for (let i = 0; i < values.length; i++) {
+    if (values[i][0] == searchString) {
+      return i;
+    }
+  }
+};
+
+
+
+/**  
  * Delete Files older than some number of days
  * @param {number} RetentionPeriod
  */
 const DeleteOldFiles = () => {
-  var folder = DriveApp.getFoldersByName("Job Forms");
-
-  function processFolder(folder) {
+  const folder = DriveApp.getFoldersByName("Job Forms");
+  const processFolder = (folder) => {
     var files = folder.getFiles();
     while (files.hasNext()) {
       var file = files.next();
@@ -26,7 +46,7 @@ const DeleteOldFiles = () => {
  */
 const formatCell = (cell) => {
     try {
-        let strategy = SpreadsheetApp.WrapStrategy.CLIP;
+        const strategy = SpreadsheetApp.WrapStrategy.CLIP;
         cell.setWrapStrategy(strategy);
     } catch (err) {
         Logger.log(`${err} : Cell failed to be clipped.`);
@@ -69,14 +89,13 @@ const formatCell = (cell) => {
 const setByHeader = (theSheet, colName, row, val) => {
   //let theSheet = SpreadsheetApp.getActiveSheet();
   try {
-    let data = theSheet.getDataRange().getValues();
-    let col = data[0].indexOf(colName);
+    const data = theSheet.getDataRange().getValues();
+    const col = data[0].indexOf(colName);
     let range = theSheet.getRange(row, col+1);
     range.setValue(val);
     //Logger.log(`Value of row: ${row} col: ${col} set to ${val}`);
   } catch (err) {
-    //Logger.log(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
-    Logg(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
+    Logger.log(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
   }
 };
 

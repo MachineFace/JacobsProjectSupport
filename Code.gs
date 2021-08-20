@@ -118,7 +118,7 @@ const onSubmission = async (e) => {
       }
     }
     //sheet.getRange("A" + lastRow).setValue("Received");
-    setByHeader(sheet, "(INTERNAL) Status", lastRow, "Received");
+    setByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.received);
     Logg("Set status to 'Received'.");
   } catch (err) {
     Logg(`${err}: Could not set status to 'Received'.`);
@@ -227,7 +227,7 @@ const onSubmission = async (e) => {
 
   //Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
-  stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status",  lastRow, "Received"); 
+  stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
   Logger.log("Status refixed to 'Received'.");
 
   //"Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
@@ -278,7 +278,7 @@ const onSubmission = async (e) => {
 
       //Set access to Missing Access
       //sheet.getRange("A" + lastRow).setValue("Missing Access");
-      setByHeader(sheet, "(INTERNAL) Status", lastRow, "Missing Access");
+      setByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
       Logger.log(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
@@ -375,7 +375,7 @@ const onChange = async (e) => {
   setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, priority);
   if (priority == "STUDENT NOT FOUND") {
       // SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange(thisRow, 1, 1, 1).setValue("Missing Access");
-      setByHeader(thisSheet, "(INTERNAL) Status", thisRow, "Missing Access");
+      setByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
 
   //STATUS CHANGE TRIGGER
@@ -482,7 +482,7 @@ const onChange = async (e) => {
     var startTime = submissiontime;
     var elapsedCell = ss.getRange(thisRow, 43).getValue();
     if (elapsedCell == undefined || elapsedCell == null || elapsedCell == "") {
-      if (status == "Completed" || status == "Billed") {
+      if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
         let time = await CalculateDuration(startTime, endTime);
 
@@ -503,7 +503,7 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   //Trigger for generating a "Ticket"
-  if ( status == "Received" || status == "In-Progress" || status == "Pending Approval" ) {
+  if ( status == STATUS.received || status == STATUS.inProgress || status == STATUS.pendingApproval ) {
     try {
       var Ticket = await CreateTicket(
         designspecialist,
@@ -538,7 +538,7 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   //Make an approval form on demand
   // Create a new form, then add a checkbox question, a multiple choice question,
-  if (status == "Pending Approval") {
+  if (status == STATUS.pendingApproval) {
     var approvalURL = await CreateApprovalForm(name, jobnumber, cost);
     Logg(`Approval Form generated and sent to user.`);
   }
@@ -575,7 +575,7 @@ const onChange = async (e) => {
 
   //Send email with appropriate response and cc Chris and Cody.
   switch (status) {
-    case "Received":
+    case STATUS.received:
       GmailApp.sendEmail(email, "Jacobs Project Support : Received", "", {
         htmlBody: Message.receivedMessage,
         from: supportAlias,
@@ -584,7 +584,7 @@ const onChange = async (e) => {
         name: gmailName,
       });
       break;
-    case "Pending Approval":
+    case STATUS.pendingApproval:
       GmailApp.sendEmail(email, "Jacobs Project Support : Needs Your Approval", "", {
           htmlBody: Message.pendingMessage,
           from: supportAlias,
@@ -593,7 +593,7 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "In-Progress":
+    case STATUS.inProgress:
       GmailApp.sendEmail(email, "Jacobs Project Support : Project Started", "", {
           htmlBody: Message.inProgressMessage,
           from: supportAlias,
@@ -602,7 +602,7 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "Completed":
+    case STATUS.completed:
       GmailApp.sendEmail(email, "Jacobs Project Support : Project Completed", "", {
           htmlBody: Message.completedMessage,
           from: supportAlias,
@@ -611,7 +611,16 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "Shipped":
+    case STATUS.pickedUp:
+      GmailApp.sendEmail(email, "Jacobs Project Support : Project Picked Up", "", {
+          htmlBody: Message.pickedUpMessage,
+          from: supportAlias,
+          cc: designspecialistemail,
+          bcc: InvokeDS("Chris", "email"),
+          name: gmailName,
+      });
+      break;
+    case STATUS.shipped:
       GmailApp.sendEmail(email, "Jacobs Project Support : Project Shipped", "", {
           htmlBody: Message.shippedMessage,
           from: supportAlias,
@@ -620,7 +629,7 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "FAILED":
+    case STATUS.failed:
       GmailApp.sendEmail(email, "Jacobs Project Support : Project has Failed", "", {
           htmlBody: Message.failedMessage,
           from: supportAlias,
@@ -629,7 +638,7 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "Rejected by Student":
+    case STATUS.rejectedByStudent:
       GmailApp.sendEmail(email, "Jacobs Project Support : Project has been Declined", "", {
           htmlBody: Message.rejectedByStudentMessage,
           from: supportAlias,
@@ -638,7 +647,7 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "Rejected by Staff":
+    case STATUS.rejectedByStaff:
     case "Cancelled":
       GmailApp.sendEmail(email, "Jacobs Project Support : Project has been Cancelled", "", {
           htmlBody: Message.rejectedByStaffMessage,
@@ -648,7 +657,7 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "Billed":
+    case STATUS.billed:
       GmailApp.sendEmail(email, "Jacobs Project Support : Project Closed", "", {
         htmlBody: Message.billedMessage,
         from: supportAlias,
@@ -657,7 +666,7 @@ const onChange = async (e) => {
         name: gmailName,
       });
       break;
-    case "Waitlist":
+    case STATUS.waitlist:
       GmailApp.sendEmail(email, "Jacobs Project Support : Project Waitlisted", "", {
           htmlBody: Message.waitlistMessage,
           from: supportAlias,
@@ -666,7 +675,7 @@ const onChange = async (e) => {
           name: gmailName,
       });
       break;
-    case "Missing Access":
+    case STATUS.missingAccess:
       if (priority == false) break;
       else {
         GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
@@ -1089,18 +1098,6 @@ var GetPriorityFromEmail = (email) => {
 
 
 
-/**
- * @param {[string]} array to search
- * @param {string} searchString
- * @returns {int} index
- */
-const Search = (values, searchString) => {
-  for (let i = 0; i < values.length; i++) {
-    if (values[i][0] == searchString) {
-      return i;
-    }
-  }
-};
 
 
 
@@ -1138,7 +1135,7 @@ const GetPriorityWithEmailOrSID = (email, sid) => {
 
   if (index != null || index != undefined) {
       index += 2
-      Logger.log(`Index on ApprovedSheet : ${index}`)
+      // Logger.log(`Index on ApprovedSheet : ${index}`)
       priority = sheetDict.approved.getRange(index, 4).getValue()
   } else priority = `STUDENT NOT FOUND!`
 
@@ -1148,8 +1145,7 @@ const GetPriorityWithEmailOrSID = (email, sid) => {
 
 
 const _testGetPriority = async () => {
-    let priority = await GetPriorityWithEmailOrSID(`laxbop@berkeley.edu`,3036051329)
-    Logger.log(`Priority : ${priority}`)
+    return await GetPriorityWithEmailOrSID(`laxbop@berkeley.edu`,3036051329)
 }
 
 

@@ -129,9 +129,9 @@ class CreateMessage
             }
             else message += '<p>The cost is estimated to be ' + this.costFormatted + ' <br /><p></br>';
             message += '<br/>';
-            message += 'Completed projects can be picked up in-person, unless otherwise noted with your instructor.<br/><br/>';
+            message += 'Completed projects can be picked up in-person, unless otherwise noted with your instructor, or unless you have elected to have your parts shipped.<br/><br/>';
             message += '<b>Pick-Up Location:<br/>';
-            message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall South side - Room 110 Side Doors<br/>'; 
+            message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>'; 
             message += '2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>';
             message += '<b>Pick-Up Hours:<br/>';
             message += 'Monday - Friday: 11am - 1pm</b><br/><br/>'
@@ -144,7 +144,7 @@ class CreateMessage
     get pickedUpMessage() {
         let message = '<p>Hi ' + this.name + ',</p>';
             message += '<p>Thank you for choosing Jacobs Project Support.<br />';
-            message += 'The part or parts requested for your project, <b><i>' + this.projectname + '</i></b> have been picked up. Job Number: <i>' + this.jobnumber + '</i><br />';
+            message += 'The part or parts requested for your project, <b><i>' + this.projectname + '</i></b> have been picked up and the project is now CLOSED. Job Number: <i>' + this.jobnumber + '</i><br />';
             message += 'Please email ' + this.designspecialist + ' at ' + this.designspecialistemaillink + ' if you have any additional questions.<br/>';
             message += '<p>Please take a moment to take our survey so we can improve JPS : '
             message += '<a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>';
@@ -289,7 +289,7 @@ class CreateSubmissionMessage
             message += '<br/>';
             message += 'Parts can be dropped off in-person safely at our touchless dropoff window. <br/><br/>';
             message += '<b>Drop-off Location:<br/>';
-            message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall South side - Room 110 Side Doors<br/>'; 
+            message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>'; 
             message += '2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>';
             message += '<b>Drop-off Hours:<br/>';
             message += 'Monday - Friday: 11am - 1pm</b><br/><br/>'
@@ -316,62 +316,6 @@ class CreateSubmissionMessage
 }
 
 
-/**
- * Unit Test for Making 'OnEdit' Messages
- */
-const _testOnEditMessages = async () => {
-  const message = new CreateMessage('Cody', 'Test Project', '101293874098', 'url',
-    'material1URL', 45, 'TestPLA',
-    'material2URL', 15, 'TestBreakaway',
-    'mat3URL', 23, 'Steel',
-    'mat4URL', 24, 'Aluminum',
-    'mat5URL', 75, 'Plastic',
-    'designspecialist', 'cody@glen.com', 45.50);
-
-    Logger.log('DEFAULT' + message.defaultMessage);
-    Logger.log('RECEIVED' + message.receivedMessage);
-    Logger.log('PENDING' + message.pendingMessage);
-    Logger.log('IN-PROGRESS' + message.inProgressMessage);
-    Logger.log('COMPLETED' + message.completedMessage);
-    Logger.log('PICKEDUP' + message.pickedUpMessage);
-    Logger.log('SHIPPING QUESTION' + message.shippingQuestion);
-    Logger.log('SHIPPED' + message.shippedMessage);
-    Logger.log('FAILED' + message.failedMessage);
-    Logger.log('REJECTED' + message.rejectedByStudentMessage);
-    Logger.log('BILLED' + message.billedMessage);
-
-    return Promise.resolve( message );
-}
-
-
-
-/**
- * Unit Test for Making 'OnformSubmit' messages
- */
-const _testOnformSubmitMessages = async () => {
-    const message = new CreateSubmissionMessage('Cody', 'SomeProject', 102938471431 );
-    Logger.log('DS MESSAGE' + message.dsMessage);
-    Logger.log('CREAFORM MESSAGE' + message.creaformMessage);
-    Logger.log('MISSING ACCESS' + message.missingAccessMessage);
-    Logger.log('SHIPPING MESSAGE' + message.shippingMessage);
-
-    return Promise.resolve( message );
-}
-
-/**
- * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 
- */
-const _testAllMessages = async () => {
-
-    Promise.all([
-        await _testOnEditMessages(),
-        await _testOnformSubmitMessages(),
-    ])
-    .then(Logger.log('Test Success'))
-    .catch(Error => {
-        Logger.log(Error + 'Failure');
-    }); 
-}
 
 
 

@@ -71,19 +71,22 @@ const RESPONSECODES = {
 	599 : `Network connect timeout error`,
 }
 
-const STATUS = [
-  "Received",
-  "Pending Approval",
-  "In-Progress",
-  "Completed",
-  "Picked Up",
-  "Waitlist",
-  "Billed",
-  "FAILED",
-  "Cancelled",
-  "Missing Access",
-  "CLOSED",
-]
+const STATUS = {
+  received : "Received",
+  pendingApproval : "Pending Approval",
+  inProgress : "In-Progress",
+  completed : "Completed",
+  pickedUp : "Picked Up",
+  shipped : "Shipped",
+  failed : "FAILED",
+  rejectedByStudent : "Rejected by Student",
+  rejectedByStaff : "Rejected by Staff",
+  billed : "Billed",
+  waitlist : "Waitlist",
+  cancelled : "Cancelled",
+  missingAccess : "Missing Access",
+  closed : "CLOSED",
+}
 
 
 
