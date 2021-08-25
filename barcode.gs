@@ -100,11 +100,13 @@ const GenerateQRCode = (url, jobnumber) => {
 }
 
 
-const PickupByBarcode = (jobnumber) => {
+const PickupByBarcode = () => {
     //Search each sheet for jobnumber
     //return sheet and row number
     //change status of that row to 'Picked Up'
     var sh = SpreadsheetApp.getActiveSpreadsheet();
+    var searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
+    var jobnumber = searchUISheet.getRange(2,2).getValue();
     var titleRow = 1;
 
     //create array with sheets in active spreadsheet
