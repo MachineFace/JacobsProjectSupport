@@ -114,7 +114,11 @@ const GenerateQRCode = (url, jobnumber) => {
 
 }
 
-
+/**
+ * For use with barcode scanner.
+ * Searches for job number found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
+ * 
+ */
 const PickupByBarcode = () => {
     //Search each sheet for jobnumber
     //return sheet and row number
@@ -122,32 +126,25 @@ const PickupByBarcode = () => {
     var sh = SpreadsheetApp.getActiveSpreadsheet();
     var searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
     var jobnumber = searchUISheet.getRange(2,2).getValue();
-    var titleRow = 1;
-
-    //create array with sheets in active spreadsheet
-    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();  
+    var progress = searchUISheet.getRange(3,2)
+    progress.setValue("Searching for job number...");
 
     //loop through sheets to look for value
-    //for(var i in sheetDict) {
     for (const [key, value] of Object.entries(submissionSheetDict)) {
-
-        //SpreadsheetApp.setActiveSheet(submissionSheetDict[key])
         let searchSheet = submissionSheetDict[key];
         let data = searchSheet.getDataRange().getValues();
         let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
-        //var searchResult = col.findIndex(jobnumber); //Row Index - 2
         var textFinder = searchSheet.createTextFinder(jobnumber);
-        
         var searchFind = textFinder.findNext();
         if (searchFind != null) {
             searchRow = searchFind.getRow();
-            //searchResult + 2 is row index.
             
             // change status to picked up
             setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
+            progress.setValue("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
+            Logger.log("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
             //var ui = SpreadsheetApp.getUi();
             //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
-            Logger.log("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
             return;
         }
 
