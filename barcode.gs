@@ -122,8 +122,10 @@ const PickupByBarcode = (jobnumber) => {
 
         if(searchResult != -1) {
             //searchResult + 2 is row index.
-            //SpreadsheetApp.getActiveSpreadsheet().setActiveRange(sheet.getRange(searchResult + 2, 1))
-            setByHeader(searchSheet, "(INTERNAL) Status", searchResult, STATUS.received);
+            
+            // uncomment this to start changing status
+            //setByHeader(searchSheet, "(INTERNAL) Status", searchResult, STATUS.received);
+            Logg("Picked up " + searchSheet.getSheetName() + " row " + searchResult + 2);
             return;
         }
         
