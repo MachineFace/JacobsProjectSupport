@@ -136,10 +136,11 @@ const PickupByBarcode = () => {
         let data = searchSheet.getDataRange().getValues();
         let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
         //var searchResult = col.findIndex(jobnumber); //Row Index - 2
-        var textFinder = searchSheet.createTextFinder(jobnumber)
-        var searchRow = textFinder.findNext().getRow()
-
-        if(searchRow != -1) {
+        var textFinder = searchSheet.createTextFinder(jobnumber);
+        
+        var searchFind = textFinder.findNext();
+        if (searchFind != null) {
+            searchRow = searchFind.getRow();
             //searchResult + 2 is row index.
             
             // uncomment this to start changing status
@@ -149,6 +150,8 @@ const PickupByBarcode = () => {
             Logg("Job marked as picked up. Job on sheet " + searchSheet.getSheetName() + " row " + searchRow);
             return;
         }
+
+       
         
     }
 } 
