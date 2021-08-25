@@ -963,8 +963,8 @@ var CreateTicket = (
           [DocumentApp.Attribute.BOLD]: true,
         });
 
-      // // body.appendImage(barcode).setAltTitle("Barcode");
-      // body.appendImage(qrCode).setAltTitle("QRCode");
+      body.appendImage(barcode).setAltTitle("Barcode");
+      body.appendImage(qrCode).setAltTitle("QRCode");
 
       // Create a two-dimensional array containing the cell contents.
       body.appendTable([

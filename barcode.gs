@@ -100,6 +100,42 @@ const GenerateQRCode = (url, jobnumber) => {
 }
 
 
+const PickupByBarcode = (jobnumber) => {
+    //Search each sheet for jobnumber
+    //return sheet and row number
+    //change status of that row to 'Picked Up'
+    var sh = SpreadsheetApp.getActiveSpreadsheet();
+    var titleRow = 1;
 
+    //create array with sheets in active spreadsheet
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();  
 
+    //loop through sheets to look for value
+    //for(var i in sheetDict) {
+    for (const [key, value] of Object.entries(sheetDict)) {
 
+        SpreadsheetApp.setActiveSheet(sheetDict[key])
+        let searchSheet = sh.getActiveSheet();
+        let data = searchSheet.getDataRange().getValues();
+        let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
+        var searchResult = col.findIndex(searchString); //Row Index - 2
+
+        if(searchResult != -1) {
+            //searchResult + 2 is row index.
+            //SpreadsheetApp.getActiveSpreadsheet().setActiveRange(sheet.getRange(searchResult + 2, 1))
+            setByHeader(searchSheet, "(INTERNAL) Status", searchResult, STATUS.received);
+            return;
+        }
+        
+    }
+} 
+
+// const SearchByBarcode = (jobnumber, range) => {
+//     let d = sheetDict.backgrounddata.getRange('V2:V').getValues();
+//     for(let i = 0; i < d.length; i++){ 
+//         if(d[i] != '' && d[i] != null && d[i] != undefined && d[i] != ' ') {
+//             people.push(d[i]); 
+//         }
+//     }
+//     Logger.log(`People : ${people.toString()}`); 
+// }
