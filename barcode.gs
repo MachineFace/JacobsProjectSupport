@@ -147,10 +147,8 @@ const PickupByBarcode = () => {
             //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
             return;
         }
-        progress.setValue('Job number not found. Try again.');
-       
-        
     }
+    progress.setValue('Job number not found. Try again.');
 } 
 
 // const SearchByBarcode = (jobnumber, range) => {
