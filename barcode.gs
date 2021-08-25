@@ -143,11 +143,11 @@ const PickupByBarcode = () => {
             searchRow = searchFind.getRow();
             //searchResult + 2 is row index.
             
-            // uncomment this to start changing status
-            //setByHeader(searchSheet, "(INTERNAL) Status", searchResult, STATUS.received);
-            var ui = SpreadsheetApp.getUi();
-            ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
-            Logg("Job marked as picked up. Job on sheet " + searchSheet.getSheetName() + " row " + searchRow);
+            // change status to picked up
+            setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
+            //var ui = SpreadsheetApp.getUi();
+            //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
+            Logg("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
             return;
         }
 
