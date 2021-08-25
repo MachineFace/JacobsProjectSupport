@@ -119,7 +119,7 @@ const PickupByBarcode = (jobnumber) => {
         let data = searchSheet.getDataRange().getValues();
         let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
         //var searchResult = col.findIndex(jobnumber); //Row Index - 2
-        var textFinder = searchSheet.createTextFinder(search_string)
+        var textFinder = searchSheet.createTextFinder(jobnumber)
         var searchRow = textFinder.findNext().getRow()
 
         if(searchRow != -1) {
