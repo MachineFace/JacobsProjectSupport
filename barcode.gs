@@ -3,6 +3,21 @@
  * Generate a barcode png image from a jobnumber.
  * Documentation at "https://github.com/metafloor/bwip-js/wiki/Online-Barcode-API"
  */
+
+ const submissionSheetDict = {
+    laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
+    ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), //Ultimaker Sheet
+    fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), //Fablight Sheet
+    waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), //Waterjet Sheet
+    advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced Lab"), //Advanced Lab Sheet
+    shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), //Shopbot Sheet
+    haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), //Haas Sheet
+    vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), //Vinyl Sheet
+    othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), //Othermill Sheet
+    creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), //Creaform Sheet
+    othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Other Tools"), //Other Sheet
+    plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), //Plotter Sheet
+};
 const GenerateBarCode = (jobnumber) => {
 
     //jobnumber = "20210301140515";   //Test JobNumber
@@ -114,9 +129,9 @@ const PickupByBarcode = () => {
 
     //loop through sheets to look for value
     //for(var i in sheetDict) {
-    for (const [key, value] of Object.entries(sheetDict)) {
+    for (const [key, value] of Object.entries(submissionSheetDict)) {
 
-        SpreadsheetApp.setActiveSheet(sheetDict[key])
+        SpreadsheetApp.setActiveSheet(submissionSheetDict[key])
         let searchSheet = sh.getActiveSheet();
         let data = searchSheet.getDataRange().getValues();
         let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
