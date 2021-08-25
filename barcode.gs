@@ -131,8 +131,8 @@ const PickupByBarcode = () => {
     //for(var i in sheetDict) {
     for (const [key, value] of Object.entries(submissionSheetDict)) {
 
-        SpreadsheetApp.setActiveSheet(submissionSheetDict[key])
-        let searchSheet = sh.getActiveSheet();
+        //SpreadsheetApp.setActiveSheet(submissionSheetDict[key])
+        let searchSheet = submissionSheetDict[key];
         let data = searchSheet.getDataRange().getValues();
         let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
         //var searchResult = col.findIndex(jobnumber); //Row Index - 2
