@@ -147,7 +147,7 @@ const PickupByBarcode = () => {
             setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
             //var ui = SpreadsheetApp.getUi();
             //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
-            Logg("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
+            Logger.log("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
             return;
         }
 
