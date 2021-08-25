@@ -128,6 +128,11 @@ const PickupByBarcode = () => {
     var jobnumber = searchUISheet.getRange(2,2).getValue();
     var progress = searchUISheet.getRange(3,2)
     progress.setValue("Searching for job number...");
+    if (jobnumber = null) {
+        //job number is blank
+        progress.setValue("No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.");
+        return;
+    }
 
     //loop through sheets to look for value
     for (const [key, value] of Object.entries(submissionSheetDict)) {
