@@ -118,7 +118,7 @@ const PickupByBarcode = (jobnumber) => {
         let searchSheet = sh.getActiveSheet();
         let data = searchSheet.getDataRange().getValues();
         let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
-        var searchResult = col.findIndex(searchString); //Row Index - 2
+        var searchResult = col.findIndex(jobnumber); //Row Index - 2
 
         if(searchResult != -1) {
             //searchResult + 2 is row index.
