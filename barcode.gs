@@ -120,40 +120,34 @@ const GenerateQRCode = (url, jobnumber) => {
  * 
  */
 const PickupByBarcode = () => {
-    //Search each sheet for jobnumber
-    //return sheet and row number
-    //change status of that row to 'Picked Up'
-    var sh = SpreadsheetApp.getActiveSpreadsheet();
-    var searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
-    var jobnumber = searchUISheet.getRange(2,2).getValue();
-    var progress = searchUISheet.getRange(3,2)
-    progress.setValue("Searching for job number...");
-    if (jobnumber == null || jobnumber == "") {
-        //job number is blank
-        progress.setValue("No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.");
-        return;
-    }
+  const searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
+  const jobnumber = searchUISheet.getRange(2,2).getValue();
+  let progress = searchUISheet.getRange(3,2)
+  progress.setValue(`Searching for job number...`);
+  if (jobnumber == null || jobnumber == "") {
+    progress.setValue(`No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
+    return;
+  }
 
-    //loop through sheets to look for value
-    for (const [key, value] of Object.entries(submissionSheetDict)) {
-        let searchSheet = submissionSheetDict[key];
-        let data = searchSheet.getDataRange().getValues();
-        let col = data[0].indexOf('(INTERNAL AUTO) Job Number');
-        var textFinder = searchSheet.createTextFinder(jobnumber);
-        var searchFind = textFinder.findNext();
-        if (searchFind != null) {
-            searchRow = searchFind.getRow();
-            
-            // change status to picked up
-            setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
-            progress.setValue("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
-            Logger.log("Job number " + jobnumber + " marked as picked up. Sheet: " + searchSheet.getSheetName() + " row: " + searchRow);
-            //var ui = SpreadsheetApp.getUi();
-            //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
-            return;
-        }
+  // loop through sheets to look for value
+  for (const [key, value] of Object.entries(submissionSheetDict)) {
+    const searchSheet = submissionSheetDict[key];
+    // const data = searchSheet.getDataRange().getValues();
+    const textFinder = searchSheet.createTextFinder(jobnumber);
+    const searchFind = textFinder.findNext();
+    if (searchFind != null) {
+      searchRow = searchFind.getRow();
+      
+      // change status to picked up
+      setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
+      progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
+      Logger.log(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
+      //var ui = SpreadsheetApp.getUi();
+      //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
+      return;
     }
-    progress.setValue('Job number not found. Try again.');
+  }
+  progress.setValue('Job number not found. Try again.');
 } 
 
 // const SearchByBarcode = (jobnumber, range) => {
