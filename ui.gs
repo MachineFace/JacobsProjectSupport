@@ -208,6 +208,7 @@ const BarMenu = () => {
   SpreadsheetApp.getUi()
     .createMenu("JPS Menu")
     .addItem("Generate Bill to Selected Student", "BillFromSelected")
+    .addItem("Barcode Scanning Tool", "OpenBarcodeTab")
     .addSeparator()
     .addItem(
       "Check All Missing Access Students",
@@ -476,3 +477,10 @@ const BillFromSelected = async () => {
 
   Logger.log("Completed BillFromSelected");
 };
+
+
+const OpenBarcodeTab = async () => {
+  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
+  spreadsheet.setActiveSheet(searchUISheet).getRange('B3').activate();
+}
