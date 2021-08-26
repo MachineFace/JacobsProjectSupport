@@ -122,7 +122,7 @@ const GenerateQRCode = (url, jobnumber) => {
 const PickupByBarcode = () => {
   const searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
   const jobnumber = searchUISheet.getRange(3,2).getValue();
-  let progress = searchUISheet.getRange(4,2)
+  let progress = searchUISheet.getRange(4,2);
   progress.setValue(`Searching for job number...`);
   if (jobnumber == null || jobnumber == "") {
     progress.setValue(`No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
