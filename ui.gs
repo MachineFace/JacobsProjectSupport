@@ -481,6 +481,6 @@ const BillFromSelected = async () => {
 
 const OpenBarcodeTab = async () => {
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  const searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
+  const searchUISheet = SpreadsheetApp.getActive().getSheetByName('Pickup');
   spreadsheet.setActiveSheet(searchUISheet).getRange('B3').activate();
 }

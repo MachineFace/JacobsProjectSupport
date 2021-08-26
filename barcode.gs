@@ -120,7 +120,7 @@ const GenerateQRCode = (url, jobnumber) => {
  * 
  */
 const PickupByBarcode = () => {
-  const searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
+  const searchUISheet = SpreadsheetApp.getActive().getSheetByName('Pickup');
   const jobnumber = searchUISheet.getRange(3,2).getValue();
   let progress = searchUISheet.getRange(4,2);
 
