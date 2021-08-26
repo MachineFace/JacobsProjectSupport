@@ -121,8 +121,13 @@ const GenerateQRCode = (url, jobnumber) => {
  */
 const PickupByBarcode = () => {
   const searchUISheet = SpreadsheetApp.getActive().getSheetByName('SearchByBarcode');
-  const jobnumber = searchUISheet.getRange(3,2).getValue();
-  let progress = searchUISheet.getRange(4,2); //
+<<<<<<< HEAD
+  const jobnumber = searchUISheet.getRange(2,2).getValue();
+  let progress = searchUISheet.getRange(3,2)
+=======
+  const jobnumber = searchUISheet.getRange(2,2).getValue();
+  let progress = searchUISheet.getRange(3,2)
+>>>>>>> 9ffa5bfc6c19c80a15f53ab6bb979adc3d5f2690
   progress.setValue(`Searching for job number...`);
   if (jobnumber == null || jobnumber == "") {
     progress.setValue(`No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
@@ -135,16 +140,16 @@ const PickupByBarcode = () => {
     // const data = searchSheet.getDataRange().getValues();
     const textFinder = searchSheet.createTextFinder(jobnumber);
     const searchFind = textFinder.findNext();
-    //if result is found
-    if (searchFind != null) { 
+    if (searchFind != null) {
       searchRow = searchFind.getRow();
+      
       // change status to picked up
       setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
       progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       Logger.log(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();
       //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
-      return; //stop looking
+      return;
     }
   }
   progress.setValue('Job number not found. Try again.');
@@ -159,3 +164,108 @@ const PickupByBarcode = () => {
 //     }
 //     Logger.log(`People : ${people.toString()}`); 
 // }
+
+
+
+
+
+
+
+
+
+
+/**
+ * Generate a QR code from some data. Feed it a url.
+ * @param {string} url
+ * @pararm {string} jobnumber
+ * @return
+ */
+class QRCodeAndBarcodeGenerator {
+  constructor(
+    {
+      url = 'jps.jacobshall.org/', 
+      jobnumber = Math.floor(Math.random() * 100000).toFixed(),
+    }) {
+    this.url = url;
+    this.jobnumber = jobnumber;
+  }
+
+  GenerateQRCode(){
+    Logger.log(`URL : ${this.url}, Jobnumber || RNDNumber : ${this.jobnumber}`);
+    const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
+    const postParams = {
+        "method" : "GET",
+        "headers" : { "Authorization" : "Basic" },
+        "contentType" : "application/json",
+        followRedirects : true,
+        muteHttpExceptions : true
+    };
+
+    let qrCode;
+    const html = UrlFetchApp.fetch(loc, postParams);
+    Logger.log(`Response Code : ${html.getResponseCode()}`);
+    if (html.getResponseCode() == 200) {
+        qrCode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber ) );
+        qrCode.setTrashed(true);
+    }
+    else Logger.log('Failed to GET QRCode');
+
+    Logger.log(qrCode);
+    return qrCode;
+  }
+
+  GenerateBarCode() {
+
+    const root = 'http://bwipjs-api.metafloor.com/';
+    const rootsec = 'https://bwipjs-api.metafloor.com/';
+    const type = '?bcid=code128';
+    const ts = '&text=';
+    const scale = '&scale=0.75'
+    const postfx = '&includetext';
+
+    //let barcodeLoc = 'http://bwipjs-api.metafloor.com/?bcid=code128&text=1234567890&includetext';  //KNOWN WORKING LOCATION
+    const barcodeLoc = root + type + ts + this.jobnumber + scale +postfx;
+
+    const params = {
+        "method" : "GET",
+        "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
+        "contentType" : "application/json",
+        followRedirects : true,
+        muteHttpExceptions : true
+    };
+    
+    let barcode;
+
+    let html = UrlFetchApp.fetch(barcodeLoc, params);
+    Logger.log("Response Code : " + html.getResponseCode());
+    if (html.getResponseCode() == 200) {
+
+        barcode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+        barcode.setTrashed(true);
+
+        // var meta = Drive.Files.get(file.getId()).imageMediaMetadata;
+        // let embed = Drive.Files.get(file.getId()).embedLink; 
+
+        // GmailApp.sendEmail('codyglen@berkeley.edu', 'JPSY : Barcode', '', {
+        //     htmlBody: embed,
+        //     'from': 'jacobsprojectsupport@berkeley.edu',
+        //     'name': 'JPSY'
+        // });
+
+    } 
+    else Logger.log('Failed to GET Barcode');
+
+    Logger.log(barcode);
+    return barcode;
+
+  }
+  
+}
+
+
+
+
+
+
+
+
