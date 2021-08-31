@@ -108,7 +108,7 @@ const PopupCreateTicket = async () => {
   let timestamp = getByHeader(thisSheet, `Timestamp`, thisRow);
   let name = getByHeader(thisSheet, `What is your name?`, thisRow);
   let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
-  let email = getByHeader(thisSheet, "Email", thisRow);
+  let email = getByHeader(thisSheet, "Email Address", thisRow);
   let projectname = getByHeader(thisSheet, "Project Name", thisRow);
 
   //Materials
@@ -280,7 +280,7 @@ const BillFromSelected = async () => {
   let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
   Logg(`Status of billed row = ${status}`);
   let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  let email = getByHeader(thisSheet, "Email", thisRow);
+  let email = getByHeader(thisSheet, "Email Address", thisRow);
   let name = getByHeader(thisSheet, "What is your name?", thisRow);
   //let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
   //let projectname = getByHeader(thisSheet, "Project Name", thisRow);

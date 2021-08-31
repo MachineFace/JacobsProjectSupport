@@ -126,7 +126,7 @@ const onSubmission = async (e) => {
 
   //Parse Functions for shipping / variables
   var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : getByHeader(sheet, "What is your name?", lastRow);
-  var email = e.namedValues["Email"][0] ? e.namedValues["Email"][0] : getByHeader(sheet, "Email", lastRow);
+  var email = e.namedValues["Email Address"][0] ? e.namedValues["Email Address"][0] : getByHeader(sheet, "Email Address", lastRow);
   var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : getByHeader(sheet, "Your Student ID Number?", lastRow);
   var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0] ? e.namedValues["What is your affiliation to the Jacobs Institute?"][0] : getByHeader(sheet, "What is your affiliation to the Jacobs Institute?", lastRow);
   var projectname = e.namedValues["Project Name"][0] ? e.namedValues["Project Name"][0] : getByHeader(sheet, "Project Name", lastRow);
@@ -367,7 +367,7 @@ const onChange = async (e) => {
   //Check Priority
   // let tempEmail = ss.getRange(thisRow, 9).getValue();
   // let tempSID = ss.getRange(thisRow, 11).getValue();
-  let tempEmail = getByHeader(thisSheet, "Email", thisRow);
+  let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
   let tempSID = getByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
   var priority = await GetPriorityWithEmailOrSID(tempEmail, tempSID);
@@ -391,7 +391,7 @@ const onChange = async (e) => {
   var jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
   var studentApproval = getByHeader(thisSheet, "Student Has Approved Job", thisRow);
   var submissiontime = getByHeader(thisSheet, "Timestamp", thisRow);
-  var email = getByHeader(thisSheet, "Email", thisRow);
+  var email = getByHeader(thisSheet, "Email Address", thisRow);
   var name = getByHeader(thisSheet, "What is your name?", thisRow);
   var sid = getByHeader(thisSheet, "Student ID Number", thisRow);
   var studentType = getByHeader(thisSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
