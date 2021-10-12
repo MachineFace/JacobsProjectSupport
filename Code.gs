@@ -24,69 +24,6 @@
 const supportAlias = GmailApp.getAliases()[0];
 const gmailName = "Jacobs Project Support";
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Collection of Sheets : Dictionary of key / value pair.
- * Example: Calling 'sheetDict.laser' returns value sheet.
- */
-const sheetDict = {
-    summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Summary"), //Summary Sheet
-    laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
-    ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), //Ultimaker Sheet
-    fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), //Fablight Sheet
-    waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), //Waterjet Sheet
-    advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced Lab"), //Advanced Lab Sheet
-    shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), //Shopbot Sheet
-    haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), //Haas Sheet
-    vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), //Vinyl Sheet
-    othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), //Othermill Sheet
-    creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), //Creaform Sheet
-    othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Other Tools"), //Other Sheet
-    plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), //Plotter Sheet
-    approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Student List DONOTDELETE"), //Approved Sheet DONOTDELETE **
-    staff: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Staff List"), //Staff List Sheet **
-    logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Logger"), //Logger Sheet **
-    data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Metrics"), //Data Metrics Sheet **
-    backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Background Data Mgmt"), //Background Data Mgmt Sheet **
-    billing: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Billing"), //Billing Sheet **
-};
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Collection of INTERNAL Sheets : Dictionary of key / value pair.
- * Example: Calling 'materialDict.laser' returns value materialSheet.
- */
-const materialDict = {
-    advlab:     SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AdvLabStoreItems"),
-    ultimaker:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("UltimakerStoreItems"),
-    fablight:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FablightStoreItems"),
-    haas:       SpreadsheetApp.getActiveSpreadsheet().getSheetByName("HaasTormachStoreItems"),
-    shopbot:    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ShopbotStoreItems"),
-    waterjet:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("WaterjetStoreItems"),
-    vinyl:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("VinylCutterStoreItems"),
-    laser:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("LaserStoreItems"),
-    othermill:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("OthermillStoreItems"),
-};
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Collection of Forms : Dictionary of key / value pair.
- * Example: Calling 'formDict.laser' returns value string.
- */
-const formDict = {
-    ultimaker: "1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8",
-    laser: "1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w",
-    fablight: "1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA",
-    waterjet: "1dNLAlC8Wg0DLLkBboRMgztPqP-fMmUqyGt5xqtg8TKk",
-    advancedlab: "1okWAdclqrleQ5ktyXbSIRoY6hrL_v2OYYAhaeb0f1jQ",
-    shopbot: "1RFuhGCtQrcA9gbpEStaksK5eYeIAo0dzn5NIcxVngH4",
-    haas: "1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk",
-    vinyl: "1WTh9nDQ4C_3HyQvCNMIxRFbJk1FH4dZeYeAkiXkItKw",
-    othermill: "1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI",
-    creaform: "1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc",
-    othertools: "1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38",
-    plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
-};
 
 const DaysRetentionNumber = 15; //How many days to hold a file
 const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
@@ -322,7 +259,7 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   //Add link to DS List
-  var stafflist = sheetDict.staff;
+  var stafflist = OTHERSHEETS.staff;
   var sLink = stafflist.getRange(thisRow, 4).getValue();
   if (thisRow > 2) {
     if ( sLink == undefined || sLink == null || (sLink == "" && stafflist.getRange(thisRow, 3).getValue() != "") ) {
@@ -334,7 +271,7 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   //Count Active Users & Post to a cell / Fetch top 10
   var users = await CountActiveUsers();
-  sheetDict.data.getRange("C4").setValue(users);
+  OTHERSHEETS.data.getRange("C4").setValue(users);
 
   //----------------------------------------------------------------------------------------------------------------
   //Ignore Edits on background sheets like Logger and StoreItems - NICE!! /CG
@@ -419,26 +356,6 @@ const onChange = async (e) => {
   const material5Quantity = getByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
   const material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
   const material5URL = new LookupProductID(material5Name).link;
-
-  // const material1Quantity = ss.getRange(thisRow, 13).getValue();
-  // const material1Name = ss.getRange(thisRow, 14).getValue();
-  // const material1URL = await new LookupProductID(material1Name).link;
-
-  // const material2Quantity = ss.getRange(thisRow, 15).getValue();
-  // const material2Name = ss.getRange(thisRow, 16).getValue();
-  // const material2URL = await new LookupProductID(material2Name).link;
-
-  // const material3Quantity = ss.getRange(thisRow, 17).getValue();
-  // const material3Name = ss.getRange(thisRow, 18).getValue();
-  // const material3URL = await new LookupProductID(material3Name).link;
-
-  // const material4Quantity = ss.getRange(thisRow, 19).getValue();
-  // const material4Name = ss.getRange(thisRow, 20).getValue();
-  // const material4URL = await new LookupProductID(material4Name).link;
-
-  // const material5Quantity = ss.getRange(thisRow, 21).getValue();
-  // const material5Name = ss.getRange(thisRow, 22).getValue();
-  // const material5URL = await new LookupProductID(material5Name).link;
 
   if (material1Name != "") var mat1 = true;
   else mat1 = false;
@@ -702,8 +619,8 @@ const onChange = async (e) => {
     if (topten.length >= 10) {
       for (var i = 0; i < 10; i++) {
         let thisRow = 106 + i;
-        sheetDict.data.getRange("B" + thisRow).setValue(topten[i]);
-        sheetDict.data.getRange("C" + thisRow).setValue(topten[i][1]);
+        OTHERSHEETS.data.getRange("B" + thisRow).setValue(topten[i]);
+        OTHERSHEETS.data.getRange("C" + thisRow).setValue(topten[i][1]);
       }
     }
     Logg(`Recalculated Top 10 Distribution.`);
@@ -810,7 +727,7 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
  */
 var CreateJobNumber = (date) => {
   //var date = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Ultimaker').getRange('H135').getValue();
-  //date = sheetDict.othertools.getRange('G7').getValue();
+  //date = SHEETS.othertools.getRange('G7').getValue();
 
   //Check that it's a date
   let testedDate = isValidDate(date);
@@ -902,31 +819,31 @@ var CreateTicket = (
   var partcount = [];
   var notes = [];
   if (sheetname == "Ultimaker") {
-    thisSheet = sheetDict.ultimaker;
+    thisSheet = SHEETS.ultimaker;
     mat.push( "Needs Breakaway Removed:", thisSheet.getRange("AD" + thisRow).getValue().toString());
     partcount.push( "Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString());
     notes.push( "Notes:", thisSheet.getRange("AE" + thisRow).getValue().toString());
   }
   if (sheetname == "Laser Cutter") {
-    thisSheet = sheetDict.laser;
+    thisSheet = SHEETS.laser;
     mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
     partcount.push("Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString() );
     notes.push( "Notes:", thisSheet.getRange("AC" + thisRow).getValue().toString() );
   }
   if (sheetname == "Fablight") {
-    thisSheet = sheetDict.fablight;
+    thisSheet = SHEETS.fablight;
     mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
     partcount.push( "Part Count:", thisSheet.getRange("AB" + thisRow).getValue().toString() );
     notes.push( "Notes:", thisSheet.getRange("AC" + thisRow).getValue().toString() );
   }
   if (sheetname == "Waterjet") {
-    thisSheet = sheetDict.waterjet;
+    thisSheet = SHEETS.waterjet;
     mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
     partcount.push( "Part Count:", thisSheet.getRange("AB" + thisRow).getValue().toString() );
     notes.push( "Notes:", thisSheet.getRange("AD" + thisRow).getValue().toString() );
   }
   if (sheetname == "Advanced Lab") {
-    thisSheet = sheetDict.advancedlab;
+    thisSheet = SHEETS.advancedlab;
     mat.push( "Which Printer:", thisSheet.getRange("Z" + thisRow).getValue().toString() );
     partcount.push( "Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString() );
     notes.push( "Notes:", thisSheet.getRange("AJ" + thisRow).getValue().toString() );
@@ -968,7 +885,6 @@ var CreateTicket = (
 
       // Create a two-dimensional array containing the cell contents.
       body.appendTable([
-          ["Needs Shipping:", shippingQuestion.toString()],
           ["Design Specialist:", designspecialist.toString()],
           ["Job Number:", jobnumber.toString()],
           ["Student Name:", name.toString()],
@@ -1042,15 +958,15 @@ var GetPriority = (sid) => {
 
   let index = 0;
 
-  let last = sheetDict.approved.getLastRow() - 1;
-  let approvedList = sheetDict.approved.getRange(2, 3, last, 1).getValues(); //Column C3:C
+  let last = OTHERSHEETS.approved.getLastRow() - 1;
+  let approvedList = OTHERSHEETS.approved.getRange(2, 3, last, 1).getValues(); //Column C3:C
 
   //Loop through SIDs to find a match and fetch priority number
   for (let i = 0; i < approvedList.length; i++) {
     let item = approvedList[i][0].toString().replace(/\s+/g, "");
     if (item == stringSID) {
       index = i + 2;
-      priority = sheetDict.approved.getRange(index, 4).getValue();
+      priority = OTHERSHEETS.approved.getRange(index, 4).getValue();
       break;
     } else if (item != stringSID) {
       priority = "STUDENT NOT FOUND!";
@@ -1077,15 +993,15 @@ var GetPriorityFromEmail = (email) => {
 
   let priority;
 
-  let last = sheetDict.approved.getLastRow() - 1;
-  let approvedList = sheetDict.approved.getRange(2, 2, last, 1).getValues();
+  let last = OTHERSHEETS.approved.getLastRow() - 1;
+  let approvedList = OTHERSHEETS.approved.getRange(2, 2, last, 1).getValues();
 
   //Loop through SIDs to find a match and fetch priority number
   for (let i = 0; i < approvedList.length; i++) {
     let item = approvedList[i][0].toString();
     if (item == email) {
       let index = i + 2;
-      priority = sheetDict.approved.getRange(index, 4).getValue();
+      priority = OTHERSHEETS.approved.getRange(index, 4).getValue();
       break;
     } else if (item != email) {
       priority = "STUDENT NOT FOUND!";
@@ -1117,8 +1033,8 @@ const GetPriorityWithEmailOrSID = (email, sid) => {
       stringSID = sid.toString().replace(/\s+/g, "")
   }
 
-  let approvedListEmails = sheetDict.approved.getRange(2, 2, sheetDict.approved.getLastRow() - 1, 1).getValues()
-  let approvedListSIDs = sheetDict.approved.getRange(2, 3, sheetDict.approved.getLastRow() - 1, 1).getValues()
+  let approvedListEmails = OTHERSHEETS.approved.getRange(2, 2, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues()
+  let approvedListSIDs = OTHERSHEETS.approved.getRange(2, 3, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues()
 
   let casefixedList = []
   approvedListEmails.forEach(email => {
@@ -1136,7 +1052,7 @@ const GetPriorityWithEmailOrSID = (email, sid) => {
   if (index != null || index != undefined) {
       index += 2
       // Logger.log(`Index on ApprovedSheet : ${index}`)
-      priority = sheetDict.approved.getRange(index, 4).getValue()
+      priority = OTHERSHEETS.approved.getRange(index, 4).getValue()
   } else priority = `STUDENT NOT FOUND!`
 
   Logger.log(`Priority = ${priority}`)

@@ -107,7 +107,7 @@ const setByHeader = (theSheet, colName, row, val) => {
  * @returns message to specific logger sheet
  */
 const Logg = (message) => {
-    let logger = sheetDict.logger;
+    let logger = OTHERSHEETS.logger;
     let thisRow = logger.getLastRow() + 1;
     let time = new Date();
     try {
@@ -474,35 +474,35 @@ const _test = async () => {
  */
 const CheckMissingAccessStudents = () => {
   let accessPool = {
-    Ultimaker: sheetDict.ultimaker
-      .getRange(2, 3, sheetDict.ultimaker.getLastRow() - 1, 1)
+    Ultimaker: SHEETS.ultimaker
+      .getRange(2, 3, SHEETS.ultimaker.getLastRow() - 1, 1)
       .getValues(),
-    "Laser Cutter": sheetDict.laser
-      .getRange(2, 3, sheetDict.laser.getLastRow() - 1, 1)
+    "Laser Cutter": SHEETS.laser
+      .getRange(2, 3, SHEETS.laser.getLastRow() - 1, 1)
       .getValues(),
-    Fablight: sheetDict.fablight
-      .getRange(2, 3, sheetDict.fablight.getLastRow() - 1, 1)
+    Fablight: SHEETS.fablight
+      .getRange(2, 3, SHEETS.fablight.getLastRow() - 1, 1)
       .getValues(),
-    Waterjet: sheetDict.waterjet
-      .getRange(2, 3, sheetDict.waterjet.getLastRow() - 1, 1)
+    Waterjet: SHEETS.waterjet
+      .getRange(2, 3, SHEETS.waterjet.getLastRow() - 1, 1)
       .getValues(),
-    "Advanced Lab": sheetDict.advancedlab
-      .getRange(2, 3, sheetDict.advancedlab.getLastRow() - 1, 1)
+    "Advanced Lab": SHEETS.advancedlab
+      .getRange(2, 3, SHEETS.advancedlab.getLastRow() - 1, 1)
       .getValues(),
-    Shopbot: sheetDict.shopbot
-      .getRange(2, 3, sheetDict.shopbot.getLastRow() - 1, 1)
+    Shopbot: SHEETS.shopbot
+      .getRange(2, 3, SHEETS.shopbot.getLastRow() - 1, 1)
       .getValues(),
-    "Haas & Tormach": sheetDict.haas
-      .getRange(2, 3, sheetDict.haas.getLastRow() - 1, 1)
+    "Haas & Tormach": SHEETS.haas
+      .getRange(2, 3, SHEETS.haas.getLastRow() - 1, 1)
       .getValues(),
-    "Vinyl Cutter": sheetDict.vinyl
-      .getRange(2, 3, sheetDict.vinyl.getLastRow() - 1, 1)
+    "Vinyl Cutter": SHEETS.vinyl
+      .getRange(2, 3, SHEETS.vinyl.getLastRow() - 1, 1)
       .getValues(),
-    Othermill: sheetDict.othermill
-      .getRange(2, 3, sheetDict.othermill.getLastRow() - 1, 1)
+    Othermill: SHEETS.othermill
+      .getRange(2, 3, SHEETS.othermill.getLastRow() - 1, 1)
       .getValues(),
-    "Other Tools": sheetDict.othertools
-      .getRange(2, 3, sheetDict.othertools.getLastRow() - 1, 1)
+    "Other Tools": SHEETS.othertools
+      .getRange(2, 3, SHEETS.othertools.getLastRow() - 1, 1)
       .getValues(),
   };
 
@@ -573,48 +573,6 @@ const Help = () => {
 };
 
 
-
-/**
- * Test Get 3dPrinterOS Data from Admin. DOES NOT FETCH ACTUAL DATA
- */
-const _testGet3dPrinterOSData = () => {
-  let url = `https://cloud.3dprinteros.com/#/org-admin/reports`;
-
-  // let api_key = '1e70652225e070b078def8bf6e154e98';
-  // let api_pass = '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';
-
-  //Encode Header
-  // let headers = { "Authorization": "Basic " + Utilities.base64EncodeWebSafe(api_key + ":" + api_pass) };
-  let headers = { Authorization: "Basic " };
-
-  //Stuff payload into postParams
-  let postParams = {
-    method: "GET",
-    headers: headers,
-    contentType: "application/json",
-    followRedirects: true,
-    muteHttpExceptions: true,
-  };
-
-  //Fetch Orders
-  let html = UrlFetchApp.fetch(url, postParams)
-  let responseCode = html.getResponseCode()
-  Logger.log(`Response Code : ${responseCode}`)
-
-  if (html.getResponseCode() == 200) {
-    let content = html.getContentText();
-
-    let str = JSON.stringify(content);
-    // Logger.log(str);
-
-    // let start = str.indexOf(`</head>`);
-    // let end = str.indexOf(`</body>`)
-    // Logger.log(`Start : ${start}, End : ${end}`)
-    // let slice = str.slice( start, end)
-    // Logger.log(slice)
-    
-  }
-};
 
 
 const CountTotalEmailsSent = async () => {

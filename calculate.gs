@@ -9,8 +9,7 @@
 const CalculateAverageTurnaround = (sheet) => {
 
     //Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
-    let last = sheet.getLastRow();
-    let completionTimes = sheet.getRange(3, 44, last, 1).getValues(); //Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
+    let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); //Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
 
     //Get list of times and remove all the Bullshit
     let revisedTimes = [];
@@ -132,42 +131,25 @@ const CalculateDuration = (start, end) => {
  * @returns {number} count
  */
 const CountActiveUsers = () => {
-    let people = [];
-    let nameRange = 'J3:J';
-    let plotter = sheetDict.plotter.getRange(nameRange).getValues();
-    let other = sheetDict.othertools.getRange(nameRange).getValues();
-    let creaform = sheetDict.creaform.getRange(nameRange).getValues();
-    let othermill = sheetDict.othermill.getRange(nameRange).getValues();
-    let vinyl = sheetDict.vinyl.getRange(nameRange).getValues();
-    let haas = sheetDict.haas.getRange(nameRange).getValues();
-    let shopbot = sheetDict.shopbot.getRange(nameRange).getValues();
-    let adv = sheetDict.advancedlab.getRange(nameRange).getValues();
-    let waterjet = sheetDict.waterjet.getRange(nameRange).getValues();
-    let fablight = sheetDict.fablight.getRange(nameRange).getValues();
-    let ultimaker = sheetDict.ultimaker.getRange(nameRange).getValues();
-    let laser = sheetDict.laser.getRange(nameRange).getValues();
+  let persons = []
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    let peeps = sheet.getRange(2, 10, sheet.getLastRow() -1, 1 ).getValues();
+    peeps = [].concat(...peeps);
+    peeps.forEach(person => {
+      if(person != "FORMULA ROW" || person != null || person != undefined || person != "Test" || person != "" || person != " ") {
+        persons.push(person);
+      }
+    })
+  }
 
-    plotter.forEach(item => people.push(item[0]));
-    other.forEach(item => people.push(item[0]));
-    creaform.forEach(item => people.push(item[0]));
-    othermill.forEach(item => people.push(item[0]));
-    vinyl.forEach(item => people.push(item[0]));
-    haas.forEach(item => people.push(item[0]));
-    shopbot.forEach(item => people.push(item[0]));
-    adv.forEach(item => people.push(item[0]));
-    waterjet.forEach(item => people.push(item[0]));
-    fablight.forEach(item => people.push(item[0]));
-    ultimaker.forEach(item => people.push(item[0]));
-    laser.forEach(item => people.push(item[0]));
+  //Filter out duplicate entries in the list
+  let unique = persons.filter((c, index) => {
+      return persons.indexOf(c) === index;
+  });
 
-    //Filter out duplicate entries in the list
-    let unique = people.filter((c, index) => {
-        return people.indexOf(c) === index;
-    });
-
-    var count = unique.length - 1; //Removes the space.
-    Logger.log(`Active JPS Users : ${count}`);
-    return count;
+  var count = unique.length - 1; //Removes the space.
+  Logger.log(`Active JPS Users : ${count}`);
+  return count;
 }
 
 
@@ -184,18 +166,18 @@ const CalculateDistribution = () => {
     let sheets = SpreadsheetApp.getActiveSpreadsheet();
     let people = [];
     let nameRange = 'J3:J';
-    let plotter = sheetDict.plotter.getRange(nameRange).getValues();
-    let other = sheetDict.othertools.getRange(nameRange).getValues();
-    let creaform = sheetDict.creaform.getRange(nameRange).getValues();
-    let othermill = sheetDict.othermill.getRange(nameRange).getValues();
-    let vinyl = sheetDict.vinyl.getRange(nameRange).getValues();
-    let haas = sheetDict.haas.getRange(nameRange).getValues();
-    let shopbot = sheetDict.shopbot.getRange(nameRange).getValues();
-    let adv = sheetDict.advancedlab.getRange(nameRange).getValues();
-    let waterjet = sheetDict.waterjet.getRange(nameRange).getValues();
-    let fablight = sheetDict.fablight.getRange(nameRange).getValues();
-    let ultimaker = sheetDict.ultimaker.getRange(nameRange).getValues();
-    let laser = sheetDict.laser.getRange(nameRange).getValues();
+    let plotter = SHEETS.plotter.getRange(nameRange).getValues();
+    let other = SHEETS.othertools.getRange(nameRange).getValues();
+    let creaform = SHEETS.creaform.getRange(nameRange).getValues();
+    let othermill = SHEETS.othermill.getRange(nameRange).getValues();
+    let vinyl = SHEETS.vinyl.getRange(nameRange).getValues();
+    let haas = SHEETS.haas.getRange(nameRange).getValues();
+    let shopbot = SHEETS.shopbot.getRange(nameRange).getValues();
+    let adv = SHEETS.advancedlab.getRange(nameRange).getValues();
+    let waterjet = SHEETS.waterjet.getRange(nameRange).getValues();
+    let fablight = SHEETS.fablight.getRange(nameRange).getValues();
+    let ultimaker = SHEETS.ultimaker.getRange(nameRange).getValues();
+    let laser = SHEETS.laser.getRange(nameRange).getValues();
 
     plotter.forEach(item => people.push(item[0]));
     other.forEach(item => people.push(item[0]));
@@ -239,7 +221,7 @@ const CalculateDistribution = () => {
     counts.sort((a, b) => a - b);
     for (let i = 0; i < max; i++) {
         let rownum = 2 + i;
-        if (counts[i] < 2000) sheetDict.backgrounddata.getRange('V' + rownum).setValue(counts[i]);
+        if (counts[i] < 2000) OTHERSHEETS.backgrounddata.getRange('V' + rownum).setValue(counts[i]);
     }
 
 
@@ -262,15 +244,40 @@ const CalculateDistribution = () => {
 
     chop.forEach((pair, index) => {
       Logger.log(`${pair[0]} -----> ${pair[1]}`)
-      sheetDict.data.getRange(106+index,2,1,1).setValue(pair[0])
-      sheetDict.data.getRange(106+index,3,1,1).setValue(pair[1])
+      OTHERSHEETS.data.getRange(106+index,2,1,1).setValue(pair[0])
+      OTHERSHEETS.data.getRange(106+index,3,1,1).setValue(pair[1])
     })
 
     return chop;
 
 }
 
-
+const CalculateDistributionTwo = () => {
+  let count = {};
+  let userList = [];
+  for(const [name, sheet] of Object.entries(SHEETS)) { 
+    let users = sheet.getRange(3, 10, sheet.getLastRow(), 1).getValues();
+    users = [].concat(...users);
+    users.forEach( user => {
+      if(user != null || user != undefined || user != "" || user != " " || user != "Test" || user != "FORMULA ROW") {
+        userList.push(user);
+      }
+    })
+  }
+  let occurrences = userList.reduce( (acc, curr) => {
+    return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+  }, {});
+  let items = Object.keys(occurrences).map((key) => {
+    if (key != "" || key != undefined || key != null) {
+      return [key, occurrences[key]];
+    }
+  });
+  items.sort((first, second) => {
+    return second[1] - first[1];
+  });
+  Logger.log(items);
+  return items;  
+}
 
 
 /**
@@ -281,16 +288,16 @@ const CalculateDistribution = () => {
  */
 var CalcDistributionByID = () => {
     let sheets = {
-        'Ultimaker' : sheetDict.ultimaker.getRange(2, 9, sheetDict.ultimaker.getLastRow() -1, 3).getValues(),
-        'Laser Cutter' : sheetDict.laser.getRange(2, 9, sheetDict.laser.getLastRow() -1, 3).getValues(),
-        'Fablight' : sheetDict.fablight.getRange(2, 9, sheetDict.fablight.getLastRow() -1, 3).getValues(),
-        'Waterjet' : sheetDict.waterjet.getRange(2, 9, sheetDict.waterjet.getLastRow() -1, 3).getValues(),
-        'Advanced Lab' : sheetDict.advancedlab.getRange(2, 9, sheetDict.advancedlab.getLastRow() -1, 3).getValues(),
-        'Shopbot' : sheetDict.shopbot.getRange(2, 9, sheetDict.shopbot.getLastRow() -1, 3).getValues(),
-        'Haas & Tormach' : sheetDict.haas.getRange(2, 9, sheetDict.haas.getLastRow() -1, 3).getValues(),
-        'Vinyl Cutter' : sheetDict.vinyl.getRange(2, 9, sheetDict.vinyl.getLastRow() -1, 3).getValues(),
-        'Othermill' : sheetDict.othermill.getRange(2, 9, sheetDict.othermill.getLastRow() -1, 3).getValues(),
-        'Other Tools' : sheetDict.othertools.getRange(2, 9, sheetDict.othertools.getLastRow() -1, 3).getValues(),
+        'Ultimaker' : SHEETS.ultimaker.getRange(2, 9, SHEETS.ultimaker.getLastRow() -1, 3).getValues(),
+        'Laser Cutter' : SHEETS.laser.getRange(2, 9, SHEETS.laser.getLastRow() -1, 3).getValues(),
+        'Fablight' : SHEETS.fablight.getRange(2, 9, SHEETS.fablight.getLastRow() -1, 3).getValues(),
+        'Waterjet' : SHEETS.waterjet.getRange(2, 9, SHEETS.waterjet.getLastRow() -1, 3).getValues(),
+        'Advanced Lab' : SHEETS.advancedlab.getRange(2, 9, SHEETS.advancedlab.getLastRow() -1, 3).getValues(),
+        'Shopbot' : SHEETS.shopbot.getRange(2, 9, SHEETS.shopbot.getLastRow() -1, 3).getValues(),
+        'Haas & Tormach' : SHEETS.haas.getRange(2, 9, SHEETS.haas.getLastRow() -1, 3).getValues(),
+        'Vinyl Cutter' : SHEETS.vinyl.getRange(2, 9, SHEETS.vinyl.getLastRow() -1, 3).getValues(),
+        'Othermill' : SHEETS.othermill.getRange(2, 9, SHEETS.othermill.getLastRow() -1, 3).getValues(),
+        'Other Tools' : SHEETS.othertools.getRange(2, 9, SHEETS.othertools.getLastRow() -1, 3).getValues(),
     }
 
     let ids = [];
@@ -357,10 +364,10 @@ var CalcDistributionByID = () => {
 
     //Match IDS to emails
     let sortedEmails = [];
-    let studentList = sheetDict.approved.getRange('C2:C').getValues();
+    let studentList = OTHERSHEETS.approved.getRange('C2:C').getValues();
     chop.forEach(async item => {
         let index = studentList.findIndex(item[0]) + 2;
-        let email = sheetDict.approved.getRange('B' + index).getValue();
+        let email = OTHERSHEETS.approved.getRange('B' + index).getValue();
         return await sortedEmails.push(email);
     });
 
@@ -390,7 +397,7 @@ var CalcDistributionByID = () => {
 const CalculateStandardDeviation = () => {
      
     let people = [];
-    let d = sheetDict.backgrounddata.getRange('V2:V').getValues();
+    let d = OTHERSHEETS.backgrounddata.getRange('V2:V').getValues();
     for(let i = 0; i < d.length; i++){ 
         if(d[i] != '' && d[i] != null && d[i] != undefined && d[i] != ' ') {
             people.push(d[i]); 
@@ -419,42 +426,42 @@ const CalculateStandardDeviation = () => {
 const Metrics = () => {
     try {
         //Return Averages to Metrics beginning at cell D26 
-        let metricsTab = sheetDict.data;
+        let metricsTab = OTHERSHEETS.data;
 
-        let laserSheet = sheetDict.laser; //Laser Sheet
+        let laserSheet = SHEETS.laser; //Laser Sheet
         metricsTab.getRange('D26').setValue(CalculateAverageTurnaround(laserSheet));
 
-        let ultimakerSheet = sheetDict.ultimaker; //Ultimaker Sheet
+        let ultimakerSheet = SHEETS.ultimaker; //Ultimaker Sheet
         metricsTab.getRange('D27').setValue(CalculateAverageTurnaround(ultimakerSheet));
 
-        let fablightSheet = sheetDict.fablight; //Fablight Sheet
+        let fablightSheet = SHEETS.fablight; //Fablight Sheet
         metricsTab.getRange('D28').setValue(CalculateAverageTurnaround(fablightSheet));
 
-        let omaxSheet = sheetDict.waterjet; //Waterjet Sheet
+        let omaxSheet = SHEETS.waterjet; //Waterjet Sheet
         metricsTab.getRange('D29').setValue(CalculateAverageTurnaround(omaxSheet));
 
-        let advLabSheet = sheetDict.advancedlab; //Advanced Lab Sheet 
+        let advLabSheet = SHEETS.advancedlab; //Advanced Lab Sheet 
         metricsTab.getRange('D30').setValue(CalculateAverageTurnaround(advLabSheet));
 
-        let shopbotSheet = sheetDict.shopbot; //Shopbot Sheet
+        let shopbotSheet = SHEETS.shopbot; //Shopbot Sheet
         metricsTab.getRange('D31').setValue(CalculateAverageTurnaround(shopbotSheet));
 
-        let haasSheet = sheetDict.haas; //Haas Sheet 
+        let haasSheet = SHEETS.haas; //Haas Sheet 
         metricsTab.getRange('D32').setValue(CalculateAverageTurnaround(haasSheet));
 
-        let vinylSheet = sheetDict.vinyl; //Vinyl Sheet
+        let vinylSheet = SHEETS.vinyl; //Vinyl Sheet
         metricsTab.getRange('D33').setValue(CalculateAverageTurnaround(vinylSheet));
 
-        let othermillSheet = sheetDict.othermill; //Othermill Sheet
+        let othermillSheet = SHEETS.othermill; //Othermill Sheet
         metricsTab.getRange('D34').setValue(CalculateAverageTurnaround(othermillSheet));
 
-        let creaformSheet = sheetDict.creaform; //Creaform Sheet
+        let creaformSheet = SHEETS.creaform; //Creaform Sheet
         metricsTab.getRange('D35').setValue(CalculateAverageTurnaround(creaformSheet));
 
-        let otherSheet = sheetDict.othertools; //Other Sheet
+        let otherSheet = SHEETS.othertools; //Other Sheet
         metricsTab.getRange('D36').setValue(CalculateAverageTurnaround(otherSheet));
 
-        let plotter = sheetDict.plotter; //Plotter Sheet
+        let plotter = SHEETS.plotter; //Plotter Sheet
         metricsTab.getRange('D37').setValue(CalculateAverageTurnaround(plotter));
         Logger.log('Recalculated Metrics');
     }

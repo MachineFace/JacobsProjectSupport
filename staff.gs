@@ -112,7 +112,7 @@ const MakeLink = (email) => {
  * Return Staff Email as a string.
  */
 const StaffEmailAsString = () => {
-    let stafflist = sheetDict.staff;
+    let stafflist = OTHERSHEETS.staff;
     let last = stafflist.getLastRow();
     let emaillist = stafflist.getRange(2, 3, last - 1, 1).getValues();
     return emaillist.toString();
@@ -127,27 +127,25 @@ const StaffEmailAsString = () => {
  * @returns {string} fullname, email, or email link
  */
 const InvokeDS = (name, property) => {
-  let stafflist = sheetDict.staff;
-  let last = stafflist.getLastRow();
-  let staffrange = stafflist.getRange(2, 1, last, 4).getValues();
+  let staff = OTHERSHEETS.staff.getRange(2, 1, OTHERSHEETS.staff.getLastRow(), 4).getValues();
 
-  for (let i in staffrange) {
-    let _name = staffrange[i][0];
-    let _fullname = staffrange[i][1];
-    let _email = staffrange[i][2];
-    let _emailLink = staffrange[i][3];
+  for (let i in staff) {
+    let _name = staff[i][0];
+    let _fullname = staff[i][1];
+    let _email = staff[i][2];
+    let _emailLink = staff[i][3];
     //Logger.log('name = %s, fullname = %s,  email = %s, emaillink = %s',_name,_fullname,_email,_emailLink);
 
     switch (property) {
         case "fullname":
           // @ts-ignore
-          if (staffrange[i][0] == name) return _fullname;
+          if (staff[i][0] == name) return _fullname;
         case "email":
           // @ts-ignore
-          if (staffrange[i][0] == name) return _email;
+          if (staff[i][0] == name) return _email;
         case "emaillink":
           // @ts-ignore
-          if (staffrange[i][0] == name) return _emailLink;
+          if (staff[i][0] == name) return _emailLink;
     }
   }
 }
@@ -160,7 +158,7 @@ const InvokeDS = (name, property) => {
  * @returns {[string]} DSList
  */
 const CreateDS = () => {
-    let stafflist = sheetDict.staff;
+    let stafflist = OTHERSHEETS.staff;
     let last = stafflist.getLastRow();
     let staffrange = stafflist.getRange(2, 1, last, 4).getValues();
 

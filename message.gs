@@ -134,7 +134,7 @@ class CreateMessage
             message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby. <br/>'; 
             message += '2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>';
             message += '<b>Pick-Up Hours:<br/>';
-            message += 'Monday - Friday: 11am - 1pm</b><br/><br/>'
+            message += 'Monday - Friday: 11am - 1pm & 4pm - 6pm.</b><br/><br/>'
             message += 'If you have any further questions or need assistance please email ' + InvokeDS("Staff", "emaillink") + '. <br/>';
             message += '<p>Please take a moment to take our survey so we can improve JPS : '
             message += '<a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>';
@@ -240,7 +240,7 @@ class CreateMessage
             message += 'DES INV and affiliated courses students are approved automatically upon registration submission. '; 
             message += 'Researchers are added when we receive IOC payment approval from their PI. '; 
             message += 'Researchers are urged to contact their PI to ensure they have appropriate approval.<br/>';
-            message += 'Information on how to gain access can be found at <a href="makerspace.jacobshall.org"><b>Here</b></a><br/><br/>';
+            message += 'Information on how to gain access can be found at <a href="https://jacobsinstitute.berkeley.edu/jps/"><b>Here</b></a><br/><br/>';
             message += 'Please register if you have not done so yet: <br/>';
             message += '<a href="https://jacobsaccess.ist.berkeley.edu/jps/signup"><b>Registration</b></a> <br/><br/>';
             message += '</p>';
@@ -292,7 +292,7 @@ class CreateSubmissionMessage
             message += '<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>'; 
             message += '2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>';
             message += '<b>Drop-off Hours:<br/>';
-            message += 'Monday - Friday: 11am - 1pm</b><br/><br/>'
+            message += 'Monday - Friday: 11am - 1pm  & 4pm - 6pm.</b><br/><br/>'
             message += 'Please email ' + InvokeDS("Chris", "fullname") + ' at ' + InvokeDS("Chris", "emaillink") + ' for further details.<br/>';
             message += 'If you have any further questions or need assistance please email ' + InvokeDS("Staff", "emaillink") + '. <br/>';
             message += '<p>Best,<br />Jacobs Hall Staff</p>';
@@ -304,7 +304,7 @@ class CreateSubmissionMessage
             message += 'If you recently applied, please allow approximately 3 days for the approval to move through the system, and disregard this email.<br/><br/>';
             message += 'DES INV and affiliated courses students are approved automatically upon registration submission. Researchers are added when we receive IOC payment approval from their PI. ';
             message += 'Researchers are urged to contact their PI to ensure they have appropriate approval.<br/>';
-            message += 'Information on how to gain access can be found <a href="makerspace.jacobshall.org"><b>Here.</b></a><br/><br/>';
+            message += 'Information on how to gain access can be found <a href="https://jacobsinstitute.berkeley.edu/jps/"><b>Here.</b></a><br/><br/>';
             message += 'Please register if you have not done so yet: <br/>';
             message += '<a href="https://jacobsaccess.ist.berkeley.edu/jps/signup"><b>Registration</b></a> <br/><br/>';
             message += '</p>';

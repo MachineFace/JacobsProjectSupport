@@ -364,8 +364,8 @@ const BillFromSelected = async () => {
       let response;
 
       // //Check for Staff
-      // let staffEmails = sheetDict.staff
-      //   .getRange(2, 3, sheetDict.staff.getLastRow() - 1, 1)
+      // let staffEmails = OTHERSHEETS.staff
+        // .getRange(2, 3, OTHERSHEETS.staff.getLastRow() - 1, 1)
       //   .getValues();
       // for (let i = 0; i < staffEmails.length; i++) {
       //   if (email == staffEmails[i]) {

@@ -4,20 +4,8 @@
  * Documentation at "https://github.com/metafloor/bwip-js/wiki/Online-Barcode-API"
  */
 
- const submissionSheetDict = {
-    laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
-    ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), //Ultimaker Sheet
-    fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), //Fablight Sheet
-    waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), //Waterjet Sheet
-    advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced Lab"), //Advanced Lab Sheet
-    shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), //Shopbot Sheet
-    haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), //Haas Sheet
-    vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), //Vinyl Sheet
-    othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), //Othermill Sheet
-    creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), //Creaform Sheet
-    othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Other Tools"), //Other Sheet
-    plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), //Plotter Sheet
-};
+
+
 const GenerateBarCode = (jobnumber) => {
 
     //jobnumber = "20210301140515";   //Test JobNumber
@@ -131,8 +119,8 @@ const PickupByBarcode = () => {
   }
 
   // loop through sheets to look for value
-  for (const [key, value] of Object.entries(submissionSheetDict)) {
-    const searchSheet = submissionSheetDict[key];
+  for (const [key, value] of Object.entries(SHEETS)) {
+    const searchSheet = SHEETS[key];
     // const data = searchSheet.getDataRange().getValues();
     const textFinder = searchSheet.createTextFinder(jobnumber);
     const searchFind = textFinder.findNext();
@@ -152,7 +140,7 @@ const PickupByBarcode = () => {
 } 
 
 // const SearchByBarcode = (jobnumber, range) => {
-//     let d = sheetDict.backgrounddata.getRange('V2:V').getValues();
+    // let d = OTHERSHEETS.backgrounddata.getRange('V2:V').getValues();
 //     for(let i = 0; i < d.length; i++){ 
 //         if(d[i] != '' && d[i] != null && d[i] != undefined && d[i] != ' ') {
 //             people.push(d[i]); 

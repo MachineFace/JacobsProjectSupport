@@ -88,6 +88,71 @@ const STATUS = {
   closed : "CLOSED",
 }
 
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Collection of Sheets : Dictionary of key / value pair.
+ * Example: Calling 'sheetDict.laser' returns value sheet.
+ */
+const SHEETS = {
+  laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
+  ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), //Ultimaker Sheet
+  fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), //Fablight Sheet
+  waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), //Waterjet Sheet
+  advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced Lab"), //Advanced Lab Sheet
+  shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), //Shopbot Sheet
+  haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), //Haas Sheet
+  vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), //Vinyl Sheet
+  othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), //Othermill Sheet
+  creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), //Creaform Sheet
+  othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Other Tools"), //Other Sheet
+  plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), //Plotter Sheet
+};
 
+const OTHERSHEETS = {
+  summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Summary"),
+  approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Student List DONOTDELETE"),
+  staff: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Staff List"),
+  logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Logger"),
+  data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Metrics"),
+  backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Background Data Mgmt"),
+  billing: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Billing"),
+}
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Collection of INTERNAL Sheets : Dictionary of key / value pair.
+ * Example: Calling 'materialDict.laser' returns value materialSheet.
+ */
+const materialDict = {
+    advlab:     SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AdvLabStoreItems"),
+    ultimaker:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("UltimakerStoreItems"),
+    fablight:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FablightStoreItems"),
+    haas:       SpreadsheetApp.getActiveSpreadsheet().getSheetByName("HaasTormachStoreItems"),
+    shopbot:    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ShopbotStoreItems"),
+    waterjet:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("WaterjetStoreItems"),
+    vinyl:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("VinylCutterStoreItems"),
+    laser:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("LaserStoreItems"),
+    othermill:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("OthermillStoreItems"),
+};
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Collection of Forms : Dictionary of key / value pair.
+ * Example: Calling 'formDict.laser' returns value string.
+ */
+const formDict = {
+    ultimaker: "1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8",
+    laser: "1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w",
+    fablight: "1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA",
+    waterjet: "1dNLAlC8Wg0DLLkBboRMgztPqP-fMmUqyGt5xqtg8TKk",
+    advancedlab: "1okWAdclqrleQ5ktyXbSIRoY6hrL_v2OYYAhaeb0f1jQ",
+    shopbot: "1RFuhGCtQrcA9gbpEStaksK5eYeIAo0dzn5NIcxVngH4",
+    haas: "1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk",
+    vinyl: "1WTh9nDQ4C_3HyQvCNMIxRFbJk1FH4dZeYeAkiXkItKw",
+    othermill: "1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI",
+    creaform: "1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc",
+    othertools: "1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38",
+    plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
+};
 
 

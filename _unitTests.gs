@@ -49,7 +49,7 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Calc Average Turnaround`, (t) => {
-      let x = CalculateAverageTurnaround(sheetDict.ultimaker)
+      let x = CalculateAverageTurnaround(SHEETS.ultimaker)
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
