@@ -118,6 +118,18 @@ const OTHERSHEETS = {
   billing: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Billing"),
 }
 
+const STORESHEETS = {
+  AdvLabStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('AdvLabStoreItems'),
+  UltimakerStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UltimakerStoreItems'),
+  FablightStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FablightStoreItems'),
+  HaasTormachStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('HaasTormachStoreItems'),
+  ShopbotStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ShopbotStoreItems'),
+  WaterjetStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('WaterjetStoreItems'),
+  VinylCutterStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('VinylCutterStoreItems'),
+  LaserStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('LaserStoreItems'),
+  OthermillStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OthermillStoreItems'),
+};
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Collection of INTERNAL Sheets : Dictionary of key / value pair.
