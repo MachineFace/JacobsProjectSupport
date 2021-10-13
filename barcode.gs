@@ -7,55 +7,42 @@
 
 
 const GenerateBarCode = (jobnumber) => {
+  // jobnumber = "20210301140515";   //Test JobNumber
+  // jobnumber = 20210224175306;
+  // Access Tokens
+  let root = 'http://bwipjs-api.metafloor.com/';
+  let rootsec = 'https://bwipjs-api.metafloor.com/';
+  let type = '?bcid=code128';
+  let ts = '&text=';
+  let scale = '&scale=0.75'
+  let postfx = '&includetext';
 
-    //jobnumber = "20210301140515";   //Test JobNumber
-    //jobnumber = 20210224175306;
+  // let barcodeLoc = 'http://bwipjs-api.metafloor.com/?bcid=code128&text=1234567890&includetext';  //KNOWN WORKING LOCATION
 
-    //Access Tokens
-    let root = 'http://bwipjs-api.metafloor.com/';
-    let rootsec = 'https://bwipjs-api.metafloor.com/';
-    let type = '?bcid=code128';
-    let ts = '&text=';
-    let scale = '&scale=0.75'
-    let postfx = '&includetext';
+  let barcodeLoc = root + type + ts + jobnumber + scale +postfx;
 
-    //let barcodeLoc = 'http://bwipjs-api.metafloor.com/?bcid=code128&text=1234567890&includetext';  //KNOWN WORKING LOCATION
+  //Params
+  let params = {
+    "method" : "GET",
+    "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
+    "contentType" : "application/json",
+    followRedirects : true,
+    muteHttpExceptions : true
+  };
+  
+  let barcode;
 
-    let barcodeLoc = root + type + ts + jobnumber + scale +postfx;
+  //Fetch Barcode
+  let res = UrlFetchApp.fetch(barcodeLoc, params);
+  Logger.log("Response Code : " + res.getResponseCode());
+  if (res.getResponseCode() == 200) {
+    barcode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName('Barcode' + jobnumber ) );
+    barcode.setTrashed(true);
+  } 
+  else Logger.log('Failed to GET Barcode');
 
-    //Params
-    let params = {
-        "method" : "GET",
-        "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
-        "contentType" : "application/json",
-        followRedirects : true,
-        muteHttpExceptions : true
-    };
-    
-    let barcode;
-
-    //Fetch Barcode
-    let res = UrlFetchApp.fetch(barcodeLoc, params);
-    Logger.log("Response Code : " + res.getResponseCode());
-    if (res.getResponseCode() == 200) {
-
-        barcode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName('Barcode' + jobnumber ) );
-        barcode.setTrashed(true);
-
-        // var meta = Drive.Files.get(file.getId()).imageMediaMetadata;
-        // let embed = Drive.Files.get(file.getId()).embedLink; 
-
-        // GmailApp.sendEmail('codyglen@berkeley.edu', 'JPSY : Barcode', '', {
-        //     htmlBody: embed,
-        //     'from': 'jacobsprojectsupport@berkeley.edu',
-        //     'name': 'JPSY'
-        // });
-
-    } 
-    else Logger.log('Failed to GET Barcode');
-
-    Logger.log(barcode);
-    return barcode;
+  Logger.log(barcode);
+  return barcode;
 
 }
 
@@ -68,37 +55,37 @@ const GenerateBarCode = (jobnumber) => {
  */
 const GenerateQRCode = (url, jobnumber) => {
 
-    if(url === null || url === undefined) {
-         url = 'jps.jacobshall.org/';
-    }
-    if(jobnumber == null || jobnumber == undefined) {
-         jobnumber = Math.floor(Math.random() * 100000).toFixed()
-    }
-    Logger.log(`URL : ${url}, Jobnumber || RNDNumber : ${jobnumber}`);
+  if(url === null || url === undefined) {
+    url = 'jps.jacobshall.org/';
+  }
+  if(jobnumber == null || jobnumber == undefined) {
+    jobnumber = Math.floor(Math.random() * 100000).toFixed()
+  }
+  Logger.log(`URL : ${url}, Jobnumber || RNDNumber : ${jobnumber}`);
 
-    let loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${url}`;  //API call
-    
-    //Stuff payload into postParams
-    let postParams = {
-        "method" : "GET",
-        "headers" : { "Authorization" : "Basic" },
-        "contentType" : "application/json",
-        followRedirects : true,
-        muteHttpExceptions : true
-    };
+  let loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${url}`;  //API call
+  
+  //Stuff payload into postParams
+  let postParams = {
+    "method" : "GET",
+    "headers" : { "Authorization" : "Basic" },
+    "contentType" : "application/json",
+    followRedirects : true,
+    muteHttpExceptions : true
+  };
 
-    //Fetch QR Code
-    let qrCode;
-    let res = UrlFetchApp.fetch(loc, postParams);
-    Logger.log(`Response Code : ${res.getResponseCode()}`);
-    if (res.getResponseCode() == 200) {
-        qrCode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName('QRCode' + jobnumber ) );
-        qrCode.setTrashed(true);
-    }
-    else Logger.log('Failed to GET QRCode');
+  //Fetch QR Code
+  let qrCode;
+  let res = UrlFetchApp.fetch(loc, postParams);
+  Logger.log(`Response Code : ${res.getResponseCode()}`);
+  if (res.getResponseCode() == 200) {
+    qrCode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName('QRCode' + jobnumber ) );
+    qrCode.setTrashed(true);
+  }
+  else Logger.log('Failed to GET QRCode');
 
-    Logger.log(qrCode);
-    return qrCode;
+  Logger.log(qrCode);
+  return qrCode;
 
 }
 
@@ -178,19 +165,19 @@ class QRCodeAndBarcodeGenerator {
     Logger.log(`URL : ${this.url}, Jobnumber || RNDNumber : ${this.jobnumber}`);
     const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
     const postParams = {
-        "method" : "GET",
-        "headers" : { "Authorization" : "Basic" },
-        "contentType" : "application/json",
-        followRedirects : true,
-        muteHttpExceptions : true
+      "method" : "GET",
+      "headers" : { "Authorization" : "Basic" },
+      "contentType" : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : true
     };
 
     let qrCode;
     const html = UrlFetchApp.fetch(loc, postParams);
     Logger.log(`Response Code : ${html.getResponseCode()}`);
     if (html.getResponseCode() == 200) {
-        qrCode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber ) );
-        qrCode.setTrashed(true);
+      qrCode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber ) );
+      qrCode.setTrashed(true);
     }
     else Logger.log('Failed to GET QRCode');
 
@@ -211,11 +198,11 @@ class QRCodeAndBarcodeGenerator {
     const barcodeLoc = root + type + ts + this.jobnumber + scale +postfx;
 
     const params = {
-        "method" : "GET",
-        "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
-        "contentType" : "application/json",
-        followRedirects : true,
-        muteHttpExceptions : true
+      "method" : "GET",
+      "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
+      "contentType" : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : true
     };
     
     let barcode;
@@ -223,19 +210,8 @@ class QRCodeAndBarcodeGenerator {
     let html = UrlFetchApp.fetch(barcodeLoc, params);
     Logger.log("Response Code : " + html.getResponseCode());
     if (html.getResponseCode() == 200) {
-
-        barcode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) );
-        barcode.setTrashed(true);
-
-        // var meta = Drive.Files.get(file.getId()).imageMediaMetadata;
-        // let embed = Drive.Files.get(file.getId()).embedLink; 
-
-        // GmailApp.sendEmail('codyglen@berkeley.edu', 'JPSY : Barcode', '', {
-        //     htmlBody: embed,
-        //     'from': 'jacobsprojectsupport@berkeley.edu',
-        //     'name': 'JPSY'
-        // });
-
+      barcode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      barcode.setTrashed(true);
     } 
     else Logger.log('Failed to GET Barcode');
 

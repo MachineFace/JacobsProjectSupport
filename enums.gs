@@ -155,4 +155,17 @@ const formDict = {
     plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
 };
 
+const TYPES = [
+  "Researcher",
+  "DES INV Faculty",
+  "Jacobs-affiliated Course Faculty",
+  "MDES Student",
+  "DES INV Student",
+  "Jacobs Engineering Design Scholar",
+  "Innovation Catalysts Grantee",
+  "Jacobs Staff (Including Work-studies)",
+  "Students in Jacobs-affiliated courses (NON-DES INV)",
+  "Club and/or Team",
+  "Other: Berkeley Faculty, Berkeley Staff, and Students",
+];
 

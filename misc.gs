@@ -45,12 +45,12 @@ const DeleteOldFiles = () => {
  * @param {cell} cell
  */
 const formatCell = (cell) => {
-    try {
-        const strategy = SpreadsheetApp.WrapStrategy.CLIP;
-        cell.setWrapStrategy(strategy);
-    } catch (err) {
-        Logger.log(`${err} : Cell failed to be clipped.`);
-    }
+  try {
+    const strategy = SpreadsheetApp.WrapStrategy.CLIP;
+    cell.setWrapStrategy(strategy);
+  } catch (err) {
+    Logger.log(`${err} : Cell failed to be clipped.`);
+  }
 };
 
 
@@ -107,16 +107,16 @@ const setByHeader = (theSheet, colName, row, val) => {
  * @returns message to specific logger sheet
  */
 const Logg = (message) => {
-    let logger = OTHERSHEETS.logger;
-    let thisRow = logger.getLastRow() + 1;
-    let time = new Date();
-    try {
-        logger.getRange(thisRow, 1).setValue(time);
-        logger.getRange(thisRow, 2).setValue("INFO");
-        logger.getRange(thisRow, 3).setValue(message);
-    } catch (err) {
-        Logger.log(`${err} : Couldnt log messages to sheet for whatever reason.`);
-    }
+  let logger = OTHERSHEETS.logger;
+  let thisRow = logger.getLastRow() + 1;
+  let time = new Date();
+  try {
+    logger.getRange(thisRow, 1).setValue(time);
+    logger.getRange(thisRow, 2).setValue("INFO");
+    logger.getRange(thisRow, 3).setValue(message);
+  } catch (err) {
+    Logger.log(`${err} : Couldnt log messages to sheet for whatever reason.`);
+  }
 };
 
 
@@ -124,10 +124,10 @@ const Logg = (message) => {
  * Materials Class function
  */
 const materials = (index, quantity, name, url) => {
-    this.index = index;
-    this.quantity = quantity;
-    this.name = name;
-    this.url = url;
+  this.index = index;
+  this.quantity = quantity;
+  this.name = name;
+  this.url = url;
 };
 
 
@@ -180,22 +180,22 @@ const CreateTimeDrivenTrigger = () => {
  * Used in 'DisableJPS()'
  */
 const RemoveTimedTriggers = () => {
-    let triggers = ScriptApp.getProjectTriggers();
-    try {
-        for (var i = 0; i < triggers.length; i++) {
-            if (triggers[i].getEventType() == ScriptApp.EventType.ON_EDIT)
-                Logger.log(`OnEdit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
-            if (triggers[i].getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
-                Logger.log(`OnFormSubmit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
-            if (triggers[i].getEventType() == ScriptApp.EventType.CLOCK) {
-                Logger.log(`TimeBased Trigger : ${triggers[i].getUniqueId()}`);
-                ScriptApp.deleteTrigger(triggers[i]);
-            }
-        }
-        Logger.log(`Removed Triggers for Summary Emails`);
-    } catch (err) {
-        Logger.log(`${err} : Couldnt remove triggers for whatever reason.`);
+  let triggers = ScriptApp.getProjectTriggers();
+  try {
+    for (var i = 0; i < triggers.length; i++) {
+      if (triggers[i].getEventType() == ScriptApp.EventType.ON_EDIT)
+        Logger.log(`OnEdit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
+      if (triggers[i].getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
+        Logger.log(`OnFormSubmit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
+      if (triggers[i].getEventType() == ScriptApp.EventType.CLOCK) {
+        Logger.log(`TimeBased Trigger : ${triggers[i].getUniqueId()}`);
+        ScriptApp.deleteTrigger(triggers[i]);
+      }
     }
+    Logger.log(`Removed Triggers for Summary Emails`);
+  } catch (err) {
+    Logger.log(`${err} : Couldnt remove triggers for whatever reason.`);
+  }
 };
 
 
@@ -207,13 +207,13 @@ const RemoveTimedTriggers = () => {
 const DisableJPS = () => {
   //Disable Forms
   try {
-      for (let name in formDict) {
-          FormApp.openById(formDict[name]).setAcceptingResponses(false);
-          Logger.log(`${name} : ${formDict[name]} IS NOW DISABLED.`);
-      }
-      Logger.log(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
+    for (let name in formDict) {
+      FormApp.openById(formDict[name]).setAcceptingResponses(false);
+      Logger.log(`${name} : ${formDict[name]} IS NOW DISABLED.`);
+    }
+    Logger.log(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
   } catch (err) {
-      Logger.log(`${err} : Couldnt disable Accepting Responses on Forms`);
+    Logger.log(`${err} : Couldnt disable Accepting Responses on Forms`);
   }
 
   //Delete Timebased Triggers for Daily Emails
@@ -227,23 +227,22 @@ const DisableJPS = () => {
  * Used in conjunction with 'DisableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
 const EnableJPS = () => {
-  //Disable Forms
   try {
-      for (let name in formDict) {
-          FormApp.openById(formDict[name]).setAcceptingResponses(true);
-          Logger.log(`${name} : ${formDict[name]} IS NOW ENABLED.`);
-      }
-      Logger.log(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
+    for (let name in formDict) {
+      FormApp.openById(formDict[name]).setAcceptingResponses(true);
+      Logger.log(`${name} : ${formDict[name]} IS NOW ENABLED.`);
+    }
+    Logger.log(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
   } catch (err) {
-      Logger.log(err + " : Couldnt enable Accepting Responses on Forms");
+    Logger.log(err + " : Couldnt enable Accepting Responses on Forms");
   }
 
   //Create Triggers
   try {
-      CreateTimeDrivenTrigger();
-      Logger.log("Created Daily Summary Email Triggers.");
+    CreateTimeDrivenTrigger();
+    Logger.log("Created Daily Summary Email Triggers.");
   } catch (err) {
-      Logger.log(`${err} : Couldnt install triggers for whatever reason.`);
+    Logger.log(`${err} : Couldnt install triggers for whatever reason.`);
   }
 };
 
@@ -257,14 +256,14 @@ const EnableJPS = () => {
  * @returns {int} indexes
  */
 const FindDataInColumn = (sheet, column, data) => {
-    let indexes = [];
-    let values = sheet.getRange(column + ":" + column).getValues(); // like A:A
-    let row = 2;
+  let indexes = [];
+  let values = sheet.getRange(column + ":" + column).getValues(); // like A:A
+  let row = 2;
 
-    while (values[row] && values[row][0] !== data) row++;
-    if (values[row][0] === data) indexes.push(row + 1);
-    else return -1;
-    return indexes;
+  while (values[row] && values[row][0] !== data) row++;
+  if (values[row][0] === data) indexes.push(row + 1);
+  else return -1;
+  return indexes;
 };
 
 
@@ -283,12 +282,6 @@ const FindDataInRow = (sheet, data) => {
   for (let r = 1; r < rows.length; r++) {
     let index = rows[r].indexOf(data) + 1;
     indexes.push(index);
-    /*
-        if ( rows[r].join("#").indexOf(data) !== -1 )
-        {
-          indexes.push(r + 1);
-        }
-        */
   }
   return indexes;
 };
@@ -388,10 +381,10 @@ const Recolor = (wholerow, status, shippingQuestion) => {
  * @returns {int} index
  */
 Array.prototype.findIndex = (search) => {
-    if (search == "") return false;
-    for (let i = 0; i < this.length; i++)
-        if (this[i].toString().indexOf(search) > -1) return i;
-    return -1;
+  if (search == "") return false;
+  for (let i = 0; i < this.length; i++)
+    if (this[i].toString().indexOf(search) > -1) return i;
+  return -1;
 };
 
 
@@ -505,6 +498,12 @@ const CheckMissingAccessStudents = () => {
       .getRange(2, 3, SHEETS.othertools.getLastRow() - 1, 1)
       .getValues(),
   };
+  // let accessPool = [];
+  // for(const [key, sheet] of Object.entries(SHEETS)) {
+  //   let access = sheet.getRange(2, 3, sheet.getLastRow() -1, 1).getValues();
+  //   access = [].concat(...access);
+  //   accessPool.push(access);
+  // }
 
   let emails = [];
   let names = [];
@@ -576,48 +575,55 @@ const Help = () => {
 
 
 const CountTotalEmailsSent = async () => {
-    const supportAlias = GmailApp.getAliases()[0];
-    let labelName = "JPS Notifications";
+  const supportAlias = GmailApp.getAliases()[0];
+  let labelName = "JPS Notifications";
 
-    var labels = GmailApp.getUserLabels();
-    // labels.forEach(label => {
-    //     let name = label.getName()
-    //     Logger.log(`Labels : ${name}`)
-    // })
+  var labels = GmailApp.getUserLabels();
+  // labels.forEach(label => {
+  //     let name = label.getName()
+  //     Logger.log(`Labels : ${name}`)
+  // })
 
-    let now = new Date();
-    let oldest = now;
-    let pageSize = 50;
-    let start = 0;
-    let threads;
+  let now = new Date();
+  let oldest = now;
+  let pageSize = 50;
+  let start = 0;
+  let threads;
 
-    do {
-      threads = await GmailApp.search(`label:jacobs-project-support-jps-notifications `, start, pageSize);
-      // threads = await GmailApp.getInboxThreads(start, pageSize);
-      threads.forEach((thread) => {
-          oldest = thread.getLastMessageDate() < oldest ? thread.getLastMessageDate() : oldest;
-      });
+  do {
+    threads = await GmailApp.search(`label:jacobs-project-support-jps-notifications `, start, pageSize);
+    // threads = await GmailApp.getInboxThreads(start, pageSize);
+    threads.forEach((thread) => {
+        oldest = thread.getLastMessageDate() < oldest ? thread.getLastMessageDate() : oldest;
+    });
 
-      start += pageSize;
-      Utilities.sleep(1000);
-    } while(threads.length > 0);
-    
-    // calculate age of oldest messag in days
-    let ageOfOldest = Math.round((datetimeToDate(now) - datetimeToDate(oldest)) / (1000 * 60 * 60 * 24))
+    start += pageSize;
+    Utilities.sleep(1000);
+  } while(threads.length > 0);
+  
+  // calculate age of oldest messag in days
+  let ageOfOldest = Math.round((datetimeToDate(now) - datetimeToDate(oldest)) / (1000 * 60 * 60 * 24))
 
-    // get all threads in inbox as an array in order to count 
-    var threadsCount = GmailApp.getInboxThreads();
-    
-    // Add a row of the spreadsheet's first sheet and include the following data:
-    // current date & time | username / email address | # of message threads in inbox | Age in days of oldest message
-    Logger.log(`Time Now : ${now}, Number of Emails in Inbox : ${threadsCount.length}, Oldest Email : ${ageOfOldest}`);
+  // get all threads in inbox as an array in order to count 
+  var threadsCount = GmailApp.getInboxThreads();
+  
+  // Add a row of the spreadsheet's first sheet and include the following data:
+  // current date & time | username / email address | # of message threads in inbox | Age in days of oldest message
+  Logger.log(`Time Now : ${now}, Number of Emails in Inbox : ${threadsCount.length}, Oldest Email : ${ageOfOldest}`);
 }
 
 const datetimeToDate = (d) => {
   return new Date(d.getYear(), d.getMonth(), d.getDate());
 }
 
-
+const FindMissingElementsInArrays = (array1, array2) => {
+  let indexes = [];
+  array1.forEach( item => {
+    let i = array2.indexOf(item);
+    indexes.push(i);
+  })
+  return indexes;
+}
 
 
 

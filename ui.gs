@@ -221,7 +221,7 @@ const BarMenu = () => {
       SpreadsheetApp.getUi()
         .createMenu("Calculate")
         .addItem("Generate Metrics", "Metrics")
-        .addItem("Generate Distribution", "CalculateDistribution")
+        .addItem("Generate Top Ten", "CreateTopTen")
         .addItem("Generate Standard Deviation", "CalculateStandardDeviation")
     )
     .addSeparator()

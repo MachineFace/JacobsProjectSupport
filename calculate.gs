@@ -8,77 +8,74 @@
  */
 const CalculateAverageTurnaround = (sheet) => {
 
-    //Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
-    let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); //Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
+  //Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
+  let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); //Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
 
-    //Get list of times and remove all the Bullshit
-    let revisedTimes = [];
-    try {
-        for (let i = 0; i < completionTimes.length; i++) {
-            let time = completionTimes[i][0];
-            if (time != '' || time != undefined || time != null || time != ' ' || time != NaN || time != '[]') {
-                let ds = time.replace(" ", ":");
-                let t = ds.split(':');
-                if (!isNaN(parseFloat(t[1])) && isFinite(t[1])) //check if the 2nd number out of the array of 4 is BS or not - if not BS, write the values to the array
-                {
-                    revisedTimes.push(t);
-                }
-            }
+  //Get list of times and remove all the Bullshit
+  let revisedTimes = [];
+  try {
+    for (let i = 0; i < completionTimes.length; i++) {
+      let time = completionTimes[i][0];
+      if (time != '' || time != undefined || time != null || time != ' ' || time != NaN || time != '[]') {
+        let ds = time.replace(" ", ":");
+        let t = ds.split(':');
+        if (!isNaN(parseFloat(t[1])) && isFinite(t[1])) //check if the 2nd number out of the array of 4 is BS or not - if not BS, write the values to the array
+        {
+          revisedTimes.push(t);
         }
+      }
     }
-    catch (err) {
-        Logger.log(`${err} : Could not fetch list of times. Probably a sheet error.`);
+  }
+  catch (err) {
+    Logger.log(`${err} : Could not fetch list of times. Probably a sheet error.`);
+  }
+
+  //Convert everything to seconds
+  let totals = [];
+  try {
+    for (let i = 0; i < revisedTimes.length; i++) {
+      //Time
+      let days = (+revisedTimes[i][0] * 24 * 60); //days to hours to minutes
+      let hours = (+revisedTimes[i][1] * 60); //hours to minutes
+      let minutes = (+revisedTimes[i][2]); //minutes     
+      let seconds = (+revisedTimes[i][3]); //seconds, forget about seconds
+
+      let total = days + hours + minutes;
+      totals.push(total);
     }
+  }
+  catch (err) {
+    Logger.log(`${err} : Could not sum times.`);
+  }
 
-    //Convert everything to seconds
-    let totals = [];
-    try {
-        for (let i = 0; i < revisedTimes.length; i++) {
-            //Time
-            let days = (+revisedTimes[i][0] * 24 * 60); //days to hours to minutes
-            let hours = (+revisedTimes[i][1] * 60); //hours to minutes
-            let minutes = (+revisedTimes[i][2]); //minutes     
-            let seconds = (+revisedTimes[i][3]); //seconds, forget about seconds
+  //sum all the totals
+  let totalTotal = 0;
+  for (let i = 0; i < totals.length; i++) {
+    totalTotal += totals[i];
+  }
 
-            let total = days + hours + minutes;
-            totals.push(total);
-        }
-    }
-    catch (err) {
-        Logger.log(`${err} : Could not sum times.`);
-    }
+  //Average the totals (a list of times in minutes)
+  let averageMins = totalTotal / totals.length;
 
-    //sum all the totals
-    let totalTotal = 0;
-    for (let i = 0; i < totals.length; i++) {
-        totalTotal += totals[i];
-    }
+  //Recalculate average minutes into readable duration
+  let averageRecalc = averageMins;
 
-    //Average the totals (a list of times in minutes)
-    let averageMins = totalTotal / totals.length;
+  let mins = parseInt((averageRecalc % 60), 10); //Calc mins
+  averageRecalc = Math.floor(averageRecalc / 60); //Difference mins to hrs
+  let minutesAsString = mins < 10 ? "0" + mins : mins + ""; //Pad with a zero
 
-    //Recalculate average minutes into readable duration
-    let averageRecalc = averageMins;
+  let hrs = averageRecalc % 24; //Calc hrs
+  averageRecalc = Math.floor(averageRecalc / 24); //Difference hrs to days
+  let dys = averageRecalc;
 
-    let mins = parseInt((averageRecalc % 60), 10); //Calc mins
-    averageRecalc = Math.floor(averageRecalc / 60); //Difference mins to hrs
-    let minutesAsString = mins < 10 ? "0" + mins : mins + ""; //Pad with a zero
+  //Format into readable time and return (if data is still missing, set it to zero)
+  if (isNaN(dys)) dys = 0;
+  if (isNaN(hrs)) hrs = 0;
+  if (isNaN(minutesAsString)) minutesAsString = 0;
 
-    let hrs = averageRecalc % 24; //Calc hrs
-    averageRecalc = Math.floor(averageRecalc / 24); //Difference hrs to days
-    let dys = averageRecalc;
-
-    //Format into readable time and return (if data is still missing, set it to zero)
-    if (isNaN(dys)) dys = 0;
-    if (isNaN(hrs)) hrs = 0;
-    if (isNaN(minutesAsString)) minutesAsString = 0;
-
-    let formatted = dys + 'd ' + hrs + 'h ' + minutesAsString + "m";
-    return formatted;
+  let formatted = dys + 'd ' + hrs + 'h ' + minutesAsString + "m";
+  return formatted;
 }
-
-
-
 
 
 /**
@@ -89,39 +86,35 @@ const CalculateAverageTurnaround = (sheet) => {
  * @returns {duration} formatted time
  */
 const CalculateDuration = (start, end) => {
-    try {
-        end = end ? end : new Date();  //if supplied with nothing, set end time to now
-        start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
+  try {
+    end = end ? end : new Date();  //if supplied with nothing, set end time to now
+    start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
 
-        let timeDiff = Math.abs((end - start) / 1000); //Abs Value Milliseconds to sec
+    let timeDiff = Math.abs((end - start) / 1000); //Abs Value Milliseconds to sec
 
-        let secs = Math.floor(timeDiff % 60); //Calc seconds
-        timeDiff = Math.floor(timeDiff / 60); //Difference seconds to minutes
-        let secondsAsString = secs < 10 ? "0" + secs : secs + ""; //Pad with a zero
+    let secs = Math.floor(timeDiff % 60); //Calc seconds
+    timeDiff = Math.floor(timeDiff / 60); //Difference seconds to minutes
+    let secondsAsString = secs < 10 ? "0" + secs : secs + ""; //Pad with a zero
 
-        let mins = timeDiff % 60; //Calc mins 
-        timeDiff = Math.floor(timeDiff / 60); //Difference mins to hrs
-        let minutesAsString = mins < 10 ? "0" + mins : mins + ""; //Pad with a zero
+    let mins = timeDiff % 60; //Calc mins 
+    timeDiff = Math.floor(timeDiff / 60); //Difference mins to hrs
+    let minutesAsString = mins < 10 ? "0" + mins : mins + ""; //Pad with a zero
 
-        let hrs = timeDiff % 24; //Calc hrs
-        timeDiff = Math.floor(timeDiff / 24); //Difference hrs to days
-        let days = timeDiff;
+    let hrs = timeDiff % 24; //Calc hrs
+    timeDiff = Math.floor(timeDiff / 24); //Difference hrs to days
+    let days = timeDiff;
 
-        //Write
-        let formatted = days + ' ' + hrs + ':' + minutesAsString + ':' + secondsAsString;
-        Logg("Duration = " + formatted);
+    //Write
+    let formatted = days + ' ' + hrs + ':' + minutesAsString + ':' + secondsAsString;
+    Logg("Duration = " + formatted);
 
-        //Return Completed time
-        return formatted;
-    }
-    catch (err) {
-        Logg(`${err} : Calculating the duration has failed for some reason.`);
-    }
+    // Return Completed time
+    return formatted;
+  }
+  catch (err) {
+    Logg(`${err} : Calculating the duration has failed for some reason.`);
+  }
 }
-
-
-
-
 
 
 /**
@@ -152,8 +145,31 @@ const CountActiveUsers = () => {
   return count;
 }
 
-
-
+/**
+ * Count Number of Submissions
+ */
+const CountEachSubmission = () => {
+  let data = []
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    // let count = sheet.getLastRow() - 3;
+    let range = sheet.getRange(2, 8, sheet.getLastRow() - 1).getValues();
+    range = [].concat(...range);
+    let culled = []
+    culled = range.filter(Boolean);
+    let count = culled.length - 2;
+    // Logger.log(`Sheet : ${sheet.getName()}, Count : ${count}`);
+    data.push([sheet.getName(), count]);
+  }
+  Logger.log(data)
+  return data;
+}
+const PrintSubmissionData = () => {
+  let data = CountEachSubmission();
+  data.forEach( (entry, index) => {
+    OTHERSHEETS.data.getRange(13 + index , 2, 1, 1).setValue(entry[0]);
+    OTHERSHEETS.data.getRange(13 + index , 3, 1, 1).setValue(entry[1]);
+  })
+}
 
 
 /**
@@ -162,104 +178,42 @@ const CountActiveUsers = () => {
  * Writes the distribution to a sheet, and returns the top ten most active users
  * @returns {[string]} names
  */
-const CalculateDistribution = () => {
-    let sheets = SpreadsheetApp.getActiveSpreadsheet();
-    let people = [];
-    let nameRange = 'J3:J';
-    let plotter = SHEETS.plotter.getRange(nameRange).getValues();
-    let other = SHEETS.othertools.getRange(nameRange).getValues();
-    let creaform = SHEETS.creaform.getRange(nameRange).getValues();
-    let othermill = SHEETS.othermill.getRange(nameRange).getValues();
-    let vinyl = SHEETS.vinyl.getRange(nameRange).getValues();
-    let haas = SHEETS.haas.getRange(nameRange).getValues();
-    let shopbot = SHEETS.shopbot.getRange(nameRange).getValues();
-    let adv = SHEETS.advancedlab.getRange(nameRange).getValues();
-    let waterjet = SHEETS.waterjet.getRange(nameRange).getValues();
-    let fablight = SHEETS.fablight.getRange(nameRange).getValues();
-    let ultimaker = SHEETS.ultimaker.getRange(nameRange).getValues();
-    let laser = SHEETS.laser.getRange(nameRange).getValues();
+const CreateTopTen = () => {
+  const distribution = CalculateDistribution();
+  // Create a new array with only the first 10 items and remove Tests
+  let chop = distribution.slice(0, 11);
 
-    plotter.forEach(item => people.push(item[0]));
-    other.forEach(item => people.push(item[0]));
-    creaform.forEach(item => people.push(item[0]));
-    othermill.forEach(item => people.push(item[0]));
-    vinyl.forEach(item => people.push(item[0]));
-    haas.forEach(item => people.push(item[0]));
-    shopbot.forEach(item => people.push(item[0]));
-    adv.forEach(item => people.push(item[0]));
-    waterjet.forEach(item => people.push(item[0]));
-    fablight.forEach(item => people.push(item[0]));
-    ultimaker.forEach(item => people.push(item[0]));
-    laser.forEach(item => people.push(item[0]));
-
-    let distribution = {}, max = 0, result = [];
-
-    people.forEach((a) => {
-        distribution[a] = (distribution[a] || 0) + 1;
-        if (distribution[a] > max) {
-            max = distribution[a];
-            result = [a];
-            return;
-        }
-        if (distribution[a] === max) {
-            result.push(a);
-        }
-    });
-
-
-    //Fetch Top 10 Power Users
-    // Create items array
-    let counts = [];
-    let items = Object.keys(distribution).map(function (key) {
-        if (key != "" || key != undefined || key != null) {
-            counts.push(distribution[key]);
-            return [key, distribution[key]];
-        }
-    });
-
-    //Log to sheet
-    counts.sort((a, b) => a - b);
-    for (let i = 0; i < max; i++) {
-        let rownum = 2 + i;
-        if (counts[i] < 2000) OTHERSHEETS.backgrounddata.getRange('V' + rownum).setValue(counts[i]);
-    }
-
-
-    // Sort the array based on the second element
-    items.sort((first, second) => {
-        return second[1] - first[1];
-    });
-
-    // Create a new array with only the first 10 items and remove Tests
-    let chop = items.slice(0, 11);
-    //Logger.log(chop);
-    let loc;
-    chop.forEach((item) => {
-        item.forEach((pair) => {
-            if(pair == 'Test')  loc = chop.indexOf(item);
-        })
-    });
-    chop.splice(loc,1);
-    // Logger.log(chop);
-
-    chop.forEach((pair, index) => {
-      Logger.log(`${pair[0]} -----> ${pair[1]}`)
-      OTHERSHEETS.data.getRange(106+index,2,1,1).setValue(pair[0])
-      OTHERSHEETS.data.getRange(106+index,3,1,1).setValue(pair[1])
+  let loc;
+  chop.forEach((item) => {
+    item.forEach((pair) => {
+      if(pair == 'Test') {
+        loc = chop.indexOf(item);
+      }
     })
+  });
+  chop.splice(loc,1);
 
-    return chop;
+  chop.forEach((pair, index) => {
+    Logger.log(`${pair[0]} -----> ${pair[1]}`)
+    OTHERSHEETS.data.getRange(106+index,2,1,1).setValue(pair[0])
+    OTHERSHEETS.data.getRange(106+index,3,1,1).setValue(pair[1])
+  })
+
+  return chop;
 
 }
 
-const CalculateDistributionTwo = () => {
+/**
+ * Calculate Distribution of projects.
+ */
+const CalculateDistribution = () => {
   let count = {};
   let userList = [];
   for(const [name, sheet] of Object.entries(SHEETS)) { 
     let users = sheet.getRange(3, 10, sheet.getLastRow(), 1).getValues();
     users = [].concat(...users);
     users.forEach( user => {
-      if(user != null || user != undefined || user != "" || user != " " || user != "Test" || user != "FORMULA ROW") {
+      if(user!= null || user != undefined || user != "" || user != " " || user != "Test" || user != "FORMULA ROW") {
         userList.push(user);
       }
     })
@@ -268,17 +222,78 @@ const CalculateDistributionTwo = () => {
     return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
   }, {});
   let items = Object.keys(occurrences).map((key) => {
-    if (key != "" || key != undefined || key != null) {
+    if (key != "" || key != undefined || key != null || key != " ") {
       return [key, occurrences[key]];
     }
   });
   items.sort((first, second) => {
     return second[1] - first[1];
   });
+  items.splice(0,1);
   Logger.log(items);
   return items;  
 }
 
+
+/**
+ * Count Types of Users
+ */
+const CountTypes = () => {
+  let userList = [];
+  for(const [name, sheet] of Object.entries(SHEETS)) { 
+    if(sheet.getName() != SHEETS.advancedlab.getName()) {
+      let types = sheet.getRange(3, 24, sheet.getLastRow(), 1).getValues();
+      types = [].concat(...types);
+      types.forEach( type => {
+        if(type !== null || type !== undefined || type !== "" || type !== " " || type !== "Test" || type !== "FORMULA ROW") {
+          userList.push(type);
+        }
+      })
+    }
+  }
+  let adv = SHEETS.advancedlab.getRange(3, 27, SHEETS.advancedlab.getLastRow() -1, 1).getValues();
+  adv = [].concat(...adv);
+  adv.forEach(item => userList.push(item));
+
+  let occurrences = userList.reduce( (acc, curr) => {
+    return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+  }, {});
+  let items = Object.keys(occurrences).map((key) => {
+    if (key != "" || key != undefined || key != null || key != " ") {
+      return [key, occurrences[key]];
+    }
+  });
+  items.sort((first, second) => {
+    return second[1] - first[1];
+  });
+  items.splice(0,1);
+  Logger.log(items);
+  
+  return items;  
+}
+const PrintTypesCount = () => {
+  let indexes = [];
+  let types = CountTypes();
+  types.forEach(type => {
+    let name = type[0];
+    indexes.push(TYPES.indexOf(name));
+  })
+  let missingTypes = [];
+  TYPES.forEach(type => missingTypes.push(type));
+
+  let temp1 = []
+  types.forEach(item => temp1.push(item[0]));
+
+  let nums = FindMissingElementsInArrays(temp1, missingTypes);
+  nums.forEach(index => missingTypes.splice(index, 1));
+  missingTypes.forEach(item => types.push([item, 0]));
+  Logger.log(types);
+  types.forEach( (item, index) => {
+    OTHERSHEETS.data.getRange(45 + index, 2, 1, 1).setValue(item[0]);
+    OTHERSHEETS.data.getRange(45 + index, 3, 1, 1).setValue(item[1]);
+  })
+  return types;
+}
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -286,104 +301,59 @@ const CalculateDistributionTwo = () => {
  * Writes the distribution to a sheet, and returns the top ten most active users
  * @returns {[string]} names
  */
-var CalcDistributionByID = () => {
-    let sheets = {
-        'Ultimaker' : SHEETS.ultimaker.getRange(2, 9, SHEETS.ultimaker.getLastRow() -1, 3).getValues(),
-        'Laser Cutter' : SHEETS.laser.getRange(2, 9, SHEETS.laser.getLastRow() -1, 3).getValues(),
-        'Fablight' : SHEETS.fablight.getRange(2, 9, SHEETS.fablight.getLastRow() -1, 3).getValues(),
-        'Waterjet' : SHEETS.waterjet.getRange(2, 9, SHEETS.waterjet.getLastRow() -1, 3).getValues(),
-        'Advanced Lab' : SHEETS.advancedlab.getRange(2, 9, SHEETS.advancedlab.getLastRow() -1, 3).getValues(),
-        'Shopbot' : SHEETS.shopbot.getRange(2, 9, SHEETS.shopbot.getLastRow() -1, 3).getValues(),
-        'Haas & Tormach' : SHEETS.haas.getRange(2, 9, SHEETS.haas.getLastRow() -1, 3).getValues(),
-        'Vinyl Cutter' : SHEETS.vinyl.getRange(2, 9, SHEETS.vinyl.getLastRow() -1, 3).getValues(),
-        'Othermill' : SHEETS.othermill.getRange(2, 9, SHEETS.othermill.getLastRow() -1, 3).getValues(),
-        'Other Tools' : SHEETS.othertools.getRange(2, 9, SHEETS.othertools.getLastRow() -1, 3).getValues(),
-    }
-
-    let ids = [];
-    let names = [];
-    let emails = [];
-
-    for (let [page, values] of Object.entries(sheets)) {
-        values.forEach( (item, index) => {          
-            let i = index + 2;
-            //Logger.log('Item : ' + item  + ', Index : ' + i); 
-
-            let email = item[0];
-            if(email !== null || email !== undefined || email != "") {
-                emails.push(email);
-            } 
-            
-
-            let name = item[1];
-            if(name !== null || name !== undefined || name != "") {
-                names.push(name);
-            }
-            
-
-            let id = item[2];
-            if(id !== null || id !== undefined || id != "" || id === typeof Number) {
-                ids.push(id.toString());
-            }
-                 
-        })
-    }
-    
-    let cleanedIDS = ids.filter(n => n)
-    Logger.log(cleanedIDS);
-    
-    
-    let distribution = {}, max = 0, result = [];
-
-    cleanedIDS.forEach(a => {
-        distribution[a] = (distribution[a] || 0) + 1;
-        if (distribution[a] > max) {
-            max = distribution[a];
-            result = [a];
-            return;
+const CreateTopTenByID = () => {
+  let count = {};
+  let userList = [];
+  for(const [name, sheet] of Object.entries(SHEETS)) {
+    if(sheet.getName() != SHEETS.advancedlab.getName()) {
+      let users = sheet.getRange(3, 11, sheet.getLastRow() -1, 1).getValues();
+      users = [].concat(...users);
+      users.forEach( user => {
+        if(user!= null || user != undefined || user != "" || user != " " || user != "Test" || user != "FORMULA ROW") {
+          userList.push(user);
         }
-        if (distribution[a] === max) {
-            result.push(a);
-        }
-    });
-  
+      })
+    } 
+  }
+  let adv = SHEETS.advancedlab.getRange(3, 14, SHEETS.advancedlab.getLastRow() -1, 1).getValues();
+  adv = [].concat(...adv);
+  adv.forEach(id => {
+    if(id !== null || id !== undefined || id !== "" || id !== " " ) {
+      userList.push(id.toString());
+    }
+  })
 
-    //Fetch Top 10 Power Users
-    // Create items array
-    var items = Object.keys(distribution).map(key => {
-        return [key, distribution[key]];
-    });
+  let occurrences = userList.reduce( (acc, curr) => {
+    return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+  }, {});
+  let items = Object.keys(occurrences).map((key) => {
+    if (key != "" || key != undefined || key != null || key != " ") {
+      return [key, occurrences[key]];
+    }
+  });
+  items.sort((first, second) => {
+    return second[1] - first[1];
+  });
+  items.splice(0,1);
 
-    // Sort the array based on the second element
-    items.sort( (first, second) => {
-        return second[1] - first[1];
-    });
-    
-    // Create a new array with only the first 10 items and remove Tests
-    var chop = items.slice(0, 11);
+  // Fetch Top 10 Power Users
+  const chop = items.slice(0, 11);
+  Logger.log(chop);
 
-    //Match IDS to emails
-    let sortedEmails = [];
-    let studentList = OTHERSHEETS.approved.getRange('C2:C').getValues();
-    chop.forEach(async item => {
-        let index = studentList.findIndex(item[0]) + 2;
-        let email = OTHERSHEETS.approved.getRange('B' + index).getValue();
-        return await sortedEmails.push(email);
-    });
-
-    //Query Store and return how much spent
-    Logger.log(chop);
-    Logger.log(sortedEmails);
-    
-    let spending = [];
-    sortedEmails.forEach(async email => {
-        return await spending.push(GetShopifyCustomerByEmail(email).total_spent) 
-    });
-
-    Logger.log(spending);
-    
-    return chop;
-  
+  // Match ID with Email
+  let output = [];
+  chop.forEach(id => {
+    const finder = OTHERSHEETS.approved.createTextFinder(id[0]);
+    const search = finder.findNext();
+    if (search != null) {
+      let index = search.getRow();
+      Logger.log(`INDEX : ${index}`);
+      let email = OTHERSHEETS.approved.getRange(index, 2, 1, 1).getValue();
+      output.push([email, id[1]]);
+    }
+  })
+  Logger.log(output);
+  return output;
 }
 
 
@@ -395,28 +365,130 @@ var CalcDistributionByID = () => {
  * @returns {number} standard deviation
  */
 const CalculateStandardDeviation = () => {
-     
-    let people = [];
-    let d = OTHERSHEETS.backgrounddata.getRange('V2:V').getValues();
-    for(let i = 0; i < d.length; i++){ 
-        if(d[i] != '' && d[i] != null && d[i] != undefined && d[i] != ' ') {
-            people.push(d[i]); 
-        }
-    }
-    Logger.log(`People : ${people.toString()}`); 
-    
-    let n = people.length;
-    Logger.log(`n = ${n}`);
-    
-    let mean = people.reduce((a, b) => a + b) / n;
-    Logger.log(`Mean = ${mean}`);
+  const distribution = CalculateDistribution();
+  let n = distribution.length;
+  Logger.log(`n = ${n}`);
 
-    let standardDeviation = Math.sqrt(people.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-    Logger.log(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
-    return standardDeviation;
+  let values = [];
+  distribution.forEach(person => values.push(person[1]))
+  Logger.log(values)
+  let mean = values.reduce((a, b) => a + b) / n;
+  Logger.log(`Mean = ${mean}`);
+
+  let standardDeviation = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+  Logger.log(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
+  return standardDeviation;
 }
 
 
+/**
+ * Arithmetic Mean
+ */
+const CalculateArithmeticMean = () => {
+  const distribution = CalculateDistribution();
+  let n = distribution.length;
+  Logger.log(`n = ${n}`);
+
+  let values = [];
+  distribution.forEach(person => values.push(person[1]))
+  Logger.log(values)
+  let mean = values.reduce((a, b) => a + b) / n;
+  Logger.log(`Mean = ${mean}`);
+
+  return mean;
+}
+const PrintStatistics = () => {
+  const mean = CalculateArithmeticMean();
+  OTHERSHEETS.data.getRange(102, 3, 1, 1).setValue(mean);
+  const stand = CalculateStandardDeviation();
+  OTHERSHEETS.data.getRange(103, 3, 1, 1).setValue(stand);
+}
+
+
+/**
+ * Count Tiers
+ */
+const CountTiers = () => {
+  let tiers = OTHERSHEETS.approved.getRange(3, 4, OTHERSHEETS.approved.getLastRow() -2, 1).getValues();
+  tiers = [].concat(...tiers);
+
+  let occurrences = tiers.reduce( (acc, curr) => {
+    return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+  }, {});
+  
+  let items = Object.keys(occurrences).map((key) => {
+    if (key !== "" || key !== undefined || key !== null || key !== " ") {
+      return [key, occurrences[key]];
+    }
+  });
+  // Logger.log(items);
+  return items;  
+}
+const PrintTiers = () => {
+  const tiers = CountTiers();
+  tiers.forEach( (tier, index) => {
+    OTHERSHEETS.data.getRange(39 + index, 3, 1, 1).setValue(tier[1]);
+    Logger.log(tier)
+  });
+}
+
+/**
+ * Print the Turnaround Times 
+ */
+const PrintTurnaroundTimes = () => {
+  let data = [];
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    data.push([`${sheet.getName()} Turnaround`, CalculateAverageTurnaround(sheet)]);
+  }
+  data.forEach( (entry, index) => {
+    OTHERSHEETS.data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
+    OTHERSHEETS.data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
+  })
+}
+
+/**
+ * Count Statuses
+ */
+const CountStatuses = () => {
+  let statuses = [];
+  for(const [name, sheet] of Object.entries(SHEETS)) { 
+    let stats = sheet.getRange(2, 1, sheet.getLastRow(), 1).getValues();
+    stats = [].concat(...stats);
+    stats.forEach( status => statuses.push(status));
+  }
+  let occurrences = statuses.reduce( (acc, curr) => {
+    return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+  }, {});
+  let items = Object.keys(occurrences).map((key) => {
+    if (key != "" || key != undefined || key != null || key != " ") {
+      return [key, occurrences[key]];
+    }
+  });
+  items.sort((first, second) => {
+    return second[1] - first[1];
+  });
+  items.splice(0,1);
+  Logger.log(items);
+  
+  return items; 
+}
+const PrintStatusCounts = () => {
+  let data = CountStatuses();
+  let completed = 0;
+  let cancelled = 0;
+  let inprogress = 0;
+  data.forEach( status => {
+    if(status[0] == STATUS.completed || status[0] == STATUS.billed || status[0] == STATUS.closed || status[0] == STATUS.pickedUp) {
+      completed += status[1];
+    }
+    if(status[0] == STATUS.cancelled) cancelled += status[1];
+    if(status[0] == STATUS.inProgress) inprogress += status[1];
+  })
+  OTHERSHEETS.data.getRange(8, 3, 1, 1).setValue(completed);
+  OTHERSHEETS.data.getRange(9, 3, 1, 1).setValue(cancelled);
+  OTHERSHEETS.data.getRange(10, 3, 1, 1).setValue(inprogress);
+  Logger.log(completed);
+}
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -424,50 +496,19 @@ const CalculateStandardDeviation = () => {
  * Used to Calculate Average Turnaround times and write to 'Data/Metrics' sheet
  */
 const Metrics = () => {
-    try {
-        //Return Averages to Metrics beginning at cell D26 
-        let metricsTab = OTHERSHEETS.data;
-
-        let laserSheet = SHEETS.laser; //Laser Sheet
-        metricsTab.getRange('D26').setValue(CalculateAverageTurnaround(laserSheet));
-
-        let ultimakerSheet = SHEETS.ultimaker; //Ultimaker Sheet
-        metricsTab.getRange('D27').setValue(CalculateAverageTurnaround(ultimakerSheet));
-
-        let fablightSheet = SHEETS.fablight; //Fablight Sheet
-        metricsTab.getRange('D28').setValue(CalculateAverageTurnaround(fablightSheet));
-
-        let omaxSheet = SHEETS.waterjet; //Waterjet Sheet
-        metricsTab.getRange('D29').setValue(CalculateAverageTurnaround(omaxSheet));
-
-        let advLabSheet = SHEETS.advancedlab; //Advanced Lab Sheet 
-        metricsTab.getRange('D30').setValue(CalculateAverageTurnaround(advLabSheet));
-
-        let shopbotSheet = SHEETS.shopbot; //Shopbot Sheet
-        metricsTab.getRange('D31').setValue(CalculateAverageTurnaround(shopbotSheet));
-
-        let haasSheet = SHEETS.haas; //Haas Sheet 
-        metricsTab.getRange('D32').setValue(CalculateAverageTurnaround(haasSheet));
-
-        let vinylSheet = SHEETS.vinyl; //Vinyl Sheet
-        metricsTab.getRange('D33').setValue(CalculateAverageTurnaround(vinylSheet));
-
-        let othermillSheet = SHEETS.othermill; //Othermill Sheet
-        metricsTab.getRange('D34').setValue(CalculateAverageTurnaround(othermillSheet));
-
-        let creaformSheet = SHEETS.creaform; //Creaform Sheet
-        metricsTab.getRange('D35').setValue(CalculateAverageTurnaround(creaformSheet));
-
-        let otherSheet = SHEETS.othertools; //Other Sheet
-        metricsTab.getRange('D36').setValue(CalculateAverageTurnaround(otherSheet));
-
-        let plotter = SHEETS.plotter; //Plotter Sheet
-        metricsTab.getRange('D37').setValue(CalculateAverageTurnaround(plotter));
-        Logger.log('Recalculated Metrics');
-    }
-    catch (err) {
-        Logger.log(`${err} : Couldnt generate statistics on Metrics.`);
-    }
+  try {
+    Logger.log(`Calculating Metrics .....`)
+    PrintTiers();
+    PrintStatusCounts();
+    PrintStatistics();
+    PrintTypesCount();
+    PrintSubmissionData();
+    PrintTurnaroundTimes();
+    Logger.log(`Recalculated Metrics`);
+  }
+  catch (err) {
+    Logger.log(`${err} : Couldn't generate statistics on Metrics.`);
+  }
 
 }
 

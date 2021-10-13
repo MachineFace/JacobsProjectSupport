@@ -615,7 +615,7 @@ const onChange = async (e) => {
     await Metrics();
     Logg(`Recalculated Metrics tab.`);
 
-    var topten = await CalculateDistribution();
+    var topten = await CreateTopTen();
     if (topten.length >= 10) {
       for (var i = 0; i < 10; i++) {
         let thisRow = 106 + i;
