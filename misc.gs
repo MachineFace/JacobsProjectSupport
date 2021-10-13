@@ -11,11 +11,9 @@
  * @returns {int} index
  */
 const Search = (values, searchString) => {
-  for (let i = 0; i < values.length; i++) {
-    if (values[i][0] == searchString) {
-      return i;
-    }
-  }
+  values.forEach( (value, index) => {
+    if(value[0] == searchString) return index;
+  })
 };
 
 
@@ -182,16 +180,16 @@ const CreateTimeDrivenTrigger = () => {
 const RemoveTimedTriggers = () => {
   let triggers = ScriptApp.getProjectTriggers();
   try {
-    for (var i = 0; i < triggers.length; i++) {
-      if (triggers[i].getEventType() == ScriptApp.EventType.ON_EDIT)
-        Logger.log(`OnEdit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
-      if (triggers[i].getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
-        Logger.log(`OnFormSubmit Trigger : ${triggers[i].getUniqueId()}`); //KEEP THIS TRIGGER
-      if (triggers[i].getEventType() == ScriptApp.EventType.CLOCK) {
-        Logger.log(`TimeBased Trigger : ${triggers[i].getUniqueId()}`);
-        ScriptApp.deleteTrigger(triggers[i]);
+    triggers.forEach( trigger => {
+      if (trigger.getEventType() == ScriptApp.EventType.ON_EDIT)
+        Logger.log(`OnEdit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+      if (trigger.getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
+        Logger.log(`OnFormSubmit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+      if (trigger.getEventType() == ScriptApp.EventType.CLOCK) {
+        Logger.log(`TimeBased Trigger : ${trigger.getUniqueId()}`);
+        ScriptApp.deleteTrigger(trigger);
       }
-    }
+    })
     Logger.log(`Removed Triggers for Summary Emails`);
   } catch (err) {
     Logger.log(`${err} : Couldnt remove triggers for whatever reason.`);
@@ -287,91 +285,6 @@ const FindDataInRow = (sheet, data) => {
 };
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Recolors a single row on a sheet based on 'Status' ***DEFUNCT***
- * @param {row} wholerow
- */
-const Recolor = (wholerow, status, shippingQuestion) => {
-  try {
-    switch (shippingQuestion) {
-      case "Yes":
-        wholerow.setFontColor(null); //unset
-        wholerow.setFontColor("#3c78d8"); //Dark blue
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#cfe2f3"); //Light Blue
-        break;
-      case "No":
-        wholerow.setFontColor(null); //unset
-        wholerow.setBackground(null); //Unset previous color
-        break;
-      default:
-        break;
-    }
-
-    switch (status) {
-      case "Received":
-        wholerow.setFontColor(null); //unset
-        wholerow.setFontColor("#00785A"); //Dark mint
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#30E6B4"); //Light mint
-        break;
-      case "Pending Approval":
-        wholerow.setFontColor(null); //unset
-        wholerow.setFontColor("#f1c232"); //Dark Yellow
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#fff2cc"); //Light yellow
-        break;
-      case "In-Progress":
-        wholerow.setFontColor(null); //unset
-        wholerow.setFontColor("#38761d"); //green
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#d9ead3"); //Light green
-        break;
-      case "Completed":
-        wholerow.setFontColor(null); //Unset previous color
-        wholerow.setFontColor("#7D7D7D"); //Gray
-        wholerow.setBackground(null); //unset
-        break;
-      case "CLOSED":
-      case "Billed":
-        wholerow.setFontColor(null); //unset
-        wholerow.setFontColor("#999999"); //Dark Gray
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#efefef"); //Light Grey
-        break;
-      case "Cancelled":
-        wholerow.setFontColor(null); //unset
-        wholerow.setFontColor("#9900ff"); //Purple
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#d9d2e9"); //Light purple
-        break;
-      case "FAILED":
-        wholerow.setFontColor(null); //unset
-        wholerow.setFontColor("#ff0000"); //Red
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#e6b8af"); //Light red
-        break;
-      case "Waitlist":
-      case "Missing Access":
-        wholerow.setFontColor(null); //Unset previous color
-        wholerow.setFontColor("#ff9900"); //Orange
-        wholerow.setBackground(null); //unset
-        wholerow.setBackground("#fce5cd"); //Light orange
-        break;
-      case undefined:
-        wholerow.setFontColor(null); //Unset Color
-        wholerow.setBackground(null); //Unset previous color
-        break;
-      default:
-        wholerow.setFontColor(null); //Unset Color
-        wholerow.setBackground(null); //Unset previous color
-        break;
-    }
-  } catch (err) {
-      Logg(`${err} : Cant change row color for some reason. `);
-  }
-};
 
 
 /**
