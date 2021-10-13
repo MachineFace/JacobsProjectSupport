@@ -76,7 +76,16 @@ const CalculateAverageTurnaround = (sheet) => {
   let formatted = dys + 'd ' + hrs + 'h ' + minutesAsString + "m";
   return formatted;
 }
-
+const PrintTurnaroundTimes = () => {
+  let data = [];
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    data.push([`${sheet.getName()} Turnaround`, CalculateAverageTurnaround(sheet)]);
+  }
+  data.forEach( (entry, index) => {
+    OTHERSHEETS.data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
+    OTHERSHEETS.data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
+  })
+}
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -432,19 +441,7 @@ const PrintTiers = () => {
   });
 }
 
-/**
- * Print the Turnaround Times 
- */
-const PrintTurnaroundTimes = () => {
-  let data = [];
-  for(const [key, sheet] of Object.entries(SHEETS)) {
-    data.push([`${sheet.getName()} Turnaround`, CalculateAverageTurnaround(sheet)]);
-  }
-  data.forEach( (entry, index) => {
-    OTHERSHEETS.data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
-    OTHERSHEETS.data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
-  })
-}
+
 
 /**
  * Count Statuses

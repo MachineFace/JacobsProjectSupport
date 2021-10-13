@@ -245,20 +245,20 @@ const onSubmission = async (e) => {
  * @param {Event} e
  */
 const onChange = async (e) => {
-  //Fetch Data from Sheets
+  // Fetch Data from Sheets
   var ss = e.range.getSheet();
   var spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
   var thisSheet = spreadSheet.getActiveSheet();
 
-  //Fetch Columns and rows and check validity
+  // Fetch Columns and rows and check validity
   var thisCol = e.range.getColumn();
   var thisRow = e.range.getRow();
 
-  //Skip the first 2 rows of data.
+  // Skip the first 2 rows of data.
   if (thisRow <= 1) return;
 
   //----------------------------------------------------------------------------------------------------------------
-  //Add link to DS List
+  // Add link to DS List
   var stafflist = OTHERSHEETS.staff;
   var sLink = stafflist.getRange(thisRow, 4).getValue();
   if (thisRow > 2) {
@@ -269,7 +269,7 @@ const onChange = async (e) => {
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  //Count Active Users & Post to a cell / Fetch top 10
+  // Count Active Users & Post to a cell / Fetch top 10
   var users = await CountActiveUsers();
   OTHERSHEETS.data.getRange("C4").setValue(users);
 
