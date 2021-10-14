@@ -491,6 +491,33 @@ const PrintStatusCounts = () => {
   Logger.log(completed);
 }
 
+const AdvancedLabCounts = () => {
+  let userList = [];
+
+  let range = SHEETS.advancedlab.getRange(3, 5, SHEETS.advancedlab.getLastRow() -1, 1).getValues();
+  range = [].concat(...range);
+  let printers = []
+  printers = range.filter(Boolean);
+
+  let occurrences = printers.reduce( (acc, curr) => {
+    return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+  }, {});
+  let items = Object.keys(occurrences).map((key) => {
+    if (key != "" || key != undefined || key != null || key != " ") {
+      return [key, occurrences[key]];
+    }
+  });
+  items.sort((first, second) => {
+    return second[1] - first[1];
+  });
+  // items.splice(0,1);
+  Logger.log(range)
+  Logger.log(items);
+  
+  // return items;  
+}
+
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Metrics - DO NOT DELETE

@@ -444,6 +444,53 @@ const CheckMissingAccessStudents = () => {
 };
 
 
+const CheckMissingAccessStudents2 = () => {
+  let accessPool = [];
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    let range = sheet.getRange(2, 3, sheet.getLastRow() -1, 1).getValues();
+    range = [].concat(...range);
+    accessPool.push([sheet.getName(), range]);
+  }
+  let emails = [];
+  let names = [];
+  accessPool.forEach( sheet => {
+    sheet[1].forEach( (item, index) => {
+      if (item == "STUDENT NOT FOUND!") {
+        let i = index + 2;
+        let email = SpreadsheetApp.getActiveSpreadsheet()
+          .getSheetByName(sheet[0])
+          .getRange(i, 9, 1, 1)
+          .getValue()
+          .toString();
+        emails.push(email);
+        let sid = SpreadsheetApp.getActiveSpreadsheet()
+          .getSheetByName(sheet[0])
+          .getRange(i, 11, 1, 1)
+          .getValue()
+          .toString();
+        let name = SpreadsheetApp.getActiveSpreadsheet()
+          .getSheetByName(sheet[0])
+          .getRange(i, 10, 1, 1)
+          .getValue()
+          .toString();
+        names.push(name);
+
+        let priority = GetPriorityWithEmailOrSID(email, sid);
+        SpreadsheetApp.getActiveSpreadsheet()
+          .getSheetByName(sheet[0])
+          .getRange(i, 3, 1, 1)
+          .setValue(priority);
+      }
+    })
+  })
+
+  Logger.log(emails);
+  Logger.log(names);
+
+  //Return the names of the missing students
+  return names;
+};
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  *
