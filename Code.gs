@@ -76,8 +76,7 @@ const onSubmission = async (e) => {
   Logg(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
 
   //Generate new Job number
-  var jobnumber = await CreateJobNumber(timestamp);
-  //sheet.getRange("F" + lastRow).setValue(jobnumber);
+  const jobnumber = await new JobNumberGenerator(timestamp).Create();
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
   //Check Priority
@@ -223,7 +222,7 @@ const onSubmission = async (e) => {
   }
 
   //Check again
-  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : CreateJobNumber(timestamp);
+  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator(timestamp).Create();
   //sheet.getRange("F" + lastRow).setValue(jobnumber);
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
   
@@ -259,19 +258,14 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Add link to DS List
-  var stafflist = OTHERSHEETS.staff;
-  var sLink = stafflist.getRange(thisRow, 4).getValue();
+  const sLink = OTHERSHEETS.staff.getRange(thisRow, 4).getValue();
   if (thisRow > 2) {
-    if ( sLink == undefined || sLink == null || (sLink == "" && stafflist.getRange(thisRow, 3).getValue() != "") ) {
-      var l = MakeLink(stafflist.getRange(thisRow, 3).getValue());
-      stafflist.getRange(thisRow, 4).setValue(l);
+    if ( sLink == undefined || sLink == null || (sLink == "" && OTHERSHEETS.staff.getRange(thisRow, 3).getValue() != "") ) {
+      const l = MakeLink(OTHERSHEETS.staff.getRange(thisRow, 3).getValue());
+      OTHERSHEETS.staff.getRange(thisRow, 4).setValue(l);
     }
   }
-
-  //----------------------------------------------------------------------------------------------------------------
-  // Count Active Users & Post to a cell / Fetch top 10
-  var users = await CountActiveUsers();
-  OTHERSHEETS.data.getRange("C4").setValue(users);
+  
 
   //----------------------------------------------------------------------------------------------------------------
   //Ignore Edits on background sheets like Logger and StoreItems - NICE!! /CG
@@ -301,7 +295,7 @@ const onChange = async (e) => {
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  //Check Priority
+  // Check Priority
   // let tempEmail = ss.getRange(thisRow, 9).getValue();
   // let tempSID = ss.getRange(thisRow, 11).getValue();
   let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
@@ -315,8 +309,8 @@ const onChange = async (e) => {
       setByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
 
-  //STATUS CHANGE TRIGGER
-  //Only look at Column 1 for email trigger.... Also 52 is live.
+  // STATUS CHANGE TRIGGER
+  // Only look at Column 1 for email trigger.... Also 52 is live.
   if (thisCol > 1 && thisCol != 3 && thisCol != 52) return;
 
   //----------------------------------------------------------------------------------------------------------------
@@ -339,23 +333,23 @@ const onChange = async (e) => {
   //Materials
   const material1Quantity = getByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
   const material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
-  const material1URL = await new LookupProductID(material1Name).link;
+  const material1URL = LookupProductID(material1Name).link;
 
   const material2Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
   const material2Name = getByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
-  const material2URL = await new LookupProductID(material2Name).link;
+  const material2URL = LookupProductID(material2Name).link;
 
   const material3Quantity = getByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
   const material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
-  const material3URL = new LookupProductID(material3Name).link;
+  const material3URL = LookupProductID(material3Name).link;
 
   const material4Quantity = getByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
   const material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
-  const material4URL = new LookupProductID(material4Name).link;
+  const material4URL = LookupProductID(material4Name).link;
 
   const material5Quantity = getByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
   const material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
-  const material5URL = new LookupProductID(material5Name).link;
+  const material5URL = LookupProductID(material5Name).link;
 
   if (material1Name != "") var mat1 = true;
   else mat1 = false;
@@ -374,8 +368,8 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   //Fix Job Number if it's missing
   try {
-    if (status == "Received" || status == "In-Progress") {
-      jobnumber = jobnumber ? jobnumber : CreateJobNumber(submissiontime);
+    if (status == STATUS.received || status == STATUS.inProgress) {
+      jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).Create();
       //ss.getRange(thisRow, 6).setValue(jobnumber);
       setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
       Logg(`Job Number was missing, so the script fixed it. Submission by ${email}`);
@@ -419,7 +413,7 @@ const onChange = async (e) => {
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  //Trigger for generating a "Ticket"
+  // Trigger for generating a "Ticket"
   if ( status == STATUS.received || status == STATUS.inProgress || status == STATUS.pendingApproval ) {
     try {
       var Ticket = await CreateTicket(
@@ -609,21 +603,10 @@ const onChange = async (e) => {
       break;
   }
 
-
   //Lastly Run these Metrics ignoring first 2 rows:
   if (thisRow > 3) {
     await Metrics();
     Logg(`Recalculated Metrics tab.`);
-
-    var topten = await CreateTopTen();
-    if (topten.length >= 10) {
-      for (var i = 0; i < 10; i++) {
-        let thisRow = 106 + i;
-        OTHERSHEETS.data.getRange("B" + thisRow).setValue(topten[i]);
-        OTHERSHEETS.data.getRange("C" + thisRow).setValue(topten[i][1]);
-      }
-    }
-    Logg(`Recalculated Top 10 Distribution.`);
   }
 };
 //END OF OnEdit
@@ -652,41 +635,41 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
 
     let sendloc = "16oCqmnW9zCUhpQLo3TXsaUSxDcSv7aareEVSE9zYtVQ";
     let destination = approvalForm.setDestination( FormApp.DestinationType.SPREADSHEET, sendloc );
-    //Form Setup
-    approvalForm.setTitle(`Approval Form`);
-    approvalForm.setDescription(`Referrence Number: ${jobnumber}`);
-    approvalForm.setConfirmationMessage(`Thanks for responding!`);
-    approvalForm.setAllowResponseEdits(false);
-    approvalForm.setAcceptingResponses(true);
+    // Form Setup
+    approvalForm.setTitle(`Approval Form`)
+      .setDescription(`Referrence Number: ${jobnumber}`)
+      .setConfirmationMessage(`Thanks for responding!`)
+      .setAllowResponseEdits(false)
+      .setAcceptingResponses(true);
 
     //Ask Questions
     if (cost == "" || cost == undefined || cost == 0) {
       Logg(`Approval form: No known cost. cost = ${cost}`);
-      let item = approvalForm.addMultipleChoiceItem().setRequired(true);
-      item.setTitle(`For this job, the cost of materials was not specified. 
-              Please speak with a Design Specialist if you have questions. 
-              Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`);
-      item.setChoices([
-        item.createChoice(`Yes, I approve.`),
-        item.createChoice(`No. I reject.`),
-      ]);
+      let item = approvalForm.addMultipleChoiceItem().setRequired(true)
+        .setTitle(`For this job, the cost of materials was not specified. 
+          Please speak with a Design Specialist if you have questions. 
+          Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`)
+        .setChoices([
+          item.createChoice(`Yes, I approve.`),
+          item.createChoice(`No. I reject.`),
+        ]);
     } else {
       let costFormatted = Utilities.formatString("$%.2f", cost);
       Logg(`Approval form: Known cost. cost = ${costFormatted}`);
-      let item = approvalForm.addMultipleChoiceItem().setRequired(true);
-      item.setTitle(`For this job, the cost of materials is estimated to be: ${costFormatted}. 
-            Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`);
-      item.setChoices([
-        item.createChoice(`Yes, I approve.`),
-        item.createChoice(`No. I reject.`),
-      ]);
+      let item = approvalForm.addMultipleChoiceItem().setRequired(true)
+        .setTitle(`For this job, the cost of materials is estimated to be: ${costFormatted}. 
+          Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`)
+        .setChoices([
+          item.createChoice(`Yes, I approve.`),
+          item.createChoice(`No. I reject.`),
+        ]);
     }
-    let item2 = approvalForm.addMultipleChoiceItem().setRequired(true);
-    item2.setTitle(`Please select your name below.`);
-    item2.setChoices([item2.createChoice(name)]);
-    let item3 = approvalForm.addMultipleChoiceItem().setRequired(true);
-    item3.setTitle(`Please select the job number below.`);
-    item3.setChoices([item3.createChoice(jobnumber)]);
+    let item2 = approvalForm.addMultipleChoiceItem().setRequired(true)
+      .setTitle(`Please select your name below.`)
+      .setChoices([item2.createChoice(name)]);
+    let item3 = approvalForm.addMultipleChoiceItem().setRequired(true)
+      .setTitle(`Please select the job number below.`)
+      .setChoices([item3.createChoice(jobnumber)]);
     let approvalURL = approvalForm.getPublishedUrl();
     Logg(`Created an Approval Form for the student.`);
   } catch (err) {
@@ -694,10 +677,10 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
   }
 
   try {
-    //Set folder
+    // Set folder
     let folder = DriveApp.getFoldersByName(`Job Forms`);
 
-    //Remove File from root and Add that file to a specific folder
+    // Remove File from root and Add that file to a specific folder
     let id = approvalForm.getId();
     let docFile = DriveApp.getFileById(id);
   } catch (err) {
@@ -708,8 +691,8 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
     folder.next().addFile(docFile);
 
     //Set permissions to 'anyone can edit' for that file
-    let file = DriveApp.getFileById(id);
-    file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
+    DriveApp.getFileById(id)
+      .setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
   } catch (err) {
     Logg(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
   }
@@ -719,225 +702,10 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
 
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Generate new Job number from a date
- * @param {time} date
- * @return {number} job number
- */
-var CreateJobNumber = (date) => {
-  //var date = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Ultimaker').getRange('H135').getValue();
-  //date = SHEETS.othertools.getRange('G7').getValue();
-
-  //Check that it's a date
-  let testedDate = isValidDate(date);
-
-  let jobnumber;
-  try {
-    if ( date == undefined || date == null || date == "" || testedDate == false ) {
-      jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
-      Logg(`Set Jobnumber to a new time because timestamp was missing.`);
-    } else {
-      jobnumber = +Utilities.formatDate(date, `PST`, `yyyyMMddhhmmss`);
-      Logg(`Input time: ${date}, Set Jobnumber: ${jobnumber}`);
-    }
-  } catch (err) {
-    Logg(`${err} : Couldnt fix jobnumber.`);
-  }
-  if (jobnumber == undefined || testedDate == false) {
-    jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
-  }
-  Logger.log(`Returned Job Number: ${jobnumber}`);
-  return jobnumber.toString();
-};
 
 
 
 
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Create a Ticket to Print
- * @param {Event} e
- * @param {string} designspecialist
- * @param {bool} priority
- * @param {number} jobnumber
- * @param {time} submissiontime
- * @param {string} name
- * @param {number} sid
- * @param {string} email
- * @param {string} projectname
- * @param {number} material1Quantity
- * @param {string} material1Name
- * @param {number} material2Quantity
- * @param {string} material2Name
- * @param {bool} shippingQuestion
- * @returns {doc} doc
- */
-var CreateTicket = (
-  designspecialist,
-  priority,
-  jobnumber,
-  submissiontime,
-  name,
-  sid,
-  email,
-  projectname,
-  material1Quantity,
-  material1Name,
-  material2Quantity,
-  material2Name,
-  shippingQuestion
-) => {
-  //Create Doc
-  try {
-    var folder = DriveApp.getFoldersByName(`Job Tickets`); //Set the correct folder
-    var doc = DocumentApp.create(`Job Ticket`); //Make Document
-    var body = doc.getBody();
-    var docId = doc.getId();
-  } catch (err) {
-    Logg( `${err} : Could not fetch doc folder, or make ticket, or get body or docId.` );
-  }
-
-  try {
-    var barcode = GenerateBarCode(jobnumber);
-  } catch (err) {
-    Logger.log(`${err} : Couldnt create barcode for some reason.`);
-  }
-  try {
-    var qrCode = GenerateQRCode(doc.getUrl());
-  } catch (err) {
-    Logger.log(`${err} : Couldnt create QRCode for some reason.`);
-  }
-
-  //Parse for Individual Sheets
-  var sheetname = SpreadsheetApp.getActiveSheet().getSheetName();
-  var thisRow = SpreadsheetApp.getActiveSheet().getActiveRange().getRow();
-
-  var thisSheet;
-  var mat = [];
-  var partcount = [];
-  var notes = [];
-  if (sheetname == "Ultimaker") {
-    thisSheet = SHEETS.ultimaker;
-    mat.push( "Needs Breakaway Removed:", thisSheet.getRange("AD" + thisRow).getValue().toString());
-    partcount.push( "Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString());
-    notes.push( "Notes:", thisSheet.getRange("AE" + thisRow).getValue().toString());
-  }
-  if (sheetname == "Laser Cutter") {
-    thisSheet = SHEETS.laser;
-    mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
-    partcount.push("Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString() );
-    notes.push( "Notes:", thisSheet.getRange("AC" + thisRow).getValue().toString() );
-  }
-  if (sheetname == "Fablight") {
-    thisSheet = SHEETS.fablight;
-    mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
-    partcount.push( "Part Count:", thisSheet.getRange("AB" + thisRow).getValue().toString() );
-    notes.push( "Notes:", thisSheet.getRange("AC" + thisRow).getValue().toString() );
-  }
-  if (sheetname == "Waterjet") {
-    thisSheet = SHEETS.waterjet;
-    mat.push( "Rough Dimensions:", thisSheet.getRange("AA" + thisRow).getValue().toString() );
-    partcount.push( "Part Count:", thisSheet.getRange("AB" + thisRow).getValue().toString() );
-    notes.push( "Notes:", thisSheet.getRange("AD" + thisRow).getValue().toString() );
-  }
-  if (sheetname == "Advanced Lab") {
-    thisSheet = SHEETS.advancedlab;
-    mat.push( "Which Printer:", thisSheet.getRange("Z" + thisRow).getValue().toString() );
-    partcount.push( "Part Count:", thisSheet.getRange("Y" + thisRow).getValue().toString() );
-    notes.push( "Notes:", thisSheet.getRange("AJ" + thisRow).getValue().toString() );
-  } else {
-    mat.push("Materials: ", "");
-    partcount.push("Part Count: ", "1");
-    notes.push("Notes: ", "None");
-  }
-
-  //Append Document with Info
-  if (doc != undefined || doc != null || doc != NaN) {
-    try {
-      let header = doc
-        .addHeader()
-        .appendTable([[`img1`, `img2`]])
-        .setAttributes({
-          [DocumentApp.Attribute.BORDER_WIDTH]: 0,
-          [DocumentApp.Attribute.BORDER_COLOR]: `#ffffff`,
-        });
-      ReplaceTextToImage(header, `img1`, barcode);
-      ReplaceTextToImage(header, `img2`, qrCode);
-
-      body.insertHorizontalRule(0);
-      body.insertParagraph(1, "Name: " + name.toString())
-        .setHeading(DocumentApp.ParagraphHeading.HEADING1)
-        .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 18,
-          [DocumentApp.Attribute.BOLD]: true,
-        });
-      body.insertParagraph(2, "Job Number: " + +jobnumber.toString())
-        .setHeading(DocumentApp.ParagraphHeading.HEADING2)
-        .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 12,
-          [DocumentApp.Attribute.BOLD]: true,
-        });
-
-      //body.appendImage(barcode).setAltTitle("Barcode");
-      //body.appendImage(qrCode).setAltTitle("QRCode");
-
-      // Create a two-dimensional array containing the cell contents.
-      body.appendTable([
-          ["Design Specialist:", designspecialist.toString()],
-          ["Job Number:", jobnumber.toString()],
-          ["Student Name:", name.toString()],
-          ["Project Name:", projectname.toString()],
-          ["Materials:", material1Name.toString()],
-          [mat[0], mat[1]],
-          [partcount[0], partcount[1]],
-          [notes[0], notes[1]],
-        ])
-        .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 9,
-        });
-    } catch (err) {
-      Logg(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
-    }
-
-    //Remove File from root and Add that file to a specific folder
-    try {
-      var docFile = DriveApp.getFileById(docId);
-      DriveApp.removeFile(docFile);
-      folder.next().addFile(docFile);
-      folder.next().addFile(barcode);
-    } catch (err) {
-      Logg( `${err} : Couldn't delete the file from the drive folder. Sheet is still linked` );
-    }
-
-    //Set permissions to 'anyone can edit' for that file
-    try {
-      var file = DriveApp.getFileById(docId);
-      file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
-    } catch (err) {
-      Logg( `${err} : Couldn't change permissions on the file. You probably have to do something else to make it work.` );
-    }
-  }
-  //Return Document to use later
-  return doc;
-};
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Replace table entries with an Image blob
- * @param {DocumentApp.create(`doc`).getbody()} body
- * @param {string} text
- * @param {blob} image
- */
-const ReplaceTextToImage = (body, searchText, image) => {
-  var next = body.findText(searchText);
-  if (!next) return;
-  var r = next.getElement();
-  r.asText().setText("");
-  var img = r.getParent().asParagraph().insertInlineImage(0, image);
-  return next;
-};
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -946,7 +714,7 @@ const ReplaceTextToImage = (body, searchText, image) => {
  * @param {number} sid
  * @returns {number} priority number 1 - 4
  */
-var GetPriority = (sid) => {
+const GetPriority = (sid) => {
   //sid = 3035249023;  //test good sid
   //sid = 2323453444;//test bad sid
 
@@ -958,8 +726,7 @@ var GetPriority = (sid) => {
 
   let index = 0;
 
-  let last = OTHERSHEETS.approved.getLastRow() - 1;
-  let approvedList = OTHERSHEETS.approved.getRange(2, 3, last, 1).getValues(); //Column C3:C
+  let approvedList = OTHERSHEETS.approved.getRange(2, 3, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues(); //Column C3:C
 
   //Loop through SIDs to find a match and fetch priority number
   for (let i = 0; i < approvedList.length; i++) {
@@ -987,14 +754,13 @@ var GetPriority = (sid) => {
  * @param {string} email
  * @returns {number} priority number 1 - 4
  */
-var GetPriorityFromEmail = (email) => {
+const GetPriorityFromEmail = (email) => {
   //email = "saveritt@berkeley.edu";  //test good email
   //email = "some@thing.com";    //test bad email
 
   let priority;
 
-  let last = OTHERSHEETS.approved.getLastRow() - 1;
-  let approvedList = OTHERSHEETS.approved.getRange(2, 2, last, 1).getValues();
+  let approvedList = OTHERSHEETS.approved.getRange(2, 2, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues();
 
   //Loop through SIDs to find a match and fetch priority number
   for (let i = 0; i < approvedList.length; i++) {

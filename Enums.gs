@@ -91,7 +91,7 @@ const STATUS = {
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheets : Dictionary of key / value pair.
- * Example: Calling 'sheetDict.laser' returns value sheet.
+ * Example: Calling 'SHEETS.laser' returns value sheet.
  */
 const SHEETS = {
   laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
@@ -108,6 +108,10 @@ const SHEETS = {
   plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), //Plotter Sheet
 };
 
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Collection of Sheet : NOT TO BE ITERATED THROUGH
+ */
 const OTHERSHEETS = {
   summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Summary"),
   approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Student List DONOTDELETE"),
@@ -118,6 +122,11 @@ const OTHERSHEETS = {
   billing: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Billing"),
 }
 
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Collection of Sheet : NOT TO BE ITERATED THROUGH
+ */
 const STORESHEETS = {
   AdvLabStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('AdvLabStoreItems'),
   UltimakerStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UltimakerStoreItems'),
@@ -130,29 +139,13 @@ const STORESHEETS = {
   OthermillStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OthermillStoreItems'),
 };
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Collection of INTERNAL Sheets : Dictionary of key / value pair.
- * Example: Calling 'materialDict.laser' returns value materialSheet.
- */
-const materialDict = {
-    advlab:     SpreadsheetApp.getActiveSpreadsheet().getSheetByName("AdvLabStoreItems"),
-    ultimaker:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("UltimakerStoreItems"),
-    fablight:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("FablightStoreItems"),
-    haas:       SpreadsheetApp.getActiveSpreadsheet().getSheetByName("HaasTormachStoreItems"),
-    shopbot:    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ShopbotStoreItems"),
-    waterjet:   SpreadsheetApp.getActiveSpreadsheet().getSheetByName("WaterjetStoreItems"),
-    vinyl:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("VinylCutterStoreItems"),
-    laser:      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("LaserStoreItems"),
-    othermill:  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("OthermillStoreItems"),
-};
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Collection of Forms : Dictionary of key / value pair.
  * Example: Calling 'formDict.laser' returns value string.
  */
-const formDict = {
+const FORMS = {
     ultimaker: "1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8",
     laser: "1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w",
     fablight: "1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA",
@@ -167,6 +160,10 @@ const formDict = {
     plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
 };
 
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Collection of Student Types
+ */
 const TYPES = [
   "Researcher",
   "DES INV Faculty",

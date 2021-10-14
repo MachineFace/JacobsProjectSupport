@@ -2,8 +2,8 @@
  * Build HTML for MaterialMenu()
  */
 const BuildHTMLMenu = () => {
-  let last = materialDict.advlab.getLastRow() - 1;
-  let materialList = materialDict.advlab.getRange(2, 1, last, 1).getValues();
+  let last = STORESHEETS.AdvLabStoreItems.getLastRow() - 1;
+  let materialList = STORESHEETS.AdvLabStoreItems.getRange(2, 1, last, 1).getValues();
   Logger.log(materialList);
 
   let html = '<label for="Material 1">Choose a Material:</label> <br/>';
@@ -383,7 +383,7 @@ const BillFromSelected = async () => {
           Browser.Buttons.OK
         );
       } else {
-        const package = await new PackageMaterials(
+        const package = await PackageMaterials(
           material1Name,
           material1Quantity,
           material2Name,
@@ -395,7 +395,7 @@ const BillFromSelected = async () => {
           material5Name,
           material5Quantity
         );
-        const formattedMats = await new MakeLineItems(package);
+        const formattedMats = await MakeLineItems(package);
 
         var boxTitle = `Generate Bill to Shopify`;
         var boxMsg = `Would you like to Generate a Bill to: \\n\\n`;
@@ -445,7 +445,7 @@ const BillFromSelected = async () => {
           );
           if (response == "yes") {
             Logger.log('User clicked "Yes".');
-            const order = await new CreateShopifyOrder(
+            const order = await CreateShopifyOrder(
               customer,
               jobnumber,
               package,

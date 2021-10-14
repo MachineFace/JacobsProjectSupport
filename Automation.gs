@@ -66,7 +66,7 @@ const GetPriceFromShopify = (url) => {
 
   }
   catch(err){
-    Logger.log(err + 'Couldnt fetch price');
+    Logger.log(`${err} : Couldn't fetch price.`);
   }
   //Logger.log('Price = ' + price);
   return price;
@@ -122,7 +122,7 @@ const FetchProductIDInProductURL = (sheet) => {
     }
   }
   catch(err) {
-    Logger.log('Sheet Oops');
+    Logger.log(`${err} : Sheet Oops`);
   }
   // Write to Sheet
   ids.forEach( (id, index) => {

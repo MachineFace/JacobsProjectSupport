@@ -205,9 +205,9 @@ const RemoveTimedTriggers = () => {
 const DisableJPS = () => {
   //Disable Forms
   try {
-    for (let name in formDict) {
-      FormApp.openById(formDict[name]).setAcceptingResponses(false);
-      Logger.log(`${name} : ${formDict[name]} IS NOW DISABLED.`);
+    for (let name in FORMS) {
+      FormApp.openById(FORMS[name]).setAcceptingResponses(false);
+      Logger.log(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
     }
     Logger.log(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
   } catch (err) {
@@ -226,9 +226,9 @@ const DisableJPS = () => {
  */
 const EnableJPS = () => {
   try {
-    for (let name in formDict) {
-      FormApp.openById(formDict[name]).setAcceptingResponses(true);
-      Logger.log(`${name} : ${formDict[name]} IS NOW ENABLED.`);
+    for (let name in FORMS) {
+      FormApp.openById(FORMS[name]).setAcceptingResponses(true);
+      Logger.log(`${name} : ${FORMS[name]} IS NOW ENABLED.`);
     }
     Logger.log(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
   } catch (err) {
@@ -357,20 +357,6 @@ const TimeDiff = (start, end) => {
   }
 };
 
-const _test = async () => {
-  let first = await TimeDiff();
-  let second = await TimeDiff(new Date(1996, 6, 5), new Date(1941, 2, 9));
-  Logger.log(first);
-  Logger.log(second);
-
-  /*
-    //Paralell Processing
-    await Promise.all([
-        (async() => await TimeDiff())(),
-        (async() => await TimeDiff( new Date(1996,6,5), new Date(1941,2,9) ))(),
-    ])
-    */
-};
 
 
 
@@ -538,5 +524,56 @@ const FindMissingElementsInArrays = (array1, array2) => {
   return indexes;
 }
 
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Generate new Job number from a date
+ * @param {time} date
+ * @return {number} job number
+ */
+class JobNumberGenerator
+{
+  constructor(date){
+    this.date = date ? date : new Date();
+    this.jobnumber;
+  }
+
+  Create() {
+    let testedDate = this.IsValidDate();
+    try {
+      if ( this.date == undefined || this.date == null || this.date == "" || testedDate == false ) {
+        this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
+        Logger.log(`Set Jobnumber to a new time because timestamp was missing.`);
+      } else {
+        this.jobnumber = +Utilities.formatDate(this.date, `PST`, `yyyyMMddhhmmss`);
+        Logger.log(`Input time: ${this.date}, Set Jobnumber: ${this.jobnumber}`);
+      }
+    } catch (err) {
+      Logger.log(`${err} : Couldn't fix jobnumber.`);
+    }
+    if (this.jobnumber == undefined || testedDate == false) {
+      this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
+    }
+    Logger.log(`Returned Job Number : ${this.jobnumber}`);
+    return this.jobnumber.toString();
+  };
+
+  Format() {
+    return new Date(this.date.getYear(), this.date.getMonth(), this.date.getDate() -1);
+  }
+
+  IsValidDate() {
+    if (Object.prototype.toString.call(this.date) !== "[object Date]") return false;
+    return !isNaN(this.date.getTime());
+  };
+}
+
+const _testJobNumberGen = () => {
+  const gen = new JobNumberGenerator(new Date(2015, 10, 3));
+  const num = gen.Create();
+  Logger.log(num);
+  const formatted = gen.Format();
+  Logger.log(formatted);
+}
 
 

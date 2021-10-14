@@ -153,6 +153,10 @@ const CountActiveUsers = () => {
   Logger.log(`Active JPS Users : ${count}`);
   return count;
 }
+const PrintActiveUsers = () => {
+  const users = CountActiveUsers();
+  OTHERSHEETS.data.getRange("C4").setValue(users);
+}
 
 /**
  * Count Number of Submissions
@@ -494,7 +498,8 @@ const PrintStatusCounts = () => {
  */
 const Metrics = () => {
   try {
-    Logger.log(`Calculating Metrics .....`)
+    Logger.log(`Calculating Metrics .....`);
+    PrintActiveUsers();
     PrintTiers();
     PrintStatusCounts();
     PrintStatistics();

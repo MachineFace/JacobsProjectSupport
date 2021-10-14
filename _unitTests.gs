@@ -19,100 +19,108 @@ const _gastTestRunner = async () => {
   // })
 
 
-  await test(`Generate Barcode: `, (t) => {
-      let jobnumber = `20210301140515`
-      let x = GenerateBarCode(jobnumber)
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+  await test(`Generate Barcode: `, async(t) => {
+    let jobnumber = `20210301140515`;
+    let qgen = new QRCodeAndBarcodeGenerator({jobnumber : jobnumber});
+    let x = await qgen.GenerateBarCode();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
-  await test(`Generate QRCode: `, (t) => {
-      let jobnumber = `20210301140515`
-      let x = GenerateQRCode(jobnumber)
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
-  })
-
-  await test(`Staff Functions`, (t) => {
-      let x = new DesignSpecialist(`Testa`, `Testa Nama`, `some@thing.com`)
-      StaffEmailAsString()
-      InvokeDS(`Cody`,`email`)
-      CreateDS()
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+  await test(`Generate QRCode: `, async(t) => {
+    let jobnumber = `20210301140515`;
+    let url = `http://www.codyglen.com/`;
+    let qgen = new QRCodeAndBarcodeGenerator({url : url, jobnumber : jobnumber});
+    let x = await qgen.GenerateQRCode();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Staff Functions`, (t) => {
-      let x = MakeLink(`some@thing.com`)
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let x = new DesignSpecialist(`Testa`, `Testa Nama`, `some@thing.com`);
+    StaffEmailAsString();
+    InvokeDS(`Cody`,`email`);
+    CreateDS();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
+  })
+
+  await test(`Staff Functions`, (t) => {
+    let x = MakeLink(`some@thing.com`);
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Calc Average Turnaround`, (t) => {
-      let x = CalculateAverageTurnaround(SHEETS.ultimaker)
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let x = CalculateAverageTurnaround(SHEETS.ultimaker);
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Calc Duration`, (t) => {
-      let x = CalculateDuration( new Date(1992,03,27), new Date() )
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let x = CalculateDuration( new Date(1992,03,27), new Date() );
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Count Active Users`, (t) => {
-      let x = CountActiveUsers()
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let x = CountActiveUsers();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Calc Distribution`, (t) => {
-      let x = CalculateDistribution()
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let x = CalculateDistribution();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Calc Standard Deviation`, (t) => {
-      let x = CalculateStandardDeviation()
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let x = CalculateStandardDeviation();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Calc Metrics`, (t) => {
-      let x = Metrics()
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let x = Metrics();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Get Last Shopify Order`, (t) => {
-      let x = GetLastShopifyOrder()
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let shopify = new ShopifyAPI();
+    let x = shopify.GetLastShopifyOrder();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Get Shopify Orders List`, (t) => {
-      let x = GetShopifyOrdersList()
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let shopify = new ShopifyAPI();
+    let x = shopify.GetShopifyOrdersList();
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Shopify Lookup Product ID`, (t) => {
-      let x = LookupProductID(`Fortus Red ABS-M30`)
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
+    let shopify = new ShopifyAPI();
+    let x = shopify.LookupShopifyProductFromSheet(`Fortus Red ABS-M30`);
+    t.pass(`Good : ${x}`);
+    t.fail(`Bad`);
   })
 
   await test(`Shopify Functions`, (t) => {
-      let x = GetShopifyCustomerByEmail(`eli_lee@berkeley.edu`)
-      t.pass(`Good : ${JSON.stringify(x)}`)
-      t.fail(`Bad`)
+    let shopify = new ShopifyAPI();
+    let x = shopify.GetShopifyCustomerByEmail(`eli_lee@berkeley.edu`);
+    t.pass(`Good : ${JSON.stringify(x)}`);
+    t.fail(`Bad`);
   })
 
   await test(`Shopify Functions`, (t) => {
-      let p = LookupProductID(`Fortus Red ABS-M30`)
-      let x = GetShopifyProductByID(p)
-      t.pass(`Good : ${JSON.stringify(x)}`)
-      t.fail(`Bad`)
+    let shopify = new ShopifyAPI();
+    let p = shopify.LookupShopifyProductFromSheet(`Fortus Red ABS-M30`);
+    let x = shopify.GetShopifyProductByID(p);
+    t.pass(`Good : ${JSON.stringify(x)}`);
+    t.fail(`Bad`);
   })
 
   await test(`Messages`, (t) => {
@@ -172,7 +180,7 @@ const _gastTestRunner = async () => {
   })
 
   await test(`JobNumber`, (t) => {
-      let x = CreateJobNumber(new Date())
+      let x = new JobNumberGenerator(new Date()).Create();
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
