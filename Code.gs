@@ -24,7 +24,6 @@
 const supportAlias = GmailApp.getAliases()[0];
 const gmailName = "Jacobs Project Support";
 
-
 const DaysRetentionNumber = 15; //How many days to hold a file
 const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
 
@@ -40,11 +39,12 @@ const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of m
  * @param {Event} e
  */
 const onSubmission = async (e) => {
-  //Set status to RECEIVED on new submission
+  const writer = new WriteLogger();
+  // Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var sheetName = e.range.getSheet().getName();
 
-  //Loop through to get last row and set status to received
+  // Loop through to get last row and set status to received
   try {
     var searchRange = sheet.getRange(2, 8, sheet.getLastRow()).getValues(); //search timestamp rows for last row
     var lastRow;
@@ -54,14 +54,13 @@ const onSubmission = async (e) => {
         break;
       }
     }
-    //sheet.getRange("A" + lastRow).setValue("Received");
     setByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.received);
-    Logg("Set status to 'Received'.");
+    writer.Info(`Set status to 'Received'.`);
   } catch (err) {
-    Logg(`${err}: Could not set status to 'Received'.`);
+    writer.Error(`${err}: Could not set status to 'Received'.`);
   }
 
-  //Parse Functions for shipping / variables
+  // Parse Functions for shipping / variables
   var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : getByHeader(sheet, "What is your name?", lastRow);
   var email = e.namedValues["Email Address"][0] ? e.namedValues["Email Address"][0] : getByHeader(sheet, "Email Address", lastRow);
   var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : getByHeader(sheet, "Your Student ID Number?", lastRow);
@@ -72,25 +71,24 @@ const onSubmission = async (e) => {
 
   var values = e.namedValues;
 
-  Logger.log(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
-  Logg(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
+  writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
 
-  //Generate new Job number
+  // Generate new Job number
   const jobnumber = await new JobNumberGenerator(timestamp).Create();
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
-  //Check Priority
+  // Check Priority
   var priority = await GetPriorityWithEmailOrSID(email, sid);
   //sheet.getRange("C" + lastRow).setValue(priority);
   setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority);
 
-  //Create Messages
+  // Create Messages
   var message = await new CreateSubmissionMessage(name, projectname, jobnumber);
 
-  //Get DS-Specific Message
+  // Get DS-Specific Message
   let dsMessage = message.dsMessage;
 
-  //Create array summary of student's entry and append it to the message
+  // Create array summary of student's entry and append it to the message
   var values = e.namedValues;
   dsMessage += "<ul>";
   for (Key in values) {
@@ -101,7 +99,7 @@ const onSubmission = async (e) => {
   dsMessage += "</ul>";
   dsMessage += "<div>";
 
-  //Notify Staff via email and set their assignment
+  // Notify Staff via email and set their assignment
   var designspecialistemail;
 
   switch (sheetName) {
@@ -148,7 +146,7 @@ const onSubmission = async (e) => {
       break;
   }
 
-  //Email each DS
+  // Email each DS
   try {
     GmailApp.sendEmail(designspecialistemail, "Jacobs Project Support Notification", "", {
         htmlBody: dsMessage,
@@ -156,17 +154,17 @@ const onSubmission = async (e) => {
         bcc: InvokeDS("Chris", "email"),
         name: gmailName,
     });
-    Logg("Design Specialist has been emailed.");
+    writer.Info(`Design Specialist has been emailed.`);
   } catch (err) {
-    Logg(`${err} : Could not email DS. Something went wrong.`);
+    writer.Error(`${err} : Could not email DS. Something went wrong.`);
   }
 
-  //Fix "Received" Status Issue
+  // Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
   stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
-  Logger.log("Status refixed to 'Received'.");
+  writer.Info(`Status refixed to 'Received'.`);
 
-  //"Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
+  // "Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
   var shippingbody = message.shippingMessage;
 
   if (shipping == "Yes") {
@@ -177,10 +175,10 @@ const onSubmission = async (e) => {
       bcc: InvokeDS("Chris", "email"),
       name: gmailName,
     });
-    Logg("Shipping instructions email sent.");
+    writer.Info(`Shipping instructions email sent.`);
   }
 
-  //Creaform Email with instructions for student dropoff.
+  // Creaform Email with instructions for student dropoff.
   var creaformMessage = message.creaformMessage;
 
   try {
@@ -192,13 +190,13 @@ const onSubmission = async (e) => {
           bcc: InvokeDS("Chris", "email"),
           name: gmailName,
       });
-      Logger.log("Creaform instruction email sent.");
+      writer.Info(`Creaform instruction email sent.`);
     }
   } catch (err) {
-    Logger.log(`${err} : Couldnt send Creaform email for some reason.`);
+    writer.Error(`${err} : Couldnt send Creaform email for some reason.`);
   }
 
-  //No Access Response
+  // No Access Response
   let missingaccessbody = message.missingAccessMessage;
 
   var access;
@@ -212,24 +210,22 @@ const onSubmission = async (e) => {
         name: "Jacobs Project Support",
       });
 
-      //Set access to Missing Access
-      //sheet.getRange("A" + lastRow).setValue("Missing Access");
+      // Set access to Missing Access
       setByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
-      Logger.log(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
+      writer.Info(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
-    Logg(`${err} : Could not find student access boolean value`);
+    writer.Error(`${err} : Couldn't find student access boolean value`);
   }
 
-  //Check again
+  // Check again
   jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator(timestamp).Create();
-  //sheet.getRange("F" + lastRow).setValue(jobnumber);
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
   
 
-  //Fix wrapping issues
+  // Fix wrapping issues
   let driveloc = sheet.getRange("D" + lastRow);
-  formatCell(driveloc);
+  FormatCell(driveloc);
 };
 
 /**
@@ -244,6 +240,7 @@ const onSubmission = async (e) => {
  * @param {Event} e
  */
 const onChange = async (e) => {
+  const writer = new WriteLogger();
   // Fetch Data from Sheets
   var ss = e.range.getSheet();
   var spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -296,16 +293,13 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
-  // let tempEmail = ss.getRange(thisRow, 9).getValue();
-  // let tempSID = ss.getRange(thisRow, 11).getValue();
+
   let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
   let tempSID = getByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
-  var priority = await GetPriorityWithEmailOrSID(tempEmail, tempSID);
-  //ss.getRange("C" + thisRow).setValue(priority);
-  setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, priority);
-  if (priority == "STUDENT NOT FOUND") {
-      // SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getRange(thisRow, 1, 1, 1).setValue("Missing Access");
+  const tempPriority = GetPriorityFromEmailOrSID(tempEmail, tempSID);
+  setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority);
+  if (tempPriority == "STUDENT NOT FOUND") {
       setByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
 
@@ -314,7 +308,7 @@ const onChange = async (e) => {
   if (thisCol > 1 && thisCol != 3 && thisCol != 52) return;
 
   //----------------------------------------------------------------------------------------------------------------
-  //Parse Data
+  // Parse Data
   const status = getByHeader(spreadSheet, "(INTERNAL) Status", thisRow);
 
   var designspecialist = getByHeader(thisSheet, "(INTERNAL): DS Assigned", thisRow);
@@ -333,23 +327,28 @@ const onChange = async (e) => {
   //Materials
   const material1Quantity = getByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
   const material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
-  const material1URL = LookupProductID(material1Name).link;
+  // const material1URL = LookupProductID(material1Name).link;
+  const material1URL = "";
 
   const material2Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
   const material2Name = getByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
-  const material2URL = LookupProductID(material2Name).link;
+  // const material2URL = LookupProductID(material2Name).link;
+  const material2URL = "";
 
   const material3Quantity = getByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
   const material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
-  const material3URL = LookupProductID(material3Name).link;
+  // const material3URL = LookupProductID(material3Name).link;
+  const material3URL = "";
 
   const material4Quantity = getByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
   const material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
-  const material4URL = LookupProductID(material4Name).link;
+  // const material4URL = LookupProductID(material4Name).link;
+  const material4URL = "";
 
   const material5Quantity = getByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
   const material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
-  const material5URL = LookupProductID(material5Name).link;
+  // const material5URL = LookupProductID(material5Name).link;
+  const material5URL = "";
 
   if (material1Name != "") var mat1 = true;
   else mat1 = false;
@@ -362,29 +361,29 @@ const onChange = async (e) => {
   if (material5Name != "") var mat5 = true;
   else mat5 = false;
 
-  //Log submission info to sheet
-  Logger.log(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
+  // Log submission info to sheet
+  writer.Info(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
 
   //----------------------------------------------------------------------------------------------------------------
-  //Fix Job Number if it's missing
+  // Fix Job Number if it's missing
   try {
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).Create();
       //ss.getRange(thisRow, 6).setValue(jobnumber);
       setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
-      Logg(`Job Number was missing, so the script fixed it. Submission by ${email}`);
+      writer.Info(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
-    Logg(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+    writer.Error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  //Fix empty variables
+  // Fix empty variables
   try {
     designspecialist = designspecialist ? designspecialist : "a Design Specialist";
     projectname = projectname ? projectname : "Your Project";
   } catch (err) {
-    Logg( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
+    writer.Error( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -397,11 +396,9 @@ const onChange = async (e) => {
         let endTime = new Date();
         let time = await CalculateDuration(startTime, endTime);
 
-        //Write to Column - d h:mm:ss
-        //ss.getRange(thisRow, 44).setValue(time);
+        // Write to Column - d h:mm:ss
         setByHeader(thisSheet, "Elapsed Time", thisRow, time);
-
-        Logg(`Turnaround Time = ${time}`);
+        writer.Info(`Turnaround Time = ${time}`);
 
         //Write Completed time
         //ss.getRange(thisRow, 43).setValue(endTime);
@@ -409,7 +406,7 @@ const onChange = async (e) => {
       }
     }
   } catch (err) {
-    Logg( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
+    writer.Error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -432,7 +429,7 @@ const onChange = async (e) => {
         shippingQuestion
       );
     } catch (err) {
-      Logger.log( `${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+      writer.Error( `${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
     }
     try {
       var id = Ticket.getId();
@@ -440,18 +437,18 @@ const onChange = async (e) => {
       var docUrl = doc.getUrl();
       //ss.getRange(thisRow, 5).setValue(docUrl); //Push to cell
       setByHeader(thisSheet, "Printable Ticket", thisRow, docUrl);
-      Logger.log(`Ticket Created.`);
+      writer.Info(`Ticket Created.`);
     } catch (err) {
-      Logger.log(`${err} : Couldn't push ticket to the cell.`);
+      writer.Error(`${err} : Couldn't push ticket to the cell.`);
     }
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  //Make an approval form on demand
+  // Make an approval form on demand
   // Create a new form, then add a checkbox question, a multiple choice question,
   if (status == STATUS.pendingApproval) {
     var approvalURL = await CreateApprovalForm(name, jobnumber, cost);
-    Logg(`Approval Form generated and sent to user.`);
+    writer.Info(`Approval Form generated and sent to user.`);
   }
 
   //Case switch for different Design Specialists email
@@ -606,10 +603,10 @@ const onChange = async (e) => {
   //Lastly Run these Metrics ignoring first 2 rows:
   if (thisRow > 3) {
     await Metrics();
-    Logg(`Recalculated Metrics tab.`);
+    writer.Info(`Recalculated Metrics tab.`);
   }
 };
-//END OF OnEdit
+
 
 /**
  * =======================================================================================================================================================================
@@ -625,7 +622,8 @@ const onChange = async (e) => {
  * @param {number} jobnumber
  * @returns {string} approval form
  */
-var CreateApprovalForm = (name, jobnumber, cost) => {
+const CreateApprovalForm = (name, jobnumber, cost) => {
+  const writer = new WriteLogger();
   try {
     // Make a new approval form
     let approvalForm = FormApp.create("Approval Form");
@@ -644,7 +642,7 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
 
     //Ask Questions
     if (cost == "" || cost == undefined || cost == 0) {
-      Logg(`Approval form: No known cost. cost = ${cost}`);
+      writer.Info(`Approval form: No known cost. cost = ${cost}`);
       let item = approvalForm.addMultipleChoiceItem().setRequired(true)
         .setTitle(`For this job, the cost of materials was not specified. 
           Please speak with a Design Specialist if you have questions. 
@@ -655,7 +653,7 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
         ]);
     } else {
       let costFormatted = Utilities.formatString("$%.2f", cost);
-      Logg(`Approval form: Known cost. cost = ${costFormatted}`);
+      writer.Info(`Approval form: Known cost. cost = ${costFormatted}`);
       let item = approvalForm.addMultipleChoiceItem().setRequired(true)
         .setTitle(`For this job, the cost of materials is estimated to be: ${costFormatted}. 
           Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`)
@@ -671,9 +669,9 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
       .setTitle(`Please select the job number below.`)
       .setChoices([item3.createChoice(jobnumber)]);
     let approvalURL = approvalForm.getPublishedUrl();
-    Logg(`Created an Approval Form for the student.`);
+    writer.Info(`Created an Approval Form for the student.`);
   } catch (err) {
-    Logg(`${err} : Couldn't generate Approval Form`);
+    writer.Error(`${err} : Couldn't generate Approval Form`);
   }
 
   try {
@@ -684,7 +682,7 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
     let id = approvalForm.getId();
     let docFile = DriveApp.getFileById(id);
   } catch (err) {
-    Logg(`${err} : Couldn't get the id of the file.`);
+    writer.Error(`${err} : Couldn't get the id of the file.`);
   }
   try {
     DriveApp.removeFile(docFile);
@@ -694,7 +692,7 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
     DriveApp.getFileById(id)
       .setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
   } catch (err) {
-    Logg(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
+    writer.Error(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
   }
   return approvalURL;
 };
@@ -715,6 +713,7 @@ var CreateApprovalForm = (name, jobnumber, cost) => {
  * @returns {number} priority number 1 - 4
  */
 const GetPriority = (sid) => {
+  const writer = new WriteLogger();
   //sid = 3035249023;  //test good sid
   //sid = 2323453444;//test bad sid
 
@@ -740,7 +739,7 @@ const GetPriority = (sid) => {
     }
   }
 
-  Logger.log(`Priority = ${priority}`);
+  writer.Info(`Priority = ${priority}`);
   //Return value
   return priority;
 };
@@ -755,6 +754,7 @@ const GetPriority = (sid) => {
  * @returns {number} priority number 1 - 4
  */
 const GetPriorityFromEmail = (email) => {
+  const writer = new WriteLogger();
   //email = "saveritt@berkeley.edu";  //test good email
   //email = "some@thing.com";    //test bad email
 
@@ -774,60 +774,83 @@ const GetPriorityFromEmail = (email) => {
     }
   }
 
-  Logger.log(`Priority = ${priority}`);
+  writer.Info(`Priority = ${priority}`);
   return priority;
 };
 
 
-
-
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Get Priority Number from Erik's List
+ * @param {string} name, email or SID
+ * @returns {number} priority number 1 - 4
+ */
+const GetPriorityFromANY = (any) => {
+  const writer = new WriteLogger();
+  let priority;
+  any = 3034073475;  // test good sid
+  // any = 2323453444;   // test bad sid
+  // any = "helentongli@berkeley.edu"; // good test
+  if (any) any.toString().replace(/\s+/g, "");
+  const finder = OTHERSHEETS.approved.createTextFinder(any).findNext();
+  if (finder != null) {
+    let row = finder.getRow();
+    priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
+    writer.Info(`ROW : ${row} : PRIORITY : ${priority}`);
+  } else if (!finder) {
+    priority = "STUDENT NOT FOUND!";
+    writer.Warning(`PRIORITY : ${priority}`);
+  }
+  return priority;
+}
 
 
 /**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Get Priority
  * @param {string} email
  * @param {string} SID
  * @returns {int} priority
  */
-const GetPriorityWithEmailOrSID = (email, sid) => {
-  if(email != null) email = email.toLowerCase()
-  Logger.log(`Email : ${email}, SID : ${sid}`)
-
-  let priority
-
-  let stringSID = sid.toString()
-  if (sid) {
-      stringSID = sid.toString().replace(/\s+/g, "")
+const GetPriorityFromEmailOrSID = (email, sid) => {
+  const writer = new WriteLogger();
+  let priority;
+  // any = 3034073475;  // test good sid
+  // any = 2323453444;   // test bad sid
+  // any = "helentongli@berkeley.edu"; // good test
+  if (email) {
+    email.toString().replace(/\s+/g, "");
+    const finder = OTHERSHEETS.approved.createTextFinder(email).findNext();
+    if (finder != null) {
+      let row = finder.getRow();
+      priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
+      writer.Info(`ROW : ${row} : PRIORITY : ${priority}`);
+    } else if (!finder) {
+      priority = "STUDENT NOT FOUND!";
+      writer.Warning(`PRIORITY : ${priority}`);
+    }
   }
-
-  let approvedListEmails = OTHERSHEETS.approved.getRange(2, 2, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues()
-  let approvedListSIDs = OTHERSHEETS.approved.getRange(2, 3, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues()
-
-  let casefixedList = []
-  approvedListEmails.forEach(email => {
-      if(email[0] != null || email[0] != undefined) {
-          casefixedList.push(email[0].toString().toLowerCase())
-      }
-      else casefixedList.push(email[0].toString())
-  })
-
-  let index = Search(casefixedList, email)
-  if (index == null || index == undefined) {
-      index = Search(approvedListSIDs, stringSID)
-  }
-
-  if (index != null || index != undefined) {
-      index += 2
-      // Logger.log(`Index on ApprovedSheet : ${index}`)
-      priority = OTHERSHEETS.approved.getRange(index, 4).getValue()
-  } else priority = `STUDENT NOT FOUND!`
-
-  Logger.log(`Priority = ${priority}`)
-  return priority
-};
+  if(sid) {
+    sid.toString().replace(/\s+/g, "");
+    const finder = OTHERSHEETS.approved.createTextFinder(sid).findNext();
+    if (finder != null) {
+      let row = finder.getRow();
+      priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
+      writer.Info(`ROW : ${row} : PRIORITY : ${priority}`);
+    } else if (!finder) {
+      priority = "STUDENT NOT FOUND!";
+      writer.Warning(`PRIORITY : ${priority}`);
+    }
+  } else priority = "STUDENT NOT FOUND!";
+  
+  return priority;
+}
 
 
-const _testGetPriority = async () => {
-    return await GetPriorityWithEmailOrSID(`laxbop@berkeley.edu`,3036051329)
+
+
+const _testGetPriority = () => {
+  GetPriorityFromEmailOrSID(`laxbop@berkeley.edu`,3036051329)
 }
 
 

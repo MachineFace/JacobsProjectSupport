@@ -112,7 +112,7 @@ const CreateSummaryEmail = () => {
         'bcc': 'cparsell@berkeley.edu',
         'name': 'JPS DAILY SUMMARY'
     });
-    Logg('DS Team Emailed with Summary for the day.');
+    WriteLog('DS Team Emailed with Summary for the day.');
 }
 
 

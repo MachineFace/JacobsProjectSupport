@@ -12,10 +12,11 @@ class QRCodeAndBarcodeGenerator {
     }) {
     this.url = url;
     this.jobnumber = jobnumber;
+    this.writer = new WriteLogger();
   }
 
   async GenerateQRCode(){
-    Logger.log(`URL : ${this.url}, Jobnumber || RNDNumber : ${this.jobnumber}`);
+    this.writer.Info(`URL : ${this.url}, Jobnumber || RNDNumber : ${this.jobnumber}`);
     const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
     const params = {
       "method" : "GET",
@@ -28,14 +29,14 @@ class QRCodeAndBarcodeGenerator {
     let qrCode;
     const html = UrlFetchApp.fetch(loc, params);
     const responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    this.writer.Debug(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       qrCode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber ) );
       qrCode.setTrashed(true);
     }
-    else Logger.log('Failed to GET QRCode');
+    else this.writer.Error('Failed to GET QRCode');
 
-    Logger.log(qrCode);
+    this.writer.Info(qrCode);
     return await qrCode;
   }
 
@@ -63,12 +64,12 @@ class QRCodeAndBarcodeGenerator {
 
     const html = UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    this.writer.Debug(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       barcode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) );
       barcode.setTrashed(true);
     } 
-    else Logger.log('Failed to GET Barcode');
+    else this.writer.Error('Failed to GET Barcode');
 
     Logger.log(barcode);
     return await barcode;
@@ -84,6 +85,7 @@ class QRCodeAndBarcodeGenerator {
  * 
  */
 const PickupByBarcode = () => {
+  const writer = new WriteLogger();
   const searchUISheet = SpreadsheetApp.getActive().getSheetByName('Pickup');
   const jobnumber = searchUISheet.getRange(3,2).getValue();
   let progress = searchUISheet.getRange(4,2);
@@ -106,7 +108,7 @@ const PickupByBarcode = () => {
       // change status to picked up
       setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
       progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
-      Logger.log(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
+      writer.Info(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();
       //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
       return;

@@ -7,11 +7,11 @@
  * @returns {duration} formatted time
  */
 const CalculateAverageTurnaround = (sheet) => {
+  const writer = new WriteLogger();
+  // Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
+  let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); // Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
 
-  //Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
-  let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); //Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
-
-  //Get list of times and remove all the Bullshit
+  // Get list of times and remove all the Bullshit
   let revisedTimes = [];
   try {
     for (let i = 0; i < completionTimes.length; i++) {
@@ -19,7 +19,7 @@ const CalculateAverageTurnaround = (sheet) => {
       if (time != '' || time != undefined || time != null || time != ' ' || time != NaN || time != '[]') {
         let ds = time.replace(" ", ":");
         let t = ds.split(':');
-        if (!isNaN(parseFloat(t[1])) && isFinite(t[1])) //check if the 2nd number out of the array of 4 is BS or not - if not BS, write the values to the array
+        if (!isNaN(parseFloat(t[1])) && isFinite(t[1])) // check if the 2nd number out of the array of 4 is BS or not - if not BS, write the values to the array
         {
           revisedTimes.push(t);
         }
@@ -27,7 +27,7 @@ const CalculateAverageTurnaround = (sheet) => {
     }
   }
   catch (err) {
-    Logger.log(`${err} : Could not fetch list of times. Probably a sheet error.`);
+    writer.Error(`${err} : Couldn't fetch list of times. Probably a sheet error.`);
   }
 
   //Convert everything to seconds
@@ -95,6 +95,7 @@ const PrintTurnaroundTimes = () => {
  * @returns {duration} formatted time
  */
 const CalculateDuration = (start, end) => {
+  const writer = new WriteLogger();
   try {
     end = end ? end : new Date();  //if supplied with nothing, set end time to now
     start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
@@ -115,13 +116,13 @@ const CalculateDuration = (start, end) => {
 
     //Write
     let formatted = days + ' ' + hrs + ':' + minutesAsString + ':' + secondsAsString;
-    Logg("Duration = " + formatted);
+    writer.Info("Duration = " + formatted);
 
     // Return Completed time
     return formatted;
   }
   catch (err) {
-    Logg(`${err} : Calculating the duration has failed for some reason.`);
+    writer.Error(`${err} : Calculating the duration has failed for some reason.`);
   }
 }
 
@@ -133,6 +134,7 @@ const CalculateDuration = (start, end) => {
  * @returns {number} count
  */
 const CountActiveUsers = () => {
+  const writer = new WriteLogger();
   let persons = []
   for(const [key, sheet] of Object.entries(SHEETS)) {
     let peeps = sheet.getRange(2, 10, sheet.getLastRow() -1, 1 ).getValues();
@@ -150,7 +152,7 @@ const CountActiveUsers = () => {
   });
 
   var count = unique.length - 1; //Removes the space.
-  Logger.log(`Active JPS Users : ${count}`);
+  writer.Info(`Active JPS Users : ${count}`);
   return count;
 }
 const PrintActiveUsers = () => {
@@ -162,6 +164,7 @@ const PrintActiveUsers = () => {
  * Count Number of Submissions
  */
 const CountEachSubmission = () => {
+  const writer = new WriteLogger();
   let data = []
   for(const [key, sheet] of Object.entries(SHEETS)) {
     // let count = sheet.getLastRow() - 3;
@@ -173,7 +176,7 @@ const CountEachSubmission = () => {
     // Logger.log(`Sheet : ${sheet.getName()}, Count : ${count}`);
     data.push([sheet.getName(), count]);
   }
-  Logger.log(data)
+  writer.Info(data)
   return data;
 }
 const PrintSubmissionData = () => {
@@ -192,6 +195,7 @@ const PrintSubmissionData = () => {
  * @returns {[string]} names
  */
 const CreateTopTen = () => {
+  const writer = new WriteLogger();
   const distribution = CalculateDistribution();
   // Create a new array with only the first 10 items and remove Tests
   let chop = distribution.slice(0, 11);
@@ -207,7 +211,7 @@ const CreateTopTen = () => {
   chop.splice(loc,1);
 
   chop.forEach((pair, index) => {
-    Logger.log(`${pair[0]} -----> ${pair[1]}`)
+    writer.Info(`${pair[0]} -----> ${pair[1]}`)
     OTHERSHEETS.data.getRange(106+index,2,1,1).setValue(pair[0])
     OTHERSHEETS.data.getRange(106+index,3,1,1).setValue(pair[1])
   })
@@ -220,6 +224,7 @@ const CreateTopTen = () => {
  * Calculate Distribution of projects.
  */
 const CalculateDistribution = () => {
+  const writer = new WriteLogger();
   let count = {};
   let userList = [];
   for(const [name, sheet] of Object.entries(SHEETS)) { 
@@ -243,7 +248,7 @@ const CalculateDistribution = () => {
     return second[1] - first[1];
   });
   items.splice(0,1);
-  Logger.log(items);
+  writer.Info(items);
   return items;  
 }
 
@@ -252,6 +257,7 @@ const CalculateDistribution = () => {
  * Count Types of Users
  */
 const CountTypes = () => {
+  const writer = new WriteLogger();
   let userList = [];
   for(const [name, sheet] of Object.entries(SHEETS)) { 
     if(sheet.getName() != SHEETS.advancedlab.getName()) {
@@ -280,7 +286,7 @@ const CountTypes = () => {
     return second[1] - first[1];
   });
   items.splice(0,1);
-  Logger.log(items);
+  writer.Debug(items);
   
   return items;  
 }
@@ -300,7 +306,6 @@ const PrintTypesCount = () => {
   let nums = FindMissingElementsInArrays(temp1, missingTypes);
   nums.forEach(index => missingTypes.splice(index, 1));
   missingTypes.forEach(item => types.push([item, 0]));
-  Logger.log(types);
   types.forEach( (item, index) => {
     OTHERSHEETS.data.getRange(45 + index, 2, 1, 1).setValue(item[0]);
     OTHERSHEETS.data.getRange(45 + index, 3, 1, 1).setValue(item[1]);
@@ -378,18 +383,19 @@ const CreateTopTenByID = () => {
  * @returns {number} standard deviation
  */
 const CalculateStandardDeviation = () => {
+  const writer = new WriteLogger();
   const distribution = CalculateDistribution();
   let n = distribution.length;
-  Logger.log(`n = ${n}`);
+  writer.Debug(`n = ${n}`);
 
   let values = [];
   distribution.forEach(person => values.push(person[1]))
-  Logger.log(values)
+  writer.Debug(values)
   let mean = values.reduce((a, b) => a + b) / n;
-  Logger.log(`Mean = ${mean}`);
+  writer.Info(`Mean = ${mean}`);
 
   let standardDeviation = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-  Logger.log(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
+  writer.Info(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
   return standardDeviation;
 }
 
@@ -398,15 +404,16 @@ const CalculateStandardDeviation = () => {
  * Arithmetic Mean
  */
 const CalculateArithmeticMean = () => {
+  const writer = new WriteLogger();
   const distribution = CalculateDistribution();
   let n = distribution.length;
-  Logger.log(`n = ${n}`);
+  writer.Debug(`n = ${n}`);
 
   let values = [];
   distribution.forEach(person => values.push(person[1]))
-  Logger.log(values)
+  writer.Debug(values)
   let mean = values.reduce((a, b) => a + b) / n;
-  Logger.log(`Mean = ${mean}`);
+  writer.Info(`Mean = ${mean}`);
 
   return mean;
 }
@@ -492,7 +499,6 @@ const PrintStatusCounts = () => {
 }
 
 const AdvancedLabCounts = () => {
-  let userList = [];
 
   let range = SHEETS.advancedlab.getRange(3, 5, SHEETS.advancedlab.getLastRow() -1, 1).getValues();
   range = [].concat(...range);
@@ -510,11 +516,10 @@ const AdvancedLabCounts = () => {
   items.sort((first, second) => {
     return second[1] - first[1];
   });
-  // items.splice(0,1);
-  Logger.log(range)
+
   Logger.log(items);
   
-  // return items;  
+  return items;  
 }
 
 

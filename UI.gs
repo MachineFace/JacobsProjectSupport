@@ -278,7 +278,7 @@ const BillFromSelected = async () => {
   }
 
   let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-  Logg(`Status of billed row = ${status}`);
+  WriteLog(`Status of billed row = ${status}`);
   let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
   let email = getByHeader(thisSheet, "Email Address", thisRow);
   let name = getByHeader(thisSheet, "What is your name?", thisRow);
@@ -342,7 +342,7 @@ const BillFromSelected = async () => {
   let quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
 
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
-    Logg(`Cannot bill - no quantity recorded`);
+    WriteLog(`Cannot bill - no quantity recorded`);
 
     Browser.msgBox(
       "Generate Bill to Shopify",

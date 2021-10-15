@@ -30,6 +30,7 @@ class Ticket
     this.printerName = printerName;
     this.printDuration = printDuration;
     this.jobnumber = jobnumber;
+    this.writer = new WriteLogger();
   }
 
   /**
@@ -107,7 +108,7 @@ class Ticket
         folder.next().addFile(docFile);
         folder.next().addFile(barcode);
       } catch (err) {
-        Logger.log(`Whoops : ${err}`);
+        this.writer.Error(`Whoops : ${err}`);
       }
 
 
@@ -115,8 +116,8 @@ class Ticket
       let file = DriveApp.getFileById(docId);
       file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
     }
-    //Return Document to use later
-    Logger.log(JSON.stringify(doc))
+    // Return Document to use later
+    this.writer.Info(JSON.stringify(doc))
     return doc;
   };
 }
@@ -182,7 +183,7 @@ var CreateTicket = (
     var body = doc.getBody();
     var docId = doc.getId();
   } catch (err) {
-    Logg( `${err} : Could not fetch doc folder, or make ticket, or get body or docId.` );
+    WriteLog( `${err} : Could not fetch doc folder, or make ticket, or get body or docId.` );
   }
   const url = doc.getUrl();
   const qgen = new QRCodeAndBarcodeGenerator({url : url, jobnumber : jobnumber});
@@ -285,7 +286,7 @@ var CreateTicket = (
           [DocumentApp.Attribute.FONT_SIZE]: 9,
         });
     } catch (err) {
-      Logg(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
+      WriteLog(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
     }
 
     //Remove File from root and Add that file to a specific folder
@@ -295,7 +296,7 @@ var CreateTicket = (
       folder.next().addFile(docFile);
       folder.next().addFile(barcode);
     } catch (err) {
-      Logg( `${err} : Couldn't delete the file from the drive folder. Sheet is still linked` );
+      WriteLog( `${err} : Couldn't delete the file from the drive folder. Sheet is still linked` );
     }
 
     //Set permissions to 'anyone can edit' for that file
@@ -303,7 +304,7 @@ var CreateTicket = (
       var file = DriveApp.getFileById(docId);
       file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
     } catch (err) {
-      Logg( `${err} : Couldn't change permissions on the file. You probably have to do something else to make it work.` );
+      WriteLog( `${err} : Couldn't change permissions on the file. You probably have to do something else to make it work.` );
     }
   }
   //Return Document to use later

@@ -42,12 +42,13 @@ const DeleteOldFiles = () => {
  * Format cell to fix overlap issue
  * @param {cell} cell
  */
-const formatCell = (cell) => {
+const FormatCell = (cell) => {
+  const writer = new WriteLogger();
   try {
     const strategy = SpreadsheetApp.WrapStrategy.CLIP;
     cell.setWrapStrategy(strategy);
   } catch (err) {
-    Logger.log(`${err} : Cell failed to be clipped.`);
+    writer.Error(`${err} : Cell failed to be clipped.`);
   }
 };
 
@@ -60,17 +61,18 @@ const formatCell = (cell) => {
  * @param {number} row
  */
  const getByHeader = (theSheet, colName, row) => {
+  const writer = new WriteLogger();
   // let data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
   try {
     let data = theSheet.getDataRange().getValues();
     let col = data[0].indexOf(colName);
     if (col != -1) {
       return data[row - 1][col];
-      //Logg(`Value of col: ${colName} row: ${row} is ${data[row - 1][col]}`);
+      // writer.Debug(`Value of col: ${colName} row: ${row} is ${data[row - 1][col]}`);
     }
   } catch (err) {
     //Logger.log(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
-    Logg(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
+    writer.Error(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
   }
 };
 
@@ -85,6 +87,7 @@ const formatCell = (cell) => {
  * @param {any} val
  */
 const setByHeader = (theSheet, colName, row, val) => {
+  const writer = new WriteLogger();
   //let theSheet = SpreadsheetApp.getActiveSheet();
   try {
     const data = theSheet.getDataRange().getValues();
@@ -93,7 +96,7 @@ const setByHeader = (theSheet, colName, row, val) => {
     range.setValue(val);
     //Logger.log(`Value of row: ${row} col: ${col} set to ${val}`);
   } catch (err) {
-    Logger.log(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
+    writer.Error(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
   }
 };
 
@@ -104,14 +107,12 @@ const setByHeader = (theSheet, colName, row, val) => {
  * @param {string} message
  * @returns message to specific logger sheet
  */
-const Logg = (message) => {
-  let logger = OTHERSHEETS.logger;
-  let thisRow = logger.getLastRow() + 1;
-  let time = new Date();
+const WriteLog = (message) => {
+  let thisRow = OTHERSHEETS.logger.getLastRow() + 1;
   try {
-    logger.getRange(thisRow, 1).setValue(time);
-    logger.getRange(thisRow, 2).setValue("INFO");
-    logger.getRange(thisRow, 3).setValue(message);
+    OTHERSHEETS.logger.getRange(thisRow, 1).setValue(new Date());
+    OTHERSHEETS.logger.getRange(thisRow, 2).setValue("INFO");
+    OTHERSHEETS.logger.getRange(thisRow, 3).setValue(message);
   } catch (err) {
     Logger.log(`${err} : Couldnt log messages to sheet for whatever reason.`);
   }
@@ -135,6 +136,7 @@ const materials = (index, quantity, name, url) => {
  * Used in EnableJPS()
  */
 const CreateTimeDrivenTrigger = () => {
+  const writer = new WriteLogger();
   // Trigger every 6 hours.
   //ScriptApp.newTrigger('myFunction').timeBased().everyHours(6).create();
 
@@ -167,7 +169,7 @@ const CreateTimeDrivenTrigger = () => {
       .atHour(timetoEmail)
       .create();
   } catch (err) {
-    Logg(`${err} : Could not create triggers`);
+    writer.Error(`${err} : Could not create triggers`);
   }
 };
 
@@ -178,21 +180,22 @@ const CreateTimeDrivenTrigger = () => {
  * Used in 'DisableJPS()'
  */
 const RemoveTimedTriggers = () => {
+  const writer = new WriteLogger();
   let triggers = ScriptApp.getProjectTriggers();
   try {
     triggers.forEach( trigger => {
       if (trigger.getEventType() == ScriptApp.EventType.ON_EDIT)
-        Logger.log(`OnEdit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+        writer.Info(`OnEdit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
       if (trigger.getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
-        Logger.log(`OnFormSubmit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+        writer.Info(`OnFormSubmit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
       if (trigger.getEventType() == ScriptApp.EventType.CLOCK) {
-        Logger.log(`TimeBased Trigger : ${trigger.getUniqueId()}`);
+        writer.Info(`TimeBased Trigger : ${trigger.getUniqueId()}`);
         ScriptApp.deleteTrigger(trigger);
       }
     })
-    Logger.log(`Removed Triggers for Summary Emails`);
+    writer.Info(`Removed Triggers for Summary Emails`);
   } catch (err) {
-    Logger.log(`${err} : Couldnt remove triggers for whatever reason.`);
+    writer.Error(`${err} : Couldnt remove triggers for whatever reason.`);
   }
 };
 
@@ -203,15 +206,16 @@ const RemoveTimedTriggers = () => {
  * Used in conjunction with 'EnableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
 const DisableJPS = () => {
+  const writer = new WriteLogger();
   //Disable Forms
   try {
     for (let name in FORMS) {
       FormApp.openById(FORMS[name]).setAcceptingResponses(false);
-      Logger.log(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
+      writer.Info(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
     }
-    Logger.log(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
+    writer.Info(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
   } catch (err) {
-    Logger.log(`${err} : Couldnt disable Accepting Responses on Forms`);
+    writer.Error(`${err} : Couldnt disable Accepting Responses on Forms`);
   }
 
   //Delete Timebased Triggers for Daily Emails
@@ -225,22 +229,23 @@ const DisableJPS = () => {
  * Used in conjunction with 'DisableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
 const EnableJPS = () => {
+  const writer = new WriteLogger();
   try {
     for (let name in FORMS) {
       FormApp.openById(FORMS[name]).setAcceptingResponses(true);
-      Logger.log(`${name} : ${FORMS[name]} IS NOW ENABLED.`);
+      writer.Info(`${name} : ${FORMS[name]} IS NOW ENABLED.`);
     }
-    Logger.log(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
+    writer.Info(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
   } catch (err) {
-    Logger.log(err + " : Couldnt enable Accepting Responses on Forms");
+    writer.Error(err + " : Couldnt enable Accepting Responses on Forms");
   }
 
   //Create Triggers
   try {
     CreateTimeDrivenTrigger();
-    Logger.log("Created Daily Summary Email Triggers.");
+    writer.Info("Created Daily Summary Email Triggers.");
   } catch (err) {
-    Logger.log(`${err} : Couldnt install triggers for whatever reason.`);
+    writer.Error(`${err} : Couldnt install triggers for whatever reason.`);
   }
 };
 
@@ -325,6 +330,7 @@ const isValidDate = (d) => {
  * @returns {duration} formatted time
  */
 const TimeDiff = (start, end) => {
+  const writer = new WriteLogger();
   try {
     end = end ? end : new Date(); //if supplied with nothing, set end time to now
     start = start ? start : new Date(end - 87000000); //if supplied with nothing, set start time to now minus 24 hours.
@@ -346,14 +352,14 @@ const TimeDiff = (start, end) => {
     //Write
     let formatted =
       days + " " + hrs + ":" + minutesAsString + ":" + secondsAsString;
-    Logger.log("Duration = " + formatted);
+    writer.Info("Duration = " + formatted);
 
     return new Promise((resolve) => {
       resolve(formatted);
-      Logger.log(formatted);
+      writer.Info(formatted);
     });
   } catch (err) {
-    Logg(err + " : Calculating the duration has failed for some reason.");
+    writer.Error(`${err} : Calculating the duration has failed for some reason.`);
   }
 };
 
@@ -436,8 +442,6 @@ const CheckMissingAccessStudents = () => {
       }
     });
   }
-  Logger.log(emails);
-  Logger.log(names);
 
   //Return the names of the missing students
   return names;
@@ -484,9 +488,6 @@ const CheckMissingAccessStudents2 = () => {
     })
   })
 
-  Logger.log(emails);
-  Logger.log(names);
-
   //Return the names of the missing students
   return names;
 };
@@ -496,7 +497,7 @@ const CheckMissingAccessStudents2 = () => {
  *
  */
 const Help = () => {
-  //go to some kind of help file that breaks down using JPS, step by step.
+  // Go to some kind of help file that breaks down using JPS, step by step.
   let info = [
     "Note : All status changes trigger an email to the student except for 'CLOSED' status",
     "New Project comes into a sheet and status will automatically be set to 'Received'.",
@@ -583,6 +584,7 @@ class JobNumberGenerator
   constructor(date){
     this.date = date ? date : new Date();
     this.jobnumber;
+    this.writer = new WriteLogger();
   }
 
   Create() {
@@ -590,18 +592,18 @@ class JobNumberGenerator
     try {
       if ( this.date == undefined || this.date == null || this.date == "" || testedDate == false ) {
         this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
-        Logger.log(`Set Jobnumber to a new time because timestamp was missing.`);
+        this.writer.Info(`Set Jobnumber to a new time because timestamp was missing.`);
       } else {
         this.jobnumber = +Utilities.formatDate(this.date, `PST`, `yyyyMMddhhmmss`);
-        Logger.log(`Input time: ${this.date}, Set Jobnumber: ${this.jobnumber}`);
+        this.writer.Warning(`Input time: ${this.date}, Set Jobnumber: ${this.jobnumber}`);
       }
     } catch (err) {
-      Logger.log(`${err} : Couldn't fix jobnumber.`);
+      this.writer.Error(`${err} : Couldn't fix jobnumber.`);
     }
     if (this.jobnumber == undefined || testedDate == false) {
       this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
     }
-    Logger.log(`Returned Job Number : ${this.jobnumber}`);
+    this.writer.Info(`Returned Job Number : ${this.jobnumber}`);
     return this.jobnumber.toString();
   };
 

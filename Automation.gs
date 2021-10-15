@@ -24,14 +24,14 @@ const UpdatePrices = () => {
  * Used in "UpdatePriced()" function
  */
 const WritePrice = (sheet) => {
-    let prices = [];
-    let range = sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues();
-    range.forEach(link => prices.push(GetPriceFromShopify(link)));
-    Logger.log(prices);
+  let prices = [];
+  let range = sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues();
+  range.forEach(link => prices.push(GetPriceFromShopify(link)));
+  Logger.log(prices);
 
-    prices.forEach( (price, index) => {
-      sheet.getRange(index + 2, 6, 1, 1).setValue(price);
-    });
+  prices.forEach( (price, index) => {
+    sheet.getRange(index + 2, 6, 1, 1).setValue(price);
+  });
 }
 
 

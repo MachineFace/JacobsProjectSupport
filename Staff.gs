@@ -178,7 +178,7 @@ const CreateDS = () => {
         let DS = new DesignSpecialist(_name, _fullname, _email);  //Make a new DS
         DSList.push(DS);  //Push to List
     }
-    DSList.forEach(element => Logg(element));
+    // DSList.forEach(element => WriteLog(element));
     // @ts-ignore
     return DSList;
 }
