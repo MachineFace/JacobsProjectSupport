@@ -74,7 +74,7 @@ const onSubmission = async (e) => {
   writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  const jobnumber = await new JobNumberGenerator(timestamp).Create();
+  let jobnumber = await new JobNumberGenerator(timestamp).Create();
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
   // Check Priority
@@ -779,30 +779,27 @@ const GetPriorityFromEmail = (email) => {
 };
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Get Priority Number from Erik's List
- * @param {string} name, email or SID
- * @returns {number} priority number 1 - 4
- */
-const GetPriorityFromANY = (any) => {
+const GetPriority2 = (email, sid) => {
   const writer = new WriteLogger();
   let priority;
-  any = 3034073475;  // test good sid
-  // any = 2323453444;   // test bad sid
-  // any = "helentongli@berkeley.edu"; // good test
-  if (any) any.toString().replace(/\s+/g, "");
-  const finder = OTHERSHEETS.approved.createTextFinder(any).findNext();
-  if (finder != null) {
-    let row = finder.getRow();
-    priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
-    writer.Info(`ROW : ${row} : PRIORITY : ${priority}`);
-  } else if (!finder) {
-    priority = "STUDENT NOT FOUND!";
-    writer.Warning(`PRIORITY : ${priority}`);
+  let emailSearch, sidSearch;
+  const search = SearchSpecificSheet(OTHERSHEETS.approved, email);
+  if(search) {
+    emailSearch = OTHERSHEETS.approved.getRange(search, 4, 1, 1).getValue().toString();
+    if(emailSearch == "STUDENT NOT FOUND!") {
+      const secondSearch = SearchSpecificSheet(OTHERSHEETS.approved, sid);
+      if(secondSearch) {
+        sidSearch = OTHERSHEETS.approved.getRange(secondSearch, 4, 1, 1).getValue().toString();
+      }
+    }
   }
+  if(emailSearch) priority = emailSearch;
+  else if(sidSearch) priority = sidSearch;
+  writer.Info(`Priority ----> ${priority}`);
   return priority;
-}
+};
+
+
 
 
 /**
@@ -850,7 +847,15 @@ const GetPriorityFromEmailOrSID = (email, sid) => {
 
 
 const _testGetPriority = () => {
-  GetPriorityFromEmailOrSID(`laxbop@berkeley.edu`,3036051329)
+  const writer = new WriteLogger();
+  let p1 = GetPriority2(`laxbop@berkeley.edu`,3036051329) // Good Email and Good SID
+  let p2 = GetPriority2(`laxbop@berkeley.edu`, 12938749123) // Good Email, Bad SID
+  let p3 = GetPriority2(`ding@bat.edu`, 3036051329) // Bad Email, Good SID
+  let p4 = GetPriority2(`ding@bat.edu`, 2394872349587) // Bad Email, Bad SID
+  writer.Info(`Good Email and Good SID : ${p1}`);
+  writer.Warning(`Good Email, Bad SID : ${p2}`);
+  writer.Warning(`Bad Email, Good SID : ${p3}`);
+  writer.Error(`Bad Email, Bad SID : ${p4}`);
 }
 
 

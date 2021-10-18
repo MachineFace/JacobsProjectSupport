@@ -27,6 +27,21 @@ const Search = (value) => {
   return res;
 }
 
+/**
+ * Search a Specific Sheets for a value
+ * @required {string} value
+ * @returns {[sheet, [values]]} list of sheets with lists of indexes
+ */
+const SearchSpecificSheet = (sheet, value) => {
+  const writer = new WriteLogger();
+  if (value) value.toString().replace(/\s+/g, "");
+
+  const finder = sheet.createTextFinder(value).findNext();
+  if (finder != null) {
+    return finder.getRow();
+  } else return false;
+
+}
 
 
 /**  
