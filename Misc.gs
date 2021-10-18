@@ -4,17 +4,28 @@
  */
 
 
+
 /**
- * Search an Array for a Specific Value
- * @required {[string]} array to search
- * @required {string} searchString
- * @returns {int} index
+ * Search all Sheets for a value
+ * @required {string} value
+ * @returns {[sheet, [values]]} list of sheets with lists of indexes
  */
-const Search = (values, searchString) => {
-  values.forEach( (value, index) => {
-    if(value[0] == searchString) return index;
-  })
-};
+const Search = (value) => {
+  const writer = new WriteLogger();
+  // value = "laxbop@berkeley.edu";  // test good sid
+  if (value) value.toString().replace(/\s+/g, "");
+  let res = {};
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    const finder = sheet.createTextFinder(value).findAll();
+    if (finder != null) {
+      temp = [];
+      finder.forEach(result => temp.push(result.getRow()));
+      res[sheet.getName()] = temp;
+    }
+  }
+  writer.Debug(JSON.stringify(res));
+  return res;
+}
 
 
 
@@ -71,7 +82,6 @@ const FormatCell = (cell) => {
       // writer.Debug(`Value of col: ${colName} row: ${row} is ${data[row - 1][col]}`);
     }
   } catch (err) {
-    //Logger.log(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
     writer.Error(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
   }
 };
@@ -101,22 +111,6 @@ const setByHeader = (theSheet, colName, row, val) => {
 };
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Custom Logger function - Writes to the tab called "Logger" for debugging purposes
- * @param {string} message
- * @returns message to specific logger sheet
- */
-const WriteLog = (message) => {
-  let thisRow = OTHERSHEETS.logger.getLastRow() + 1;
-  try {
-    OTHERSHEETS.logger.getRange(thisRow, 1).setValue(new Date());
-    OTHERSHEETS.logger.getRange(thisRow, 2).setValue("INFO");
-    OTHERSHEETS.logger.getRange(thisRow, 3).setValue(message);
-  } catch (err) {
-    Logger.log(`${err} : Couldnt log messages to sheet for whatever reason.`);
-  }
-};
 
 
 /**
@@ -371,125 +365,21 @@ const TimeDiff = (start, end) => {
  * Check Students with Missing Access for their Priority Number if it exists.
  */
 const CheckMissingAccessStudents = () => {
-  let accessPool = {
-    Ultimaker: SHEETS.ultimaker
-      .getRange(2, 3, SHEETS.ultimaker.getLastRow() - 1, 1)
-      .getValues(),
-    "Laser Cutter": SHEETS.laser
-      .getRange(2, 3, SHEETS.laser.getLastRow() - 1, 1)
-      .getValues(),
-    Fablight: SHEETS.fablight
-      .getRange(2, 3, SHEETS.fablight.getLastRow() - 1, 1)
-      .getValues(),
-    Waterjet: SHEETS.waterjet
-      .getRange(2, 3, SHEETS.waterjet.getLastRow() - 1, 1)
-      .getValues(),
-    "Advanced Lab": SHEETS.advancedlab
-      .getRange(2, 3, SHEETS.advancedlab.getLastRow() - 1, 1)
-      .getValues(),
-    Shopbot: SHEETS.shopbot
-      .getRange(2, 3, SHEETS.shopbot.getLastRow() - 1, 1)
-      .getValues(),
-    "Haas & Tormach": SHEETS.haas
-      .getRange(2, 3, SHEETS.haas.getLastRow() - 1, 1)
-      .getValues(),
-    "Vinyl Cutter": SHEETS.vinyl
-      .getRange(2, 3, SHEETS.vinyl.getLastRow() - 1, 1)
-      .getValues(),
-    Othermill: SHEETS.othermill
-      .getRange(2, 3, SHEETS.othermill.getLastRow() - 1, 1)
-      .getValues(),
-    "Other Tools": SHEETS.othertools
-      .getRange(2, 3, SHEETS.othertools.getLastRow() - 1, 1)
-      .getValues(),
-  };
-  // let accessPool = [];
-  // for(const [key, sheet] of Object.entries(SHEETS)) {
-  //   let access = sheet.getRange(2, 3, sheet.getLastRow() -1, 1).getValues();
-  //   access = [].concat(...access);
-  //   accessPool.push(access);
-  // }
-
-  let emails = [];
-  let names = [];
-  for (let [page, values] of Object.entries(accessPool)) {
-    values.forEach((item, index) => {
-      if (item == "STUDENT NOT FOUND!") {
-        let i = index + 2;
-        let email = SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(page)
-          .getRange(i, 9, 1, 1)
-          .getValue()
-          .toString();
-        emails.push(email);
-        let sid = SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(page)
-          .getRange(i, 11, 1, 1)
-          .getValue()
-          .toString();
-        let name = SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(page)
-          .getRange(i, 10, 1, 1)
-          .getValue()
-          .toString();
-        names.push(name);
-
-        let priority = GetPriorityWithEmailOrSID(email, sid);
-        SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(page)
-          .getRange(i, 3, 1, 1)
-          .setValue(priority);
-      }
-    });
+  const writer = new WriteLogger();
+  let results = Search("STUDENT NOT FOUND!");
+  if(results != null) {
+    for(const [sheetName, values] of Object.entries(results)) {
+      values.forEach( row => {
+        let email = getByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Email Address", row);
+        let sid = getByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Your Student ID Number?", row)
+        let priority = GetPriorityFromEmailOrSID(email, sid);
+        writer.Info(`Email : ${email}, SID : ${sid}, Priority : ${priority}`);
+        if(priority != `STUDENT NOT FOUND!`) {
+          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(priority);
+        }
+      })
+    }
   }
-
-  //Return the names of the missing students
-  return names;
-};
-
-
-const CheckMissingAccessStudents2 = () => {
-  let accessPool = [];
-  for(const [key, sheet] of Object.entries(SHEETS)) {
-    let range = sheet.getRange(2, 3, sheet.getLastRow() -1, 1).getValues();
-    range = [].concat(...range);
-    accessPool.push([sheet.getName(), range]);
-  }
-  let emails = [];
-  let names = [];
-  accessPool.forEach( sheet => {
-    sheet[1].forEach( (item, index) => {
-      if (item == "STUDENT NOT FOUND!") {
-        let i = index + 2;
-        let email = SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(sheet[0])
-          .getRange(i, 9, 1, 1)
-          .getValue()
-          .toString();
-        emails.push(email);
-        let sid = SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(sheet[0])
-          .getRange(i, 11, 1, 1)
-          .getValue()
-          .toString();
-        let name = SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(sheet[0])
-          .getRange(i, 10, 1, 1)
-          .getValue()
-          .toString();
-        names.push(name);
-
-        let priority = GetPriorityWithEmailOrSID(email, sid);
-        SpreadsheetApp.getActiveSpreadsheet()
-          .getSheetByName(sheet[0])
-          .getRange(i, 3, 1, 1)
-          .setValue(priority);
-      }
-    })
-  })
-
-  //Return the names of the missing students
-  return names;
 };
 
 /**

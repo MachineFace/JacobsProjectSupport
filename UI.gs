@@ -1,38 +1,3 @@
-/**
- * Build HTML for MaterialMenu()
- */
-const BuildHTMLMenu = () => {
-  let last = STORESHEETS.AdvLabStoreItems.getLastRow() - 1;
-  let materialList = STORESHEETS.AdvLabStoreItems.getRange(2, 1, last, 1).getValues();
-  Logger.log(materialList);
-
-  let html = '<label for="Material 1">Choose a Material:</label> <br/>';
-  html += '<select name="Material 1" id="Material 1">';
-  materialList.forEach(
-    (item) => (html += '   <option value="' + item + '">' + item + "</option>")
-  );
-  html += "</select>";
-  html += '<label for="Material 2">Choose a Material:</label> <br/>';
-  html += '<select name="Material 2" id="Material 2">';
-  materialList.forEach(
-    (item) => (html += '   <option value="' + item + '">' + item + "</option>")
-  );
-  html += "</select>";
-  Logger.log(html);
-  return html;
-};
-
-/**
- * Popup for Materials
- */
-const MaterialMenu = () => {
-  let ui = SpreadsheetApp.getUi();
-  // Display a modal dialog box with custom HtmlService content.
-  let htmlOutput = HtmlService.createHtmlOutput(BuildHTMLMenu())
-    .setWidth(640)
-    .setHeight(480);
-  let modal = ui.showModalDialog(htmlOutput, "JPS Material Selector");
-};
 
 /**
  * Creates a pop-up for counting users.
@@ -64,6 +29,7 @@ const PopupCheckMissingAccessStudents = async () => {
  * Create a pop-up to Create a new Ticket if one is missing.
  */
 const PopupCreateTicket = async () => {
+  const writer = new WriteLogger();
   let ui = SpreadsheetApp.getUi();
 
   let thisSheet = SpreadsheetApp.getActiveSheet();
@@ -237,6 +203,7 @@ const BarMenu = () => {
  * Bill from a selected line
  */
 const BillFromSelected = async () => {
+  const writer = new WriteLogger();
   //Could use a couple checks.  Cant be row 1 that is selected, and cant be more than one row selected.
   //also check that its not the summary page
 
@@ -278,13 +245,13 @@ const BillFromSelected = async () => {
   }
 
   let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-  WriteLog(`Status of billed row = ${status}`);
+  writer.Info(`Status of billed row = ${status}`);
   let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
   let email = getByHeader(thisSheet, "Email Address", thisRow);
   let name = getByHeader(thisSheet, "What is your name?", thisRow);
   //let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
   //let projectname = getByHeader(thisSheet, "Project Name", thisRow);
-  Logger.log(`STATUS : ${status}, JOBNUMBER : ${jobnumber}, EMAIL : ${email}, NAME : ${name}`)
+  writer.Info(`STATUS : ${status}, JOBNUMBER : ${jobnumber}, EMAIL : ${email}, NAME : ${name}`)
 
   //Materials
   // let material1Quantity = ss.getRange(thisRow, 13).getValue();
@@ -342,7 +309,7 @@ const BillFromSelected = async () => {
   let quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
 
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
-    WriteLog(`Cannot bill - no quantity recorded`);
+    writer.Warning(`Cannot bill - no quantity recorded`);
 
     Browser.msgBox(
       "Generate Bill to Shopify",
@@ -357,7 +324,7 @@ const BillFromSelected = async () => {
         Browser.Buttons.OK
       );
       if (response == "OK") {
-        Logger.log(`User clicked "OK".`);
+        writer.Info(`User clicked "OK".`);
         await ss.getRange("AZ" + thisRow).setValue(false);
       }
     } else if (status != "Billed") {
@@ -444,7 +411,7 @@ const BillFromSelected = async () => {
             Browser.Buttons.YES_NO_CANCEL
           );
           if (response == "yes") {
-            Logger.log('User clicked "Yes".');
+            writer.Info('User clicked "Yes".');
             const order = await CreateShopifyOrder(
               customer,
               jobnumber,
@@ -453,7 +420,7 @@ const BillFromSelected = async () => {
             );
             //ss.getRange('AZ' + thisRow).setValue(false);
             await ss.getRange("A" + thisRow).setValue("Billed");
-            Logger.log(order.toString());
+            writer.Info(order.toString());
             let lastOrder = await GetLastShopifyOrder();
             Browser.msgBox(
               boxTitle,
@@ -461,13 +428,11 @@ const BillFromSelected = async () => {
               Browser.Buttons.OK
             );
           } else {
-            Logger.log('User clicked "No / Cancel".');
-            Logger.log("Order NOT Created.");
+            writer.Warning('User clicked "No / Cancel".');
+            writer.Warning("Order NOT Created.");
           }
         } catch (err) {
-          Logger.log(
-            `${err} : Could not generate a message box to gather info.`
-          );
+          writer.Error(`${err} : Could not generate a message box to gather info.`);
         } finally {
           ss.getRange("AZ" + thisRow).setValue(false);
         }

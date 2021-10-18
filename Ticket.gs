@@ -1,149 +1,3 @@
-class Ticket 
-{
-  constructor({
-    designspecialist = "Staff", 
-    submissiontime = new Date(), 
-    name = "Student Name", 
-    email = "Student Email", 
-    projectname = "Project Name",
-    material1Name = "Plywood", 
-    material1Quantity = 0,
-    material2Name, 
-    material2Quantity = 0,
-    ticketName = "PrinterOS Ticket",
-    printerID = "79165",
-    printerName = "Spectrum",
-    printDuration = 2000,
-    jobnumber = 12934871,
-  }){
-    this.designspecialist = designspecialist;
-    this.submissiontime = submissiontime;
-    this.name = name;
-    this.email = email;
-    this.projectname = projectname;
-    this.material1Name = material1Name;
-    this.material1Quantity = material1Quantity;
-    this.material2Name = material2Name;
-    this.material2Quantity = material2Quantity;
-    this.ticketName = ticketName;
-    this.printerID = printerID;
-    this.printerName = printerName;
-    this.printDuration = printDuration;
-    this.jobnumber = jobnumber;
-    this.writer = new WriteLogger();
-  }
-
-  /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Replace table entries with an Image blob
-   * @param {DocumentApp.create(`doc`).getbody()} body
-   * @param {string} text
-   * @param {blob} image
-   */
-  ReplaceTextToImage(body, searchText, image) {
-    var next = body.findText(searchText);
-    if (!next) return;
-    var r = next.getElement();
-    r.asText().setText("");
-    var img = r.getParent().asParagraph().insertInlineImage(0, image);
-    return next;
-  };
-
-  CreateTicket() {
-    const jobnumber = this.jobnumber;
-    const folder = DriveApp.getFoldersByName(`Job Tickets`); //Set the correct folder
-    const doc = DocumentApp.create(this.ticketName); //Make Document
-    let body = doc.getBody();
-    let docId = doc.getId();
-    let url = doc.getUrl();
-    
-    const qGen = new QRCodeAndBarcodeGenerator({url, jobnumber});
-    const barcode = qGen.GenerateBarCode();
-    const qrCode = qGen.GenerateQRCode();
-
-    // Append Document with Info
-    if (doc != undefined || doc != null || doc != NaN) {
-      let header = doc
-        .addHeader()
-        .appendTable([[`img1`, `img2`]])
-        .setAttributes({
-          [DocumentApp.Attribute.BORDER_WIDTH]: 0,
-          [DocumentApp.Attribute.BORDER_COLOR]: `#ffffff`,
-        });
-      this.ReplaceTextToImage(header, `img1`, barcode);
-      this.ReplaceTextToImage(header, `img2`, qrCode);
-
-      body.insertHorizontalRule(0);
-      body.insertParagraph(1, "Email: " + this.email.toString())
-        .setHeading(DocumentApp.ParagraphHeading.HEADING1)
-        .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 18,
-          [DocumentApp.Attribute.BOLD]: true,
-        });
-      body.insertParagraph(2, "Printer: " + this.printerName.toString())
-        .setHeading(DocumentApp.ParagraphHeading.HEADING2)
-        .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 12,
-          [DocumentApp.Attribute.BOLD]: true,
-        });
-
-      // Create a two-dimensional array containing the cell contents.
-      body.appendTable([
-          ["Date Started", this.submissiontime.toString()],
-          ["Design Specialist:", this.designspecialist],
-          ["Job Number:", this.jobnumber.toString()],
-          ["Student Email:", this.email.toString()],
-          ["Elapsed time : ", this.printDuration.toString()],
-          ["Materials:", `PLA : ${this.material1Quantity}`],
-          ["Materials:", `Breakaway Support : ${this.material2Quantity}`],
-        ])
-        .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 9,
-        });
-
-      // Remove File from root and Add that file to a specific folder
-      try {
-        const docFile = DriveApp.getFileById(docId);
-        DriveApp.removeFile(docFile);
-        folder.next().addFile(docFile);
-        folder.next().addFile(barcode);
-      } catch (err) {
-        this.writer.Error(`Whoops : ${err}`);
-      }
-
-
-      // Set permissions to 'anyone can edit' for that file
-      let file = DriveApp.getFileById(docId);
-      file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
-    }
-    // Return Document to use later
-    this.writer.Info(JSON.stringify(doc))
-    return doc;
-  };
-}
-
-const _testTicket = () => {
-  const dummyObj = {
-    designspecialist : "Mike",
-    submissiontime : new Date(),
-    name : "Stu Dent",
-    email : "email@email.com",
-    projectname : "Pro Jecta",
-    material1Quantity : 5000,
-    material2Quantity : 9000,
-
-  }
-  const tic = new Ticket(dummyObj).CreateTicket();
-  Logger.log(tic);
-}
-
-
-
-
-
-
-
-
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Create a Ticket to Print
@@ -162,6 +16,194 @@ const _testTicket = () => {
  * @param {string} material2Name
  * @returns {doc} doc
  */
+class Ticket 
+{
+  constructor(jobnumber){
+    this.jobnumber = jobnumber;
+    this.designspecialist;
+    this.submissiontime;
+    this.name;
+    this.email;
+    this.projectname;
+    this.material1Name;
+    this.material1Quantity;
+    this.material2Name;
+    this.material2Quantity;
+    this.sheetName;
+    this.row;
+    this.doc;
+    this.url;
+    this.writer = new WriteLogger();
+  }
+
+
+  GetInfo() {
+    let thisSheet;
+    for(const [key, sheet] of Object.entries(SHEETS)) {
+      const finder = sheet.createTextFinder(this.jobnumber).findNext();
+      if (finder != null) {
+        this.row = finder.getRow();
+        thisSheet = sheet;
+        this.sheetName = sheet.getName();
+      }
+    }
+    this.designspecialist = this.GetByHeader(thisSheet, "(INTERNAL): DS Assigned", this.row);
+    this.submissiontime = this.GetByHeader(thisSheet, "Timestamp", this.row);
+    this.email = this.GetByHeader(thisSheet, "Email Address", this.row);
+    this.name = this.GetByHeader(thisSheet, "What is your name?", this.row);
+    this.projectname = this.GetByHeader(thisSheet, "Project Name", this.row);
+    this.material1Name = this.GetByHeader(thisSheet, "(INTERNAL) Item 1", this.row);
+    this.material1Quantity = this.GetByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", this.row);
+    this.material2Name = this.GetByHeader(thisSheet, "(INTERNAL) Item 2", this.row);
+    this.material2Quantity = this.GetByHeader(thisSheet, "(INTERNAL) Material 2 Quantity", this.row);
+  }
+
+  GetByHeader (sheet, colName, row) {
+    let data = sheet.getDataRange().getValues();
+    let col = data[0].indexOf(colName);
+    if (col != -1) {
+      return data[row - 1][col];
+    }
+  };
+
+  CreateTicket() {
+    const folder = DriveApp.getFoldersByName(`Job Tickets`); //Set the correct folder
+    this.doc = DocumentApp.create(`Job Ticket-${this.jobnumber}`); //Make Document
+    this.url = this.doc.getUrl();
+    let body = this.doc.getBody();
+    let docId = this.doc.getId();
+    
+    const qGen = new QRCodeAndBarcodeGenerator({url : url, jobnumber : this.jobnumber});
+    const barcode = qGen.GenerateBarCode();
+    const qrCode = qGen.GenerateQRCode();
+
+    this.GetInfo();
+
+    let mat = [];
+    let partcount = [];
+    let notes = [];
+    if (this.sheetName == "Ultimaker") {
+      mat.push( "Needs Breakaway Removed:", SHEETS.ultimaker.getRange("AD" + this.row).getValue().toString());
+      partcount.push( "Part Count:", SHEETS.ultimaker.getRange("Y" + this.row).getValue().toString());
+      notes.push( "Notes:", SHEETS.ultimaker.getRange("AE" + this.row).getValue().toString());
+    }
+    if (this.sheetName == "Laser Cutter") {
+      mat.push( "Rough Dimensions:", SHEETS.laser.getRange("AA" + this.row).getValue().toString() );
+      partcount.push("Part Count:", SHEETS.laser.getRange("Y" + this.row).getValue().toString() );
+      notes.push( "Notes:", SHEETS.laser.getRange("AC" + this.row).getValue().toString() );
+    }
+    if (this.sheetName == "Fablight") {
+      mat.push( "Rough Dimensions:", SHEETS.fablight.getRange("AA" + this.row).getValue().toString() );
+      partcount.push( "Part Count:", SHEETS.fablight.getRange("AB" + this.row).getValue().toString() );
+      notes.push( "Notes:", SHEETS.fablight.getRange("AC" + this.row).getValue().toString() );
+    }
+    if (this.sheetName == "Waterjet") {
+      mat.push( "Rough Dimensions:", SHEETS.waterjet.getRange("AA" + this.row).getValue().toString() );
+      partcount.push( "Part Count:", SHEETS.waterjet.getRange("AB" + this.row).getValue().toString() );
+      notes.push( "Notes:", SHEETS.waterjet.getRange("AD" + this.row).getValue().toString() );
+    }
+    if (this.sheetName == "Advanced Lab") {
+      mat.push( "Which Printer:", SHEETS.advancedlab.getRange("Z" + this.row).getValue().toString() );
+      partcount.push( "Part Count:", SHEETS.advancedlab.getRange("Y" + this.row).getValue().toString() );
+      notes.push( "Notes:", SHEETS.advancedlab.getRange("AJ" + this.row).getValue().toString() );
+    } else {
+      mat.push("Materials: ", "None");
+      partcount.push("Part Count: ", "None");
+      notes.push("Notes: ", "None");
+    }
+
+    // Append Document with Info
+    if (this.doc != undefined || this.doc != null || this.doc != NaN) {
+      try {
+        let header = this.doc
+          .addHeader()
+          .appendTable([
+            ['img1', 'img2']
+          ])
+          .setAttributes({
+            [DocumentApp.Attribute.BORDER_WIDTH]: 0,
+            [DocumentApp.Attribute.BORDER_COLOR]: `#ffffff`,
+          });
+        this.ReplaceTextToImage(header, `img1`, barcode);
+        this.ReplaceTextToImage(header, `img2`, qrCode);
+
+        body.insertHorizontalRule(0);
+        body.insertParagraph(1, "Name: " + name.toString())
+          .setHeading(DocumentApp.ParagraphHeading.HEADING1)
+          .setAttributes({
+            [DocumentApp.Attribute.FONT_SIZE]: 18,
+            [DocumentApp.Attribute.BOLD]: true,
+          });
+        body.insertParagraph(2, "Job Number: " + +jobnumber.toString())
+          .setHeading(DocumentApp.ParagraphHeading.HEADING2)
+          .setAttributes({
+            [DocumentApp.Attribute.FONT_SIZE]: 12,
+            [DocumentApp.Attribute.BOLD]: true,
+          });
+
+        // Create a two-dimensional array containing the cell contents.
+        body.appendTable([
+            ["Design Specialist:", designspecialist.toString()],
+            ["Job Number:", jobnumber.toString()],
+            ["Student Name:", name.toString()],
+            ["Project Name:", projectname.toString()],
+            [mat[0], mat[1]],
+            [partcount[0], partcount[1]],
+            [notes[0], notes[1]],
+          ])
+          .setAttributes({
+            [DocumentApp.Attribute.FONT_SIZE]: 9,
+          });
+      } catch (err) {
+        this.writer.Error(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
+      }
+
+      // Remove File from root and Add that file to a specific folder
+      try {
+        const docFile = DriveApp.getFileById(docId);
+        DriveApp.removeFile(docFile);
+        folder.next()
+          .addFile(docFile)
+          .addFile(barcode)
+      } catch (err) {
+        this.writer.Error(`Whoops : ${err}`);
+      }
+
+
+      // Set permissions to 'anyone can edit' for that file
+      let file = DriveApp.getFileById(docId);
+      file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
+    }
+    // Return Document to use later
+    this.writer.Info(JSON.stringify(doc))
+    return doc;
+  };
+
+  ReplaceTextToImage (body, searchText, image) {
+    let next = body.findText(searchText);
+    if (!next) return;
+    let r = next.getElement();
+    r.asText().setText("");
+    r.getParent().asParagraph().insertInlineImage(image);
+    return next;
+  };
+  
+}
+
+const _testTicket = () => {
+  const jnum = 20210920145816;
+  const tic = new Ticket(jnum).CreateTicket();
+  Logger.log(tic);
+}
+
+
+
+
+
+
+
+
+
 var CreateTicket = (
   designspecialist,
   priority,
@@ -326,3 +368,19 @@ const ReplaceTextToImage = (body, searchText, image) => {
   var img = r.getParent().asParagraph().insertInlineImage(0, image);
   return next;
 };
+
+
+
+const _testFind = () => {
+  let thisRow;
+  let thisSheet;
+  let jobnumber = 20210920145816;
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    const finder = sheet.createTextFinder(jobnumber).findNext();
+    if (finder != null) {
+      thisRow = finder.getRow();
+      thisSheet = sheet.getName();
+    }
+  }
+  Logger.log(`Sheet : ${thisSheet}, ROW : ${thisRow}`)
+}

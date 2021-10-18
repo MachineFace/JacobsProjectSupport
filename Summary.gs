@@ -7,10 +7,10 @@
  * @param {dataRange} dataRange
  * @returns {html} htmlBody
  */
-var getEmailHtml = (dataRange) => {
-    var htmlTemplate = HtmlService.createTemplateFromFile("tabletemplate.html");
+const getEmailHtml = (dataRange) => {
+    let htmlTemplate = HtmlService.createTemplateFromFile("TableTemplate.html");
     htmlTemplate.items = dataRange;
-    var htmlBody = htmlTemplate.evaluate().getContent();
+    const htmlBody = htmlTemplate.evaluate().getContent();
     return htmlBody;
 }
 
@@ -22,7 +22,7 @@ var getEmailHtml = (dataRange) => {
  * @param {any} values
  * @returns {[any]} list
  */
-var getData = (values) => {
+const getData = (values) => {
     values.shift(); //remove headers
     let items = [];
     values.forEach(function (value) {
@@ -52,7 +52,6 @@ var getData = (values) => {
 
         items.push(item);
     })
-    // @ts-ignore
     return items;
 }
 

@@ -78,7 +78,7 @@ const onSubmission = async (e) => {
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
   // Check Priority
-  var priority = await GetPriorityWithEmailOrSID(email, sid);
+  var priority = await GetPriorityFromEmailOrSID(email, sid);
   //sheet.getRange("C" + lastRow).setValue(priority);
   setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority);
 
