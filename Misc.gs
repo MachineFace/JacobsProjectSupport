@@ -387,7 +387,7 @@ const CheckMissingAccessStudents = () => {
       values.forEach( row => {
         let email = getByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Email Address", row);
         let sid = getByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Your Student ID Number?", row)
-        let priority = GetPriorityFromEmailOrSID(email, sid);
+        let priority = GetPriority(email, sid);
         writer.Info(`Email : ${email}, SID : ${sid}, Priority : ${priority}`);
         if(priority != `STUDENT NOT FOUND!`) {
           SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(priority);

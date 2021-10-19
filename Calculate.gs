@@ -7,66 +7,38 @@
  * @returns {duration} formatted time
  */
 const CalculateAverageTurnaround = (sheet) => {
+
   const writer = new WriteLogger();
   // Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
   let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); // Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
-
-  // Get list of times and remove all the Bullshit
-  let revisedTimes = [];
-  try {
-    for (let i = 0; i < completionTimes.length; i++) {
-      let time = completionTimes[i][0];
-      if (time != '' || time != undefined || time != null || time != ' ' || time != NaN || time != '[]') {
-        let ds = time.replace(" ", ":");
-        let t = ds.split(':');
-        if (!isNaN(parseFloat(t[1])) && isFinite(t[1])) // check if the 2nd number out of the array of 4 is BS or not - if not BS, write the values to the array
-        {
-          revisedTimes.push(t);
-        }
-      }
-    }
-  }
-  catch (err) {
-    writer.Error(`${err} : Couldn't fetch list of times. Probably a sheet error.`);
-  }
-
-  //Convert everything to seconds
+  completionTimes = [].concat(...completionTimes);
+  let culled = completionTimes.filter(Boolean);
+  
+  // Convert everything to seconds
   let totals = [];
-  try {
-    for (let i = 0; i < revisedTimes.length; i++) {
-      //Time
-      let days = (+revisedTimes[i][0] * 24 * 60); //days to hours to minutes
-      let hours = (+revisedTimes[i][1] * 60); //hours to minutes
-      let minutes = (+revisedTimes[i][2]); //minutes     
-      let seconds = (+revisedTimes[i][3]); //seconds, forget about seconds
+  culled.forEach(time => {
+    let days = (+time[0] * 24 * 60); // days to hours to minutes
+    let hours = (+time[1] * 60); // hours to minutes
+    let minutes = (+time[2]); // minutes     
+    let seconds = (+time[3]); // seconds, forget about seconds
+    let total = days + hours + minutes;
+    totals.push(total);
+  })
 
-      let total = days + hours + minutes;
-      totals.push(total);
-    }
-  }
-  catch (err) {
-    Logger.log(`${err} : Could not sum times.`);
-  }
+  // Sum all the totals
+  let sum = 0;
+  totals.forEach( (item, index) => sum += item);
 
-  //sum all the totals
-  let totalTotal = 0;
-  for (let i = 0; i < totals.length; i++) {
-    totalTotal += totals[i];
-  }
+  // Average the totals (a list of times in minutes)
+  let average = sum / totals.length;
 
-  //Average the totals (a list of times in minutes)
-  let averageMins = totalTotal / totals.length;
+  let mins = parseInt((average % 60), 10); // Calc mins
+  average = Math.floor(average / 60); // Difference mins to hrs
+  let minutesAsString = mins < 10 ? "0" + mins : mins + ""; // Pad with a zero
 
-  //Recalculate average minutes into readable duration
-  let averageRecalc = averageMins;
-
-  let mins = parseInt((averageRecalc % 60), 10); //Calc mins
-  averageRecalc = Math.floor(averageRecalc / 60); //Difference mins to hrs
-  let minutesAsString = mins < 10 ? "0" + mins : mins + ""; //Pad with a zero
-
-  let hrs = averageRecalc % 24; //Calc hrs
-  averageRecalc = Math.floor(averageRecalc / 24); //Difference hrs to days
-  let dys = averageRecalc;
+  let hrs = average % 24; // Calc hrs
+  average = Math.floor(average / 24); // Difference hrs to days
+  let dys = average;
 
   //Format into readable time and return (if data is still missing, set it to zero)
   if (isNaN(dys)) dys = 0;
@@ -74,9 +46,11 @@ const CalculateAverageTurnaround = (sheet) => {
   if (isNaN(minutesAsString)) minutesAsString = 0;
 
   let formatted = dys + 'd ' + hrs + 'h ' + minutesAsString + "m";
+  writer.Info(formatted);
   return formatted;
 }
 const PrintTurnaroundTimes = () => {
+  const writer = new WriteLogger();
   let data = [];
   for(const [key, sheet] of Object.entries(SHEETS)) {
     data.push([`${sheet.getName()} Turnaround`, CalculateAverageTurnaround(sheet)]);
@@ -86,6 +60,7 @@ const PrintTurnaroundTimes = () => {
     OTHERSHEETS.data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
   })
 }
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------

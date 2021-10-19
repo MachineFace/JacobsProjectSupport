@@ -78,7 +78,7 @@ const onSubmission = async (e) => {
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
   // Check Priority
-  var priority = await GetPriorityFromEmailOrSID(email, sid);
+  var priority = await GetPriority(email, sid);
   //sheet.getRange("C" + lastRow).setValue(priority);
   setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority);
 
@@ -297,7 +297,7 @@ const onChange = async (e) => {
   let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
   let tempSID = getByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
-  const tempPriority = GetPriorityFromEmailOrSID(tempEmail, tempSID);
+  const tempPriority = GetPriority(tempEmail, tempSID);
   setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority);
   if (tempPriority == "STUDENT NOT FOUND") {
       setByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
@@ -705,106 +705,44 @@ const CreateApprovalForm = (name, jobnumber, cost) => {
 
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Get Priority Number from Erik's List
- * Old Excel formula : '=ARRAYFORMULA(ISNUMBER(MATCH(Text(K2:K, "0"), Text('Student List DONOTDELETE'!C2:C500, "0"),0)))'
- * @param {number} sid
- * @returns {number} priority number 1 - 4
- */
-const GetPriority = (sid) => {
-  const writer = new WriteLogger();
-  //sid = 3035249023;  //test good sid
-  //sid = 2323453444;//test bad sid
-
-  //Cast SID to string and remove garbage
-  let stringSID;
-  let priority;
-
-  if (sid) stringSID = sid.toString().replace(/\s+/g, "");
-
-  let index = 0;
-
-  let approvedList = OTHERSHEETS.approved.getRange(2, 3, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues(); //Column C3:C
-
-  //Loop through SIDs to find a match and fetch priority number
-  for (let i = 0; i < approvedList.length; i++) {
-    let item = approvedList[i][0].toString().replace(/\s+/g, "");
-    if (item == stringSID) {
-      index = i + 2;
-      priority = OTHERSHEETS.approved.getRange(index, 4).getValue();
-      break;
-    } else if (item != stringSID) {
-      priority = "STUDENT NOT FOUND!";
-    }
-  }
-
-  writer.Info(`Priority = ${priority}`);
-  //Return value
-  return priority;
-};
-
-
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Get Priority Number from Erik's List
- * Old Excel formula : '=ARRAYFORMULA(ISNUMBER(MATCH(Text(K2:K, "0"), Text('Student List DONOTDELETE'!C2:C500, "0"),0)))'
+ * Get Priority Number
  * @param {string} email
+ * @param {string} sid
  * @returns {number} priority number 1 - 4
  */
-const GetPriorityFromEmail = (email) => {
-  const writer = new WriteLogger();
-  //email = "saveritt@berkeley.edu";  //test good email
-  //email = "some@thing.com";    //test bad email
-
-  let priority;
-
-  let approvedList = OTHERSHEETS.approved.getRange(2, 2, OTHERSHEETS.approved.getLastRow() - 1, 1).getValues();
-
-  //Loop through SIDs to find a match and fetch priority number
-  for (let i = 0; i < approvedList.length; i++) {
-    let item = approvedList[i][0].toString();
-    if (item == email) {
-      let index = i + 2;
-      priority = OTHERSHEETS.approved.getRange(index, 4).getValue();
-      break;
-    } else if (item != email) {
-      priority = "STUDENT NOT FOUND!";
-    }
-  }
-
-  writer.Info(`Priority = ${priority}`);
-  return priority;
-};
-
-
-const GetPriority2 = (email, sid) => {
+const GetPriority = (email, sid) => {
   const writer = new WriteLogger();
   let priority;
   let emailSearch, sidSearch;
-  const search = SearchSpecificSheet(OTHERSHEETS.approved, email);
-  if(search) {
-    emailSearch = OTHERSHEETS.approved.getRange(search, 4, 1, 1).getValue().toString();
-    if(emailSearch == "STUDENT NOT FOUND!") {
-      const secondSearch = SearchSpecificSheet(OTHERSHEETS.approved, sid);
-      if(secondSearch) {
-        sidSearch = OTHERSHEETS.approved.getRange(secondSearch, 4, 1, 1).getValue().toString();
-      }
-    }
+  emailSearch = SearchSpecificSheet(OTHERSHEETS.approved, email);
+  if(emailSearch) {
+    priority = OTHERSHEETS.approved.getRange(emailSearch, 4, 1, 1).getValue().toString();;
   }
-  if(emailSearch) priority = emailSearch;
-  else if(sidSearch) priority = sidSearch;
-  writer.Info(`Priority ----> ${priority}`);
+  else if(!emailSearch) {
+    sidSearch = SearchSpecificSheet(OTHERSHEETS.approved, sid);
+    if(!sidSearch) {
+      priority = "STUDENT NOT FOUND!";
+      return priority;
+    }
+    priority = OTHERSHEETS.approved.getRange(sidSearch, 4, 1, 1).getValue().toString();
+  }
+  if(!emailSearch && !sidSearch) {
+    priority = "STUDENT NOT FOUND!";
+  }
   return priority;
 };
 
 
 
 
+
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Get Priority
+ * DEFUNCT Get Priority
  * @param {string} email
  * @param {string} SID
  * @returns {int} priority
@@ -848,10 +786,10 @@ const GetPriorityFromEmailOrSID = (email, sid) => {
 
 const _testGetPriority = () => {
   const writer = new WriteLogger();
-  let p1 = GetPriority2(`laxbop@berkeley.edu`,3036051329) // Good Email and Good SID
-  let p2 = GetPriority2(`laxbop@berkeley.edu`, 12938749123) // Good Email, Bad SID
-  let p3 = GetPriority2(`ding@bat.edu`, 3036051329) // Bad Email, Good SID
-  let p4 = GetPriority2(`ding@bat.edu`, 2394872349587) // Bad Email, Bad SID
+  let p1 = GetPriority(`laxbop@berkeley.edu`,3036051329) // Good Email and Good SID
+  let p2 = GetPriority(`laxbop@berkeley.edu`, 12938749123) // Good Email, Bad SID
+  let p3 = GetPriority(`ding@bat.edu`, 3036051329) // Bad Email, Good SID
+  let p4 = GetPriority(`ding@bat.edu`, 2394872349587) // Bad Email, Bad SID
   writer.Info(`Good Email and Good SID : ${p1}`);
   writer.Warning(`Good Email, Bad SID : ${p2}`);
   writer.Warning(`Bad Email, Good SID : ${p3}`);
