@@ -9,14 +9,14 @@ class QRCodeAndBarcodeGenerator {
     {
       url = 'jps.jacobshall.org/', 
       jobnumber = Number(Math.floor(Math.random() * 100000)).toFixed(),
-    }) {
+    }
+  ) {
     this.url = url;
     this.jobnumber = jobnumber;
-    this.writer = new WriteLogger();
   }
 
   async GenerateQRCode(){
-    this.writer.Info(`URL : ${this.url}, Jobnumber || RNDNumber : ${this.jobnumber}`);
+    Logger.log(`QRCode URL : ${this.url} For ---> Jobnumber : ${this.jobnumber}`);
     const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
     const params = {
       "method" : "GET",
@@ -29,15 +29,17 @@ class QRCodeAndBarcodeGenerator {
     let qrCode;
     const html = UrlFetchApp.fetch(loc, params);
     const responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
-      qrCode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber ) );
+      let qrBlob = Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber );
+      qrCode = await DriveApp.createFile( qrBlob );
       qrCode.setTrashed(true);
+      Logger.log(qrCode);
+      return qrCode;
+    } else {
+      Logger.log('Failed to GET QRCode');
+      return false;
     }
-    else this.writer.Error('Failed to GET QRCode');
-
-    this.writer.Info(qrCode);
-    return await qrCode;
   }
 
   async GenerateBarCode() {
@@ -64,15 +66,18 @@ class QRCodeAndBarcodeGenerator {
 
     const html = UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
-      barcode = DriveApp.createFile( Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      let barcodeBlob = Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) ;
+      barcode = await DriveApp.createFile( barcodeBlob );
       barcode.setTrashed(true);
-    } 
-    else this.writer.Error('Failed to GET Barcode');
+      Logger.log(barcode);
+      return barcode;
+    } else {
+      Logger.log('Failed to GET Barcode');
+      return false;
+    }
 
-    Logger.log(barcode);
-    return await barcode;
 
   }
   
@@ -85,7 +90,6 @@ class QRCodeAndBarcodeGenerator {
  * 
  */
 const PickupByBarcode = () => {
-  const writer = new WriteLogger();
   const searchUISheet = SpreadsheetApp.getActive().getSheetByName('Pickup');
   const jobnumber = searchUISheet.getRange(3,2).getValue();
   let progress = searchUISheet.getRange(4,2);
@@ -108,7 +112,7 @@ const PickupByBarcode = () => {
       // change status to picked up
       setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
       progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
-      writer.Info(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
+      Logger.log(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();
       //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
       return;

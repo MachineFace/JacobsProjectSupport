@@ -139,6 +139,8 @@ const STORESHEETS = {
   OthermillStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OthermillStoreItems'),
 };
 
+const NONITERABLESHEETS = {...OTHERSHEETS, ...STORESHEETS};
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------

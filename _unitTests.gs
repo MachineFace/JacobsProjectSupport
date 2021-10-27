@@ -52,31 +52,36 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Calc Average Turnaround`, (t) => {
-    let x = CalculateAverageTurnaround(SHEETS.ultimaker);
+    const calc = new Calculate();
+    let x = calc.CalculateAverageTurnaround(SHEETS.ultimaker);
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Calc Duration`, (t) => {
-    let x = CalculateDuration( new Date(1992,03,27), new Date() );
+    const calc = new Calculate();
+    let x = calc.CalculateDuration( new Date(1992,03,27), new Date() );
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Count Active Users`, (t) => {
-    let x = CountActiveUsers();
+    const calc = new Calculate();
+    let x = calc.CountActiveUsers();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Calc Distribution`, (t) => {
-    let x = CalculateDistribution();
+    const calc = new Calculate();
+    let x = calc.CalculateDistribution();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Calc Standard Deviation`, (t) => {
-    let x = CalculateStandardDeviation();
+    const calc = new Calculate();
+    let x = calc.CalculateStandardDeviation();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })

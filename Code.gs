@@ -394,7 +394,8 @@ const onChange = async (e) => {
     if (elapsedCell == undefined || elapsedCell == null || elapsedCell == "") {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
-        let time = await CalculateDuration(startTime, endTime);
+        const calc = new Calculate();
+        let time = await calc.CalculateDuration(startTime, endTime);
 
         // Write to Column - d h:mm:ss
         setByHeader(thisSheet, "Elapsed Time", thisRow, time);
@@ -412,34 +413,11 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Trigger for generating a "Ticket"
   if ( status == STATUS.received || status == STATUS.inProgress || status == STATUS.pendingApproval ) {
+    const ticketGenerator = new Ticket({jobnumber : jobnumber});
     try {
-      var Ticket = await CreateTicket(
-        designspecialist,
-        priority,
-        jobnumber,
-        submissiontime,
-        name,
-        sid,
-        email,
-        projectname,
-        material1Quantity,
-        material1Name,
-        material2Quantity,
-        material2Name,
-        shippingQuestion
-      );
+      const ticket = ticketGenerator.CreateTicket();
     } catch (err) {
-      writer.Error( `${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
-    }
-    try {
-      var id = Ticket.getId();
-      var doc = DocumentApp.openById(id);
-      var docUrl = doc.getUrl();
-      //ss.getRange(thisRow, 5).setValue(docUrl); //Push to cell
-      setByHeader(thisSheet, "Printable Ticket", thisRow, docUrl);
-      writer.Info(`Ticket Created.`);
-    } catch (err) {
-      writer.Error(`${err} : Couldn't push ticket to the cell.`);
+      writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
     }
   }
 

@@ -29,15 +29,25 @@ const PopupCheckMissingAccessStudents = async () => {
  * Create a pop-up to Create a new Ticket if one is missing.
  */
 const PopupCreateTicket = async () => {
-  const writer = new WriteLogger();
   let ui = SpreadsheetApp.getUi();
 
   let thisSheet = SpreadsheetApp.getActiveSheet();
   let ss = thisSheet.getActiveRange().getSheet();
   let sheetname = thisSheet.getName();
   let thisRow = thisSheet.getActiveRange().getRow();
+  let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
 
-  //If It is on a valid sheet
+  // If It is on a valid sheet
+  // for(const [key, sheet] of Object.entries(NONITERABLESHEETS)) {
+  //   if(thisSheet === sheet) {
+  //     Browser.msgBox(
+  //       "Incorrect Sheet Active",
+  //       "Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.",
+  //       Browser.Buttons.OK
+  //     );
+  //     return;
+  //   }
+  // }
   switch (sheetname) {
     case "Logger":
     case "Master Intake Form Responses":
@@ -66,69 +76,17 @@ const PopupCreateTicket = async () => {
       );
       return;
   }
-
-  let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-  let ds = getByHeader(thisSheet, `(INTERNAL): DS Assigned`, thisRow);
-  let priority = getByHeader(thisSheet, `(INTERNAL): Priority`, thisRow);
-  let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  let timestamp = getByHeader(thisSheet, `Timestamp`, thisRow);
-  let name = getByHeader(thisSheet, `What is your name?`, thisRow);
-  let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
-  let email = getByHeader(thisSheet, "Email Address", thisRow);
-  let projectname = getByHeader(thisSheet, "Project Name", thisRow);
-
-  //Materials
-  let material1Quantity = getByHeader(
-    thisSheet,
-    `(INTERNAL) Material 1 Quantity`,
-    thisRow
-  );
-  let material1Name = getByHeader(thisSheet, `(INTERNAL) Item 1`, thisRow);
-  let material2Quantity = getByHeader(
-    thisSheet,
-    `(INTERNAL) Material 2 Quanity`,
-    thisRow
-  );
-  let material2Name = getByHeader(thisSheet, `(INTERNAL) Item 2`, thisRow);
-  let shippingQuestion = getByHeader(
-    thisSheet,
-    `Do you need your parts shipped to you?`,
-    thisRow
-  );
-
-  let ticket;
+  
+  const ticketMaker = new Ticket({jobnumber : jobnumber});
   try {
-    ticket = await CreateTicket(
-      ds,
-      priority,
-      jobnumber,
-      timestamp,
-      name,
-      sid,
-      email,
-      projectname,
-      material1Quantity,
-      material1Name,
-      material2Quantity,
-      material2Name,
-      shippingQuestion
-    );
+    const ticket = ticketMaker.CreateTicket();
   } catch (err) {
     Logger.log(`${err} : Couldn't create a ticket.`);
-  }
-  try {
-    var id = await ticket.getId();
-    var doc = await DocumentApp.openById(id);
-    var docUrl = await doc.getUrl();
-    await ss.getRange(thisRow, 5).setValue(docUrl); //Push to cell
-    Logger.log(`Ticket Created.`);
-  } catch (err) {
-    Logger.log(`${err} : Couldn't push ticket to the cell.`);
   }
 
   ui.alert(
     `JPS Runtime Message`,
-    `Ticket Created for : ${name}, Job Number : ${jobnumber}`,
+    `Ticket Created for : ${ticketMaker.name}, Job Number : ${jobnumber}`,
     ui.ButtonSet.OK
   );
 };
@@ -187,8 +145,8 @@ const BarMenu = () => {
       SpreadsheetApp.getUi()
         .createMenu("Calculate")
         .addItem("Generate Metrics", "Metrics")
-        .addItem("Generate Top Ten", "CreateTopTen")
-        .addItem("Generate Standard Deviation", "CalculateStandardDeviation")
+        .addItem("Generate Top Ten", "RunTopTen")
+        .addItem("Generate Standard Deviation", "RunStandardDeviation")
     )
     .addSeparator()
     .addItem("Help", "PopupHelp")
@@ -199,11 +157,20 @@ const BarMenu = () => {
     .addToUi();
 };
 
+const RunStandardDeviation = () => {
+  const calc = new Calculate();
+  return calc.CalculateStandardDeviation();
+}
+const RunTopTen = () => {
+  const calc = new Calculate();
+  return calc.CreateTopTen();
+}
+
+
 /**
  * Bill from a selected line
  */
 const BillFromSelected = async () => {
-  const writer = new WriteLogger();
   //Could use a couple checks.  Cant be row 1 that is selected, and cant be more than one row selected.
   //also check that its not the summary page
 
@@ -245,13 +212,13 @@ const BillFromSelected = async () => {
   }
 
   let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-  writer.Info(`Status of billed row = ${status}`);
+  Logger.log(`Status of billed row = ${status}`);
   let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
   let email = getByHeader(thisSheet, "Email Address", thisRow);
   let name = getByHeader(thisSheet, "What is your name?", thisRow);
   //let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
   //let projectname = getByHeader(thisSheet, "Project Name", thisRow);
-  writer.Info(`STATUS : ${status}, JOBNUMBER : ${jobnumber}, EMAIL : ${email}, NAME : ${name}`)
+  Logger.log(`STATUS : ${status}, JOBNUMBER : ${jobnumber}, EMAIL : ${email}, NAME : ${name}`)
 
   //Materials
   // let material1Quantity = ss.getRange(thisRow, 13).getValue();
@@ -309,7 +276,7 @@ const BillFromSelected = async () => {
   let quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
 
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
-    writer.Warning(`Cannot bill - no quantity recorded`);
+    Logger.log(`Cannot bill - no quantity recorded`);
 
     Browser.msgBox(
       "Generate Bill to Shopify",
@@ -324,7 +291,7 @@ const BillFromSelected = async () => {
         Browser.Buttons.OK
       );
       if (response == "OK") {
-        writer.Info(`User clicked "OK".`);
+        Logger.log(`User clicked "OK".`);
         await ss.getRange("AZ" + thisRow).setValue(false);
       }
     } else if (status != "Billed") {
@@ -411,7 +378,7 @@ const BillFromSelected = async () => {
             Browser.Buttons.YES_NO_CANCEL
           );
           if (response == "yes") {
-            writer.Info('User clicked "Yes".');
+            Logger.log('User clicked "Yes".');
             const order = await CreateShopifyOrder(
               customer,
               jobnumber,
@@ -420,7 +387,7 @@ const BillFromSelected = async () => {
             );
             //ss.getRange('AZ' + thisRow).setValue(false);
             await ss.getRange("A" + thisRow).setValue("Billed");
-            writer.Info(order.toString());
+            Logger.log(order.toString());
             let lastOrder = await GetLastShopifyOrder();
             Browser.msgBox(
               boxTitle,
@@ -428,11 +395,11 @@ const BillFromSelected = async () => {
               Browser.Buttons.OK
             );
           } else {
-            writer.Warning('User clicked "No / Cancel".');
-            writer.Warning("Order NOT Created.");
+            Logger.log('User clicked "No / Cancel".');
+            Logger.log("Order NOT Created.");
           }
         } catch (err) {
-          writer.Error(`${err} : Could not generate a message box to gather info.`);
+          Logger.log(`${err} : Could not generate a message box to gather info.`);
         } finally {
           ss.getRange("AZ" + thisRow).setValue(false);
         }
@@ -449,3 +416,24 @@ const OpenBarcodeTab = async () => {
   const searchUISheet = SpreadsheetApp.getActive().getSheetByName('Pickup');
   spreadsheet.setActiveSheet(searchUISheet).getRange('B3').activate();
 }
+
+
+// const _t = () => {
+//   const thisSheet = SpreadsheetApp.getActiveSheet();
+//   for(const [key, sheet] of Object.entries(NONITERABLESHEETS)) {
+//     if(thisSheet == sheet) {
+//       Browser.msgBox(
+//         "Incorrect Sheet Active",
+//         "Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.",
+//         Browser.Buttons.OK
+//       );
+//       return;
+//     }
+//   }
+// }
+
+
+
+
+
+

@@ -2,131 +2,127 @@
 
 class ShopifyAPI 
 {
-  constructor(){
+  constructor({
+    jobnumber = 202010011925,
+    email = "jacobsinstitutestore@gmail.com",
+    material1Name = "None",
+    material1Quantity = 0,
+    material2Name = "None",
+    material2Quantity = 0,
+    material3Name = "None",
+    material3Quantity = 0,
+    material4Name = "None",
+    material4Quantity = 0,
+    material5Name = "None",
+    material5Quantity = 0,
+  }){
     this.root = 'https://jacobs-student-store.myshopify.com/admin/api/2021-01/';
     this.api_key = '1e70652225e070b078def8bf6e154e98';
     this.api_pass = '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';
-    this.jobnumber;
-    this.customer;
-    this.writer = new WriteLogger();
+    this.jobnumber = jobnumber;
+    this.email = email;
+
+    this.material1Name = material1Name;
+    this.material1Quantity = material1Quantity;
+    this.material2Name = material2Name;
+    this.material2Quantity = material2Quantity;
+    this.material3Name = material3Name;
+    this.material3Quantity = material3Quantity;
+    this.material4Name = material4Name;
+    this.material4Quantity = material4Quantity;
+    this.material5Name = material5Name;
+    this.material5Quantity = material5Quantity;
+    this.customer = this.GetShopifyCustomerByEmail(this.email);
+    this.pack = this._PackageMaterials();
   }
+
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * For a given material, look up corresponding ProductID
+   * Better Lookup
    * @param {string} material name
-   * @returns {string} productID
+   * @returns {[string, string]} productID, link, price
    */
-  async LookupShopifyProductFromSheet(material) {
-    material = 'Fortus Red ABS-M30'; // Test Material
-
-    const namePool = {
-      'UltimakerStoreItems' : STORESHEETS.UltimakerStoreItems.getRange(2, 1, STORESHEETS.UltimakerStoreItems.getLastRow() -1, 1).getValues(),
-      'LaserStoreItems' : STORESHEETS.LaserStoreItems.getRange(2, 1, STORESHEETS.LaserStoreItems.getLastRow() -1, 1).getValues(),
-      'FablightStoreItems' : STORESHEETS.FablightStoreItems.getRange(2, 1, STORESHEETS.FablightStoreItems.getLastRow() -1, 1).getValues(),
-      'WaterjetStoreItems' : STORESHEETS.WaterjetStoreItems.getRange(2, 1, STORESHEETS.WaterjetStoreItems.getLastRow() -1, 1).getValues(),
-      'AdvLabStoreItems' : STORESHEETS.AdvLabStoreItems.getRange(2, 1, STORESHEETS.AdvLabStoreItems.getLastRow() -1, 1).getValues(),
-      'ShopbotStoreItems' : STORESHEETS.ShopbotStoreItems.getRange(2, 1, STORESHEETS.ShopbotStoreItems.getLastRow() -1, 1).getValues(),
-      'HaasTormachStoreItems' : STORESHEETS.HaasTormachStoreItems.getRange(2, 1, STORESHEETS.HaasTormachStoreItems.getLastRow() -1, 1).getValues(),
-      'VinylCutterStoreItems' : STORESHEETS.VinylCutterStoreItems.getRange(2, 1, STORESHEETS.VinylCutterStoreItems.getLastRow() -1, 1).getValues(),
-      'OthermillStoreItems' : STORESHEETS.OthermillStoreItems.getRange(2, 1, STORESHEETS.OthermillStoreItems.getLastRow() -1, 1).getValues(),
-    }
-
-    let index = 0;
-    let sheetName;
-    let link;
-    let price;
+  _LookupStoreProductDetails(material) {
+    // material = 'Fortus Red ABS-M30'; // Test Material
+    // let out = {}
     let productID;
-    
-    for (let [page, values] of Object.entries(namePool)) {
-      for(let i = 0; i < values.length; i++) {
-        if(values[i] == material) {
-          index = i + 2;
-          sheetName = page;
-          link = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(index, 2, 1, 1).getValue();
-          price = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(index, 6, 1, 1).getValue();
-          productID = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(page).getRange(index, 4, 1, 1).getValue();
-          break;
-        }
+    for (const [key, sheet] of Object.entries(STORESHEETS)) {
+      const find = SearchSpecificSheet(sheet, material);
+      if(find !== false) {
+        let index = find;
+        // let sheetName = sheet.getName();
+        // let link = sheet.getRange(index, 2, 1, 1).getValue();
+        // let price = sheet.getRange(index, 6, 1, 1).getValue();
+        productID = sheet.getRange(index, 4, 1, 1).getValue();
+        // out["productID"] = productID;
+        // out["link"] = link;
+        // out["price"] = price;
       }
-    }
-      
-    this.link = link;
-    this.price = price;
-    this.productID = productID;
-
-    //Logger.log('Material Found in Material Sheets: ' + material + ', Product ID : ' + this.productID.toString() + ', Index : ' + index + ', Price : $' + this.price);
-    //Logger.log(productID);
-    return productID;
-      
+    } 
+    // Logger.log(JSON.stringify(out));
+    return productID.toString();
   }
-
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Packages Materials in a way that can be used in MakeLineItems
    * @returns {[{string}]} materials
    */
-  async PackageMaterials(material1Name, material1Quantity, material2Name, material2Quantity, material3Name, material3Quantity, material4Name, material4Quantity, material5Name, material5Quantity) {
+  async _PackageMaterials() {
 
-    // //Test Variables
-    // material1Name = 'Fortus Red ABS-M30'; 
-    // material1Quantity = 5;
-    // material2Name = 'Objet Polyjet VeroMagenta RGD851';
-    // material2Quantity = 10;
-    // material3Name = null;
-    // material3Quantity = 123234;
-    // material4Name = 'Stratasys Dimension Soluble Support Material P400SR';
-    // material4Quantity = 15;
-    // material5Name = null;
-    // material5Quantity = 20;
-
-    let pack = [];
-
-    // Lists (Pushing at the same time ensures the lists are the same size.)
-    let materialList = [material1Name, material2Name, material3Name, material4Name, material5Name];
-    let quantityList = [material1Quantity, material2Quantity, material3Quantity, material4Quantity, material5Quantity];
+    let pack = {};
+    // Pack
+    pack["material1"] = { name : this.material1Name, ammount : this.material1Quantity, id : "" };
+    pack["material2"] = { name : this.material2Name, ammount : this.material2Quantity, id : "" };
+    pack["material3"] = { name : this.material3Name, ammount : this.material3Quantity, id : "" };
+    pack["material4"] = { name : this.material4Name, ammount : this.material4Quantity, id : "" };
+    pack["material5"] = { name : this.material5Name, ammount : this.material5Quantity, id : "" };
 
     // Remove when Those are empty / null / undefined
-    materialList.forEach( (material, index) => {
-      if(material == null || material == undefined || material == '' || material == ' ') {
-        materialList.splice(index);
-        quantityList.splice(index);
-      }
-    })
+    for(const [key, values] of Object.entries(pack)) {
+      if(values.name == null || values.ammount == null) {
+        delete pack[key];
+      } else values.id = this._LookupStoreProductDetails(values.name);
+    }
 
-    // Fetch IDS
-    let productIDs = [];
-    materialList.forEach(material => productIDs.push(LookupProductID(material)));
-    productIDs.forEach( (id, index) => {
-      if(id == null || id == undefined || id == '') {
-        productIDs.splice(index,1);
-      }
-    })
-    this.writer.Debug(productIDs);
+    // Logger.log(JSON.stringify(pack));
 
-    //Fetch Shopify Info
-    let shopifyInfo = [];
-    productIDs.forEach(id => shopifyInfo.push(GetShopifyProductByID(id)));
-    productIDs.forEach( (id,index) => {
-      let matDict = { 
-        name : materialList[index],
+    // Fetch Shopify Info
+    let shopifyPack = [];
+    for(const [key, values] of Object.entries(pack)) {
+      Logger.log(values.id);
+      let info = this.GetShopifyProductByID(values.id);
+      Logger.log(info);
+      shopifyPack.push({ 
+        // name : info.[index],
         title : shopifyInfo[index].title,
         id : shopifyInfo[index].id,
         price : shopifyInfo[index].variants[0].price,
         quantity : quantityList[index],
         subtotal : shopifyInfo[index].variants[0].price * quantityList[index]
-      };
-      pack.push(matDict);
-    })
+      });
+    }
+    // let shopifyInfo = [];
+    // productIDs.forEach(id => shopifyInfo.push(this.GetShopifyProductByID(id)));
+    // productIDs.forEach( (id,index) => {
+    //   let matDict = { 
+    //     name : materialList[index],
+    //     title : shopifyInfo[index].title,
+    //     id : shopifyInfo[index].id,
+    //     price : shopifyInfo[index].variants[0].price,
+    //     quantity : quantityList[index],
+    //     subtotal : shopifyInfo[index].variants[0].price * quantityList[index]
+    //   };
+    //   pack.push(matDict);
+    // })
 
-    // Calculate Sum
-    let sum = [];
-    pack.forEach(mat => sum.push(mat.subtotal));
-    let total_price = sum.reduce((a, b) => a + b, 0);
-    this.writer.Info('Total Price = ' + total_price);
+    // // Calculate Sum
+    // let sum = [];
+    // pack.forEach(mat => sum.push(mat.subtotal));
+    // let total_price = sum.reduce((a, b) => a + b, 0);
+    // Logger.log('Total Price = ' + total_price);
 
-    return pack;
+    // return pack;
   }
 
 
@@ -205,12 +201,12 @@ class ShopifyAPI
     // Fetch Orders
     let html = UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = JSON.parse(html.getContentText());
-      this.writer.Info(`Posted Order! : ${content}`);
+      Logger.log(`Posted Order! : ${content}`);
     } 
-    else this.writer.Error('Failed to POST to Shopify');
+    else Logger.log('Failed to POST to Shopify');
       
   }
 
@@ -225,8 +221,6 @@ class ShopifyAPI
    * Access individual properties by invoking GetShopifyCustomerByEmail(email).id or GetShopifyCustomerByEmail(email).name
    */
   async GetShopifyCustomerByEmail(email) {
-    // email = 'eli_lee@berkeley.edu'; //Test Name
-    // email = "thomaspdevlin@berkeley.edu";
 
     let fields = '&fields=id,first_name,last_name,total_spent';
     let scope = 'customers/search.json?query=email:' + email;
@@ -244,15 +238,15 @@ class ShopifyAPI
     //Fetch Customer
     let html = UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (html.getResponseCode() == 200) {
       //Logger.log('Customer Found! : ' + content);
       let user = JSON.parse(html.getContentText())['customers'][0];
       if(user == undefined || user == null) {
-        this.writer.Warning('User Shopify Account Does Not Exist. Please make a User Account on Shopify.');
+        Logger.log('User Shopify Account Does Not Exist. Please make a User Account on Shopify.');
         return user;
       }
-      this.writer.Info('ID: ' + user['id'] + ', Name : ' + user['first_name'] + ' ' + user['last_name'] + ', Total Spent : ' + user['total_spent']);
+      Logger.log('ID: ' + user['id'] + ', Name : ' + user['first_name'] + ' ' + user['last_name'] + ', Total Spent : ' + user['total_spent']);
 
       this.id = user['id'];
       this.first_name = user['first_name'];
@@ -293,12 +287,12 @@ class ShopifyAPI
       // Fetch Products
       let html = UrlFetchApp.fetch(this.root + repo, params);
       let responseCode = html.getResponseCode();
-      this.writer.Debug(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
       if (responseCode == 200) {
         var parsed = JSON.parse(html.getContentText())['product'];
 
         if(parsed == undefined || parsed == null || parsed == '') {
-          this.writer.Warning(`Couldn't find Product!`);
+          Logger.log(`Couldn't find Product!`);
           return;
         }
 
@@ -310,7 +304,7 @@ class ShopifyAPI
         this.price = parsed.price;
         if(parsed.price == undefined) this.price = parsed.variants[0].price;
 
-        this.writer.Info(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
+        Logger.log(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
         return parsed;  
       }
   }
@@ -343,17 +337,15 @@ class ShopifyAPI
     // Fetch Products
     let html = UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200) {
       var parsed = JSON.parse(html.getContentText())['orders'][0];
 
       let orderInfo = 'ORDER PLACED \\n TIME: ' + parsed.created_at + '\\n' + 'ORDER NUMBER : ' + parsed.name + '\\n' + 'TO : ' + parsed.email + '\\n' + 'FOR : $' + parsed.total_price;
-      this.writer.Info(orderInfo);
+      Logger.log(orderInfo);
       return parsed;  
     }
-    else {
-      return null;
-    }
+    else return null;
   }
 
 
@@ -386,7 +378,7 @@ class ShopifyAPI
     // Fetch Products
     let html = UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200) {
       var parsed = JSON.parse(html.getContentText())['orders'];
 
@@ -399,8 +391,8 @@ class ShopifyAPI
       });
       let storeSpent = spent.reduce((a, b) => a + b, 0);
       this.total = storeSpent;
-      this.writer.Info(orderNums);
-      this.writer.Info(storeSpent);
+      Logger.log(orderNums);
+      Logger.log(storeSpent);
 
       return orderNums;  
     }
@@ -437,11 +429,11 @@ class ShopifyAPI
     // Fetch Reports
     let html = await UrlFetchApp.fetch(this.root, params);
     let responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
 
     if (responseCode == 200) {
       let content = html.getContentText()
-      this.writer.Info(`Reports : ${content}`)
+      Logger.log(`Reports : ${content}`)
 
       return content 
     }
@@ -469,11 +461,11 @@ class ShopifyAPI
     // Fetch Reports
     let html = await UrlFetchApp.fetch(this.root, params);
     let responseCode = html.getResponseCode();
-    this.writer.Debug(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
     if (responseCode == 200) {
       let content = html.getContentText();
-      this.writer.Info(`Reports : ${content.toString()}`)
+      Logger.log(`Reports : ${content.toString()}`)
 
       return content;  
     }
@@ -484,16 +476,33 @@ class ShopifyAPI
 }
 
 const _testAPI = async () => {
-  const shopify = new ShopifyAPI();
+  const jobnumber = new JobNumberGenerator().Create();
+  const shopify = new ShopifyAPI({
+    jobnumber : jobnumber,
+    email : "jacobsinstitutestore@gmail.com",
+    material1Name : 'Fortus Red ABS-M30',
+    material1Quantity : 5,
+    material2Name : 'Objet Polyjet VeroMagenta RGD851',
+    material2Quantity : 10,
+    material3Name : null,
+    material3Quantity : 123234,
+    material4Name : 'Stratasys Dimension Soluble Support Material P400SR',
+    material4Quantity : 15,
+    material5Name : null,
+    material5Quantity : 20,
+  });
   // let product = await shopify.LookupShopifyProductFromSheet();
   // let lastOrder = await shopify.GetLastShopifyOrder();
   // let orders = await shopify.GetShopifyOrdersList();
   // let product = await shopify.GetShopifyProductByID(7751141320);
-  let customer = await shopify.GetShopifyCustomerByEmail('jacobsinstitutestore@gmail.com');
-  let pack = await shopify.PackageMaterials('Fortus Red ABS-M30', 5,'Objet Polyjet VeroMagenta RGD851',10,null,123234,'Stratasys Dimension Soluble Support Material P400SR',15,null,20);
-  let lineItems = await shopify.MakeLineItems(pack);
-  let order = await shopify.CreateShopifyOrder(customer, 1293847123, pack, lineItems);
-  Logger.log(customer)
+  // let customer = await shopify.GetShopifyCustomerByEmail('jacobsinstitutestore@gmail.com');
+  // let pack = await shopify.PackageMaterials('Fortus Red ABS-M30', 5,'Objet Polyjet VeroMagenta RGD851',10,null,123234,'Stratasys Dimension Soluble Support Material P400SR',15,null,20);
+  // let lineItems = await shopify.MakeLineItems(pack);
+  // let order = await shopify.CreateShopifyOrder(customer, 1293847123, pack, lineItems);
+  // let lookup = shopify.LookupShopifyProductFromSheet2();
+  // let customer = shopify.SetCustomer("jacobsinstitutestore@gmail.com");
+  let pack = shopify._PackageMaterials();
+  // Logger.log(JSON.stringify(pack))
 }
 
 
