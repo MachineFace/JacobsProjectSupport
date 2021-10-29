@@ -48,7 +48,7 @@ class Calculate
   PrintTurnaroundTimes () {
     let data = [];
     for(const [key, sheet] of Object.entries(SHEETS)) {
-      data.push([`${sheet.getName()} Turnaround`, CalculateAverageTurnaround(sheet)]);
+      data.push([`${sheet.getName()} Turnaround`, this.CalculateAverageTurnaround(sheet)]);
     }
     data.forEach( (entry, index) => {
       OTHERSHEETS.data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
@@ -111,7 +111,7 @@ class Calculate
     return count;
   }
   PrintActiveUsers () {
-    const users = CountActiveUsers();
+    const users = this.CountActiveUsers();
     OTHERSHEETS.data.getRange("C4").setValue(users);
   }
 
@@ -132,7 +132,7 @@ class Calculate
     return data;
   }
   PrintSubmissionData () {
-    let data = CountEachSubmission();
+    let data = this.CountEachSubmission();
     data.forEach( (entry, index) => {
       OTHERSHEETS.data.getRange(13 + index , 2, 1, 1).setValue(entry[0]);
       OTHERSHEETS.data.getRange(13 + index , 3, 1, 1).setValue(entry[1]);
@@ -141,7 +141,7 @@ class Calculate
 
 
   CreateTopTen () {
-    const distribution = CalculateDistribution();
+    const distribution = this.CalculateDistribution();
     // Create a new array with only the first 10 items and remove Tests
     let chop = distribution.slice(0, 11);
 
@@ -229,7 +229,7 @@ class Calculate
   }
   PrintTypesCount () {
     let indexes = [];
-    let types = CountTypes();
+    let types = this.CountTypes();
     types.forEach(type => {
       let name = type[0];
       indexes.push(TYPES.indexOf(name));
@@ -307,7 +307,7 @@ class Calculate
 
 
   CalculateStandardDeviation () {
-    const distribution = CalculateDistribution();
+    const distribution = this.CalculateDistribution();
     let n = distribution.length;
     Logger.log(`n = ${n}`);
 
@@ -324,8 +324,7 @@ class Calculate
 
 
   CalculateArithmeticMean () {
-    const writer = new WriteLogger();
-    const distribution = CalculateDistribution();
+    const distribution = this.CalculateDistribution();
     let n = distribution.length;
     Logger.log(`n = ${n}`);
 
@@ -338,9 +337,9 @@ class Calculate
     return mean;
   }
   PrintStatistics () {
-    const mean = CalculateArithmeticMean();
+    const mean = this.CalculateArithmeticMean();
     OTHERSHEETS.data.getRange(102, 3, 1, 1).setValue(mean);
-    const stand = CalculateStandardDeviation();
+    const stand = this.CalculateStandardDeviation();
     OTHERSHEETS.data.getRange(103, 3, 1, 1).setValue(stand);
   }
 
@@ -362,7 +361,7 @@ class Calculate
     return items;  
   }
   PrintTiers () {
-    const tiers = CountTiers();
+    const tiers = this.CountTiers();
     tiers.forEach( (tier, index) => {
       OTHERSHEETS.data.getRange(39 + index, 3, 1, 1).setValue(tier[1]);
       Logger.log(tier)
@@ -395,7 +394,7 @@ class Calculate
     return items; 
   }
   PrintStatusCounts () {
-    let data = CountStatuses();
+    let data = this.CountStatuses();
     let completed = 0;
     let cancelled = 0;
     let inprogress = 0;

@@ -8,7 +8,7 @@ class QRCodeAndBarcodeGenerator {
   constructor(
     {
       url = 'jps.jacobshall.org/', 
-      jobnumber = Number(Math.floor(Math.random() * 100000)).toFixed(),
+      jobnumber = Number(Math.floor(Math.random() * 100000)),
     }
   ) {
     this.url = url;

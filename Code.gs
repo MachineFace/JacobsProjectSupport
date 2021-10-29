@@ -103,38 +103,38 @@ const onSubmission = async (e) => {
   var designspecialistemail;
 
   switch (sheetName) {
-    case "Othermill":
-    case "Shopbot":
+    case SHEETS.othermill.getName():
+    case SHEETS.shopbot.getName():
       designspecialistemail = InvokeDS("Adam", "email");
       //sheet.getRange("B" + lastRow).setValue("Adam");
       setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Adam");
       break;
-    case "Advanced Lab":
-    case "Creaform":
+    case SHEETS.advancedlab.getName():
+    case SHEETS.creaform.getName():
       designspecialistemail = InvokeDS("Chris", "email");
       //sheet.getRange("B" + lastRow).setValue("Chris");
       setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Chris");
       break;
-    case "Canon Plotter":
-    case "Fablight":
-    case "Haas & Tormach":
+    case SHEETS.plotter.getName():
+    case SHEETS.fablight.getName():
+    case SHEETS.haas.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
       setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Cody");
       break;
-    case "Waterjet":
-    case "Other Tools":
+    case SHEETS.waterjet.getName():
+    case SHEETS.othertools.getName():
       designspecialistemail = InvokeDS("Gary", "email");
       //sheet.getRange("B" + lastRow).setValue("Gary");
       setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Gary");
       break;
-    case "Laser Cutter":
+    case SHEETS.laser.getName():
       //Nobody assigned / Everyone assigned.
       break;
-    case "Ultimaker":
+    case SHEETS.ultimaker.getName():
       designspecialistemail = InvokeDS("Nicole", lastRow, "email");
       break;
-    case "Vinyl Cutter":
+    case SHEETS.vinyl.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
       setByHeader(sheet, "(INTERNAL): DS Assigned",  lastRow, "Cody");

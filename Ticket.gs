@@ -206,7 +206,7 @@ class Ticket
       if (!next) return;
       let r = next.getElement();
       r.asText().setText("");
-      r.getParent().asParagraph().insertInlineImage(imageBlob);
+      r.getParent().asParagraph().insertInlineImage(0,imageBlob);
       return next;
     } catch (err) {
       Logger.log(`${err} : Couldn't swap out text for images....`);
