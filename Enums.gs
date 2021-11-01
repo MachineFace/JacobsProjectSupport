@@ -119,7 +119,6 @@ const OTHERSHEETS = {
   logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Logger"),
   data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Metrics"),
   backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Background Data Mgmt"),
-  billing: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Billing"),
 }
 
 

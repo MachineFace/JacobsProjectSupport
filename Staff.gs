@@ -15,54 +15,70 @@
  */
 class DesignSpecialist
 {
-  constructor(name, fullname, email)
-  {
-    this._name = name;
-    this._fullname = fullname;
-    this._email = email;
-    var link;
-    this._type = 'Design Specialist';
-    this._admin = true;
+  constructor({
+    name = `DS`, 
+    fullname = `Design Specialist`, 
+    email = `jacobsprojectsupport@berkeley.edu`
+  }) {
+    this.name = name;
+    this.fullname = fullname;
+    this.email = email;
+    this.link = '<a href = "' + this.email + '">' + this.email + '</a>';
+    this.type = 'Design Specialist';
+    this.isAdmin = true;
+    this.shortCode = `DS`;
   }
-  get name() { return this._name; }
-  set name(x) { this._name = x; }
-  get fullname() { return this._fullname; }
-  set fullname(x) { this._fullname = x; }
-  get email() { return this._email; }
-  set email(x) { this._email = x; }
-  get link() { return '<a href = "' + this._email + '">' + this._email + '</a>'; }
-  get type() { return this._type; }
-  get admin() { return this._admin; }
+  
+  get() {
+    return {
+      name : this.name,
+      fullname : this.fullname,
+      email : this.email,
+      link : this.link,
+      type : this.type,
+      isAdmin : this.isAdmin,
+      shortCode : this.shortCode,
+    }
+  }
+
 }
 
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * SS Class - child of DS Class
+ * Note: In derived classes, super() must be called before you can use 'this'. Leaving this out will cause a reference error.
  */
 class StudentSupervisor extends DesignSpecialist
 {
-  constructor(name, fullname, email)
-  {
+  constructor({
+    name = `SS`, 
+    fullname = `Student Supervisor`, 
+    email = `jacobsprojectsupport@berkeley.edu`
+  }) {
     // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
     super(name, fullname, email);
-    // Note: In derived classes, super() must be called before you can use 'this'. Leaving this out will cause a reference error.
-    this._name = name;
-    this._fullname = fullname;
-    this._email = email;
-    var link;
-    this._type = 'Student Supervisor';
-    this._admin = false;
+    this.name = name;
+    this.fullname = fullname;
+    this.email = email;
+    this.link = '<a href = "' + this.email + '">' + this.email + '</a>';
+    this.type = 'Student Supervisor';
+    this.isAdmin = false;
+    this.shortCode = `SS`;
   }
-  get name() { return this._name; }
-  set name(x) { this._name = x; }
-  get fullname() { return this._fullname; }
-  set fullname(x) { this._fullname = x; }
-  get email() { return this._email; }
-  set email(x) { this._email = x; }
-  get link() { return '<a href = "' + this._email + '">' + this._email + '</a>'; }
-  get type() { return this._type; }
-  get admin() { return this._admin; }
+
+  get() {
+    return {
+      name : this.name,
+      fullname : this.fullname,
+      email : this.email,
+      link : this.link,
+      type : this.type,
+      isAdmin : this.isAdmin,
+      shortCode : this.shortCode,
+    }
+  }
+
 }
 
 
@@ -72,37 +88,34 @@ class StudentSupervisor extends DesignSpecialist
  */
 class Manager extends DesignSpecialist 
 { 
-  constructor(name, fullname, email) 
+  constructor({
+    name = `MA`, 
+    fullname = `Manager`, 
+    email = `jacobsprojectsupport@berkeley.edu`
+  }) 
   {
     super(name, fullname, email);
-    this._name = name;
-    this._fullname = fullname;
-    this._email = email;
-    var link;
-    this._type = 'Manager';
-    this._admin = true;
+    this.name = name;
+    this.fullname = fullname;
+    this.email = email;
+    this.link = '<a href = "' + this.email + '">' + this.email + '</a>';
+    this.type = 'Manager';
+    this.isAdmin = true;
+    this.shortCode = `MA`;
   }
-  get name() { return this._name; }
-  set name(x) { this._name = x; }
-  get fullname() { return this._fullname; }
-  set fullname(x) { this._fullname = x; }
-  get email() { return this._email; }
-  set email(x) { this._email = x; }
-  get link() { return '<a href = "' + this._email + '">' + this._email + '</a>'; }
-  get type() { return this._type; }
-  get admin() { return this._admin; }
-}
 
-
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Turn an email address into a link
- * @param {string} email
- * @returns {string} link
- */
-const MakeLink = (email) => {
-    return '<a href="mailto:' + email + '">' + email + '</a>';
+  get() {
+    return {
+      name : this.name,
+      fullname : this.fullname,
+      email : this.email,
+      link : this.link,
+      type : this.type,
+      isAdmin : this.isAdmin,
+      shortCode : this.shortCode,
+    }
+  }
+  
 }
 
 
@@ -112,10 +125,8 @@ const MakeLink = (email) => {
  * Return Staff Email as a string.
  */
 const StaffEmailAsString = () => {
-    let stafflist = OTHERSHEETS.staff;
-    let last = stafflist.getLastRow();
-    let emaillist = stafflist.getRange(2, 3, last - 1, 1).getValues();
-    return emaillist.toString();
+  let emaillist = OTHERSHEETS.staff.getRange(2, 3, OTHERSHEETS.staff.getLastRow() - 1, 1).getValues();
+  return emaillist.toString();
 }
 
 
@@ -134,21 +145,23 @@ const InvokeDS = (name, property) => {
     let _fullname = staff[i][1];
     let _email = staff[i][2];
     let _emailLink = staff[i][3];
-    //Logger.log('name = %s, fullname = %s,  email = %s, emaillink = %s',_name,_fullname,_email,_emailLink);
+    // Logger.log(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
 
     switch (property) {
-        case "fullname":
-          // @ts-ignore
-          if (staff[i][0] == name) return _fullname;
-        case "email":
-          // @ts-ignore
-          if (staff[i][0] == name) return _email;
-        case "emaillink":
-          // @ts-ignore
-          if (staff[i][0] == name) return _emailLink;
+      case "fullname":
+        if (staff[i][0] == name) return _fullname;
+      case "email":
+        if (staff[i][0] == name) return _email;
+      case "emaillink":
+        if (staff[i][0] == name) return _emailLink;
     }
   }
 }
+
+/**
+ * Helper Make Link Function
+ */
+const MakeLink = (email) => `<a href = "${email}">${email}</a>`;
 
 
 
@@ -158,30 +171,55 @@ const InvokeDS = (name, property) => {
  * @returns {[string]} DSList
  */
 const CreateDS = () => {
-    let stafflist = OTHERSHEETS.staff;
-    let last = stafflist.getLastRow();
-    let staffrange = stafflist.getRange(2, 1, last, 4).getValues();
+  let staff = [];
+  let range = OTHERSHEETS.staff.getRange(2, 1, OTHERSHEETS.staff.getLastRow() - 1, 5).getValues();
+  let culled = range.filter(Boolean);
 
-    let DSList = [];
-    for (let i = 0; i < staffrange.length - 1; i++) {
-        let _name = staffrange[i][0];
-        let _fullname = staffrange[i][1];
-        let _email = staffrange[i][2];
-        let _emailLink = staffrange[i][3];
-
-        if (_emailLink == null || _emailLink == undefined || _emailLink == "" && _email != null) {
-            // @ts-ignore
-            _emailLink = MakeLink(_email);
-            stafflist.getRange(last, 4).setValue(_emailLink);
-        }
-        // @ts-ignore
-        let DS = new DesignSpecialist(_name, _fullname, _email);  //Make a new DS
-        DSList.push(DS);  //Push to List
+  culled.forEach( row => {
+    let name = row[0];
+    let fullname = row[1];
+    let email = row[2];
+    let link = row[3];
+    let type = row[4];
+    // Logger.log(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
+    if(email && !link) {
+      link = MakeLink(email);
+      OTHERSHEETS.staff.getRange(OTHERSHEETS.staff.getLastRow() - 1, 4).setValue(link);
     }
-    // DSList.forEach(element => WriteLog(element));
-    // @ts-ignore
-    return DSList;
+    if(type == "DS") {
+      let ds = new DesignSpecialist({name : name, fullname : fullname, email : email});
+      staff.push(ds);
+    } else if(type == "MA") {
+      let ma = new Manager({name : name, fullname : fullname, email : email});
+      staff.push(ma)
+    } else if(type == "SS") {
+      let ss = new StudentSupervisor({name : name, fullname : fullname, email : email});
+      staff.push(ss);
+    }
+  });
+  Logger.log(JSON.stringify(staff));
+  return staff;
 }
+
+
+const _testDS = () => {
+  const ds = new DesignSpecialist({
+    name : "Mike",
+    fullname : "Mike Special",
+    email : "some@email.com",
+  })
+  Logger.log(ds.get())
+  Logger.log(`Name : ${ds.name}`)
+}
+
+
+
+
+
+
+
+
+
 
 
 

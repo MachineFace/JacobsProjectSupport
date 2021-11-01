@@ -11,7 +11,9 @@ const _gastTestRunner = async () => {
   if ((typeof GasTap)==='undefined') { 
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
   } 
-  const test = new GasTap()
+  const test = new GasTap();
+  const calc = new Calculate();
+  const shopify = new ShopifyAPI({jobnumber : 1129384729384});
 
   // await test(`Checking...`, (t) => {    
   //     let i = 3 + 4
@@ -52,35 +54,30 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Calc Average Turnaround`, (t) => {
-    const calc = new Calculate();
     let x = calc.CalculateAverageTurnaround(SHEETS.ultimaker);
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Calc Duration`, (t) => {
-    const calc = new Calculate();
     let x = calc.CalculateDuration( new Date(1992,03,27), new Date() );
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Count Active Users`, (t) => {
-    const calc = new Calculate();
     let x = calc.CountActiveUsers();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Calc Distribution`, (t) => {
-    const calc = new Calculate();
     let x = calc.CalculateDistribution();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Calc Standard Deviation`, (t) => {
-    const calc = new Calculate();
     let x = calc.CalculateStandardDeviation();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
@@ -93,37 +90,32 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Get Last Shopify Order`, (t) => {
-    let shopify = new ShopifyAPI();
-    let x = shopify.GetLastShopifyOrder();
+    let x = shopify.GetLastOrder();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Get Shopify Orders List`, (t) => {
-    let shopify = new ShopifyAPI();
-    let x = shopify.GetShopifyOrdersList();
+    let x = shopify.GetOrdersList();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Shopify Lookup Product ID`, (t) => {
-    let shopify = new ShopifyAPI();
-    let x = shopify.LookupShopifyProductFromSheet(`Fortus Red ABS-M30`);
+    let x = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Shopify Functions`, (t) => {
-    let shopify = new ShopifyAPI();
-    let x = shopify.GetShopifyCustomerByEmail(`eli_lee@berkeley.edu`);
+    let x = shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
     t.pass(`Good : ${JSON.stringify(x)}`);
     t.fail(`Bad`);
   })
 
   await test(`Shopify Functions`, (t) => {
-    let shopify = new ShopifyAPI();
-    let p = shopify.LookupShopifyProductFromSheet(`Fortus Red ABS-M30`);
-    let x = shopify.GetShopifyProductByID(p);
+    let p = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
+    let x = shopify.GetProductByID(p);
     t.pass(`Good : ${JSON.stringify(x)}`);
     t.fail(`Bad`);
   })
@@ -165,21 +157,15 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Priority With Email or SID`, (t) => {
-      let goodEmailBadSID = GetPriorityWithEmailOrSID(`wkoch@berkeley.edu`, `12093487123`)
-      let badEmailGoodSID = GetPriorityWithEmailOrSID(`nmaitra@berkeley.edu`, `3033953355` )
-      let badEmailGoodSID2 = GetPriorityWithEmailOrSID(`some@thing.com`, `1029384712`)
+      let goodEmailBadSID = GetPriorityFromEmailOrSID(`wkoch@berkeley.edu`, `12093487123`)
+      let badEmailGoodSID = GetPriorityFromEmailOrSID(`nmaitra@berkeley.edu`, `3033953355` )
+      let badEmailGoodSID2 = GetPriorityFromEmailOrSID(`some@thing.com`, `1029384712`)
       t.pass(`Good : ${goodEmailBadSID}, ${badEmailGoodSID}, ${badEmailGoodSID2}`)
       t.fail(`Bad`)
   })
 
   await test(`Priority From Email`, (t) => {
-      let x = GetPriorityFromEmail(`saveritt@berkeley.edu`)
-      t.pass(`Good : ${x}`)
-      t.fail(`Bad`)
-  })
-
-  await test(`Priority`, (t) => {
-      let x = GetPriority(`3035249023`)
+      let x = GetPriorityFromEmailOrSID(`saveritt@berkeley.edu`, 3035249023);
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
@@ -189,86 +175,10 @@ const _gastTestRunner = async () => {
       t.pass(`Good : ${x}`)
       t.fail(`Bad`)
   })
-
-  test.finish()
+  await test.finish();
 }
 
 
-
-// /**
-//  * Unit Test for Shopify Functions
-//  */
-// const _testShopifyFunctions = async () => {
-//       try {
-//           let lastOrder = await GetLastShopifyOrder()
-//           Logger.log(`Last Shopify Order : ${lastOrder}`)
-
-//           let orderList = await GetShopifyOrdersList()
-//           Logger.log(`Shopify Order List: ${orderList}`)
-
-//           let productID = await LookupProductID(`Fortus Red ABS-M30`)
-//           Logger.log(`Product ID : ${productID}`)
-
-//           let getEmail = await GetShopifyCustomerByEmail(`eli_lee@berkeley.edu`)
-//           Logger.log(`Get Shopify Customer by Email : ${JSON.stringify(getEmail)}`)
-
-//           let shopifyProduct = await GetShopifyProductByID(productID)
-//           Logger.log(`Get Shopify Product : ${JSON.stringify(shopifyProduct)}`)
-
-//           let customer = await GetShopifyCustomerByEmail(`jacobsinstitutestore@gmail.com`)
-//           let materialsList = [`Fortus Red ABS-M30`, 5, `Objet Polyjet VeroMagenta RGD851`, 10, null, 123, `Stratasys Dimension Soluble Support Material P400SR`, 15, null, 20]
-//           let pack = await PackageMaterials(`Fortus Red ABS-M30`, 5, `Objet Polyjet VeroMagenta RGD851`, 10, null, 123, `Stratasys Dimension Soluble Support Material P400SR`, 15, null, 20)
-//           let lines = await MakeLineItems(pack)
-//           let order = await CreateShopifyOrder(customer, `1203948734998987`, materialsList, lines) 
-//           Logger.log(`Order : ${JSON.stringify(order)}`)
-
-//       } catch(err) {
-//           Logger.log(`${err} : Whoops`)
-//       }
-// }
-
-
-// /**
-//  * Unit Test for Making 'OnEdit' Messages
-//  */
-// const _testOnEditMessages = async () => {
-//   const message = new CreateMessage('Cody', 'Test Project', '101293874098', 'url',
-//     'material1URL', 45, 'TestPLA',
-//     'material2URL', 15, 'TestBreakaway',
-//     'mat3URL', 23, 'Steel',
-//     'mat4URL', 24, 'Aluminum',
-//     'mat5URL', 75, 'Plastic',
-//     'designspecialist', 'cody@glen.com', 45.50);
-
-//     Logger.log('DEFAULT' + message.defaultMessage);
-//     Logger.log('RECEIVED' + message.receivedMessage);
-//     Logger.log('PENDING' + message.pendingMessage);
-//     Logger.log('IN-PROGRESS' + message.inProgressMessage);
-//     Logger.log('COMPLETED' + message.completedMessage);
-//     Logger.log('PICKEDUP' + message.pickedUpMessage);
-//     Logger.log('SHIPPING QUESTION' + message.shippingQuestion);
-//     Logger.log('SHIPPED' + message.shippedMessage);
-//     Logger.log('FAILED' + message.failedMessage);
-//     Logger.log('REJECTED' + message.rejectedByStudentMessage);
-//     Logger.log('BILLED' + message.billedMessage);
-
-//     return Promise.resolve( message );
-// }
-
-
-
-// /**
-//  * Unit Test for Making 'OnformSubmit' messages
-//  */
-// const _testOnformSubmitMessages = async () => {
-//     const message = new CreateSubmissionMessage('Cody', 'SomeProject', 102938471431 );
-//     Logger.log('DS MESSAGE' + message.dsMessage);
-//     Logger.log('CREAFORM MESSAGE' + message.creaformMessage);
-//     Logger.log('MISSING ACCESS' + message.missingAccessMessage);
-//     Logger.log('SHIPPING MESSAGE' + message.shippingMessage);
-
-//     return Promise.resolve( message );
-// }
 
 // /**
 //  * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 

@@ -388,6 +388,7 @@ const TimeDiff = (start, end) => {
  * Check Students with Missing Access for their Priority Number if it exists.
  */
 const CheckMissingAccessStudents = () => {
+  let list = [];
   let results = Search("STUDENT NOT FOUND!");
   if(results != null) {
     for(const [sheetName, values] of Object.entries(results)) {
@@ -397,38 +398,15 @@ const CheckMissingAccessStudents = () => {
         let priority = GetPriority(email, sid);
         Logger.log(`Email : ${email}, SID : ${sid}, Priority : ${priority}`);
         if(priority != `STUDENT NOT FOUND!`) {
+          list.push(email);
           SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(priority);
         }
       })
     }
   }
+  return list;
 };
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- *
- */
-const Help = () => {
-  // Go to some kind of help file that breaks down using JPS, step by step.
-  let info = [
-    "Note : All status changes trigger an email to the student except for 'CLOSED' status",
-    "New Project comes into a sheet and status will automatically be set to 'Received'.",
-    "Assign yourself as the DS / SS and fill in the materials as best you can.",
-    "Change the status to 'In-Progress' when you're ready to start the project.",
-    "Wait 30 seconds for the printable ticket to generate, and print it.",
-    "Fabricate the project.",
-    "When it's done, bag the project + staple the ticket to the bag and change the status to 'Completed'.",
-    "Select any cell in the row and choose 'Generate Bill' to bill the student. The status will change itself to 'Billed'.",
-    "If you don't need to bill the student, choose 'CLOSED' status.",
-    "If you need to cancel the job, choose 'Cancelled'. ",
-    "If the project can't be fabricated at all, choose 'FAILED', and email the student why it failed.",
-    "If you need student approval before proceeding, choose 'Pending Approval'. ",
-    "'Missing Access' will be set automatically, and you should not choose this as an option.",
-    "If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. ",
-    "See Cody or Chris for additional help + protips.",
-  ];
-  return info;
-};
 
 
 
@@ -535,5 +513,33 @@ const _testJobNumberGen = () => {
   const formatted = gen.Format();
   Logger.log(formatted);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

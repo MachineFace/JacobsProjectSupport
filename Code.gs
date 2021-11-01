@@ -78,9 +78,8 @@ const onSubmission = async (e) => {
   setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
   // Check Priority
-  var priority = await GetPriority(email, sid);
-  //sheet.getRange("C" + lastRow).setValue(priority);
-  setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority);
+  let priority = await new Priority({email : email, sid : sid});
+  setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority.priority);
 
   // Create Messages
   var message = await new CreateSubmissionMessage(name, projectname, jobnumber);
@@ -165,18 +164,18 @@ const onSubmission = async (e) => {
   writer.Info(`Status refixed to 'Received'.`);
 
   // "Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
-  var shippingbody = message.shippingMessage;
+  // var shippingbody = message.shippingMessage;
 
-  if (shipping == "Yes") {
-    //Email
-    GmailApp.sendEmail(email, "Jacobs Project Support : Shipping Form", "", {
-      htmlBody: shippingbody,
-      from: supportAlias,
-      bcc: InvokeDS("Chris", "email"),
-      name: gmailName,
-    });
-    writer.Info(`Shipping instructions email sent.`);
-  }
+  // if (shipping == "Yes") {
+  //   //Email
+  //   GmailApp.sendEmail(email, "Jacobs Project Support : Shipping Form", "", {
+  //     htmlBody: shippingbody,
+  //     from: supportAlias,
+  //     bcc: InvokeDS("Chris", "email"),
+  //     name: gmailName,
+  //   });
+  //   writer.Info(`Shipping instructions email sent.`);
+  // }
 
   // Creaform Email with instructions for student dropoff.
   var creaformMessage = message.creaformMessage;
@@ -297,10 +296,10 @@ const onChange = async (e) => {
   let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
   let tempSID = getByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
-  const tempPriority = GetPriority(tempEmail, tempSID);
-  setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority);
+  let tempPriority = new Priority({email : tempEmail, sid : tempSID});
+  setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority.priority);
   if (tempPriority == "STUDENT NOT FOUND") {
-      setByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
+    setByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
 
   // STATUS CHANGE TRIGGER
@@ -327,27 +326,22 @@ const onChange = async (e) => {
   //Materials
   const material1Quantity = getByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
   const material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
-  // const material1URL = LookupProductID(material1Name).link;
   const material1URL = "";
 
   const material2Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
   const material2Name = getByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
-  // const material2URL = LookupProductID(material2Name).link;
   const material2URL = "";
 
   const material3Quantity = getByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
   const material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
-  // const material3URL = LookupProductID(material3Name).link;
   const material3URL = "";
 
   const material4Quantity = getByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
   const material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
-  // const material4URL = LookupProductID(material4Name).link;
   const material4URL = "";
 
   const material5Quantity = getByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
   const material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
-  // const material5URL = LookupProductID(material5Name).link;
   const material5URL = "";
 
   if (material1Name != "") var mat1 = true;
@@ -369,7 +363,6 @@ const onChange = async (e) => {
   try {
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).Create();
-      //ss.getRange(thisRow, 6).setValue(jobnumber);
       setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
       writer.Info(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
@@ -401,8 +394,7 @@ const onChange = async (e) => {
         setByHeader(thisSheet, "Elapsed Time", thisRow, time);
         writer.Info(`Turnaround Time = ${time}`);
 
-        //Write Completed time
-        //ss.getRange(thisRow, 43).setValue(endTime);
+        // Write Completed time
         setByHeader(thisSheet, "Date Completed", thisRow, endTime);
       }
     }
@@ -424,8 +416,14 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Make an approval form on demand
   // Create a new form, then add a checkbox question, a multiple choice question,
+  let approvalURL;
   if (status == STATUS.pendingApproval) {
-    var approvalURL = await CreateApprovalForm(name, jobnumber, cost);
+    const approvalform = await new ApprovalFormBuilder({
+      name : name,
+      jobnumber : jobnumber,
+      cost : cost,
+    })
+    approvalURL = approvalform.url;
     writer.Info(`Approval Form generated and sent to user.`);
   }
 
@@ -586,192 +584,10 @@ const onChange = async (e) => {
 };
 
 
-/**
- * =======================================================================================================================================================================
- * =======================================================================================================================================================================
- * FUNCTIONS
- */
-
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Create Approval Form
- * @param {string} name
- * @param {number} jobnumber
- * @returns {string} approval form
- */
-const CreateApprovalForm = (name, jobnumber, cost) => {
-  const writer = new WriteLogger();
-  try {
-    // Make a new approval form
-    let approvalForm = FormApp.create("Approval Form");
-
-    //Set parent folder
-    //var parentFolder = DriveApp.getFolderById("1EpvCTyuCkNzKQ4sxYrZvwPqGqzRvgtRX").addFile(approvalForm);
-
-    let sendloc = "16oCqmnW9zCUhpQLo3TXsaUSxDcSv7aareEVSE9zYtVQ";
-    let destination = approvalForm.setDestination( FormApp.DestinationType.SPREADSHEET, sendloc );
-    // Form Setup
-    approvalForm.setTitle(`Approval Form`)
-      .setDescription(`Referrence Number: ${jobnumber}`)
-      .setConfirmationMessage(`Thanks for responding!`)
-      .setAllowResponseEdits(false)
-      .setAcceptingResponses(true);
-
-    //Ask Questions
-    if (cost == "" || cost == undefined || cost == 0) {
-      writer.Info(`Approval form: No known cost. cost = ${cost}`);
-      let item = approvalForm.addMultipleChoiceItem().setRequired(true)
-        .setTitle(`For this job, the cost of materials was not specified. 
-          Please speak with a Design Specialist if you have questions. 
-          Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`)
-        .setChoices([
-          item.createChoice(`Yes, I approve.`),
-          item.createChoice(`No. I reject.`),
-        ]);
-    } else {
-      let costFormatted = Utilities.formatString("$%.2f", cost);
-      writer.Info(`Approval form: Known cost. cost = ${costFormatted}`);
-      let item = approvalForm.addMultipleChoiceItem().setRequired(true)
-        .setTitle(`For this job, the cost of materials is estimated to be: ${costFormatted}. 
-          Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`)
-        .setChoices([
-          item.createChoice(`Yes, I approve.`),
-          item.createChoice(`No. I reject.`),
-        ]);
-    }
-    let item2 = approvalForm.addMultipleChoiceItem().setRequired(true)
-      .setTitle(`Please select your name below.`)
-      .setChoices([item2.createChoice(name)]);
-    let item3 = approvalForm.addMultipleChoiceItem().setRequired(true)
-      .setTitle(`Please select the job number below.`)
-      .setChoices([item3.createChoice(jobnumber)]);
-    let approvalURL = approvalForm.getPublishedUrl();
-    writer.Info(`Created an Approval Form for the student.`);
-  } catch (err) {
-    writer.Error(`${err} : Couldn't generate Approval Form`);
-  }
-
-  try {
-    // Set folder
-    let folder = DriveApp.getFoldersByName(`Job Forms`);
-
-    // Remove File from root and Add that file to a specific folder
-    let id = approvalForm.getId();
-    let docFile = DriveApp.getFileById(id);
-  } catch (err) {
-    writer.Error(`${err} : Couldn't get the id of the file.`);
-  }
-  try {
-    DriveApp.removeFile(docFile);
-    folder.next().addFile(docFile);
-
-    //Set permissions to 'anyone can edit' for that file
-    DriveApp.getFileById(id)
-      .setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
-  } catch (err) {
-    writer.Error(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
-  }
-  return approvalURL;
-};
 
 
 
 
 
-
-
-
-
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Get Priority Number
- * @param {string} email
- * @param {string} sid
- * @returns {number} priority number 1 - 4
- */
-const GetPriority = (email, sid) => {
-  const writer = new WriteLogger();
-  let priority;
-  let emailSearch, sidSearch;
-  emailSearch = SearchSpecificSheet(OTHERSHEETS.approved, email);
-  if(emailSearch) {
-    priority = OTHERSHEETS.approved.getRange(emailSearch, 4, 1, 1).getValue().toString();;
-  }
-  else if(!emailSearch) {
-    sidSearch = SearchSpecificSheet(OTHERSHEETS.approved, sid);
-    if(!sidSearch) {
-      priority = "STUDENT NOT FOUND!";
-      return priority;
-    }
-    priority = OTHERSHEETS.approved.getRange(sidSearch, 4, 1, 1).getValue().toString();
-  }
-  if(!emailSearch && !sidSearch) {
-    priority = "STUDENT NOT FOUND!";
-  }
-  return priority;
-};
-
-
-
-
-
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * DEFUNCT Get Priority
- * @param {string} email
- * @param {string} SID
- * @returns {int} priority
- */
-const GetPriorityFromEmailOrSID = (email, sid) => {
-  const writer = new WriteLogger();
-  let priority;
-  // any = 3034073475;  // test good sid
-  // any = 2323453444;   // test bad sid
-  // any = "helentongli@berkeley.edu"; // good test
-  if (email) {
-    email.toString().replace(/\s+/g, "");
-    const finder = OTHERSHEETS.approved.createTextFinder(email).findNext();
-    if (finder != null) {
-      let row = finder.getRow();
-      priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
-      writer.Info(`ROW : ${row} : PRIORITY : ${priority}`);
-    } else if (!finder) {
-      priority = "STUDENT NOT FOUND!";
-      writer.Warning(`PRIORITY : ${priority}`);
-    }
-  }
-  if(sid) {
-    sid.toString().replace(/\s+/g, "");
-    const finder = OTHERSHEETS.approved.createTextFinder(sid).findNext();
-    if (finder != null) {
-      let row = finder.getRow();
-      priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
-      writer.Info(`ROW : ${row} : PRIORITY : ${priority}`);
-    } else if (!finder) {
-      priority = "STUDENT NOT FOUND!";
-      writer.Warning(`PRIORITY : ${priority}`);
-    }
-  } else priority = "STUDENT NOT FOUND!";
-  
-  return priority;
-}
-
-
-
-
-const _testGetPriority = () => {
-  const writer = new WriteLogger();
-  let p1 = GetPriority(`laxbop@berkeley.edu`,3036051329) // Good Email and Good SID
-  let p2 = GetPriority(`laxbop@berkeley.edu`, 12938749123) // Good Email, Bad SID
-  let p3 = GetPriority(`ding@bat.edu`, 3036051329) // Bad Email, Good SID
-  let p4 = GetPriority(`ding@bat.edu`, 2394872349587) // Bad Email, Bad SID
-  writer.Info(`Good Email and Good SID : ${p1}`);
-  writer.Warning(`Good Email, Bad SID : ${p2}`);
-  writer.Warning(`Bad Email, Good SID : ${p3}`);
-  writer.Error(`Bad Email, Bad SID : ${p4}`);
-}
 
 

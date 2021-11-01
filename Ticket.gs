@@ -79,34 +79,50 @@ class Ticket
     const qrCode = await qGen.GenerateQRCode();
     Logger.log(`Barcode ----> ${barcode}`);
 
+    let material, part, note;
     let mat = [];
     let partcount = [];
     let notes = [];
     switch(this.sheetName) {
       case 'Ultimaker':
-        mat.push( "Needs Breakaway Removed:", this.GetByHeader(SHEETS.ultimaker, 'Does your project need the support material removed?', this.row).toString());
-        partcount.push( "Part Count:", this.GetByHeader(SHEETS.ultimaker, 'Part Count', this.row).toString());
-        notes.push( "Notes:", this.GetByHeader(SHEETS.ultimaker, 'Notes', this.row).toString());
+        material = this.GetByHeader(SHEETS.ultimaker, 'Does your project need the support material removed?', this.row);
+        if(material) mat.push( "Needs Breakaway Removed:", material.toString());
+        part = this.GetByHeader(SHEETS.ultimaker, 'Part Count', this.row);
+        if(part) partcount.push( "Part Count:", part.toString());
+        note = this.GetByHeader(SHEETS.ultimaker, 'Notes', this.row);
+        if(note) notes.push( "Notes:", note.toString());
         break;
       case "Laser Cutter":
-        mat.push( "Rough Dimensions:", this.GetByHeader(SHEETS.laser, 'Rough dimensions of your part', this.row).toString());
-        partcount.push("Part Count:", this.GetByHeader(SHEETS.laser, 'Total number of parts needed', this.row).toString());
-        notes.push( "Notes:", this.GetByHeader(SHEETS.laser, 'Notes', this.row).toString());
+        material = this.GetByHeader(SHEETS.laser, 'Rough dimensions of your part', this.row)
+        if(material) mat.push( "Rough Dimensions:", material.toString());
+        part = this.GetByHeader(SHEETS.laser, 'Total number of parts needed', this.row);
+        if(part) partcount.push("Part Count:", part.toString());
+        note = this.GetByHeader(SHEETS.laser, 'Notes', this.row);
+        if(note) notes.push( "Notes:", note.toString());
         break;
       case "Fablight":
-        mat.push( "Rough Dimensions:", this.GetByHeader(SHEETS.fablight, 'Rough dimensions of your part?', this.row).toString());
-        partcount.push( "Part Count:", this.GetByHeader(SHEETS.fablight, 'How many parts do you need?', this.row).toString());
-        notes.push( "Notes:", this.GetByHeader(SHEETS.fablight, 'Notes:', this.row).toString());
+        material = this.GetByHeader(SHEETS.fablight, 'Rough dimensions of your part?', this.row);
+        if(material) mat.push( "Rough Dimensions:", material.toString());
+        part = this.GetByHeader(SHEETS.fablight, 'How many parts do you need?', this.row);
+        if(part) partcount.push( "Part Count:", part.toString());
+        note = this.GetByHeader(SHEETS.fablight, 'Notes:', this.row);
+        if(note) notes.push( "Notes:", note.toString());
         break;
       case "Waterjet":
-        mat.push( "Rough Dimensions:", this.GetByHeader(SHEETS.waterjet, 'Rough dimensions of your part', this.row).toString());
-        partcount.push( "Part Count:", this.GetByHeader(SHEETS.waterjet, 'How many parts do you need?', this.row).toString());
-        notes.push( "Notes:", this.GetByHeader(SHEETS.waterjet, 'Notes', this.row).toString());
+        material = this.GetByHeader(SHEETS.waterjet, 'Rough dimensions of your part', this.row);
+        if(material) mat.push( "Rough Dimensions:", material.toString());
+        part = this.GetByHeader(SHEETS.waterjet, 'How many parts do you need?', this.row);
+        if(part) partcount.push( "Part Count:", part.toString());
+        lnote = this.GetByHeader(SHEETS.waterjet, 'Notes', this.row);
+        if(note) notes.push( "Notes:", note.toString());
         break;
       case "Advanced Lab":
-        mat.push( "Which Printer:", this.GetByHeader(SHEETS.advancedlab, 'Which printer?', this.row).toString());
-        partcount.push( "Part Count:", this.GetByHeader(SHEETS.advancedlab, 'Total number of parts needed', this.row).toString());
-        notes.push( "Notes:", this.GetByHeader(SHEETS.advancedlab, 'Other Notes About This Job', this.row).toString());
+        material = this.GetByHeader(SHEETS.advancedlab, 'Which printer?', this.row);
+        if(material) mat.push( "Which Printer:", material.toString());
+        part = this.GetByHeader(SHEETS.advancedlab, 'Total number of parts needed', this.row);
+        if(part) partcount.push( "Part Count:", part.toString());
+        note = this.GetByHeader(SHEETS.advancedlab, 'Other Notes About This Job', this.row);
+        if(note) notes.push( "Notes:", note.toString());
         break;
       default:
         mat.push("Materials: ", "None");
