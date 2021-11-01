@@ -126,7 +126,7 @@ class ShopifyAPI
     for(const [key, values] of Object.entries(pack)) {
       Logger.log(values.id);
       let info = await this.GetProductByID(values.id);
-      let subtotal = +Number(info.variants[0].price * pack[key].ammount).toFixed(2);
+      let subtotal = +Number.parseFloat(info.variants[0].price * pack[key].ammount).toFixed(2);
       sum += subtotal;
       shopifyPack.push({ 
         name : key,
@@ -142,7 +142,7 @@ class ShopifyAPI
         }],  
       });
     }
-    const total = +Number(sum).toFixed(2);
+    const total = +Number.parseFloat(sum).toFixed(2);
     this.totalprice = total;
     Logger.log(`Total Price = ${total}`);
 
