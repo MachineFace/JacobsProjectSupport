@@ -17,7 +17,7 @@ class ShopifyAPI
     material5Quantity = 0,
   }){
     this.jobnumber = jobnumber;
-    this.root = 'https://jacobs-student-store.myshopify.com/admin/api/2021-01/';
+    this.root = 'https://jacobs-student-store.myshopify.com/admin/api/2021-10/';
     this.api_key = '1e70652225e070b078def8bf6e154e98';
     this.api_pass = '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';
     this.email = email;
@@ -33,7 +33,7 @@ class ShopifyAPI
     this.material5Name = material5Name;
     this.material5Quantity = material5Quantity;
     // this.GetInfo();
-    this.customer = this.GetCustomerByEmail(this.email);
+    this.customer;
     this.customerID;
     this.pack = this._PackageMaterials();
     this.totalprice;
@@ -158,6 +158,7 @@ class ShopifyAPI
    * Create Shopify Order
    */
   async CreateOrder () {
+    this.customer = await this.GetCustomerByEmail(this.email);
     let repo = 'orders.json/';
 
     let order = {
@@ -332,6 +333,33 @@ class ShopifyAPI
   }
 
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Look up a specific order
+   * @return {string} order data
+   */
+  async GetSpecificOrder(order) {
+    const repo = `orders/${order}.json?`;
+
+    const params = {
+      "method" : "GET",
+      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      "contentType" : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : true
+    };
+    
+    // Fetch Products
+    let html = await UrlFetchApp.fetch(this.root + repo, params);
+    let responseCode = html.getResponseCode();
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    if (responseCode == 200 || responseCode == 201) {
+      let content = JSON.parse(html.getContentText())["order"];
+      return content;  
+    }
+    else return false;
+  }
+
 
 
   /**
@@ -380,6 +408,104 @@ class ShopifyAPI
     }
     else return false;
   }
+
+
+
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Retrieve list of open orders
+   * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
+   * @return {string} order data
+   */
+  async GetUnfulfilledOrders() {
+    let orders = [];
+    const status = `status=any`;
+    const limit = `&limit=250`;
+    const additionalFields = `&financial_status=pending`;
+    const fulfillment = `&fulfillment_status=fulfilled`;
+    const fields = `&fields=id,email,name,total_price,fulfillment_status,financial_status`;
+
+    const repo = 'orders.json?' + status + limit + additionalFields + fulfillment + fields;
+
+    const params = {
+      "method" : "GET",
+      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      "contentType" : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : true
+    };
+    
+    let html = await UrlFetchApp.fetch(this.root + repo, params);
+    let responseCode = html.getResponseCode();
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    if (responseCode == 200 || responseCode == 201) {
+      let parsed = JSON.parse(html.getContentText())['orders'];
+
+      parsed.forEach(item => {
+        if(item.fulfillment_status == `fulfilled`) {
+          orders.push(item);
+          // let id = Number.parseFloat(item.id);
+          // Logger.log(`${id} : ${JSON.stringify(item)}`);  
+        }
+      }); 
+    }
+
+    return orders;
+
+  }
+
+
+
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Retrieve list of open orders
+   * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
+   * @return {string} order data
+   */
+  async CloseUnfulfilledOrders() {
+    let order = 4244891041958;
+
+    const repo = `orders/${order}.json?`;
+    Logger.log(`Putting to this Repo -----> ${this.root + repo}`);
+
+    // let payload = await this.GetSpecificOrder(order);
+    // payload.financial_status = "paid";
+    // payload.fulfillment_status = "fulfilled";
+    // Logger.log(payload)
+
+    const payload = {  
+      "order" : {
+        "id" : order.toString(),
+        "financial_status": "paid",
+        "fulfillment_status": "fulfilled",
+        "note" : "Order closed by Jacobs Billing Support.",
+        "closed_at": new Date().toISOString(),
+        "confirmed": true,
+      },
+    }
+    const params = {
+      "method" : "PUT",
+      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      "contentType" : "application/json",
+      "body" : JSON.stringify(payload),
+      followRedirects : true,
+      muteHttpExceptions : true
+    };
+
+    Logger.log(`Params -----> ${JSON.stringify(params)}`);
+    
+    let html = await UrlFetchApp.fetch(this.root + repo, params);
+    let responseCode = html.getResponseCode();
+    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    Logger.log(`Content -----> ${html.getContentText()}`);
+    if (responseCode == 200 || responseCode == 201) {
+      let content = html.getContentText();
+      Logger.log(content);
+      return content;
+    }
+  }
+
+
 
 
 
@@ -457,21 +583,21 @@ class ShopifyAPI
 
 const _testAPI = async () => {
   const jobnumber = new JobNumberGenerator().Create();
-  // const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
-  const shopify = new ShopifyAPI({
-    jobnumber : jobnumber,
-    email : `pico@pico.com`,
-    material1Name : 'Fortus Red ABS-M30',
-    material1Quantity : 5,
-    material2Name : 'Objet Polyjet VeroMagenta RGD851',
-    material2Quantity : 10,
-    material3Name : null,
-    material3Quantity : 123234,
-    material4Name : 'Stratasys Dimension Soluble Support Material P400SR',
-    material4Quantity : 15,
-    material5Name : null,
-    material5Quantity : 20,
-  });
+  const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
+  // const shopify = new ShopifyAPI({
+  //   jobnumber : jobnumber,
+  //   email : `pico@pico.com`,
+  //   material1Name : 'Fortus Red ABS-M30',
+  //   material1Quantity : 5,
+  //   material2Name : 'Objet Polyjet VeroMagenta RGD851',
+  //   material2Quantity : 10,
+  //   material3Name : null,
+  //   material3Quantity : 123234,
+  //   material4Name : 'Stratasys Dimension Soluble Support Material P400SR',
+  //   material4Quantity : 15,
+  //   material5Name : null,
+  //   material5Quantity : 20,
+  // });
   // let product = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
   // let lastOrder = await shopify.GetLastOrder();
   // let orders = await shopify.GetOrdersList();
@@ -486,7 +612,7 @@ const _testAPI = async () => {
 
   // Logger.log(customer)
   
-  let order = await shopify.CreateOrder();
+  let order = await shopify.CloseUnfulfilledOrders();
   Logger.log(JSON.stringify(order))
 }
 
