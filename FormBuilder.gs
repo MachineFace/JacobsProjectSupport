@@ -1,6 +1,7 @@
 
 /**
- * Approval Form Builder
+ * ----------------------------------------------------------------------------------------------------------------
+ * Class for Building an Approval Form
  */
 class ApprovalFormBuilder
 {

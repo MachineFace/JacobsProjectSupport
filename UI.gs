@@ -437,7 +437,8 @@ const OpenBarcodeTab = async () => {
 
 
 /**
- * Menu Class for Building the Menu
+ * ----------------------------------------------------------------------------------------------------------------
+ * Class for Building a Menu
  */
 class Menu
 {

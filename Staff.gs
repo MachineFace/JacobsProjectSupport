@@ -1,17 +1,8 @@
 
 
-
-
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Design Specialist Class function 
- * @param {string} name
- * @param {string} fullname
- * @param {string} email
- */
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Design Specialist Class
+ * Class for Creating a Design Specialist Employee
  */
 class DesignSpecialist
 {

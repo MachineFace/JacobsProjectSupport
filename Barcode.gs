@@ -1,8 +1,6 @@
 /**
- * Generate a QR code from some data. Feed it a url.
- * @param {string} url
- * @pararm {string} jobnumber
- * @return
+ * ----------------------------------------------------------------------------------------------------------------
+ * Class for Creating a Barcode and QR Code
  */
 class QRCodeAndBarcodeGenerator {
   constructor(

@@ -1,20 +1,6 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Create a Ticket to Print
- * @param {Event} e
- * @param {string} designspecialist
- * @param {bool} priority
- * @param {number} jobnumber
- * @param {time} submissiontime
- * @param {string} name
- * @param {number} sid
- * @param {string} email
- * @param {string} projectname
- * @param {number} material1Quantity
- * @param {string} material1Name
- * @param {number} material2Quantity
- * @param {string} material2Name
- * @returns {doc} doc
+ * Class for Creating a Printable Ticket
  */
 class Ticket 
 {
