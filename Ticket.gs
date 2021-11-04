@@ -238,16 +238,7 @@ const _testTicket = () => {
   Logger.log(tic);
 }
 
-const _testBarcode = async () => {
-  const jnum = 20211007000407;
-  const url = `http://www.codyglen.com/`
-  const bGen = new QRCodeAndBarcodeGenerator({url : url, jobnumber : jnum});
-  const b = await bGen.GenerateBarCode();
-  // const q = await bGen.GenerateQRCode();
-  // DriveApp.getFileById(b.getId());
-  Logger.log(b.getBlob());
 
-}
 
 
 

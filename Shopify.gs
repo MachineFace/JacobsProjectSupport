@@ -32,7 +32,6 @@ class ShopifyAPI
     this.material4Quantity = material4Quantity;
     this.material5Name = material5Name;
     this.material5Quantity = material5Quantity;
-    // this.GetInfo();
     this.customer;
     this.customerID;
     this.pack = this._PackageMaterials();

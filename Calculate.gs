@@ -193,6 +193,23 @@ class Calculate
     return items;  
   }
 
+  PrintDistributionNumbers () {
+    let userList = [];
+    for(const [name, sheet] of Object.entries(SHEETS)) { 
+      let users = [].concat(...sheet.getRange(3, 10, sheet.getLastRow(), 1).getValues());
+      users.forEach( user => userList.push(user));
+    }
+    let culled = userList.filter(Boolean);
+    let occurrences = culled.reduce( (acc, curr) => {
+      return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+    }, {});
+    let items = Object.keys(occurrences).map((key) => occurrences[key]);
+    items.sort((first, second) => second - first);
+    Logger.log(items)
+    items.forEach( (item, index) => OTHERSHEETS.backgrounddata.getRange(2 + index, 22, 1, 1).setValue(item));
+  }
+
+
 
   CountTypes () {
     let userList = [];
@@ -461,13 +478,17 @@ const Metrics = () => {
     calc.PrintTypesCount();
     calc.PrintSubmissionData();
     calc.PrintTurnaroundTimes();
+    calc.PrintDistributionNumbers();
     Logger.log(`Recalculated Metrics`);
   } catch (err) {
     Logger.log(`${err} : Couldn't generate statistics on Metrics.`);
   }
 }
 
-
+const _testDist = () => {
+  const c = new Calculate();
+  c.PrintDistributionNumbers();
+}
 
 
 
