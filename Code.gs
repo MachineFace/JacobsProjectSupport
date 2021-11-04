@@ -82,7 +82,7 @@ const onSubmission = async (e) => {
   setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority.priority);
 
   // Create Messages
-  var message = await new CreateSubmissionMessage(name, projectname, jobnumber);
+  const message = await new CreateSubmissionMessage(name, projectname, jobnumber);
 
   // Get DS-Specific Message
   let dsMessage = message.dsMessage;
@@ -148,10 +148,10 @@ const onSubmission = async (e) => {
   // Email each DS
   try {
     GmailApp.sendEmail(designspecialistemail, "Jacobs Project Support Notification", "", {
-        htmlBody: dsMessage,
-        from: supportAlias,
-        bcc: InvokeDS("Chris", "email"),
-        name: gmailName,
+      htmlBody: dsMessage,
+      from: supportAlias,
+      bcc: InvokeDS("Chris", "email"),
+      name: gmailName,
     });
     writer.Info(`Design Specialist has been emailed.`);
   } catch (err) {
@@ -177,17 +177,14 @@ const onSubmission = async (e) => {
   //   writer.Info(`Shipping instructions email sent.`);
   // }
 
-  // Creaform Email with instructions for student dropoff.
-  var creaformMessage = message.creaformMessage;
-
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == "Creaform") {
       //Email
       GmailApp.sendEmail(email, "Jacobs Project Support : Creaform Part Drop-off Instructions", "", {
-          htmlBody: creaformMessage,
-          from: supportAlias,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
+        htmlBody: message.creaformMessage,
+        from: supportAlias,
+        bcc: InvokeDS("Chris", "email"),
+        name: gmailName,
       });
       writer.Info(`Creaform instruction email sent.`);
     }
@@ -195,15 +192,11 @@ const onSubmission = async (e) => {
     writer.Error(`${err} : Couldnt send Creaform email for some reason.`);
   }
 
-  // No Access Response
-  let missingaccessbody = message.missingAccessMessage;
-
-  var access;
   try {
     if (priority == "STUDENT NOT FOUND!" || priority == false) {
       //Email
       GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
-        htmlBody: missingaccessbody,
+        htmlBody: message.missingAccessMessage,
         from: supportAlias,
         bcc: InvokeDS("Chris", "email"),
         name: "Jacobs Project Support",
