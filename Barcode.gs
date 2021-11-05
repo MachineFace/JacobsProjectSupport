@@ -1,6 +1,8 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Barcode and QR Code
+ * @required {string} url
+ * @required {number} jobnumber
  */
 class QRCodeAndBarcodeGenerator {
   constructor(
@@ -13,6 +15,10 @@ class QRCodeAndBarcodeGenerator {
     this.jobnumber = jobnumber;
   }
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Generate QR Code
+   */
   async GenerateQRCode(){
     Logger.log(`QRCode URL : ${this.url} For ---> Jobnumber : ${this.jobnumber}`);
     const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
@@ -40,6 +46,10 @@ class QRCodeAndBarcodeGenerator {
     }
   }
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Generate Barcode
+   */
   async GenerateBarCode() {
 
     const root = 'http://bwipjs-api.metafloor.com/';
@@ -83,9 +93,9 @@ class QRCodeAndBarcodeGenerator {
 
 
 /**
+ * ----------------------------------------------------------------------------------------------------------------
  * For use with barcode scanner.
  * Searches for job number found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
- * 
  */
 const PickupByBarcode = () => {
   const searchUISheet = SpreadsheetApp.getActive().getSheetByName('Pickup');
