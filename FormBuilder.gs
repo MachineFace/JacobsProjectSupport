@@ -2,6 +2,9 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Building an Approval Form
+ * @param {string} name
+ * @param {string} jobnumber
+ * @param {float} cost
  */
 class ApprovalFormBuilder
 {

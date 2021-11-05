@@ -54,18 +54,18 @@ const onSubmission = async (e) => {
         break;
       }
     }
-    setByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.received);
+    SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.received);
     writer.Info(`Set status to 'Received'.`);
   } catch (err) {
     writer.Error(`${err}: Could not set status to 'Received'.`);
   }
 
   // Parse Functions for shipping / variables
-  var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : getByHeader(sheet, "What is your name?", lastRow);
-  var email = e.namedValues["Email Address"][0] ? e.namedValues["Email Address"][0] : getByHeader(sheet, "Email Address", lastRow);
-  var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : getByHeader(sheet, "Your Student ID Number?", lastRow);
-  var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0] ? e.namedValues["What is your affiliation to the Jacobs Institute?"][0] : getByHeader(sheet, "What is your affiliation to the Jacobs Institute?", lastRow);
-  var projectname = e.namedValues["Project Name"][0] ? e.namedValues["Project Name"][0] : getByHeader(sheet, "Project Name", lastRow);
+  var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : GetByHeader(sheet, "What is your name?", lastRow);
+  var email = e.namedValues["Email Address"][0] ? e.namedValues["Email Address"][0] : GetByHeader(sheet, "Email Address", lastRow);
+  var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : GetByHeader(sheet, "Your Student ID Number?", lastRow);
+  var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0] ? e.namedValues["What is your affiliation to the Jacobs Institute?"][0] : GetByHeader(sheet, "What is your affiliation to the Jacobs Institute?", lastRow);
+  var projectname = e.namedValues["Project Name"][0] ? e.namedValues["Project Name"][0] : GetByHeader(sheet, "Project Name", lastRow);
   var shipping = e.namedValues["Do you need your parts shipped to you?"][0];
   var timestamp = e.namedValues["Timestamp"][0];
 
@@ -74,12 +74,12 @@ const onSubmission = async (e) => {
   writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let jobnumber = await new JobNumberGenerator(timestamp).Create();
-  setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
+  let jobnumber = await new JobNumberGenerator(timestamp).jobnumber;
+  SetByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
 
   // Check Priority
   let priority = await new Priority({email : email, sid : sid});
-  setByHeader(sheet, "(INTERNAL): Priority", lastRow, priority.priority);
+  SetByHeader(sheet, "(INTERNAL): Priority", lastRow, priority.priority);
 
   // Create Messages
   const message = await new CreateSubmissionMessage(name, projectname, jobnumber);
@@ -106,26 +106,26 @@ const onSubmission = async (e) => {
     case SHEETS.shopbot.getName():
       designspecialistemail = InvokeDS("Adam", "email");
       //sheet.getRange("B" + lastRow).setValue("Adam");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Adam");
+      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Adam");
       break;
     case SHEETS.advancedlab.getName():
     case SHEETS.creaform.getName():
       designspecialistemail = InvokeDS("Chris", "email");
       //sheet.getRange("B" + lastRow).setValue("Chris");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Chris");
+      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Chris");
       break;
     case SHEETS.plotter.getName():
     case SHEETS.fablight.getName():
     case SHEETS.haas.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Cody");
+      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Cody");
       break;
     case SHEETS.waterjet.getName():
     case SHEETS.othertools.getName():
       designspecialistemail = InvokeDS("Gary", "email");
       //sheet.getRange("B" + lastRow).setValue("Gary");
-      setByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Gary");
+      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Gary");
       break;
     case SHEETS.laser.getName():
       //Nobody assigned / Everyone assigned.
@@ -136,12 +136,12 @@ const onSubmission = async (e) => {
     case SHEETS.vinyl.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
-      setByHeader(sheet, "(INTERNAL): DS Assigned",  lastRow, "Cody");
+      SetByHeader(sheet, "(INTERNAL): DS Assigned",  lastRow, "Cody");
       break;
     case undefined:
       designspecialistemail = InvokeDS("Staff", "email");
       //sheet.getRange("B" + lastRow).setValue("Staff");
-      setByHeader(sheet, "(INTERNAL): DS Assigned",  lastRow, "Staff");
+      SetByHeader(sheet, "(INTERNAL): DS Assigned",  lastRow, "Staff");
       break;
   }
 
@@ -160,7 +160,7 @@ const onSubmission = async (e) => {
 
   // Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
-  stat = stat ? stat : setByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
+  stat = stat ? stat : SetByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
   writer.Info(`Status refixed to 'Received'.`);
 
   // "Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
@@ -203,7 +203,7 @@ const onSubmission = async (e) => {
       });
 
       // Set access to Missing Access
-      setByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
+      SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
       writer.Info(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
@@ -211,8 +211,8 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator(timestamp).Create();
-  setByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
+  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator(timestamp).jobnumber;
+  SetByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
   
 
   // Fix wrapping issues
@@ -286,13 +286,13 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
 
-  let tempEmail = getByHeader(thisSheet, "Email Address", thisRow);
-  let tempSID = getByHeader(thisSheet, "Your Student ID Number?", thisRow);
+  let tempEmail = GetByHeader(thisSheet, "Email Address", thisRow);
+  let tempSID = GetByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
   let tempPriority = new Priority({email : tempEmail, sid : tempSID});
-  setByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority.priority);
+  SetByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority.priority);
   if (tempPriority == "STUDENT NOT FOUND") {
-    setByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
+    SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
 
   // STATUS CHANGE TRIGGER
@@ -301,40 +301,40 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Parse Data
-  const status = getByHeader(spreadSheet, "(INTERNAL) Status", thisRow);
+  const status = GetByHeader(spreadSheet, "(INTERNAL) Status", thisRow);
 
-  var designspecialist = getByHeader(thisSheet, "(INTERNAL): DS Assigned", thisRow);
-  var priority = getByHeader(thisSheet, "(INTERNAL): Priority", thisRow);
-  var jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  var studentApproval = getByHeader(thisSheet, "Student Has Approved Job", thisRow);
-  var submissiontime = getByHeader(thisSheet, "Timestamp", thisRow);
-  var email = getByHeader(thisSheet, "Email Address", thisRow);
-  var name = getByHeader(thisSheet, "What is your name?", thisRow);
-  var sid = getByHeader(thisSheet, "Student ID Number", thisRow);
-  var studentType = getByHeader(thisSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
-  var projectname = getByHeader(thisSheet, "Project Name", thisRow);
-  var shippingQuestion = getByHeader(thisSheet, "Do you need your parts shipped to you?", thisRow);
-  var cost = getByHeader(thisSheet, "Estimate", thisRow);
+  var designspecialist = GetByHeader(thisSheet, "(INTERNAL): DS Assigned", thisRow);
+  var priority = GetByHeader(thisSheet, "(INTERNAL): Priority", thisRow);
+  var jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+  var studentApproval = GetByHeader(thisSheet, "Student Has Approved Job", thisRow);
+  var submissiontime = GetByHeader(thisSheet, "Timestamp", thisRow);
+  var email = GetByHeader(thisSheet, "Email Address", thisRow);
+  var name = GetByHeader(thisSheet, "What is your name?", thisRow);
+  var sid = GetByHeader(thisSheet, "Student ID Number", thisRow);
+  var studentType = GetByHeader(thisSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
+  var projectname = GetByHeader(thisSheet, "Project Name", thisRow);
+  var shippingQuestion = GetByHeader(thisSheet, "Do you need your parts shipped to you?", thisRow);
+  var cost = GetByHeader(thisSheet, "Estimate", thisRow);
 
   //Materials
-  const material1Quantity = getByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
-  const material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
+  const material1Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
+  const material1Name = GetByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
   const material1URL = "";
 
-  const material2Quantity = getByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
-  const material2Name = getByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
+  const material2Quantity = GetByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
+  const material2Name = GetByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
   const material2URL = "";
 
-  const material3Quantity = getByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
-  const material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
+  const material3Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
+  const material3Name = GetByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
   const material3URL = "";
 
-  const material4Quantity = getByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
-  const material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
+  const material4Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
+  const material4Name = GetByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
   const material4URL = "";
 
-  const material5Quantity = getByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
-  const material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
+  const material5Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
+  const material5Name = GetByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
   const material5URL = "";
 
   if (material1Name != "") var mat1 = true;
@@ -355,8 +355,8 @@ const onChange = async (e) => {
   // Fix Job Number if it's missing
   try {
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).Create();
-      setByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
+      jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).jobnumber;
+      SetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
       writer.Info(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
@@ -373,7 +373,7 @@ const onChange = async (e) => {
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  //Calculate Turnaround Time only when cell is empty
+  // Calculate Turnaround Time only when cell is empty
   try {
     var startTime = submissiontime;
     var elapsedCell = ss.getRange(thisRow, 43).getValue();
@@ -384,11 +384,11 @@ const onChange = async (e) => {
         let time = await calc.CalculateDuration(startTime, endTime);
 
         // Write to Column - d h:mm:ss
-        setByHeader(thisSheet, "Elapsed Time", thisRow, time);
+        SetByHeader(thisSheet, "Elapsed Time", thisRow, time);
         writer.Info(`Turnaround Time = ${time}`);
 
         // Write Completed time
-        setByHeader(thisSheet, "Date Completed", thisRow, endTime);
+        SetByHeader(thisSheet, "Date Completed", thisRow, endTime);
       }
     }
   } catch (err) {
@@ -420,11 +420,11 @@ const onChange = async (e) => {
     writer.Info(`Approval Form generated and sent to user.`);
   }
 
-  //Case switch for different Design Specialists email
+  // Case switch for different Design Specialists email
   var designspecialistemaillink = InvokeDS(designspecialist, "emaillink");
   var designspecialistemail = InvokeDS(designspecialist, "email");
 
-  //Create a Message and Return Appropriate Responses.
+  // Create a Message and Return Appropriate Responses.
   var Message = new CreateMessage(
     name,
     projectname,
@@ -450,7 +450,7 @@ const onChange = async (e) => {
     cost
   );
 
-  //Send email with appropriate response and cc Chris and Cody.
+  // Send email with appropriate response and cc Chris and Cody.
   switch (status) {
     case STATUS.received:
       GmailApp.sendEmail(email, "Jacobs Project Support : Received", "", {
@@ -569,7 +569,7 @@ const onChange = async (e) => {
       break;
   }
 
-  //Lastly Run these Metrics ignoring first 2 rows:
+  // Lastly Run these Metrics ignoring first 2 rows:
   if (thisRow > 3) {
     await Metrics();
     writer.Info(`Recalculated Metrics tab.`);

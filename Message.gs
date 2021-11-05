@@ -251,6 +251,13 @@ class CreateMessage
     }
 }
 
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Class for Creating a Submission Response Message
+ * @param {string} name
+ * @param {string} projectname
+ * @param {string} jobnumber
+ */
 class CreateSubmissionMessage
 {
   constructor(name, projectname, jobnumber) {

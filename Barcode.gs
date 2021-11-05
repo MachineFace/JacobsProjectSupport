@@ -98,17 +98,14 @@ const PickupByBarcode = () => {
     return;
   }
 
-  // loop through sheets to look for value
   for (const [key, value] of Object.entries(SHEETS)) {
     const searchSheet = SHEETS[key];
-    // const data = searchSheet.getDataRange().getValues();
     const textFinder = searchSheet.createTextFinder(jobnumber);
     const searchFind = textFinder.findNext();
     if (searchFind != null) {
       searchRow = searchFind.getRow();
       
-      // change status to picked up
-      setByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
+      SetByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
       progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       Logger.log(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();

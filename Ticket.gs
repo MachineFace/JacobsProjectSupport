@@ -1,6 +1,7 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Printable Ticket
+ * @required {number} jobnumber
  */
 class Ticket 
 {
@@ -23,7 +24,10 @@ class Ticket
     this.GetInfo();
   }
 
-
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Get Info by Looking up JobNumber
+   */
   GetInfo() {
     for(const [key, sheet] of Object.entries(SHEETS)) {
       const finder = sheet.createTextFinder(this.jobnumber).findNext();
@@ -44,6 +48,13 @@ class Ticket
     this.material2Quantity = this.GetByHeader(this.sheet, "(INTERNAL) Material 2 Quantity", this.row);
   }
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Get By Header Name Helper Function
+   * @param {sheet} sheet
+   * @param {string} column name
+   * @param {int} row number
+   */
   GetByHeader (sheet, colName, row) {
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(colName);
@@ -52,6 +63,10 @@ class Ticket
     }
   };
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Create Ticket MAIN
+   */
   async CreateTicket() {
     await this.GetInfo();
     const folder = DriveApp.getFoldersByName(`Job Tickets`); //Set the correct folder
@@ -183,6 +198,11 @@ class Ticket
     return this.doc;
   };
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Set Ticket URL
+   * Prints url to sheet
+   */
   SetTicketURL() {
     try {
       const data = this.sheet.getDataRange().getValues();
@@ -216,6 +236,10 @@ class Ticket
   };
   
 }
+
+
+
+
 
 const _testTicket = () => {
   const jnum = 20211007000407;

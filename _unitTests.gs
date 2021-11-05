@@ -172,7 +172,7 @@ const _gastTestRunner = async () => {
   })
 
   await test(`JobNumber`, (t) => {
-    const x = new JobNumberGenerator(new Date()).Create();
+    const x = new JobNumberGenerator(new Date()).jobnumber;
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })

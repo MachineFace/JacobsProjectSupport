@@ -41,6 +41,10 @@ class ShopifyAPI
     this.totalprice;
   }
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Get Info from sheet by looking up Jobnumber
+   */
   GetInfo() {
     for(const [key, sheet] of Object.entries(SHEETS)) {
       const finder = sheet.createTextFinder(this.jobnumber).findNext();
@@ -66,6 +70,13 @@ class ShopifyAPI
     this.material5Quantity = this.GetByHeader(this.sheet, "(INTERNAL) Material 5 Quantity", this.row);
   }
 
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Get By Header Name Helper Function
+   * @param {sheet} sheet
+   * @param {string} column name
+   * @param {int} row
+   */
   GetByHeader (sheet, colName, row) {
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(colName);
@@ -75,29 +86,31 @@ class ShopifyAPI
   };
 
   /**
+   * ----------------------------------------------------------------------------------------------------------------
    * Better Lookup
    * @param {string} material name
    * @returns {[string, string]} productID, link, price
    */
   _LookupStoreProductDetails(material) {
     // material = 'Fortus Red ABS-M30'; // Test Material
-    // let out = {}
-    let productID;
-    for (const [key, sheet] of Object.entries(STORESHEETS)) {
-      const find = SearchSpecificSheet(sheet, material);
-      if(find !== false) {
-        let index = find;
-        // let sheetName = sheet.getName();
-        // let link = sheet.getRange(index, 2, 1, 1).getValue();
-        // let price = sheet.getRange(index, 6, 1, 1).getValue();
-        productID = sheet.getRange(index, 4, 1, 1).getValue();
-        // out["productID"] = productID;
-        // out["link"] = link;
-        // out["price"] = price;
-      }
-    } 
-    // Logger.log(JSON.stringify(out));
-    return productID.toString();
+    if(!material) return;
+    else {
+      let productID;
+      for (const [key, sheet] of Object.entries(STORESHEETS)) {
+        const find = SearchSpecificSheet(sheet, material);
+        if(find !== false) {
+          let index = find;
+          // let sheetName = sheet.getName();
+          // let link = sheet.getRange(index, 2, 1, 1).getValue();
+          // let price = sheet.getRange(index, 6, 1, 1).getValue();
+          productID = sheet.getRange(index, 4, 1, 1).getValue();
+          // out["productID"] = productID;
+          // out["link"] = link;
+          // out["price"] = price;
+        }
+      } 
+      return productID.toString();
+    }
   }
 
   /**
@@ -117,10 +130,11 @@ class ShopifyAPI
 
     // Remove when Those are empty / null / undefined
     for(const [key, values] of Object.entries(pack)) {
-      if(values.name == null || values.ammount == null) {
+      if(!values.name || !values.ammount) {
         delete pack[key];
       } else values.id = this._LookupStoreProductDetails(values.name);
     }
+    // Logger.log(`PACK --> ${JSON.stringify(pack)}`);
 
     // Fetch Shopify Info
     let sum = 0.0;
@@ -128,13 +142,15 @@ class ShopifyAPI
     for(const [key, values] of Object.entries(pack)) {
       Logger.log(values.id);
       let info = await this.GetProductByID(values.id);
-      let subtotal = +Number.parseFloat(info.variants[0].price * pack[key].ammount).toFixed(2);
+      Logger.log(info)
+      let price = info?.variants[0]?.price * pack[key].ammount ? info?.variants[0]?.price * pack[key].ammount : info?.price * pack[key].ammount;
+      let subtotal = +Number.parseFloat(price).toFixed(2);
       sum += subtotal;
       shopifyPack.push({ 
         name : key,
-        title : info.title,
-        id : info.id,
-        price : info.variants[0].price,
+        title : info?.title,
+        id : info?.id,
+        price : info?.variants[0]?.price,
         quantity : pack[key].ammount,
         subtotal : subtotal,
         discount_allocations : [{
@@ -146,8 +162,8 @@ class ShopifyAPI
     }
     const total = +Number.parseFloat(sum).toFixed(2);
     this.totalprice = total;
-    Logger.log(`Total Price = ${total}`);
 
+    // Logger.log(`Total Price = ${total}`);
     // Logger.log(`PACKED ----> ${JSON.stringify(shopifyPack)}`);
     return shopifyPack;
   }
@@ -161,6 +177,7 @@ class ShopifyAPI
    */
   async CreateOrder () {
     this.customer = await this.GetCustomerByEmail(this.email);
+    if(!this.customer) this.customer = await this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
     let repo = 'orders.json/';
 
     let order = {
@@ -291,7 +308,7 @@ class ShopifyAPI
           this.price = parsed.price;
           if(parsed.price == undefined) this.price = parsed.variants[0].price;
 
-          Logger.log(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
+          // Logger.log(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
           return parsed; 
         }
       }
@@ -579,27 +596,29 @@ class ShopifyAPI
     }
     else return false;
   }
-
-
 }
 
+
+
+
+
 const _testAPI = async () => {
-  const jobnumber = new JobNumberGenerator().Create();
-  const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
-  // const shopify = new ShopifyAPI({
-  //   jobnumber : jobnumber,
-  //   email : `pico@pico.com`,
-  //   material1Name : 'Fortus Red ABS-M30',
-  //   material1Quantity : 5,
-  //   material2Name : 'Objet Polyjet VeroMagenta RGD851',
-  //   material2Quantity : 10,
-  //   material3Name : null,
-  //   material3Quantity : 123234,
-  //   material4Name : 'Stratasys Dimension Soluble Support Material P400SR',
-  //   material4Quantity : 15,
-  //   material5Name : null,
-  //   material5Quantity : 20,
-  // });
+  const jobnumber = new JobNumberGenerator().jobnumber;
+  // const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
+  const shopify = new ShopifyAPI({
+    jobnumber : jobnumber,
+    email : `pico@pico.com`,
+    material1Name : 'Fortus Red ABS-M30',
+    material1Quantity : 5,
+    material2Name : 'Objet Polyjet VeroMagenta RGD851',
+    material2Quantity : 10,
+    material3Name : null,
+    material3Quantity : 123234,
+    material4Name : 'Stratasys Dimension Soluble Support Material P400SR',
+    material4Quantity : 15,
+    material5Name : null,
+    material5Quantity : 20,
+  });
   // let product = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
   // let lastOrder = await shopify.GetLastOrder();
   // let orders = await shopify.GetOrdersList();
@@ -612,9 +631,12 @@ const _testAPI = async () => {
   // let customer = shopify.SetCustomer("jacobsinstitutestore@gmail.com");
 
 
-  // Logger.log(customer)
+
   
-  let order = await shopify.CloseUnfulfilledOrders();
+  // const order = await shopify.CreateOrder();
+  // Logger.log(JSON.stringify(order))
+
+  const order = await shopify.GetLastOrder();
   Logger.log(JSON.stringify(order))
 }
 

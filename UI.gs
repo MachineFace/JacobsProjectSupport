@@ -2,8 +2,8 @@
  * Creates a pop-up for counting users.
  */
 const PopupCountUsers = async () => {
-  let ui = await SpreadsheetApp.getUi();
-  let count = await CountActiveUsers();
+  const ui = await SpreadsheetApp.getUi();
+  const count = await CountActiveUsers();
   ui.alert(
     `JPS Runtime Message`,
     `Students Currently Using JPS : ${count}`,
@@ -15,13 +15,44 @@ const PopupCountUsers = async () => {
  * Create a pop-up to check for missing students
  */
 const PopupCheckMissingAccessStudents = async () => {
-  let ui = await SpreadsheetApp.getUi();
-  let names = await CheckMissingAccessStudents().join(", ");
+  const ui = await SpreadsheetApp.getUi();
+  const names = await CheckMissingAccessStudents().join(", ");
   ui.alert(
     `JPS Runtime Message`,
     `Checking Missing Access Students on All Sheets : \\n ${names}`,
     ui.ButtonSet.OK
   );
+};
+
+/**
+ * Create a pop-up to make a new Jobnumber
+ */
+const PopupCreateNewJobNumber = async () => {
+  const ui = await SpreadsheetApp.getUi();
+  const thisSheet = SpreadsheetApp.getActiveSheet();
+  let thisRow = thisSheet.getActiveRange().getRow();
+
+  // If It is on a valid sheet
+  if(CheckSheetIsForbidden(thisSheet) == true) {
+    Browser.msgBox(
+      "Incorrect Sheet Active",
+      "Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.",
+      Browser.Buttons.OK
+    );
+    return;
+  } else {
+    const timestamp = GetByHeader(thisSheet, "Timestamp", thisRow);
+    const jobnumber = new JobNumberGenerator(timestamp).jobnumber;
+    SetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber.toString());
+    ui.alert(
+      `JPS Runtime Message`,
+      `Created a New Jobnumber : ${jobnumber}`,
+      ui.ButtonSet.OK
+    );
+  }
+  
+  
+
 };
 
 /**
@@ -31,63 +62,30 @@ const PopupCreateTicket = async () => {
   let ui = SpreadsheetApp.getUi();
 
   let thisSheet = SpreadsheetApp.getActiveSheet();
-  let ss = thisSheet.getActiveRange().getSheet();
   let sheetname = thisSheet.getName();
   let thisRow = thisSheet.getActiveRange().getRow();
-  let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+  let jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
 
-  // If It is on a valid sheet
-  // for(const [key, sheet] of Object.entries(NONITERABLESHEETS)) {
-  //   if(thisSheet === sheet) {
-  //     Browser.msgBox(
-  //       "Incorrect Sheet Active",
-  //       "Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.",
-  //       Browser.Buttons.OK
-  //     );
-  //     return;
-  //   }
-  // }
-  switch (sheetname) {
-    case "Logger":
-    case "Master Intake Form Responses":
-    case "Student List DONOTDELETE":
-    case "ApprovedByStudents - DO NOT DELETE":
-    case "Staff List":
-    case "AdvLabStoreItems":
-    case "UltimakerStoreItems":
-    case "FablightStoreItems":
-    case "HaasTormachStoreItems":
-    case "OthermillStoreItems":
-    case "ShopbotStoreItems":
-    case "WaterjetStoreItems":
-    case "VinylCutterStoreItems":
-    case "LaserStoreItems":
-    case "Data Metrics":
-    case "Shipping for Gary":
-    case "Summary":
-    case "Background Data Mgmt":
-    case "Advanced Lab ReOrder":
-    case "Billing":
-      Browser.msgBox(
-        "Incorrect Sheet Active",
-        "Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.",
-        Browser.Buttons.OK
-      );
-      return;
+  if(CheckSheetIsForbidden(thisSheet) == true) {
+    Browser.msgBox(
+      "Incorrect Sheet Active",
+      "Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.",
+      Browser.Buttons.OK
+    );
+    return;
+  } else {
+    const ticketMaker = new Ticket({jobnumber : jobnumber});
+    try {
+      const ticket = ticketMaker.CreateTicket();
+    } catch (err) {
+      Logger.log(`${err} : Couldn't create a ticket.`);
+    }
+    ui.alert(
+      `JPS Runtime Message`,
+      `Ticket Created for : ${ticketMaker.name}, Job Number : ${jobnumber}`,
+      ui.ButtonSet.OK
+    );
   }
-  
-  const ticketMaker = new Ticket({jobnumber : jobnumber});
-  try {
-    const ticket = ticketMaker.CreateTicket();
-  } catch (err) {
-    Logger.log(`${err} : Couldn't create a ticket.`);
-  }
-
-  ui.alert(
-    `JPS Runtime Message`,
-    `Ticket Created for : ${ticketMaker.name}, Job Number : ${jobnumber}`,
-    ui.ButtonSet.OK
-  );
 };
 
 /**
@@ -147,12 +145,11 @@ const BarMenu = () => {
   SpreadsheetApp.getUi()
     .createMenu("JPS Menu")
     .addItem("Generate Bill to Selected Student", "BillFromSelected")
+    .addItem("Generate a New JobNumber", "PopupCreateNewJobNumber")
+    .addSeparator()
     .addItem("Barcode Scanning Tool", "OpenBarcodeTab")
     .addSeparator()
-    .addItem(
-      "Check All Missing Access Students",
-      "PopupCheckMissingAccessStudents"
-    )
+    .addItem("Check All Missing Access Students", "PopupCheckMissingAccessStudents")
     .addSeparator()
     .addItem("Count Active Users", "PopupCountUsers")
     .addItem(`Create a Ticket for a User`, `PopupCreateTicket`)
@@ -186,145 +183,70 @@ const RunTopTen = () => {
  * Bill from a selected line
  */
 const BillFromSelected = async () => {
-  //Could use a couple checks.  Cant be row 1 that is selected, and cant be more than one row selected.
-  //also check that its not the summary page
-
-  //let vv = SpreadsheetApp.getActiveSheet().getActiveCell().getValue(); //gets value of selected cell
   let thisSheet = SpreadsheetApp.getActiveSheet();
-  let range = thisSheet.getActiveRange();
-  let ss = thisSheet.getActiveRange().getSheet();
   let sheetname = thisSheet.getName();
   let thisRow = thisSheet.getActiveRange().getRow();
 
-  //If It is on a valid sheet
-  switch (sheetname) {
-    case "Logger":
-    case "Master Intake Form Responses":
-    case "Student List DONOTDELETE":
-    case "ApprovedByStudents - DO NOT DELETE":
-    case "Staff List":
-    case "AdvLabStoreItems":
-    case "UltimakerStoreItems":
-    case "FablightStoreItems":
-    case "HaasTormachStoreItems":
-    case "OthermillStoreItems":
-    case "ShopbotStoreItems":
-    case "WaterjetStoreItems":
-    case "VinylCutterStoreItems":
-    case "LaserStoreItems":
-    case "Data Metrics":
-    case "Shipping for Gary":
-    case "Summary":
-    case "Background Data Mgmt":
-    case "Advanced Lab ReOrder":
-    case "Billing":
-      Browser.msgBox(
-        "Incorrect Sheet Active",
-        "Please bill in the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row associated with the job being billed",
-        Browser.Buttons.OK
-      );
-      return;
+  if(CheckSheetIsForbidden(thisSheet) == true) {
+    Browser.msgBox(
+      "Incorrect Sheet Active",
+      "Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.",
+      Browser.Buttons.OK
+    );
+    return;
   }
 
-  let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-  Logger.log(`Status of billed row = ${status}`);
-  let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  let email = getByHeader(thisSheet, "Email Address", thisRow);
-  let name = getByHeader(thisSheet, "What is your name?", thisRow);
-  //let sid = getByHeader(thisSheet, "Student ID Number", thisRow);
-  //let projectname = getByHeader(thisSheet, "Project Name", thisRow);
-  Logger.log(`STATUS : ${status}, JOBNUMBER : ${jobnumber}, EMAIL : ${email}, NAME : ${name}`)
+  const status = GetByHeader(thisSheet, "(INTERNAL) Status", thisRow);
+  const jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+  const email = GetByHeader(thisSheet, "Email Address", thisRow);
+  const name = GetByHeader(thisSheet, "What is your name?", thisRow);
+  const material1Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
+  const material1Name = GetByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
+  const material2Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 2 Quantity",thisRow);
+  const material2Name = GetByHeader(thisSheet, "(INTERNAL) Item 2", thisRow);
+  const material3Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
+  const material3Name = GetByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
+  const material4Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 4 Quantity", thisRow );
+  const material4Name = GetByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
+  const material5Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 5 Quantity", thisRow );
+  const material5Name = GetByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
+  const quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
+  Logger.log(status+jobnumber+email+name+material1Name+material1Quantity+material2Name+material2Quantity+material3Name+material3Quantity+material4Name+material4Quantity+material5Name+material5Quantity+quantityTotal)
 
-  //Materials
-  // let material1Quantity = ss.getRange(thisRow, 13).getValue();
-  // let material1Name = ss.getRange(thisRow, 14).getValue();
-  // let material1URL = await new LookupProductID(material1Name).link;
-  let material1Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 1 Quantity",
-    thisRow
-  );
-  let material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
-  //let material1URL = await new LookupProductID(material1Name).link;
-
-  // let material2Quantity = ss.getRange(thisRow, 15).getValue();
-  // let material2Name = ss.getRange(thisRow, 16).getValue();
-  let material2Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 2 Quantity",
-    thisRow
-  );
-  let material2Name = getByHeader(thisSheet, "(INTERNAL) Item 2", thisRow);
-
-  //if(material2Name !== null || material2Name !== 'undefined') {
-  //   let material2URL = await new LookupProductID(material2Name).link;
-  //}
-
-  //Use the right Column Later once we decide on location.
-
-  // let material3Quantity = ss.getRange(thisRow, 17).getValue();
-  // let material3Name = ss.getRange(thisRow, 18).getValue();
-  let material3Quantity = getByHeader(
-    thisSheet,
-    "(INTERNAL) Material 3 Quantity",
-    thisRow
-  );
-  let material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
-
-  if (material3Name !== null || material3Name !== "undefined") {
-  }
-  //let material3URL = new LookupProductID(material3Name).link;
-
-  // let material4Quantity = ss.getRange(thisRow, 19).getValue();
-  // let material4Name = ss.getRange(thisRow, 20).getValue();
-  let material4Quantity = getByHeader( thisSheet, "(INTERNAL) Material 4 Quantity", thisRow );
-  let material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
-  //let material4URL = new LookupProductID(material4Name).link;
-
-  // let material5Name = ss.getRange(thisRow, 22).getValue();
-  // let material5Quantity = ss.getRange(thisRow, 21).getValue();
-  let material5Quantity = getByHeader( thisSheet, "(INTERNAL) Material 5 Quantity", thisRow );
-  let material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
-  //var material5URL = new LookupProductID(material5Name).link;
-
-  //Add total quantities - if there are none then cancel billing
-  let quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
-
+  const shopify = await new ShopifyAPI({
+    jobnumber : jobnumber, 
+    email : email,
+    material1Name : material1Name, material1Quantity : material1Quantity,
+    material2Name : material2Name, material2Quantity : material2Quantity,
+    material3Name : material3Name, material3Quantity : material3Quantity,
+    material4Name : material4Name, material4Quantity : material4Quantity,
+    material5Name : material5Name, material5Quantity : material5Quantity, 
+  });
+  const customer = await shopify.GetCustomerByEmail(email);
+  Logger.log(`CUSTOMER : ${JSON.stringify(customer)}`)
+  // const order = await shopify.CreateOrder();
+  // Logger.log(`ORDER : ${JSON.stringify(order)}`)
+  let response;
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
     Logger.log(`Cannot bill - no quantity recorded`);
-
     Browser.msgBox(
       "Generate Bill to Shopify",
       "No quantities entered for selected submission.",
       Browser.Buttons.OK
     );
+    return;
   } else {
-    if (status == "Billed" || status == "CLOSED") {
-      response = Browser.msgBox(
-        "Generate Bill to Shopify",
-        "You have already Generated a bill to this Student",
+    if (status == STATUS.billed || status == STATUS.closed) {
+      Browser.msgBox(
+        `Generate Bill to Shopify`,
+        `You have already Generated a bill to this Student`,
         Browser.Buttons.OK
       );
-      if (response == "OK") {
-        Logger.log(`User clicked "OK".`);
-        await ss.getRange("AZ" + thisRow).setValue(false);
-      }
-    } else if (status != "Billed") {
+      return;
+    } else {
       let response;
 
-      // //Check for Staff
-      // let staffEmails = OTHERSHEETS.staff
-        // .getRange(2, 3, OTHERSHEETS.staff.getLastRow() - 1, 1)
-      //   .getValues();
-      // for (let i = 0; i < staffEmails.length; i++) {
-      //   if (email == staffEmails[i]) {
-      //     email = "JacobsInstituteStore@gmail.com";
-      //     break;
-      //   }
-      // }
-
-      //Fetch Customer and Products
-      const customer = await GetShopifyCustomerByEmail(email);
+      // Fetch Customer and Products
       if (customer == undefined || customer == null) {
         Browser.msgBox(
           "Shopify Error",
@@ -332,58 +254,16 @@ const BillFromSelected = async () => {
           Browser.Buttons.OK
         );
       } else {
-        const package = await PackageMaterials(
-          material1Name,
-          material1Quantity,
-          material2Name,
-          material2Quantity,
-          material3Name,
-          material3Quantity,
-          material4Name,
-          material4Quantity,
-          material5Name,
-          material5Quantity
-        );
-        const formattedMats = await MakeLineItems(package);
-
-        var boxTitle = `Generate Bill to Shopify`;
-        var boxMsg = `Would you like to Generate a Bill to: \\n\\n`;
+        let boxTitle = `Generate Bill to Shopify`;
+        let boxMsg = `Would you like to Generate a Bill to: \\n\\n`;
         boxMsg += `Customer Name : ${customer.first_name} ${customer.last_name} \\n`;
         boxMsg += `Job Number : ${jobnumber} \\n`;
         boxMsg += `Shopify ID : ${customer.id} \\n`;
-        boxMsg += `For Materials : \\n\\n`;
-
-        //Lists (Pushing at the same time ensures the lists are the same size.)
-        let materialList = [
-          material1Name,
-          material2Name,
-          material3Name,
-          material4Name,
-          material5Name,
-        ];
-        let quantityList = [
-          material1Quantity,
-          material2Quantity,
-          material3Quantity,
-          material4Quantity,
-          material5Quantity,
-        ];
-
-        //Remove when Those are empty / null / undefined
-        for (let i = 0; i <= materialList.length + 1; i++) {
-          if (
-            materialList[i] == null ||
-            materialList[i] == undefined ||
-            materialList[i] == "" ||
-            materialList[i] == " "
-          ) {
-            materialList.splice(i);
-            quantityList.splice(i);
-          }
-        }
-        for (let i = 0; i < materialList.length; i++) {
-          boxMsg += `${i + 1}.   ${quantityList[i]} of ${materialList[i]} \\n`;
-        }
+        boxMsg += `For Materials : ${material1Quantity} of ${material1Name}\\n`;
+        if(material2Quantity) boxMsg += `${material2Quantity} of ${material2Name}\\n`;
+        if(material3Quantity) boxMsg += `${material2Quantity} of ${material3Name}\\n`;
+        if(material4Quantity) boxMsg += `${material2Quantity} of ${material4Name}\\n`;
+        if(material5Quantity) boxMsg += `${material2Quantity} of ${material5Name}\\n`;
 
         //Make a nessage box
         try {
@@ -394,19 +274,14 @@ const BillFromSelected = async () => {
           );
           if (response == "yes") {
             Logger.log('User clicked "Yes".');
-            const order = await CreateShopifyOrder(
-              customer,
-              jobnumber,
-              package,
-              formattedMats
-            );
-            //ss.getRange('AZ' + thisRow).setValue(false);
-            await ss.getRange("A" + thisRow).setValue("Billed");
+            
+            const order = await shopify.CreateOrder();
+            SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.billed);
             Logger.log(order.toString());
-            let lastOrder = await GetLastShopifyOrder();
+            let lastOrder = await shopify.GetLastOrder();
             Browser.msgBox(
               boxTitle,
-              "Student has been successfully billed on Shopify!\\n" + lastOrder,
+              "Student has been successfully billed on Shopify!\\n" + JSON.stringify(lastOrder),
               Browser.Buttons.OK
             );
           } else {
@@ -414,9 +289,9 @@ const BillFromSelected = async () => {
             Logger.log("Order NOT Created.");
           }
         } catch (err) {
-          Logger.log(`${err} : Could not generate a message box to gather info.`);
+          Logger.log(`${err} : Couldn't create an order...`);
         } finally {
-          ss.getRange("AZ" + thisRow).setValue(false);
+          thisSheet.getRange("AZ" + thisRow).setValue(false);
         }
       }
     }
@@ -492,7 +367,7 @@ class Menu
 
     let thisSheet = SpreadsheetApp.getActiveSheet();
     let thisRow = thisSheet.getActiveRange().getRow();
-    let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+    let jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
 
     if(this._CheckSheet(thisSheet) == true) {
       Browser.msgBox(
@@ -581,22 +456,22 @@ class Menu
         );
         return;
     } else {
-      let status = getByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-      let jobnumber = getByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-      let email = getByHeader(thisSheet, "Email Address", thisRow);
-      let name = getByHeader(thisSheet, "What is your name?", thisRow);
+      let status = GetByHeader(thisSheet, "(INTERNAL) Status", thisRow);
+      let jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+      let email = GetByHeader(thisSheet, "Email Address", thisRow);
+      let name = GetByHeader(thisSheet, "What is your name?", thisRow);
 
       // Materials
-      let material1Name = getByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
-      let material1Quantity = getByHeader( thisSheet, "(INTERNAL) Material 1 Quantity", thisRow );
-      let material2Name = getByHeader(thisSheet, "(INTERNAL) Item 2", thisRow);
-      let material2Quantity = getByHeader(thisSheet, "(INTERNAL) Material 2 Quantity", thisRow);
-      let material3Name = getByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
-      let material3Quantity = getByHeader( thisSheet, "(INTERNAL) Material 3 Quantity", thisRow );
-      let material4Name = getByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
-      let material4Quantity = getByHeader( thisSheet, "(INTERNAL) Material 4 Quantity", thisRow );
-      let material5Name = getByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
-      let material5Quantity = getByHeader( thisSheet, "(INTERNAL) Material 5 Quantity", thisRow );
+      let material1Name = GetByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
+      let material1Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 1 Quantity", thisRow );
+      let material2Name = GetByHeader(thisSheet, "(INTERNAL) Item 2", thisRow);
+      let material2Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 2 Quantity", thisRow);
+      let material3Name = GetByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
+      let material3Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 3 Quantity", thisRow );
+      let material4Name = GetByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
+      let material4Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 4 Quantity", thisRow );
+      let material5Name = GetByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
+      let material5Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 5 Quantity", thisRow );
 
       let response;
       
@@ -727,16 +602,16 @@ class Menu
 
 }
 
-const Bill = () => new Menu().BillFromSelected();
-const OpenTab = () => new Menu().OpenBarcodeTab();
-const CheckStudents = () => new Menu().PopupCheckMissingAccessStudents();
-const CountUsers = () => new Menu().PopupCountUsers();
-const MakeTicket = () => new Menu().PopupCreateTicket();
-const TopTen = () => new Menu().RunTopTen();
-const StandDev = () => new Menu().RunStandardDeviation();
-const HelpText = () => new Menu().PopupHelp();
+// const Bill = () => new Menu().BillFromSelected();
+// const OpenTab = () => new Menu().OpenBarcodeTab();
+// const CheckStudents = () => new Menu().PopupCheckMissingAccessStudents();
+// const CountUsers = () => new Menu().PopupCountUsers();
+// const MakeTicket = () => new Menu().PopupCreateTicket();
+// const TopTen = () => new Menu().RunTopTen();
+// const StandDev = () => new Menu().RunStandardDeviation();
+// const HelpText = () => new Menu().PopupHelp();
 
-const MakeMenu = () => new Menu();
+// const MakeMenu = () => new Menu();
 
 
 

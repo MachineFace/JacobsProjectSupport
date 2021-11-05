@@ -97,21 +97,37 @@ const FormatCell = (cell) => {
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Return the value of a cell by column name and row number
- * Tested and confirmed
+ * @param {sheet} sheet
  * @param {string} colName
  * @param {number} row
  */
- const getByHeader = (theSheet, colName, row) => {
-  // let data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
+const GetByHeader = (sheet, columnName, row) => {
   try {
-    let data = theSheet.getDataRange().getValues();
-    let col = data[0].indexOf(colName);
-    if (col != -1) {
-      return data[row - 1][col];
-      // Logger.log(`Value of col: ${colName} row: ${row} is ${data[row - 1][col]}`);
-    }
+    let data = sheet.getDataRange().getValues();
+    let col = data[0].indexOf(columnName);
+    if (col != -1) return data[row - 1][col];
   } catch (err) {
-    Logger.log(`${err} : getByHeader failed - Sheet: ${theSheet} Col Name specified: ${colName} Row: ${row}`);
+    Logger.log(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
+  }
+};
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Return the values of a column by the name
+ * @param {sheet} sheet
+ * @param {string} colName
+ * @param {number} row
+ */
+const GetColumnDataByHeader = (sheet, columnName) => {
+  try {
+    const data = sheet.getDataRange().getValues();
+    const col = data[0].indexOf(columnName);
+    let colData = data.map(d => d[col]);
+    colData.splice(0, 1);
+    if (col != -1) return colData;
+  } catch (err) {
+    Logger.log(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
   }
 };
 
@@ -120,23 +136,21 @@ const FormatCell = (cell) => {
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Set the value of a cell by column name and row number
- * Tested and confirmed
+ * @param {sheet} sheet
  * @param {string} colName
  * @param {number} row
  * @param {any} val
  */
-const setByHeader = (theSheet, colName, row, val) => {
-  //let theSheet = SpreadsheetApp.getActiveSheet();
+const SetByHeader = (sheet, columnName, row, val) => {
   try {
-    const data = theSheet.getDataRange().getValues();
-    const col = data[0].indexOf(colName);
-    let range = theSheet.getRange(row, col+1);
-    range.setValue(val);
-    //Logger.log(`Value of row: ${row} col: ${col} set to ${val}`);
+    const data = sheet.getDataRange().getValues();
+    const col = data[0].indexOf(columnName) + 1;
+    sheet.getRange(row, col).setValue(val);
   } catch (err) {
-    Logger.log(`${err} : setByHeader failed - Sheet: ${theSheet} Row: ${row} Col: ${col} Value: ${val}`);
+    Logger.log(`${err} : SetByHeader failed - Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
   }
 };
+
 
 
 
@@ -393,8 +407,8 @@ const CheckMissingAccessStudents = () => {
   if(results != null) {
     for(const [sheetName, values] of Object.entries(results)) {
       values.forEach( row => {
-        let email = getByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Email Address", row);
-        let sid = getByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Your Student ID Number?", row)
+        let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Email Address", row);
+        let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Your Student ID Number?", row)
         let priority = GetPriority(email, sid);
         Logger.log(`Email : ${email}, SID : ${sid}, Priority : ${priority}`);
         if(priority != `STUDENT NOT FOUND!`) {
@@ -408,6 +422,24 @@ const CheckMissingAccessStudents = () => {
 };
 
 
+/**
+ * Check if this sheet is forbidden
+ * @param {sheet} sheet to check
+ * @returns {bool} false if sheet is allowed
+ * @returns {bool} true if forbidden
+ */
+const CheckSheetIsForbidden = (someSheet) => {
+  let forbiddenNames = [];
+  Object.values(NONITERABLESHEETS).forEach( sheet => forbiddenNames.push(sheet.getName()));
+  const index = forbiddenNames.indexOf(someSheet.getName());
+  if(index == -1 || index == undefined) {
+    Logger.log(`Sheet is NOT FORBIDDEN : ${someSheet.getName()}`)
+    return false;
+  } else {
+    Logger.log(`SHEET FORBIDDEN : ${forbiddenNames[index]}`);
+    return true;
+  }
+}
 
 
 
@@ -474,6 +506,7 @@ class JobNumberGenerator
   constructor(date){
     this.date = date ? date : new Date();
     this.jobnumber;
+    this.Create();
   }
 
   Create() {
@@ -507,14 +540,19 @@ class JobNumberGenerator
 }
 
 const _testJobNumberGen = () => {
-  const gen = new JobNumberGenerator(new Date(2015, 10, 3));
-  const num = gen.Create();
-  Logger.log(num);
-  const formatted = gen.Format();
-  Logger.log(formatted);
+  const num = new JobNumberGenerator(new Date(2015, 10, 3));
+  Logger.log(num.jobnumber.toString());
 }
 
+const _testSheetChecker = () => {
+  const val = CheckSheetIsForbidden(OTHERSHEETS.logger);
+  Logger.log(`Logger Should be true-forbidden : ${val}`);
+  const val2 = CheckSheetIsForbidden(SHEETS.fablight);
+  Logger.log(`Fablight Should be false-not_forbidden: ${val2}`);
+  const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
+  Logger.log(`Store Should be true-forbidden: ${val3}`);
 
+}
 
 
 

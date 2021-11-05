@@ -1,6 +1,8 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Checking Priority
+ * @param {string} email
+ * @param {string} sid
  */
 class Priority
 {
