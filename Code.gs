@@ -60,18 +60,17 @@ const onSubmission = async (e) => {
     writer.Error(`${err}: Could not set status to 'Received'.`);
   }
 
-  // Parse Functions for shipping / variables
+  // Parse variables
   var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : GetByHeader(sheet, "What is your name?", lastRow);
   var email = e.namedValues["Email Address"][0] ? e.namedValues["Email Address"][0] : GetByHeader(sheet, "Email Address", lastRow);
   var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : GetByHeader(sheet, "Your Student ID Number?", lastRow);
   var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0] ? e.namedValues["What is your affiliation to the Jacobs Institute?"][0] : GetByHeader(sheet, "What is your affiliation to the Jacobs Institute?", lastRow);
   var projectname = e.namedValues["Project Name"][0] ? e.namedValues["Project Name"][0] : GetByHeader(sheet, "Project Name", lastRow);
-  var shipping = e.namedValues["Do you need your parts shipped to you?"][0];
   var timestamp = e.namedValues["Timestamp"][0];
 
   var values = e.namedValues;
 
-  writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Needs Shipping : ${shipping}, Timestamp : ${timestamp}`);
+  writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
   let jobnumber = await new JobNumberGenerator(timestamp).jobnumber;
@@ -313,7 +312,6 @@ const onChange = async (e) => {
   var sid = GetByHeader(thisSheet, "Student ID Number", thisRow);
   var studentType = GetByHeader(thisSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
   var projectname = GetByHeader(thisSheet, "Project Name", thisRow);
-  var shippingQuestion = GetByHeader(thisSheet, "Do you need your parts shipped to you?", thisRow);
   var cost = GetByHeader(thisSheet, "Estimate", thisRow);
 
   //Materials
