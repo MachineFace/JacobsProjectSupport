@@ -80,6 +80,7 @@ const onSubmission = async (e) => {
   let priority = await new Priority({email : email, sid : sid});
   SetByHeader(sheet, "(INTERNAL): Priority", lastRow, priority.priority);
 
+
   // Create Messages
   const message = await new CreateSubmissionMessage(name, projectname, jobnumber);
 
@@ -162,20 +163,6 @@ const onSubmission = async (e) => {
   stat = stat ? stat : SetByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
   writer.Info(`Status refixed to 'Received'.`);
 
-  // "Shipping Questions" message - Need to collect info here: https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform
-  // var shippingbody = message.shippingMessage;
-
-  // if (shipping == "Yes") {
-  //   //Email
-  //   GmailApp.sendEmail(email, "Jacobs Project Support : Shipping Form", "", {
-  //     htmlBody: shippingbody,
-  //     from: supportAlias,
-  //     bcc: InvokeDS("Chris", "email"),
-  //     name: gmailName,
-  //   });
-  //   writer.Info(`Shipping instructions email sent.`);
-  // }
-
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == "Creaform") {
       //Email
@@ -193,6 +180,9 @@ const onSubmission = async (e) => {
 
   try {
     if (priority == "STUDENT NOT FOUND!" || priority == false) {
+      // Set access to Missing Access
+      SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
+
       //Email
       GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
         htmlBody: message.missingAccessMessage,
@@ -201,17 +191,21 @@ const onSubmission = async (e) => {
         name: "Jacobs Project Support",
       });
 
-      // Set access to Missing Access
-      SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
       writer.Info(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
     writer.Error(`${err} : Couldn't find student access boolean value`);
+  } finally {
+    if (priority == "STUDENT NOT FOUND!" || priority == false) {
+      SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
+    }
   }
 
   // Check again
   jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator(timestamp).jobnumber;
   SetByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
+
+
   
 
   // Fix wrapping issues
@@ -288,7 +282,7 @@ const onChange = async (e) => {
   let tempEmail = GetByHeader(thisSheet, "Email Address", thisRow);
   let tempSID = GetByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
-  let tempPriority = new Priority({email : tempEmail, sid : tempSID});
+  let tempPriority = await new Priority({email : tempEmail, sid : tempSID});
   SetByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority.priority);
   if (tempPriority == "STUDENT NOT FOUND") {
     SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
@@ -352,6 +346,7 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
+    writer.Debug(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).jobnumber;
       SetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
@@ -373,20 +368,20 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Calculate Turnaround Time only when cell is empty
   try {
-    var startTime = submissiontime;
-    var elapsedCell = ss.getRange(thisRow, 43).getValue();
-    if (elapsedCell == undefined || elapsedCell == null || elapsedCell == "") {
+    writer.Debug(`Attempting to Calculate turnaround times`);
+    const calc = new Calculate();
+    let elapsedCell = thisSheet.getRange(thisRow, 43).getValue();
+    if (elapsedCell !== undefined || elapsedCell !== null || elapsedCell !== "") {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
-        const calc = new Calculate();
-        let time = await calc.CalculateDuration(startTime, endTime);
+        let time = await calc.CalculateDuration(new Date(submissiontime), endTime);
 
-        // Write to Column - d h:mm:ss
-        SetByHeader(thisSheet, "Elapsed Time", thisRow, time);
+        // Write to Column - d h:mm:ss  
+        SetByHeader(thisSheet, "Elapsed Time", thisRow, time.toString());
         writer.Info(`Turnaround Time = ${time}`);
 
         // Write Completed time
-        SetByHeader(thisSheet, "Date Completed", thisRow, endTime);
+        SetByHeader(thisSheet, "Date Completed", thisRow, endTime.toString());
       }
     }
   } catch (err) {
@@ -396,6 +391,7 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Trigger for generating a "Ticket"
   if ( status == STATUS.received || status == STATUS.inProgress || status == STATUS.pendingApproval ) {
+    writer.Debug(`Attempting to create a ticket`)
     const ticketGenerator = new Ticket({jobnumber : jobnumber});
     try {
       const ticket = ticketGenerator.CreateTicket();
@@ -409,13 +405,19 @@ const onChange = async (e) => {
   // Create a new form, then add a checkbox question, a multiple choice question,
   let approvalURL;
   if (status == STATUS.pendingApproval) {
-    const approvalform = await new ApprovalFormBuilder({
-      name : name,
-      jobnumber : jobnumber,
-      cost : cost,
-    })
-    approvalURL = approvalform.url;
-    writer.Info(`Approval Form generated and sent to user.`);
+    writer.Debug(`Attempting to create an approval form.`)
+    try {
+      const approvalform = await new ApprovalFormBuilder({
+        name : name,
+        jobnumber : jobnumber,
+        cost : cost,
+      })
+      approvalURL = approvalform.url;
+      writer.Info(`Approval Form generated and sent to user.`);
+    }
+    catch (err) {
+      writer.Error(`${err} : Couldn't generate an approval form` );
+    }
   }
 
   // Case switch for different Design Specialists email
@@ -449,6 +451,7 @@ const onChange = async (e) => {
   );
 
   // Send email with appropriate response and cc Chris and Cody.
+  writer.Info(`Sending email.`)
   switch (status) {
     case STATUS.received:
       GmailApp.sendEmail(email, "Jacobs Project Support : Received", "", {
@@ -571,6 +574,11 @@ const onChange = async (e) => {
   if (thisRow > 3) {
     await Metrics();
     writer.Info(`Recalculated Metrics tab.`);
+  }
+
+  // Check priority one more time:
+  if (priority == "STUDENT NOT FOUND!" && (status != STATUS.missingAccess || status != STATUS.closed || status != STATUS.cancelled)) {
+    SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
 };
 

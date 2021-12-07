@@ -28,7 +28,7 @@ class Priority
       } else if (!finder) {
         // try SID
         this.sid.toString().replace(/\s+/g, "");
-        finder = OTHERSHEETS.approved.createTextFinder(this.sid).findNext();
+        finder = OTHERSHEETS.approved.createTextFinder(this.sid.toString()).findNext();
         if (finder != null) {
           let row = finder.getRow();
           this.priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
@@ -42,7 +42,7 @@ class Priority
     } else if(this.sid) {
       // try SID
       this.sid.toString().replace(/\s+/g, "");
-      finder = OTHERSHEETS.approved.createTextFinder(this.sid).findNext();
+      finder = OTHERSHEETS.approved.createTextFinder(this.sid.toString()).findNext();
       if (finder != null) {
         let row = finder.getRow();
         this.priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();

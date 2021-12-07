@@ -21,7 +21,6 @@ class Ticket
     this.row;
     this.doc;
     this.url;
-    this.GetInfo();
   }
 
   /**
@@ -85,45 +84,70 @@ class Ticket
     let partcount = [];
     let notes = [];
     switch(this.sheetName) {
-      case 'Ultimaker':
-        material = this.GetByHeader(SHEETS.ultimaker, 'Does your project need the support material removed?', this.row);
+      case SHEETS.ultimaker.getName():
+        material = await this.GetByHeader(SHEETS.ultimaker, 'Does your project need the support material removed?', this.row);
         if(material) mat.push( "Needs Breakaway Removed:", material.toString());
-        part = this.GetByHeader(SHEETS.ultimaker, 'Part Count', this.row);
+        else mat.push("Materials: ", "None");
+
+        part = await this.GetByHeader(SHEETS.ultimaker, 'Part Count', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
-        note = this.GetByHeader(SHEETS.ultimaker, 'Notes', this.row);
+        else partcount.push("Part Count: ", "None");
+
+        note = await this.GetByHeader(SHEETS.ultimaker, 'Notes', this.row);
         if(note) notes.push( "Notes:", note.toString());
+        else notes.push("Notes: ", "None");
         break;
-      case "Laser Cutter":
-        material = this.GetByHeader(SHEETS.laser, 'Rough dimensions of your part', this.row)
+      case SHEETS.laser.getName():
+        material = await this.GetByHeader(SHEETS.laser, 'Rough dimensions of your part', this.row)
         if(material) mat.push( "Rough Dimensions:", material.toString());
-        part = this.GetByHeader(SHEETS.laser, 'Total number of parts needed', this.row);
+        else mat.push("Materials: ", "None");
+
+        part = await this.GetByHeader(SHEETS.laser, 'Total number of parts needed', this.row);
         if(part) partcount.push("Part Count:", part.toString());
-        note = this.GetByHeader(SHEETS.laser, 'Notes', this.row);
+        else partcount.push("Part Count: ", "None");
+
+        note = await this.GetByHeader(SHEETS.laser, 'Notes', this.row);
         if(note) notes.push( "Notes:", note.toString());
+        else notes.push("Notes: ", "None");
         break;
-      case "Fablight":
-        material = this.GetByHeader(SHEETS.fablight, 'Rough dimensions of your part?', this.row);
+      case SHEETS.fablight.getName():
+        material = await this.GetByHeader(SHEETS.fablight, 'Rough dimensions of your part?', this.row);
         if(material) mat.push( "Rough Dimensions:", material.toString());
-        part = this.GetByHeader(SHEETS.fablight, 'How many parts do you need?', this.row);
+        else mat.push("Materials: ", "None");
+
+        part = await this.GetByHeader(SHEETS.fablight, 'How many parts do you need?', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
-        note = this.GetByHeader(SHEETS.fablight, 'Notes:', this.row);
+        else partcount.push("Part Count: ", "None");
+
+        note = await this.GetByHeader(SHEETS.fablight, 'Notes:', this.row);
         if(note) notes.push( "Notes:", note.toString());
+        else notes.push("Notes: ", "None");
         break;
-      case "Waterjet":
-        material = this.GetByHeader(SHEETS.waterjet, 'Rough dimensions of your part', this.row);
+      case SHEETS.waterjet.getName():
+        material = await this.GetByHeader(SHEETS.waterjet, 'Rough dimensions of your part', this.row);
         if(material) mat.push( "Rough Dimensions:", material.toString());
-        part = this.GetByHeader(SHEETS.waterjet, 'How many parts do you need?', this.row);
+        else mat.push("Materials: ", "None");
+
+        part = await this.GetByHeader(SHEETS.waterjet, 'How many parts do you need?', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
-        lnote = this.GetByHeader(SHEETS.waterjet, 'Notes', this.row);
+        else partcount.push("Part Count: ", "None");
+
+        lnote = await this.GetByHeader(SHEETS.waterjet, 'Notes', this.row);
         if(note) notes.push( "Notes:", note.toString());
+        else notes.push("Notes: ", "None");
         break;
-      case "Advanced Lab":
-        material = this.GetByHeader(SHEETS.advancedlab, 'Which printer?', this.row);
+      case SHEETS.advancedlab.getName():
+        material = await this.GetByHeader(SHEETS.advancedlab, 'Which printer?', this.row);
         if(material) mat.push( "Which Printer:", material.toString());
-        part = this.GetByHeader(SHEETS.advancedlab, 'Total number of parts needed', this.row);
+        else mat.push("Materials: ", "None");
+
+        part = await this.GetByHeader(SHEETS.advancedlab, 'Total number of parts needed', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
-        note = this.GetByHeader(SHEETS.advancedlab, 'Other Notes About This Job', this.row);
+        else partcount.push("Part Count: ", "None");
+
+        note = await this.GetByHeader(SHEETS.advancedlab, 'Other Notes About This Job', this.row);
         if(note) notes.push( "Notes:", note.toString());
+        else notes.push("Notes: ", "None");
         break;
       default:
         mat.push("Materials: ", "None");
@@ -146,15 +170,23 @@ class Ticket
         });
       this._ReplaceTextToImage(header, 'img1', barcode);
       this._ReplaceTextToImage(header, 'img2', qrCode);
-
+      
+      body
+        .setPageWidth(PAGESIZES.statement.width)
+        .setPageHeight(PAGESIZES.statement.height)
+        .setMarginTop(10)
+        .setMarginBottom(10)
+        .setMarginLeft(10)
+        .setMarginRight(10);
+      
       body.insertHorizontalRule(0);
-      body.insertParagraph(1, "Name: " + this.name.toString())
+      body.insertParagraph(1, `Name: ${this.name.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING1)
         .setAttributes({
           [DocumentApp.Attribute.FONT_SIZE]: 12,
           [DocumentApp.Attribute.BOLD]: true,
         });
-      body.insertParagraph(2, "Job Number: " + this.jobnumber.toString())
+      body.insertParagraph(2, `Job Number: ${this.jobnumber.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING2)
         .setAttributes({
           [DocumentApp.Attribute.FONT_SIZE]: 10,
@@ -193,7 +225,8 @@ class Ticket
     let file = DriveApp.getFileById(docId);
     file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
 
-    Logger.log(JSON.stringify(this.doc));
+    // Logger.log(JSON.stringify(this.doc));
+    Logger.log(`DOC ----> ${this.doc.getUrl()}`)
     this.SetTicketURL();
     return this.doc;
   };

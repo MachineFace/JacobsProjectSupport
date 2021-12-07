@@ -409,11 +409,11 @@ const CheckMissingAccessStudents = () => {
       values.forEach( row => {
         let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Email Address", row);
         let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Your Student ID Number?", row)
-        let priority = GetPriority(email, sid);
-        Logger.log(`Email : ${email}, SID : ${sid}, Priority : ${priority}`);
-        if(priority != `STUDENT NOT FOUND!`) {
+        const p = new Priority({email : email, side: sid});
+        Logger.log(`Email : ${email}, SID : ${sid}, Priority : ${p.priority}`);
+        if(p.priority != `STUDENT NOT FOUND!`) {
           list.push(email);
-          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(priority);
+          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(p.priority);
         }
       })
     }
@@ -443,44 +443,6 @@ const CheckSheetIsForbidden = (someSheet) => {
 
 
 
-const CountTotalEmailsSent = async () => {
-  const supportAlias = GmailApp.getAliases()[0];
-  let labelName = "JPS Notifications";
-
-  var labels = GmailApp.getUserLabels();
-  // labels.forEach(label => {
-  //     let name = label.getName()
-  //     Logger.log(`Labels : ${name}`)
-  // })
-
-  let now = new Date();
-  let oldest = now;
-  let pageSize = 50;
-  let start = 0;
-  let threads;
-
-  do {
-    threads = await GmailApp.search(`label:jacobs-project-support-jps-notifications `, start, pageSize);
-    // threads = await GmailApp.getInboxThreads(start, pageSize);
-    threads.forEach((thread) => {
-        oldest = thread.getLastMessageDate() < oldest ? thread.getLastMessageDate() : oldest;
-    });
-
-    start += pageSize;
-    Utilities.sleep(1000);
-  } while(threads.length > 0);
-  
-  // calculate age of oldest messag in days
-  let ageOfOldest = Math.round((datetimeToDate(now) - datetimeToDate(oldest)) / (1000 * 60 * 60 * 24))
-
-  // get all threads in inbox as an array in order to count 
-  var threadsCount = GmailApp.getInboxThreads();
-  
-  // Add a row of the spreadsheet's first sheet and include the following data:
-  // current date & time | username / email address | # of message threads in inbox | Age in days of oldest message
-  Logger.log(`Time Now : ${now}, Number of Emails in Inbox : ${threadsCount.length}, Oldest Email : ${ageOfOldest}`);
-}
-
 const datetimeToDate = (d) => {
   return new Date(d.getYear(), d.getMonth(), d.getDate());
 }
@@ -504,7 +466,7 @@ const FindMissingElementsInArrays = (array1, array2) => {
 class JobNumberGenerator
 {
   constructor(date){
-    this.date = date ? date : new Date();
+    this.date = date ? new Date(date) : new Date();
     this.jobnumber;
     this.Create();
   }
@@ -555,6 +517,18 @@ const _testSheetChecker = () => {
 }
 
 
+const GetAllProjectNames = () => {
+  let names = []
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    let titles = GetColumnDataByHeader(sheet, "Project Name");
+    titles = [].concat(...titles);
+    let culled = titles.filter(Boolean);
+    names.push(culled);
+  }
+  names = [].concat(...names);
+  Logger.log(names);
+  return names;
+}
 
 
 
@@ -562,6 +536,16 @@ const _testSheetChecker = () => {
 
 
 
+const CountTotalEmailsSent = async () => {
+  let count = 0;
+  const labelName = "Jacobs Project Support/JPS Notifications";
+
+  let label = GmailApp.getUserLabelByName(labelName);
+  let threads = label.getThreads();
+  threads.forEach(thread => count += thread.getMessageCount());
+  Logger.log(`Total Emails Sent : ${count}`);
+  
+}
 
 
 

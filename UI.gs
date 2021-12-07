@@ -602,6 +602,8 @@ class Menu
 
 }
 
+const MakeMenu = () => {
+  const menu = new Menu();
 // const Bill = () => new Menu().BillFromSelected();
 // const OpenTab = () => new Menu().OpenBarcodeTab();
 // const CheckStudents = () => new Menu().PopupCheckMissingAccessStudents();
@@ -612,6 +614,7 @@ class Menu
 // const HelpText = () => new Menu().PopupHelp();
 
 // const MakeMenu = () => new Menu();
+}
 
 
 

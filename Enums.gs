@@ -180,3 +180,32 @@ const TYPES = [
   "Other: Berkeley Faculty, Berkeley Staff, and Students",
 ];
 
+
+
+const PAGESIZES = {
+  /**
+    * INPUTS
+    * -argument-     :-inches-      :-mm-     :-points-
+    * letter_size    :8.5"x11"      :216x279  :612.283x790.866
+    * tabloid_size   :11"x17"       :279x432  :790.866x1224.57
+    * legal_size     :8.5"x14"      :216x356  :612.283x1009.13
+    * statement_size :5.5"x8.5"     :140x216  :396.85x612.283
+    * executive_size :7.25"x10.5"   :184x267  :521.575x756.85
+    * folio_size     :8.5"x13"      :216x330  :612.283x935.433
+    * a3_size        :11.69"x16.54" :297x420  :841.89x1190.55
+    * a4_size        :8.27"x11.69"  :210x297  :595.276x841.89
+    * a5_size        :5.83"x8.27"   :148x210  :419.528x595.276
+    * b4_size        :9.84"x13.9"   :250x353  :708.661x1000.63
+    * b5_size        :6.93"x9.84"   :176x250  :498.898x708.661
+  */
+  letter: {width: 612.283, height: 790.866},
+  tabloid: {width: 790.866,height: 1224.57},
+  statement: {width: 396.85, height: 612.283},
+  a3: {width: 841.89, height: 1190.55},
+  a4: {width: 595.276, height: 841.89},
+  a5: {width: 419.528, height: 595.276},
+}
+
+
+
+

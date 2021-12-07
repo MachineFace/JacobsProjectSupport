@@ -9,68 +9,81 @@ class Calculate
   }
 
   CalculateAverageTurnaround (sheet) {
-    // Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
-    let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); // Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
-    completionTimes = [].concat(...completionTimes);
-    let culled = completionTimes.filter(Boolean);
-    
-    // Convert everything to seconds
-    let totals = [];
-    culled.forEach(time => {
-      let days = (+time[0] * 24 * 60); // days to hours to minutes
-      let hours = (+time[1] * 60); // hours to minutes
-      let minutes = (+time[2]); // minutes     
-      let seconds = (+time[3]); // seconds, forget about seconds
-      let total = days + hours + minutes;
-      totals.push(total);
-    })
+    try {
+      // Parse the stopwatch durations from 'dd hh:mm:ss' into seconds-format, average together, and reformat in 'dd hh:mm:ss' format. 
+      let completionTimes = sheet.getRange(3, 44, sheet.getLastRow(), 1).getValues(); // Column AR2:AR (Format: Row, Column, Last Row, Number of Columns)
+      completionTimes = [].concat(...completionTimes);
+      let culled = completionTimes.filter(Boolean);
+      
+      // Convert everything to seconds
+      let totals = [];
+      culled.forEach(time => {
+        if(time === typeof(String)) Logger.log(`Not a number: ${time}`) 
+        else {
+          let days = +Number(time[0]) * 24 * 60; // days to hours to minutes
+          let hours = +Number(time[1]) * 60; // hours to minutes
+          let minutes = +Number(time[2]); // minutes     
+          let seconds = +Number(time[3]); // seconds, forget about seconds
+          let total = days + hours + minutes;
+          totals.push(total);
+        }
+      })
 
-    // Sum all the totals
-    let sum = 0;
-    totals.forEach( (item, index) => sum += item);
+      // Sum all the totals
+      let sum = 0;
+      totals.forEach( (item, index) => sum += item);
 
-    // Average the totals (a list of times in minutes)
-    let average = sum / totals.length;
+      // Average the totals (a list of times in minutes)
+      let average = sum / totals.length;
 
-    let mins = parseInt((average % 60), 10); // Calc mins
-    average = Math.floor(average / 60); // Difference mins to hrs
-    let minutesAsString = mins < 10 ? "0" + mins : mins + ""; // Pad with a zero
+      let mins = parseInt((average % 60), 10); // Calc mins
+      average = Math.floor(average / 60); // Difference mins to hrs
+      let minutesAsString = mins < 10 ? "0" + mins : mins + ""; // Pad with a zero
 
-    let hrs = average % 24; // Calc hrs
-    average = Math.floor(average / 24); // Difference hrs to days
-    let dys = average;
+      let hrs = average % 24; // Calc hrs
+      average = Math.floor(average / 24); // Difference hrs to days
+      let dys = average;
 
-    //Format into readable time and return (if data is still missing, set it to zero)
-    if (isNaN(dys)) dys = 0;
-    if (isNaN(hrs)) hrs = 0;
-    if (isNaN(minutesAsString)) minutesAsString = 0;
+      //Format into readable time and return (if data is still missing, set it to zero)
+      if (isNaN(dys)) dys = 0;
+      if (isNaN(hrs)) hrs = 0;
+      if (isNaN(minutesAsString)) minutesAsString = 0;
 
-    let formatted = dys + 'd ' + hrs + 'h ' + minutesAsString + "m";
-    Logger.log(formatted);
-    return formatted;
+      let formatted = dys + 'd ' + hrs + 'h ' + minutesAsString + "m";
+      Logger.log(formatted);
+      return formatted;
+    }
+    catch (err) {
+      Logger.log(`${err} : Calculating the turnaround times has failed for some reason.`);
+    }
   }
   PrintTurnaroundTimes () {
-    let data = [];
-    for(const [key, sheet] of Object.entries(SHEETS)) {
-      data.push([`${sheet.getName()} Turnaround`, this.CalculateAverageTurnaround(sheet)]);
+    try {
+      let data = [];
+      for(const [key, sheet] of Object.entries(SHEETS)) {
+        data.push([`${sheet.getName()} Turnaround`, this.CalculateAverageTurnaround(sheet)]);
+      }
+      data.forEach( (entry, index) => {
+        OTHERSHEETS.data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
+        OTHERSHEETS.data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
+      })
     }
-    data.forEach( (entry, index) => {
-      OTHERSHEETS.data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
-      OTHERSHEETS.data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
-    })
+    catch (err) {
+      Logger.log(`${err} : Printing the turnaround times has failed for some reason.`);
+    }
   }
 
 
   CalculateDuration (start, end) {
     try {
-      end = end ? end : new Date();  //if supplied with nothing, set end time to now
-      start = start ? start : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
+      end = end ? new Date(end) : new Date();  //if supplied with nothing, set end time to now
+      start = start ? new Date(start) : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
+      // Logger.log(`END TYPE : ${typeof(end)}, START TYPE : ${typeof(start)}`)
 
-      let timeDiff = Math.abs((end - start) / 1000); //Abs Value Milliseconds to sec
-
-      let secs = Math.floor(timeDiff % 60); //Calc seconds
-      timeDiff = Math.floor(timeDiff / 60); //Difference seconds to minutes
-      let secondsAsString = secs < 10 ? "0" + secs : secs + ""; //Pad with a zero
+      let timeDiff = +Number(Math.abs((end - start) / 1000)); // Abs Value Milliseconds to sec
+      let secs = Math.floor(timeDiff % 60); // Calc seconds
+      timeDiff = Math.floor(timeDiff / 60); // Difference seconds to minutes
+      let secondsAsString = secs < 10 ? "0" + secs : secs + ""; // Pad with a zero
 
       let mins = timeDiff % 60; //Calc mins 
       timeDiff = Math.floor(timeDiff / 60); //Difference mins to hrs
@@ -78,14 +91,14 @@ class Calculate
 
       let hrs = timeDiff % 24; //Calc hrs
       timeDiff = Math.floor(timeDiff / 24); //Difference hrs to days
-      let days = timeDiff;
+      let days = timeDiff.toString();
 
-      //Write
-      let formatted = days + ' ' + hrs + ':' + minutesAsString + ':' + secondsAsString;
-      Logger.log("Duration = " + formatted);
-
+      // Write
+      let formatted = `days : ${days.toString()}, hrs : ${hrs.toString()}, mins : ${minutesAsString}, secs : ${secondsAsString}`;
+      let out = `${days} ${hrs}:${minutesAsString}:${secondsAsString}`;
+      Logger.log(`Duration = ${out}`);
       // Return Completed time
-      return formatted;
+      return out;
     }
     catch (err) {
       Logger.log(`${err} : Calculating the duration has failed for some reason.`);
@@ -491,7 +504,10 @@ const Metrics = () => {
 
 const _testDist = () => {
   const c = new Calculate();
-  c.PrintDistributionNumbers();
+  let start = new Date().toDateString();
+  let end = new Date(3,10,2020,10,32,42);
+  // c.CalculateDuration(start, end);
+  c.CalculateAverageTurnaround(SHEETS.laser)
 }
 
 

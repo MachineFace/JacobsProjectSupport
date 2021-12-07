@@ -57,7 +57,7 @@ class HackyStoreAutomation
         if (index >= 0) {
           const pos = index + searchstring.length
           const rate = content.substring(pos + 10, pos + 16);
-          const stripped = rate.replace(/^"(.*)"$/, '$1');
+          const stripped = +Number(rate.replace(/^"(.*)"$/, '$1'));
           price = +Number.parseFloat(stripped).toFixed(2);
         }
       }
