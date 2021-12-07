@@ -127,7 +127,11 @@ const PickupByBarcode = () => {
 } 
 
 
-
+const _testQRCode = () => {
+  const q = new QRCodeAndBarcodeGenerator({url: `https://www.codyglen.com/`, jobnumber: 0101010101});
+  const qr = q.GenerateQRCode();
+  Logger.log(qr)
+}
 
 
 

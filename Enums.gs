@@ -148,18 +148,18 @@ const NONITERABLESHEETS = {...OTHERSHEETS, ...STORESHEETS};
  * Example: Calling 'formDict.laser' returns value string.
  */
 const FORMS = {
-    ultimaker: "1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8",
-    laser: "1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w",
-    fablight: "1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA",
-    waterjet: "1dNLAlC8Wg0DLLkBboRMgztPqP-fMmUqyGt5xqtg8TKk",
-    advancedlab: "1okWAdclqrleQ5ktyXbSIRoY6hrL_v2OYYAhaeb0f1jQ",
-    shopbot: "1RFuhGCtQrcA9gbpEStaksK5eYeIAo0dzn5NIcxVngH4",
-    haas: "1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk",
-    vinyl: "1WTh9nDQ4C_3HyQvCNMIxRFbJk1FH4dZeYeAkiXkItKw",
-    othermill: "1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI",
-    creaform: "1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc",
-    othertools: "1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38",
-    plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
+  ultimaker: "1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8",
+  laser: "1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w",
+  fablight: "1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA",
+  waterjet: "1dNLAlC8Wg0DLLkBboRMgztPqP-fMmUqyGt5xqtg8TKk",
+  advancedlab: "1okWAdclqrleQ5ktyXbSIRoY6hrL_v2OYYAhaeb0f1jQ",
+  shopbot: "1RFuhGCtQrcA9gbpEStaksK5eYeIAo0dzn5NIcxVngH4",
+  haas: "1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk",
+  vinyl: "1WTh9nDQ4C_3HyQvCNMIxRFbJk1FH4dZeYeAkiXkItKw",
+  othermill: "1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI",
+  creaform: "1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc",
+  othertools: "1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38",
+  plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
 };
 
 /**
@@ -183,27 +183,17 @@ const TYPES = [
 
 
 const PAGESIZES = {
-  /**
-    * INPUTS
-    * -argument-     :-inches-      :-mm-     :-points-
-    * letter_size    :8.5"x11"      :216x279  :612.283x790.866
-    * tabloid_size   :11"x17"       :279x432  :790.866x1224.57
-    * legal_size     :8.5"x14"      :216x356  :612.283x1009.13
-    * statement_size :5.5"x8.5"     :140x216  :396.85x612.283
-    * executive_size :7.25"x10.5"   :184x267  :521.575x756.85
-    * folio_size     :8.5"x13"      :216x330  :612.283x935.433
-    * a3_size        :11.69"x16.54" :297x420  :841.89x1190.55
-    * a4_size        :8.27"x11.69"  :210x297  :595.276x841.89
-    * a5_size        :5.83"x8.27"   :148x210  :419.528x595.276
-    * b4_size        :9.84"x13.9"   :250x353  :708.661x1000.63
-    * b5_size        :6.93"x9.84"   :176x250  :498.898x708.661
-  */
   letter: {width: 612.283, height: 790.866},
   tabloid: {width: 790.866,height: 1224.57},
+  legal: {width: 612.283, height: 1009.13},
   statement: {width: 396.85, height: 612.283},
+  executive: {width: 521.575, height: 756.85},
+  folio: {width: 612.283, height: 935.433},
   a3: {width: 841.89, height: 1190.55},
   a4: {width: 595.276, height: 841.89},
   a5: {width: 419.528, height: 595.276},
+  b4: {width: 708.661, height: 1000.63},
+  b5: {width: 498.898, height: 708.661},
 }
 
 
