@@ -36,7 +36,7 @@ class Ticket
         this.sheetName = sheet.getName();
       }
     }
-    this.designspecialist = this.GetByHeader(this.sheet, "(INTERNAL): DS Assigned", this.row);
+    this.designspecialist = this.GetByHeader(this.sheet, "(INTERNAL): DS Assigned", this.row) ? this.GetByHeader(this.sheet, "(INTERNAL): DS Assigned", this.row) : "A Design Specialist";
     this.submissiontime = this.GetByHeader(this.sheet, "Timestamp", this.row);
     this.email = this.GetByHeader(this.sheet, "Email Address", this.row);
     this.name = this.GetByHeader(this.sheet, "What is your name?", this.row);
@@ -75,8 +75,7 @@ class Ticket
     let docId = this.doc.getId();
     
     const qGen = new QRCodeAndBarcodeGenerator({url : this.url, jobnumber : this.jobnumber});
-    const barcode = await qGen.GenerateBarCode();
-    const qrCode = await qGen.GenerateQRCode();
+    const barcode = await qGen.GenerateBarCodeForTicketHeader();
     Logger.log(`Barcode ----> ${barcode}`);
 
     let material, part, note;
@@ -159,18 +158,6 @@ class Ticket
     // Append Document with Info
     let header;
     try {
-      header = this.doc
-        .addHeader()
-        .appendTable([
-          ['img1', 'img2']
-        ])
-        .setAttributes({
-          [DocumentApp.Attribute.BORDER_WIDTH]: 0,
-          [DocumentApp.Attribute.BORDER_COLOR]: `#ffffff`,
-        });
-      this._ReplaceTextToImage(header, 'img1', barcode);
-      this._ReplaceTextToImage(header, 'img2', qrCode);
-      
       body
         .setPageWidth(PAGESIZES.statement.width)
         .setPageHeight(PAGESIZES.statement.height)
@@ -179,17 +166,21 @@ class Ticket
         .setMarginLeft(10)
         .setMarginRight(10);
       
-      body.insertHorizontalRule(0);
-      body.insertParagraph(1, `Name: ${this.name.toString()}`)
+      body.insertImage(0, barcode)
+        .setWidth(500)
+        .setHeight(100);
+      body.insertHorizontalRule(1);
+      
+      body.insertParagraph(2, `Name: ${this.name.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING1)
         .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 12,
+          [DocumentApp.Attribute.FONT_SIZE]: 18,
           [DocumentApp.Attribute.BOLD]: true,
         });
-      body.insertParagraph(2, `Job Number: ${this.jobnumber.toString()}`)
+      body.insertParagraph(3, `Job Number: ${this.jobnumber.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING2)
         .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 10,
+          [DocumentApp.Attribute.FONT_SIZE]: 16,
           [DocumentApp.Attribute.BOLD]: true,
         });
 
@@ -204,7 +195,7 @@ class Ticket
           [notes[0], notes[1]],
         ])
         .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 8,
+          [DocumentApp.Attribute.FONT_SIZE]: 14,
         });
     } catch (err) {
       Logger.log(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
@@ -276,7 +267,7 @@ class Ticket
 
 const _testTicket = () => {
   const jnum = 20211007000407;
-  const tic = new Ticket({jobnumber : jnum}).CreateTicket();
+  const tic = new Ticket({jobnumber : jnum,}).CreateTicket();
 
   Logger.log(tic);
 }

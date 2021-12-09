@@ -88,6 +88,39 @@ class QRCodeAndBarcodeGenerator {
 
 
   }
+
+  async GenerateBarCodeForTicketHeader() {
+
+    const root = 'http://bwipjs-api.metafloor.com/';
+    const type = '?bcid=code128';
+    const ts = '&text=';
+    const scaleX = `&scaleX=6`
+    const scaleY = '&scaleY=6';
+    const postfx = '&includetext';
+
+    const barcodeLoc = root + type + ts + this.jobnumber + scaleX + scaleY + postfx;
+
+    const params = {
+      "method" : "GET",
+      "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
+      "contentType" : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : true,
+    };
+    
+    let barcode;
+
+    const res = UrlFetchApp.fetch(barcodeLoc, params);
+    const responseCode = res.getResponseCode();
+    Logger.log(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
+    if (responseCode == 200) {
+      barcode = await DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      barcode.setTrashed(true);
+    } 
+    else Logger.log('Failed to GET Barcode');
+    Logger.log(barcode);
+    return barcode;
+  }
   
 }
 
