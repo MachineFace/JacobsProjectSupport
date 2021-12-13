@@ -261,9 +261,9 @@ const BillFromSelected = async () => {
         boxMsg += `Shopify ID : ${customer.id} \\n`;
         boxMsg += `For Materials : ${material1Quantity} of ${material1Name}\\n`;
         if(material2Quantity) boxMsg += `${material2Quantity} of ${material2Name}\\n`;
-        if(material3Quantity) boxMsg += `${material2Quantity} of ${material3Name}\\n`;
-        if(material4Quantity) boxMsg += `${material2Quantity} of ${material4Name}\\n`;
-        if(material5Quantity) boxMsg += `${material2Quantity} of ${material5Name}\\n`;
+        if(material3Quantity) boxMsg += `${material3Quantity} of ${material3Name}\\n`;
+        if(material4Quantity) boxMsg += `${material4Quantity} of ${material4Name}\\n`;
+        if(material5Quantity) boxMsg += `${material5Quantity} of ${material5Name}\\n`;
 
         //Make a nessage box
         try {
