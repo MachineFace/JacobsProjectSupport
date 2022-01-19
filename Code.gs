@@ -343,6 +343,9 @@ const onChange = async (e) => {
   // Log submission info to sheet
   writer.Info(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
 
+  // Ignore
+  if(priority == "STUDENT NOT FOUND!" || status == STATUS.closed ) return;
+
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
@@ -399,6 +402,7 @@ const onChange = async (e) => {
       writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
     }
   }
+
 
   //----------------------------------------------------------------------------------------------------------------
   // Make an approval form on demand

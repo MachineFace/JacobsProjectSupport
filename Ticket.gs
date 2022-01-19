@@ -124,20 +124,20 @@ class Ticket
         break;
       case SHEETS.waterjet.getName():
         material = await this.GetByHeader(SHEETS.waterjet, 'Rough dimensions of your part', this.row);
-        if(material) mat.push( "Rough Dimensions:", material.toString());
+        if(material) mat.push( "Rough Dimensions: ", material.toString());
         else mat.push("Materials: ", "None");
 
         part = await this.GetByHeader(SHEETS.waterjet, 'How many parts do you need?', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
         else partcount.push("Part Count: ", "None");
 
-        lnote = await this.GetByHeader(SHEETS.waterjet, 'Notes', this.row);
-        if(note) notes.push( "Notes:", note.toString());
+        note = await this.GetByHeader(SHEETS.waterjet, 'Notes', this.row);
+        if(note) notes.push( "Notes: ", note.toString());
         else notes.push("Notes: ", "None");
         break;
       case SHEETS.advancedlab.getName():
         material = await this.GetByHeader(SHEETS.advancedlab, 'Which printer?', this.row);
-        if(material) mat.push( "Which Printer:", material.toString());
+        if(material) mat.push( "Which Printer: ", material.toString());
         else mat.push("Materials: ", "None");
 
         part = await this.GetByHeader(SHEETS.advancedlab, 'Total number of parts needed', this.row);
@@ -217,7 +217,7 @@ class Ticket
     file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
 
     // Logger.log(JSON.stringify(this.doc));
-    Logger.log(`DOC ----> ${this.doc.getUrl()}`)
+    Logger.log(`DOC ----> ${this.doc.getUrl()}`);
     this.SetTicketURL();
     return this.doc;
   };
