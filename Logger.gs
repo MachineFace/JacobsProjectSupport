@@ -6,72 +6,67 @@
 class WriteLogger
 {
   constructor() { 
-    this.date = new Date();
+    this.date = new Date().toUTCString();
     this.sheet = OTHERSHEETS.logger;
     this.row = OTHERSHEETS.logger.getLastRow() + 1;
     this.sheetLength = OTHERSHEETS.logger.getMaxRows();
   }
-  Error(message){
-    if(this.row > this.sheetLength) {
-      this.sheet.appendRow([this.date, "ERROR!", message,]);
-    } else {
-      SetByHeader(this.sheet, "Date", this.row, this.date);
-      SetByHeader(this.sheet, "Type", this.row, "ERROR!");
-      SetByHeader(this.sheet, "Message", this.row, message);
-    }
-    Logger.log(`ERROR : ${this.date.toUTCString()}, ${message}`);
+  Error(message) {
+    const text = [this.date, "ERROR!", message, ];
+    this.sheet.appendRow(text);
+    console.error(`${text[0]}, ${text[1]} : ${message}`);
     this._PopItem();
+    this._CleanupSheet();
   }
   Warning(message) {
-    if(this.row > this.sheetLength) {
-      this.sheet.appendRow([this.date, "WARNING!", message,]);
-    } else {
-      SetByHeader(this.sheet, "Date", this.row, this.date);
-      SetByHeader(this.sheet, "Type", this.row, "WARNING!");
-      SetByHeader(this.sheet, "Message", this.row, message);
-    }
-    Logger.log(`WARNING : ${this.date.toUTCString()}, ${message}`);
+    const text = [this.date, "WARNING!", message, ];
+    this.sheet.appendRow(text);
+    console.warn(`${text[0]}, ${text[1]} : ${message}`);
     this._PopItem();
+    this._CleanupSheet();
   }
   Info(message) {
-    if(this.row > this.sheetLength) {
-      this.sheet.appendRow([this.date, "INFO!", message,]);
-    } else {
-      SetByHeader(this.sheet, "Date", this.row, this.date);
-      SetByHeader(this.sheet, "Type", this.row, "INFO");
-      SetByHeader(this.sheet, "Message", this.row, message);
-    }
-    Logger.log(`INFO : ${this.date.toUTCString()}, ${message}`);
+    const text = [this.date, "INFO!", message, ];
+    this.sheet.appendRow(text);
+    console.info(`${text[0]}, ${text[1]} : ${message}`);
     this._PopItem();
+    this._CleanupSheet();
   }
   Debug(message) {
-    if(this.row > this.sheetLength) {
-      this.sheet.appendRow([this.date, "DEBUG", message,]);
-    } else {
-      SetByHeader(this.sheet, "Date", this.row, this.date);
-      SetByHeader(this.sheet, "Type", this.row, "DEBUG");
-      SetByHeader(this.sheet, "Message", this.row, message);
-    }
-    Logger.log(`DEBUG : ${this.date.toUTCString()}, ${message}`);
+    const text = [this.date, "DEBUG", message, ];
+    this.sheet.appendRow(text);
+    console.log(`${text[0]}, ${text[1]} : ${message}`);
     this._PopItem();
+    this._CleanupSheet();
   }
   _PopItem() {
-    if(this.row > 2000) {
-      this.sheet.deleteRows(2, 1);
-    } else return;
+    if(this.row > 100) {
+      this.sheet.deleteRows(1, 1);
+    } else {
+      this.sheet.insertRowAfter(this.sheetLength - 1);
+    }
   }
   _CleanupSheet() {
     if(this.row > 2000) {
-      this.sheet.deleteRows(2, 1999);
+      this.sheet.deleteRows(1, 1999);
     } else return;
   }
   
 }
 
+/**
+ * -----------------------------------------------------------------------------------------------------------------
+ * Testing for Logger Class
+ */
 const _testWriteLog = () => {
   const write = new WriteLogger();
-  write.Warning(`Ooopsies ----> Warning`);
-  write.Info(`Some Info`);
-  write.Error(`ERROR`);
-  write.Debug(`Debugging`);
+  console.time(`EXECUTION TIMER`);
+  for (let i = 0; i < 5; i++) {
+    write.Warning(`Ooopsies ----> Warning`);
+    write.Info(`Some Info`);
+    write.Error(`ERROR`);
+    write.Debug(`Debugging`);
+    write._CleanupSheet();
+  }
+  console.timeEnd(`EXECUTION TIMER`);
 }

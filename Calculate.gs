@@ -18,7 +18,7 @@ class Calculate
       // Convert everything to seconds
       let totals = [];
       culled.forEach(time => {
-        if(time === typeof(String)) Logger.log(`Not a number: ${time}`) 
+        if(time === typeof(String)) console.error(`Not a number: ${time}`) 
         else {
           let days = +Number(time[0]) * 24 * 60; // days to hours to minutes
           let hours = +Number(time[1]) * 60; // hours to minutes
@@ -50,11 +50,11 @@ class Calculate
       if (isNaN(minutesAsString)) minutesAsString = 0;
 
       let formatted = dys + 'd ' + hrs + 'h ' + minutesAsString + "m";
-      Logger.log(formatted);
+      console.info(formatted);
       return formatted;
     }
     catch (err) {
-      Logger.log(`${err} : Calculating the turnaround times has failed for some reason.`);
+      console.error(`${err} : Calculating the turnaround times has failed for some reason.`);
     }
   }
   PrintTurnaroundTimes () {
@@ -69,7 +69,7 @@ class Calculate
       })
     }
     catch (err) {
-      Logger.log(`${err} : Printing the turnaround times has failed for some reason.`);
+      console.error(`${err} : Printing the turnaround times has failed for some reason.`);
     }
   }
 
@@ -78,7 +78,7 @@ class Calculate
     try {
       end = end ? new Date(end) : new Date();  //if supplied with nothing, set end time to now
       start = start ? new Date(start) : new Date(end - 87000000);  //if supplied with nothing, set start time to now minus 24 hours.
-      // Logger.log(`END TYPE : ${typeof(end)}, START TYPE : ${typeof(start)}`)
+      // console.info(`END TYPE : ${typeof(end)}, START TYPE : ${typeof(start)}`)
 
       let timeDiff = +Number(Math.abs((end - start) / 1000)); // Abs Value Milliseconds to sec
       let secs = Math.floor(timeDiff % 60); // Calc seconds
@@ -96,12 +96,12 @@ class Calculate
       // Write
       let formatted = `days : ${days.toString()}, hrs : ${hrs.toString()}, mins : ${minutesAsString}, secs : ${secondsAsString}`;
       let out = `${days} ${hrs}:${minutesAsString}:${secondsAsString}`;
-      Logger.log(`Duration = ${out}`);
+      console.info(`Duration = ${out}`);
       // Return Completed time
       return out;
     }
     catch (err) {
-      Logger.log(`${err} : Calculating the duration has failed for some reason.`);
+      console.error(`${err} : Calculating the duration has failed for some reason.`);
     }
   }
 
@@ -124,7 +124,7 @@ class Calculate
     });
 
     let count = unique.length - 1; //Removes the space.
-    Logger.log(`Active JPS Users : ${count}`);
+    console.info(`Active JPS Users : ${count}`);
     return count;
   }
   PrintActiveUsers () {
@@ -142,10 +142,10 @@ class Calculate
       let culled = []
       culled = range.filter(Boolean);
       let count = culled.length - 2;
-      // Logger.log(`Sheet : ${sheet.getName()}, Count : ${count}`);
+      // console.info(`Sheet : ${sheet.getName()}, Count : ${count}`);
       data.push([sheet.getName(), count]);
     }
-    Logger.log(data);
+    console.info(data);
     return data;
   }
   PrintSubmissionData () {
@@ -173,7 +173,7 @@ class Calculate
     chop.splice(loc,1);
 
     chop.forEach((pair, index) => {
-      Logger.log(`${pair[0]} -----> ${pair[1]}`)
+      console.info(`${pair[0]} -----> ${pair[1]}`)
       OTHERSHEETS.data.getRange(106+index,2,1,1).setValue(pair[0])
       OTHERSHEETS.data.getRange(106+index,3,1,1).setValue(pair[1])
     })
@@ -206,7 +206,7 @@ class Calculate
       return second[1] - first[1];
     });
     // items.splice(0,1);
-    Logger.log(items);
+    console.info(items);
     return items;  
   }
 
@@ -222,7 +222,7 @@ class Calculate
     }, {});
     let items = Object.keys(occurrences).map((key) => occurrences[key]);
     items.sort((first, second) => second - first);
-    Logger.log(items)
+    console.info(items)
     items.forEach( (item, index) => OTHERSHEETS.backgrounddata.getRange(2 + index, 22, 1, 1).setValue(item));
   }
 
@@ -257,7 +257,7 @@ class Calculate
       return second[1] - first[1];
     });
     items.splice(0,1);
-    Logger.log(items);
+    console.info(items);
     
     return items;  
   }
@@ -321,7 +321,7 @@ class Calculate
 
     // Fetch Top 10 Power Users
     const chop = items.slice(0, 11);
-    Logger.log(chop);
+    console.info(chop);
 
     // Match ID with Email
     let output = [];
@@ -330,12 +330,12 @@ class Calculate
       const search = finder.findNext();
       if (search != null) {
         let index = search.getRow();
-        Logger.log(`INDEX : ${index}`);
+        console.info(`INDEX : ${index}`);
         let email = OTHERSHEETS.approved.getRange(index, 2, 1, 1).getValue();
         output.push([email, id[1]]);
       }
     })
-    Logger.log(output);
+    console.info(output);
     return output;
   }
 
@@ -343,16 +343,16 @@ class Calculate
   CalculateStandardDeviation () {
     const distribution = this.CalculateDistribution();
     let n = distribution.length;
-    Logger.log(`n = ${n}`);
+    console.info(`n = ${n}`);
 
     let values = [];
     distribution.forEach(person => values.push(person[1]))
-    Logger.log(values)
+    console.info(values)
     let mean = values.reduce((a, b) => a + b) / n;
-    Logger.log(`Mean = ${mean}`);
+    console.info(`Mean = ${mean}`);
 
     let standardDeviation = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-    Logger.log(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
+    console.info(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
     return standardDeviation;
   }
 
@@ -360,13 +360,13 @@ class Calculate
   CalculateArithmeticMean () {
     const distribution = this.CalculateDistribution();
     let n = distribution.length;
-    Logger.log(`n = ${n}`);
+    console.info(`n = ${n}`);
 
     let values = [];
     distribution.forEach(person => values.push(person[1]))
-    Logger.log(values)
+    console.info(values)
     let mean = values.reduce((a, b) => a + b) / n;
-    Logger.log(`Mean = ${mean}`);
+    console.info(`Mean = ${mean}`);
 
     return mean;
   }
@@ -391,14 +391,14 @@ class Calculate
         return [key, occurrences[key]];
       }
     });
-    // Logger.log(items);
+    // console.info(items);
     return items;  
   }
   PrintTiers () {
     const tiers = this.CountTiers();
     tiers.forEach( (tier, index) => {
       OTHERSHEETS.data.getRange(39 + index, 3, 1, 1).setValue(tier[1]);
-      Logger.log(tier)
+      console.info(tier)
     });
   }
 
@@ -423,7 +423,7 @@ class Calculate
       return second[1] - first[1];
     });
     items.splice(0,1);
-    Logger.log(items);
+    console.info(items);
     
     return items; 
   }
@@ -442,7 +442,7 @@ class Calculate
     OTHERSHEETS.data.getRange(8, 3, 1, 1).setValue(completed);
     OTHERSHEETS.data.getRange(9, 3, 1, 1).setValue(cancelled);
     OTHERSHEETS.data.getRange(10, 3, 1, 1).setValue(inprogress);
-    Logger.log(completed);
+    console.info(completed);
   }
 
   AdvancedLabCounts () {
@@ -464,7 +464,7 @@ class Calculate
       return second[1] - first[1];
     });
 
-    Logger.log(items);
+    console.info(items);
     
     return items;  
   }
@@ -487,7 +487,7 @@ class Calculate
 const Metrics = () => {
   const calc = new Calculate();
   try {
-    Logger.log(`Calculating Metrics .....`);
+    console.info(`Calculating Metrics .....`);
     calc.PrintActiveUsers();
     calc.PrintTiers();
     calc.PrintStatusCounts();
@@ -496,9 +496,9 @@ const Metrics = () => {
     calc.PrintSubmissionData();
     calc.PrintTurnaroundTimes();
     calc.PrintDistributionNumbers();
-    Logger.log(`Recalculated Metrics`);
+    console.info(`Recalculated Metrics`);
   } catch (err) {
-    Logger.log(`${err} : Couldn't generate statistics on Metrics.`);
+    console.error(`${err} : Couldn't generate statistics on Metrics.`);
   }
 }
 

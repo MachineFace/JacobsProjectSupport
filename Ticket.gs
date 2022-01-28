@@ -159,29 +159,31 @@ class Ticket
     let header;
     try {
       body
-        .setPageWidth(PAGESIZES.statement.width)
-        .setPageHeight(PAGESIZES.statement.height)
-        .setMarginTop(10)
-        .setMarginBottom(10)
-        .setMarginLeft(10)
-        .setMarginRight(10);
+        .setPageWidth(PAGESIZES.custom.width)
+        .setPageHeight(PAGESIZES.custom.height)
+        .setMarginTop(2)
+        .setMarginBottom(2)
+        .setMarginLeft(2)
+        .setMarginRight(2);
       
       body.insertImage(0, barcode)
-        .setWidth(500)
+        .setWidth(260)
         .setHeight(100);
       body.insertHorizontalRule(1);
       
       body.insertParagraph(2, `Name: ${this.name.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING1)
         .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 18,
+          [DocumentApp.Attribute.FONT_SIZE]: 13,
           [DocumentApp.Attribute.BOLD]: true,
+          [DocumentApp.Attribute.LINE_SPACING]: 1,
         });
       body.insertParagraph(3, `Job Number: ${this.jobnumber.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING2)
         .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 16,
+          [DocumentApp.Attribute.FONT_SIZE]: 9,
           [DocumentApp.Attribute.BOLD]: true,
+          [DocumentApp.Attribute.LINE_SPACING]: 1,
         });
 
       // Create a two-dimensional array containing the cell contents.
@@ -195,7 +197,9 @@ class Ticket
           [notes[0], notes[1]],
         ])
         .setAttributes({
-          [DocumentApp.Attribute.FONT_SIZE]: 14,
+          [DocumentApp.Attribute.FONT_SIZE]: 6,
+          [DocumentApp.Attribute.LINE_SPACING]: 1,
+          [DocumentApp.Attribute.BORDER_WIDTH]: 0.5,
         });
     } catch (err) {
       Logger.log(`${err} : Couldn't append info to ticket. Ya dun goofed.`);

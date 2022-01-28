@@ -55,9 +55,9 @@ const onSubmission = async (e) => {
       }
     }
     SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.received);
-    writer.Info(`Set status to 'Received'.`);
+    console.info(`Set status to 'Received'.`);
   } catch (err) {
-    writer.Error(`${err}: Could not set status to 'Received'.`);
+    console.error(`${err}: Could not set status to 'Received'.`);
   }
 
   // Parse variables
@@ -153,15 +153,15 @@ const onSubmission = async (e) => {
       bcc: InvokeDS("Chris", "email"),
       name: gmailName,
     });
-    writer.Info(`Design Specialist has been emailed.`);
+    console.info(`Design Specialist has been emailed.`);
   } catch (err) {
-    writer.Error(`${err} : Could not email DS. Something went wrong.`);
+    console.error(`${err} : Could not email DS. Something went wrong.`);
   }
 
   // Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
   stat = stat ? stat : SetByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
-  writer.Info(`Status refixed to 'Received'.`);
+  console.warn(`Status refixed to 'Received'.`);
 
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == "Creaform") {
@@ -172,10 +172,10 @@ const onSubmission = async (e) => {
         bcc: InvokeDS("Chris", "email"),
         name: gmailName,
       });
-      writer.Info(`Creaform instruction email sent.`);
+      console.info(`Creaform instruction email sent.`);
     }
   } catch (err) {
-    writer.Error(`${err} : Couldnt send Creaform email for some reason.`);
+    console.error(`${err} : Couldnt send Creaform email for some reason.`);
   }
 
   try {
@@ -191,10 +191,10 @@ const onSubmission = async (e) => {
         name: "Jacobs Project Support",
       });
 
-      writer.Info(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
+      console.warn(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
-    writer.Error(`${err} : Couldn't find student access boolean value`);
+    console.error(`${err} : Couldn't find student access boolean value`);
   } finally {
     if (priority == "STUDENT NOT FOUND!" || priority == false) {
       SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
@@ -349,14 +349,14 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
-    writer.Debug(`Trying to fix job number : ${jobnumber}`)
+    console.warn(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).jobnumber;
       SetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
-      writer.Info(`Job Number was missing, so the script fixed it. Submission by ${email}`);
+      console.warn(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
-    writer.Error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+    console.error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -365,13 +365,13 @@ const onChange = async (e) => {
     designspecialist = designspecialist ? designspecialist : "a Design Specialist";
     projectname = projectname ? projectname : "Your Project";
   } catch (err) {
-    writer.Error( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
+    console.error( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
   // Calculate Turnaround Time only when cell is empty
   try {
-    writer.Debug(`Attempting to Calculate turnaround times`);
+    console.warn(`Attempting to Calculate turnaround times`);
     const calc = new Calculate();
     let elapsedCell = thisSheet.getRange(thisRow, 43).getValue();
     if (elapsedCell !== undefined || elapsedCell !== null || elapsedCell !== "") {
@@ -381,25 +381,25 @@ const onChange = async (e) => {
 
         // Write to Column - d h:mm:ss  
         SetByHeader(thisSheet, "Elapsed Time", thisRow, time.toString());
-        writer.Info(`Turnaround Time = ${time}`);
+        console.info(`Turnaround Time = ${time}`);
 
         // Write Completed time
         SetByHeader(thisSheet, "Date Completed", thisRow, endTime.toString());
       }
     }
   } catch (err) {
-    writer.Error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
+    console.error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
   // Trigger for generating a "Ticket"
   if ( status == STATUS.received || status == STATUS.inProgress || status == STATUS.pendingApproval ) {
-    writer.Debug(`Attempting to create a ticket`)
+    console.warn(`Attempting to create a ticket`)
     const ticketGenerator = new Ticket({jobnumber : jobnumber});
     try {
       const ticket = ticketGenerator.CreateTicket();
     } catch (err) {
-      writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+      console.error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
     }
   }
 
@@ -409,7 +409,7 @@ const onChange = async (e) => {
   // Create a new form, then add a checkbox question, a multiple choice question,
   let approvalURL;
   if (status == STATUS.pendingApproval) {
-    writer.Debug(`Attempting to create an approval form.`)
+    console.warn(`Attempting to create an approval form.`)
     try {
       const approvalform = await new ApprovalFormBuilder({
         name : name,
@@ -417,10 +417,10 @@ const onChange = async (e) => {
         cost : cost,
       })
       approvalURL = approvalform.url;
-      writer.Info(`Approval Form generated and sent to user.`);
+      console.info(`Approval Form generated and sent to user.`);
     }
     catch (err) {
-      writer.Error(`${err} : Couldn't generate an approval form` );
+      console.error(`${err} : Couldn't generate an approval form` );
     }
   }
 
@@ -455,7 +455,7 @@ const onChange = async (e) => {
   );
 
   // Send email with appropriate response and cc Chris and Cody.
-  writer.Info(`Sending email.`)
+  console.info(`Sending email.`)
   switch (status) {
     case STATUS.received:
       GmailApp.sendEmail(email, "Jacobs Project Support : Received", "", {
@@ -577,7 +577,7 @@ const onChange = async (e) => {
   // Lastly Run these Metrics ignoring first 2 rows:
   if (thisRow > 3) {
     await Metrics();
-    writer.Info(`Recalculated Metrics tab.`);
+    console.info(`Recalculated Metrics tab.`);
   }
 
   // Check priority one more time:

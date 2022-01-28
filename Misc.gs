@@ -22,7 +22,7 @@ const Search = (value) => {
       res[sheet.getName()] = temp;
     }
   }
-  Logger.log(JSON.stringify(res));
+  console.info(JSON.stringify(res));
   return res;
 }
 
@@ -55,7 +55,7 @@ const FindByJobNumber = (jobnumber) => {
       res[sheet.getName()] = finder.getRow();
     }
   }
-  Logger.log(JSON.stringify(res));
+  console.info(JSON.stringify(res));
   return res;
 }
 
@@ -89,7 +89,7 @@ const FormatCell = (cell) => {
     const strategy = SpreadsheetApp.WrapStrategy.CLIP;
     cell.setWrapStrategy(strategy);
   } catch (err) {
-    Logger.log(`${err} : Cell failed to be clipped.`);
+    console.error(`${err} : Cell failed to be clipped.`);
   }
 };
 
@@ -107,7 +107,7 @@ const GetByHeader = (sheet, columnName, row) => {
     let col = data[0].indexOf(columnName);
     if (col != -1) return data[row - 1][col];
   } catch (err) {
-    Logger.log(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
+    console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
   }
 };
 
@@ -127,7 +127,7 @@ const GetColumnDataByHeader = (sheet, columnName) => {
     colData.splice(0, 1);
     if (col != -1) return colData;
   } catch (err) {
-    Logger.log(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
+    console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
   }
 };
 
@@ -147,7 +147,7 @@ const SetByHeader = (sheet, columnName, row, val) => {
     const col = data[0].indexOf(columnName) + 1;
     sheet.getRange(row, col).setValue(val);
   } catch (err) {
-    Logger.log(`${err} : SetByHeader failed - Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
+    console.error(`${err} : SetByHeader failed - Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
   }
 };
 
@@ -204,7 +204,7 @@ const CreateTimeDrivenTrigger = () => {
       .atHour(timetoEmail)
       .create();
   } catch (err) {
-    Logger.log(`${err} : Could not create triggers`);
+    console.error(`${err} : Could not create triggers`);
   }
 };
 
@@ -219,17 +219,17 @@ const RemoveTimedTriggers = () => {
   try {
     triggers.forEach( trigger => {
       if (trigger.getEventType() == ScriptApp.EventType.ON_EDIT)
-        Logger.log(`OnEdit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+        console.info(`OnEdit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
       if (trigger.getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
-        Logger.log(`OnFormSubmit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+        console.info(`OnFormSubmit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
       if (trigger.getEventType() == ScriptApp.EventType.CLOCK) {
-        Logger.log(`TimeBased Trigger : ${trigger.getUniqueId()}`);
+        console.info(`TimeBased Trigger : ${trigger.getUniqueId()}`);
         ScriptApp.deleteTrigger(trigger);
       }
     })
-    Logger.log(`Removed Triggers for Summary Emails`);
+    console.info(`Removed Triggers for Summary Emails`);
   } catch (err) {
-    Logger.log(`${err} : Couldnt remove triggers for whatever reason.`);
+    console.error(`${err} : Couldnt remove triggers for whatever reason.`);
   }
 };
 
@@ -244,11 +244,11 @@ const DisableJPS = () => {
   try {
     for (let name in FORMS) {
       FormApp.openById(FORMS[name]).setAcceptingResponses(false);
-      Logger.log(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
+      console.warn(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
     }
-    Logger.log(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
+    console.warn(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
   } catch (err) {
-    Logger.log(`${err} : Couldnt disable Accepting Responses on Forms`);
+    console.error(`${err} : Couldnt disable Accepting Responses on Forms`);
   }
 
   //Delete Timebased Triggers for Daily Emails
@@ -265,19 +265,19 @@ const EnableJPS = () => {
   try {
     for (let name in FORMS) {
       FormApp.openById(FORMS[name]).setAcceptingResponses(true);
-      Logger.log(`${name} : ${FORMS[name]} IS NOW ENABLED.`);
+      console.warn(`${name} : ${FORMS[name]} IS NOW ENABLED.`);
     }
-    Logger.log(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
+    console.warn(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
   } catch (err) {
-    Logger.log(err + " : Couldnt enable Accepting Responses on Forms");
+    console.error(err + " : Couldnt enable Accepting Responses on Forms");
   }
 
   //Create Triggers
   try {
     CreateTimeDrivenTrigger();
-    Logger.log("Created Daily Summary Email Triggers.");
+    console.warn("Created Daily Summary Email Triggers.");
   } catch (err) {
-    Logger.log(`${err} : Couldnt install triggers for whatever reason.`);
+    console.error(`${err} : Couldnt install triggers for whatever reason.`);
   }
 };
 
@@ -383,14 +383,14 @@ const TimeDiff = (start, end) => {
     //Write
     let formatted =
       days + " " + hrs + ":" + minutesAsString + ":" + secondsAsString;
-    Logger.log("Duration = " + formatted);
+    console.info("Duration = " + formatted);
 
     return new Promise((resolve) => {
       resolve(formatted);
-      Logger.log(formatted);
+      console.info(formatted);
     });
   } catch (err) {
-    Logger.log(`${err} : Calculating the duration has failed for some reason.`);
+    console.error(`${err} : Calculating the duration has failed for some reason.`);
   }
 };
 
@@ -410,7 +410,7 @@ const CheckMissingAccessStudents = () => {
         let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Email Address", row);
         let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Your Student ID Number?", row)
         const p = new Priority({email : email, side: sid});
-        Logger.log(`Email : ${email}, SID : ${sid}, Priority : ${p.priority}`);
+        console.info(`Email : ${email}, SID : ${sid}, Priority : ${p.priority}`);
         if(p.priority != `STUDENT NOT FOUND!`) {
           list.push(email);
           SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(p.priority);
@@ -433,10 +433,10 @@ const CheckSheetIsForbidden = (someSheet) => {
   Object.values(NONITERABLESHEETS).forEach( sheet => forbiddenNames.push(sheet.getName()));
   const index = forbiddenNames.indexOf(someSheet.getName());
   if(index == -1 || index == undefined) {
-    Logger.log(`Sheet is NOT FORBIDDEN : ${someSheet.getName()}`)
+    console.info(`Sheet is NOT FORBIDDEN : ${someSheet.getName()}`)
     return false;
   } else {
-    Logger.log(`SHEET FORBIDDEN : ${forbiddenNames[index]}`);
+    console.error(`SHEET FORBIDDEN : ${forbiddenNames[index]}`);
     return true;
   }
 }
@@ -476,18 +476,18 @@ class JobNumberGenerator
     try {
       if ( this.date == undefined || this.date == null || this.date == "" || testedDate == false ) {
         this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
-        Logger.log(`Set Jobnumber to a new time because timestamp was missing.`);
+        console.warn(`Set Jobnumber to a new time because timestamp was missing.`);
       } else {
         this.jobnumber = +Utilities.formatDate(this.date, `PST`, `yyyyMMddhhmmss`);
-        Logger.log(`Input time: ${this.date}, Set Jobnumber: ${this.jobnumber}`);
+        console.info(`Input time: ${this.date}, Set Jobnumber: ${this.jobnumber}`);
       }
     } catch (err) {
-      Logger.log(`${err} : Couldn't fix jobnumber.`);
+      console.error(`${err} : Couldn't fix jobnumber.`);
     }
     if (this.jobnumber == undefined || testedDate == false) {
       this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
     }
-    Logger.log(`Returned Job Number : ${this.jobnumber}`);
+    console.info(`Returned Job Number : ${this.jobnumber}`);
     return this.jobnumber.toString();
   };
 
@@ -503,16 +503,16 @@ class JobNumberGenerator
 
 const _testJobNumberGen = () => {
   const num = new JobNumberGenerator(new Date(2015, 10, 3));
-  Logger.log(num.jobnumber.toString());
+  console.info(num.jobnumber.toString());
 }
 
 const _testSheetChecker = () => {
   const val = CheckSheetIsForbidden(OTHERSHEETS.logger);
-  Logger.log(`Logger Should be true-forbidden : ${val}`);
+  console.info(`Logger Should be true-forbidden : ${val}`);
   const val2 = CheckSheetIsForbidden(SHEETS.fablight);
-  Logger.log(`Fablight Should be false-not_forbidden: ${val2}`);
+  console.info(`Fablight Should be false-not_forbidden: ${val2}`);
   const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
-  Logger.log(`Store Should be true-forbidden: ${val3}`);
+  console.info(`Store Should be true-forbidden: ${val3}`);
 
 }
 
@@ -526,7 +526,7 @@ const GetAllProjectNames = () => {
     names.push(culled);
   }
   names = [].concat(...names);
-  Logger.log(names);
+  console.info(names);
   return names;
 }
 
@@ -538,17 +538,52 @@ const GetAllProjectNames = () => {
 
 const CountTotalEmailsSent = async () => {
   let count = 0;
-  const labelName = "Jacobs Project Support/JPS Notifications";
-
-  let label = GmailApp.getUserLabelByName(labelName);
-  let threads = label.getThreads();
-  threads.forEach(thread => count += thread.getMessageCount());
-  Logger.log(`Total Emails Sent : ${count}`);
-  
+  try {
+    let pageToken;
+    do {
+      const threadList = Gmail.Users.Threads.list('me', {
+        q: `label:Jacobs Project Support/JPS Notifications`,
+        pageToken: pageToken
+      });
+      count += threadList.threads.length;
+      // if (threadList.threads && threadList.threads.length > 0) {
+      //   threadList.threads.forEach(thread => {
+      //     console.info(`Snip: ${thread.snippet}`);
+      //   });
+      // }
+      pageToken = threadList.nextPageToken;
+    } while (pageToken);
+  } catch (err) {
+    console.error(`Whoops ----> ${err}`);
+  }
+  console.warn(`Total Emails Sent : ${count}`);
+  return count;
 }
 
 
-
+/**
+ * Lists, for each thread in the user's Inbox, a
+ * snippet associated with that thread.
+ */
+const ListInboxSnippets = () => {
+  try {
+    let pageToken;
+    do {
+      const threadList = Gmail.Users.Threads.list('me', {
+        q: `label:inbox`,
+        pageToken: pageToken
+      });
+      if (threadList.threads && threadList.threads.length > 0) {
+        threadList.threads.forEach(thread => {
+          console.info(`Snip: ${thread.snippet}`);
+        });
+      }
+      pageToken = threadList.nextPageToken;
+    } while (pageToken);
+  } catch (err) {
+    console.error(`Whoops ----> ${err}`);
+  }
+}
 
 
 

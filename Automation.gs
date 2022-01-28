@@ -49,7 +49,7 @@ class HackyStoreAutomation
       const html = await UrlFetchApp.fetch(url, param);
 
       const responseCode = html.getResponseCode();
-      // Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      // console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
       if(responseCode == 200 || responseCode == 201) {
         const content = html.getContentText();
         const searchstring = 'og:price:amount';
@@ -63,9 +63,9 @@ class HackyStoreAutomation
       }
     }
     catch(err){
-      Logger.log(`${err} : Couldn't fetch price.`);
+      console.error(`${err} : Couldn't fetch price.`);
     }
-    Logger.log(`Price = $${price}`);
+    console.info(`Price = $${price}`);
     return price;
   }
 
@@ -93,11 +93,11 @@ class HackyStoreAutomation
     const shopify = new ShopifyAPI({jobnumber : 0});
     const data = GetColumnDataByHeader(sheet, "Product ID (Shopify)");
     const ids = data.filter(Boolean);
-    Logger.log(ids.toString())
+    console.info(ids.toString())
     ids.forEach( async (id, index) => {
       let info = await shopify.GetProductByID(id);
       let price = info?.variants[0]?.price;
-      Logger.log(`Price : $${price}`);
+      console.info(`Price : $${price}`);
       SetByHeader(sheet, "Price", index + 2, price);
     })
     return true;
@@ -112,10 +112,10 @@ class HackyStoreAutomation
       for(const [key, sheet] of Object.entries(STORESHEETS)) {
         this.FetchProductIDInProductURL(sheet);
       }
-      Logger.log('Product IDs have been updated and written to each Store Sheet');
+      console.info('Product IDs have been updated and written to each Store Sheet');
     }
     catch(err) {
-      Logger.log(err + 'Could not update Product IDs to sheets for some reason.');
+      console.error(err + 'Could not update Product IDs to sheets for some reason.');
     }
 
   }
@@ -146,7 +146,7 @@ class HackyStoreAutomation
         const html = await UrlFetchApp.fetch(url, params);
 
         const responseCode = html.getResponseCode();
-        // Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+        // console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
         if(responseCode == 200 || responseCode == 201) {
           let content = html.getContentText();
           let searchStart = content.search(start);
@@ -157,7 +157,7 @@ class HackyStoreAutomation
       })
     } 
     catch(err) {
-      Logger.log(`${err} : Whoops`);
+      console.error(`${err} : Whoops`);
     }
 
   }

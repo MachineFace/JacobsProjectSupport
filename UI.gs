@@ -78,7 +78,7 @@ const PopupCreateTicket = async () => {
     try {
       const ticket = ticketMaker.CreateTicket();
     } catch (err) {
-      Logger.log(`${err} : Couldn't create a ticket.`);
+      console.error(`${err} : Couldn't create a ticket.`);
     }
     ui.alert(
       `JPS Runtime Message`,
@@ -122,7 +122,7 @@ const BuildHTMLHELP = () => {
   html += "</ol>";
   html += "<p>" + items[items.length - 1] + "</p>";
 
-  Logger.log(html);
+  console.info(html);
   return html;
 };
 
@@ -156,6 +156,7 @@ const BarMenu = () => {
     .addSubMenu(
       SpreadsheetApp.getUi()
         .createMenu("Calculate")
+        .addItem("Count Total Emails Sent", "CountTotalEmailsSent")
         .addItem("Generate Metrics", "Metrics")
         .addItem("Generate Top Ten", "RunTopTen")
         .addItem("Generate Standard Deviation", "RunStandardDeviation")
@@ -211,7 +212,7 @@ const BillFromSelected = async () => {
   const material5Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 5 Quantity", thisRow );
   const material5Name = GetByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
   const quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
-  Logger.log(status+jobnumber+email+name+material1Name+material1Quantity+material2Name+material2Quantity+material3Name+material3Quantity+material4Name+material4Quantity+material5Name+material5Quantity+quantityTotal)
+  console.info(status+jobnumber+email+name+material1Name+material1Quantity+material2Name+material2Quantity+material3Name+material3Quantity+material4Name+material4Quantity+material5Name+material5Quantity+quantityTotal)
 
   const shopify = await new ShopifyAPI({
     jobnumber : jobnumber, 
@@ -223,12 +224,12 @@ const BillFromSelected = async () => {
     material5Name : material5Name, material5Quantity : material5Quantity, 
   });
   const customer = await shopify.GetCustomerByEmail(email);
-  Logger.log(`CUSTOMER : ${JSON.stringify(customer)}`)
+  console.info(`CUSTOMER : ${JSON.stringify(customer)}`)
   // const order = await shopify.CreateOrder();
-  // Logger.log(`ORDER : ${JSON.stringify(order)}`)
+  // console.info(`ORDER : ${JSON.stringify(order)}`)
   let response;
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
-    Logger.log(`Cannot bill - no quantity recorded`);
+    console.warn(`Cannot bill - no quantity recorded`);
     Browser.msgBox(
       "Generate Bill to Shopify",
       "No quantities entered for selected submission.",
@@ -273,11 +274,11 @@ const BillFromSelected = async () => {
             Browser.Buttons.YES_NO_CANCEL
           );
           if (response == "yes") {
-            Logger.log('User clicked "Yes".');
+            console.info('User clicked "Yes".');
             
             const order = await shopify.CreateOrder();
             SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.billed);
-            Logger.log(order.toString());
+            console.info(order.toString());
             let lastOrder = await shopify.GetLastOrder();
             Browser.msgBox(
               boxTitle,
@@ -285,11 +286,11 @@ const BillFromSelected = async () => {
               Browser.Buttons.OK
             );
           } else {
-            Logger.log('User clicked "No / Cancel".');
-            Logger.log("Order NOT Created.");
+            console.warn('User clicked "No / Cancel".');
+            console.warn("Order NOT Created.");
           }
         } catch (err) {
-          Logger.log(`${err} : Couldn't create an order...`);
+          console.error(`${err} : Couldn't create an order...`);
         } finally {
           thisSheet.getRange("AZ" + thisRow).setValue(false);
         }
@@ -297,7 +298,7 @@ const BillFromSelected = async () => {
     }
   }
 
-  Logger.log("Completed BillFromSelected");
+  console.info("Completed BillFromSelected");
 };
 
 
@@ -382,7 +383,7 @@ class Menu
     try {
       const ticket = ticketMaker.CreateTicket();
     } catch (err) {
-      Logger.log(`${err} : Couldn't create a ticket.`);
+      console.error(`${err} : Couldn't create a ticket.`);
     }
 
     this._AlertOK(`Ticket Created for : ${ticketMaker.name}, Job Number : ${jobnumber}`);
@@ -420,7 +421,7 @@ class Menu
     html += "</ol>";
     html += "<p>" + items[items.length - 1] + "</p>";
 
-    Logger.log(html);
+    console.info(html);
     return html;
   };
 
@@ -477,7 +478,7 @@ class Menu
       
       let quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
       if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
-        Logger.log(`Can't bill - no quantity recorded`);
+        console.error(`Can't bill - no quantity recorded`);
         Browser.msgBox(
           "Generate Bill to Shopify",
           "No quantities entered for selected submission.",
@@ -531,7 +532,7 @@ class Menu
             Browser.Buttons.YES_NO_CANCEL
           );
           if (response == "yes") {
-            Logger.log('User clicked "Yes".');
+            console.info('User clicked "Yes".');
             const customer = await shopify.GetCustomerByEmail(email);
             if (customer == undefined || customer == null) {
               Browser.msgBox(
@@ -550,18 +551,18 @@ class Menu
               );
             }
           } else {
-            Logger.log('User clicked "No / Cancel".');
-            Logger.log("Order NOT Created.");
+            console.warn('User clicked "No / Cancel".');
+            console.warn("Order NOT Created.");
           }
         } catch (err) {
-          Logger.log(`${err} : Could not generate a message box to gather info.`);
+          console.error(`${err} : Could not generate a message box to gather info.`);
         } finally {
           thisSheet.getRange("AZ" + thisRow).setValue(false);
         }
       }
     }
 
-    Logger.log("Completed BillFromSelected");
+    console.info("Completed BillFromSelected");
   };
 
   /**
@@ -591,10 +592,10 @@ class Menu
     const sheets = Object.values(NONITERABLESHEETS);
     const index = sheets.indexOf(someSheet);
     if(index == -1) {
-      Logger.log(`Sheet is OK.`)
+      console.info(`Sheet is OK.`)
       return false;
     } else {
-      Logger.log(`This sheet is good no good. INDEX : ${index}`);
+      console.info(`This sheet is good no good. INDEX : ${index}`);
       return true;
     }
   }

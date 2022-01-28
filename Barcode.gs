@@ -20,7 +20,7 @@ class QRCodeAndBarcodeGenerator {
    * Generate QR Code
    */
   async GenerateQRCode(){
-    Logger.log(`QRCode URL : ${this.url} For ---> Jobnumber : ${this.jobnumber}`);
+    console.info(`QRCode URL : ${this.url} For ---> Jobnumber : ${this.jobnumber}`);
     const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
     const params = {
       "method" : "GET",
@@ -33,15 +33,15 @@ class QRCodeAndBarcodeGenerator {
     let qrCode;
     const html = UrlFetchApp.fetch(loc, params);
     const responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let qrBlob = Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber );
       qrCode = await DriveApp.createFile( qrBlob );
       qrCode.setTrashed(true);
-      Logger.log(qrCode);
+      console.info(qrCode);
       return qrCode;
     } else {
-      Logger.log('Failed to GET QRCode');
+      console.error('Failed to GET QRCode');
       return false;
     }
   }
@@ -74,15 +74,15 @@ class QRCodeAndBarcodeGenerator {
 
     const html = UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let barcodeBlob = Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) ;
       barcode = await DriveApp.createFile( barcodeBlob );
       barcode.setTrashed(true);
-      Logger.log(barcode);
+      console.info(barcode);
       return barcode;
     } else {
-      Logger.log('Failed to GET Barcode');
+      console.error('Failed to GET Barcode');
       return false;
     }
 
@@ -112,13 +112,13 @@ class QRCodeAndBarcodeGenerator {
 
     const res = UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = res.getResponseCode();
-    Logger.log(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
+    console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200) {
       barcode = await DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
       barcode.setTrashed(true);
     } 
-    else Logger.log('Failed to GET Barcode');
-    Logger.log(barcode);
+    else console.error('Failed to GET Barcode');
+    console.info(barcode);
     return barcode;
   }
   
@@ -150,7 +150,7 @@ const PickupByBarcode = () => {
       
       SetByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
       progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
-      Logger.log(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
+      console.info(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();
       //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
       return;
@@ -163,7 +163,7 @@ const PickupByBarcode = () => {
 const _testQRCode = () => {
   const q = new QRCodeAndBarcodeGenerator({url: `https://www.codyglen.com/`, jobnumber: 0101010101});
   const qr = q.GenerateQRCode();
-  Logger.log(qr)
+  console.info(qr)
 }
 
 

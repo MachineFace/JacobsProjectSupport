@@ -202,9 +202,9 @@ const _gastTestRunner = async () => {
 //         await _testOnEditMessages(),
 //         await _testOnformSubmitMessages(),
 //     ])
-//     .then(Logger.log('Test Success'))
+//     .then(console.info('Test Success'))
 //     .catch(Error => {
-//         Logger.log(Error + 'Failure');
+//         console.error(Error + 'Failure');
 //     }); 
 // }
 

@@ -194,6 +194,7 @@ const PAGESIZES = {
   a5: {width: 419.528, height: 595.276},
   b4: {width: 708.661, height: 1000.63},
   b5: {width: 498.898, height: 708.661},
+  custom: {width: 204.000, height: 566.000}
 }
 
 
