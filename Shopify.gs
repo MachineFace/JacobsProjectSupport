@@ -24,6 +24,7 @@ class ShopifyAPI
     this.api_key = '1e70652225e070b078def8bf6e154e98';
     this.api_pass = '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';
     this.email = email;
+    this.writer = new WriteLogger();
 
     this.material1Name = material1Name;
     this.material1Quantity = material1Quantity;
@@ -134,15 +135,15 @@ class ShopifyAPI
         delete pack[key];
       } else values.id = this._LookupStoreProductDetails(values.name);
     }
-    // Logger.log(`PACK --> ${JSON.stringify(pack)}`);
+    // this.writer.info(`PACK --> ${JSON.stringify(pack)}`);
 
     // Fetch Shopify Info
     let sum = 0.0;
     let shopifyPack = [];
     for(const [key, values] of Object.entries(pack)) {
-      Logger.log(values.id);
+      console.info(values.id);
       let info = await this.GetProductByID(values.id);
-      Logger.log(info)
+      console.info(info)
       let price = info?.variants[0]?.price * pack[key].ammount ? info?.variants[0]?.price * pack[key].ammount : info?.price * pack[key].ammount;
       let subtotal = +Number.parseFloat(price).toFixed(2);
       sum += subtotal;
@@ -163,8 +164,8 @@ class ShopifyAPI
     const total = +Number.parseFloat(sum).toFixed(2);
     this.totalprice = total;
 
-    // Logger.log(`Total Price = ${total}`);
-    // Logger.log(`PACKED ----> ${JSON.stringify(shopifyPack)}`);
+    // console.info(`Total Price = ${total}`);
+    // console.info(`PACKED ----> ${JSON.stringify(shopifyPack)}`);
     return shopifyPack;
   }
 
@@ -191,7 +192,7 @@ class ShopifyAPI
         "note": "Job Number : " + this.jobnumber,
       }
     };
-    Logger.log(`ORDER SUMMARY ----> ${JSON.stringify(order)}`);
+    this.writer.Info(`ORDER SUMMARY ----> ${JSON.stringify(order)}`);
 
     let params = {
       "method" : "POST",
@@ -204,13 +205,13 @@ class ShopifyAPI
 
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = JSON.parse(html.getContentText());
-      Logger.log(`Posted Order! : ${content}`);
+      this.writer.Info(`Posted Order! : ${content}`);
       return content;
     } else {
-      Logger.log('Failed to POST to Shopify');
+      this.writer.Error('Failed to POST to Shopify');
       return false;
     }
       
@@ -244,16 +245,16 @@ class ShopifyAPI
     //Fetch Customer
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (html.getResponseCode() == 200) {
       let user = JSON.parse(html.getContentText())['customers'][0];
       if(!user) {
-        Logger.log('User Shopify Account Does Not Exist. Please make a User Account on Shopify.');
-        Logger.log(`Trying as internal sale.....`)
+        this.writer.Error('User Shopify Account Does Not Exist. Please make a User Account on Shopify.');
+        this.writer.Error(`Trying as internal sale.....`)
         return this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
         
       } else {
-        Logger.log(`ID : ${user['id']}, Name : ${user['first_name']} ${user['last_name']}, Total Spent : ${user['total_spent']}`);
+        this.writer.Info(`ID : ${user['id']}, Name : ${user['first_name']} ${user['last_name']}, Total Spent : ${user['total_spent']}`);
         this.customerID = user['id'];
         return user;
       }
@@ -293,12 +294,12 @@ class ShopifyAPI
       // Fetch Products
       let html = await UrlFetchApp.fetch(this.root + repo, params);
       let responseCode = html.getResponseCode();
-      Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
       if (responseCode == 200 || responseCode == 201) {
         let parsed = JSON.parse(html.getContentText())['product'];
 
         if(!parsed) {
-          Logger.log(`Couldn't find Product!`);
+          this.writer.Error(`Couldn't find Product!`);
           return false;
         } else {
           this.productTitle = parsed.title;
@@ -308,7 +309,7 @@ class ShopifyAPI
           this.price = parsed.price;
           if(parsed.price == undefined) this.price = parsed.variants[0].price;
 
-          // Logger.log(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
+          // this.writer.Info(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
           return parsed; 
         }
       }
@@ -342,10 +343,10 @@ class ShopifyAPI
     // Fetch Products
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       var parsed = JSON.parse(html.getContentText())['orders'][0];
-      Logger.log(`ORDER PLACED ----> TIME : ${parsed.created_at}\\n ORDER NUMBER : ${parsed.name}\\n TO : ${parsed.email}\\n FOR : $${parsed.total_price}`);
+      this.writer.Info(`ORDER PLACED ----> TIME : ${parsed.created_at}\\n ORDER NUMBER : ${parsed.name}\\n TO : ${parsed.email}\\n FOR : $${parsed.total_price}`);
       return parsed;  
     }
     else return null;
@@ -371,7 +372,7 @@ class ShopifyAPI
     // Fetch Products
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = JSON.parse(html.getContentText())["order"];
       return content;  
@@ -407,7 +408,7 @@ class ShopifyAPI
     // Fetch Products
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       var parsed = JSON.parse(html.getContentText())['orders'];
 
@@ -420,8 +421,8 @@ class ShopifyAPI
       });
       let storeSpent = spent.reduce((a, b) => a + b, 0);
       this.total = storeSpent;
-      Logger.log(orderNums);
-      Logger.log(storeSpent);
+      this.writer.Info(orderNums);
+      this.writer.Info(storeSpent);
 
       return orderNums;  
     }
@@ -456,7 +457,7 @@ class ShopifyAPI
     
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let parsed = JSON.parse(html.getContentText())['orders'];
 
@@ -464,7 +465,7 @@ class ShopifyAPI
         if(item.fulfillment_status == `fulfilled`) {
           orders.push(item);
           // let id = Number.parseFloat(item.id);
-          // Logger.log(`${id} : ${JSON.stringify(item)}`);  
+          // this.writer.Info(`${id} : ${JSON.stringify(item)}`);  
         }
       }); 
     }
@@ -485,12 +486,12 @@ class ShopifyAPI
     let order = 4244891041958;
 
     const repo = `orders/${order}.json?`;
-    Logger.log(`Putting to this Repo -----> ${this.root + repo}`);
+    this.writer.Info(`Putting to this Repo -----> ${this.root + repo}`);
 
     // let payload = await this.GetSpecificOrder(order);
     // payload.financial_status = "paid";
     // payload.fulfillment_status = "fulfilled";
-    // Logger.log(payload)
+    // this.writer.Info(payload)
 
     const payload = {  
       "order" : {
@@ -511,15 +512,15 @@ class ShopifyAPI
       muteHttpExceptions : true
     };
 
-    Logger.log(`Params -----> ${JSON.stringify(params)}`);
+    this.writer.Info(`Params -----> ${JSON.stringify(params)}`);
     
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    Logger.log(`Content -----> ${html.getContentText()}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Content -----> ${html.getContentText()}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = html.getContentText();
-      Logger.log(content);
+      this.writer.Info(content);
       return content;
     }
   }
@@ -555,11 +556,11 @@ class ShopifyAPI
     // Fetch Reports
     let html = await UrlFetchApp.fetch(this.root, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
 
     if (responseCode == 200 || responseCode == 201) {
       let content = html.getContentText()
-      Logger.log(`Report -----> ${content}`)
+      this.writer.Info(`Report -----> ${content}`)
 
       return content 
     }
@@ -586,11 +587,11 @@ class ShopifyAPI
     // Fetch Reports
     let html = await UrlFetchApp.fetch(this.root, params);
     let responseCode = html.getResponseCode();
-    Logger.log(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
     if (responseCode == 200 || responseCode == 201) {
       let content = html.getContentText();
-      Logger.log(`Reports : ${content.toString()}`)
+      this.writer.Info(`Reports : ${content.toString()}`)
 
       return content;  
     }
@@ -634,10 +635,10 @@ const _testAPI = async () => {
 
   
   // const order = await shopify.CreateOrder();
-  // Logger.log(JSON.stringify(order))
+  // this.writer.Info(JSON.stringify(order))
 
   const order = await shopify.GetLastOrder();
-  Logger.log(JSON.stringify(order))
+  console.info(JSON.stringify(order))
 }
 
 

@@ -57,7 +57,7 @@ const onSubmission = async (e) => {
     SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.received);
     console.info(`Set status to 'Received'.`);
   } catch (err) {
-    console.error(`${err}: Could not set status to 'Received'.`);
+    writer.Error(`${err}: Couldn't set status to 'Received'.`);
   }
 
   // Parse variables
@@ -153,18 +153,18 @@ const onSubmission = async (e) => {
       bcc: InvokeDS("Chris", "email"),
       name: gmailName,
     });
-    console.info(`Design Specialist has been emailed.`);
+    writer.Info(`Design Specialist has been emailed.`);
   } catch (err) {
-    console.error(`${err} : Could not email DS. Something went wrong.`);
+    writer.Error(`${err} : Couldn't email DS. Something went wrong.`);
   }
 
   // Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
   stat = stat ? stat : SetByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
-  console.warn(`Status refixed to 'Received'.`);
+  writer.Warning(`Status refixed to 'Received'.`);
 
   try {
-    if (SpreadsheetApp.getActiveSheet().getSheetName() == "Creaform") {
+    if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.creaform.getSheetName()) {
       //Email
       GmailApp.sendEmail(email, "Jacobs Project Support : Creaform Part Drop-off Instructions", "", {
         htmlBody: message.creaformMessage,
@@ -172,10 +172,10 @@ const onSubmission = async (e) => {
         bcc: InvokeDS("Chris", "email"),
         name: gmailName,
       });
-      console.info(`Creaform instruction email sent.`);
+      writer.Info(`Creaform instruction email sent.`);
     }
   } catch (err) {
-    console.error(`${err} : Couldnt send Creaform email for some reason.`);
+    writer.Error(`${err} : Couldn't send Creaform email for some reason.`);
   }
 
   try {
@@ -190,11 +190,10 @@ const onSubmission = async (e) => {
         bcc: InvokeDS("Chris", "email"),
         name: "Jacobs Project Support",
       });
-
-      console.warn(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
+      writer.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
-    console.error(`${err} : Couldn't find student access boolean value`);
+    writer.Error(`${err} : Couldn't find student access boolean value`);
   } finally {
     if (priority == "STUDENT NOT FOUND!" || priority == false) {
       SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
@@ -252,28 +251,10 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   //Ignore Edits on background sheets like Logger and StoreItems - NICE!! /CG
   var thisSheetName = e.range.getSheet().getSheetName();
-  switch (thisSheetName) {
-    case "Logger":
-    case "Master Intake Form Responses":
-    case "Student List DONOTDELETE":
-    case "ApprovedByStudents - DO NOT DELETE":
-    case "Staff List":
-    case "AdvLabStoreItems":
-    case "UltimakerStoreItems":
-    case "FablightStoreItems":
-    case "HaasTormachStoreItems":
-    case "OthermillStoreItems":
-    case "ShopbotStoreItems":
-    case "WaterjetStoreItems":
-    case "VinylCutterStoreItems":
-    case "LaserStoreItems":
-    case "Data Metrics":
-    case "Shipping for Gary":
-    case "Summary":
-    case "Background Data Mgmt":
-    case "Advanced Lab ReOrder":
-    case "Billing":
+  for(const [key, sheet] of Object.entries(NONITERABLESHEETS)) {
+    if(thisSheetName == sheet.getSheetName()) {
       return;
+    }
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -349,14 +330,14 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
-    console.warn(`Trying to fix job number : ${jobnumber}`)
+    writer.Warning(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).jobnumber;
       SetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
-      console.warn(`Job Number was missing, so the script fixed it. Submission by ${email}`);
+      writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
-    console.error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+    writer.Error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -365,13 +346,13 @@ const onChange = async (e) => {
     designspecialist = designspecialist ? designspecialist : "a Design Specialist";
     projectname = projectname ? projectname : "Your Project";
   } catch (err) {
-    console.error( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
+    writer.Error( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
   // Calculate Turnaround Time only when cell is empty
   try {
-    console.warn(`Attempting to Calculate turnaround times`);
+    writer.Warning(`Attempting to Calculate turnaround times`);
     const calc = new Calculate();
     let elapsedCell = thisSheet.getRange(thisRow, 43).getValue();
     if (elapsedCell !== undefined || elapsedCell !== null || elapsedCell !== "") {
@@ -381,25 +362,25 @@ const onChange = async (e) => {
 
         // Write to Column - d h:mm:ss  
         SetByHeader(thisSheet, "Elapsed Time", thisRow, time.toString());
-        console.info(`Turnaround Time = ${time}`);
+        writer.Info(`Turnaround Time = ${time}`);
 
         // Write Completed time
         SetByHeader(thisSheet, "Date Completed", thisRow, endTime.toString());
       }
     }
   } catch (err) {
-    console.error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
+    writer.Error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
   //----------------------------------------------------------------------------------------------------------------
   // Trigger for generating a "Ticket"
   if ( status == STATUS.received || status == STATUS.inProgress || status == STATUS.pendingApproval ) {
-    console.warn(`Attempting to create a ticket`)
+    writer.Warning(`Attempting to create a ticket`)
     const ticketGenerator = new Ticket({jobnumber : jobnumber});
     try {
       const ticket = ticketGenerator.CreateTicket();
     } catch (err) {
-      console.error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+      writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
     }
   }
 
@@ -409,7 +390,7 @@ const onChange = async (e) => {
   // Create a new form, then add a checkbox question, a multiple choice question,
   let approvalURL;
   if (status == STATUS.pendingApproval) {
-    console.warn(`Attempting to create an approval form.`)
+    writer.Warning(`Attempting to create an approval form.`)
     try {
       const approvalform = await new ApprovalFormBuilder({
         name : name,
@@ -417,10 +398,10 @@ const onChange = async (e) => {
         cost : cost,
       })
       approvalURL = approvalform.url;
-      console.info(`Approval Form generated and sent to user.`);
+      writer.Info(`Approval Form generated and sent to user.`);
     }
     catch (err) {
-      console.error(`${err} : Couldn't generate an approval form` );
+      writer.Error(`${err} : Couldn't generate an approval form` );
     }
   }
 
@@ -455,10 +436,10 @@ const onChange = async (e) => {
   );
 
   // Send email with appropriate response and cc Chris and Cody.
-  console.info(`Sending email.`)
+  writer.Info(`Sending email....`)
   switch (status) {
     case STATUS.received:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Received", "", {
+      GmailApp.sendEmail(email, `${gmailName} : ${STATUS.received}`, "", {
         htmlBody: Message.receivedMessage,
         from: supportAlias,
         cc: designspecialistemail,
@@ -467,7 +448,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.pendingApproval:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Needs Your Approval", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Needs Your Approval`, "", {
           htmlBody: Message.pendingMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -476,7 +457,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.inProgress:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project Started", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project Started`, "", {
           htmlBody: Message.inProgressMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -485,7 +466,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.completed:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project Completed", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project Completed`, "", {
           htmlBody: Message.completedMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -494,7 +475,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.pickedUp:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project Picked Up", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project Picked Up`, "", {
           htmlBody: Message.pickedUpMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -503,7 +484,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.shipped:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project Shipped", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project Shipped`, "", {
           htmlBody: Message.shippedMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -512,7 +493,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.failed:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project has Failed", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project has Failed`, "", {
           htmlBody: Message.failedMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -521,7 +502,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.rejectedByStudent:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project has been Declined", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project has been Declined`, "", {
           htmlBody: Message.rejectedByStudentMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -531,7 +512,7 @@ const onChange = async (e) => {
       break;
     case STATUS.rejectedByStaff:
     case "Cancelled":
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project has been Cancelled", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project has been Cancelled`, "", {
           htmlBody: Message.rejectedByStaffMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -540,7 +521,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.billed:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project Closed", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project Closed`, "", {
         htmlBody: Message.billedMessage,
         from: supportAlias,
         cc: designspecialistemail,
@@ -549,7 +530,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.waitlist:
-      GmailApp.sendEmail(email, "Jacobs Project Support : Project Waitlisted", "", {
+      GmailApp.sendEmail(email, `${gmailName} : Project Waitlisted`, "", {
           htmlBody: Message.waitlistMessage,
           from: supportAlias,
           cc: designspecialistemail,
@@ -560,7 +541,7 @@ const onChange = async (e) => {
     case STATUS.missingAccess:
       if (priority == false) break;
       else {
-        GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
+        GmailApp.sendEmail(email, `${gmailName} : Missing Access`, "", {
             htmlBody: Message.noAccessMessage,
             from: supportAlias,
             cc: designspecialistemail,
@@ -577,11 +558,11 @@ const onChange = async (e) => {
   // Lastly Run these Metrics ignoring first 2 rows:
   if (thisRow > 3) {
     await Metrics();
-    console.info(`Recalculated Metrics tab.`);
+    writer.Info(`Recalculated Metrics....`);
   }
 
   // Check priority one more time:
-  if (priority == "STUDENT NOT FOUND!" && (status != STATUS.missingAccess || status != STATUS.closed || status != STATUS.cancelled)) {
+  if (priority == "STUDENT NOT FOUND!" && (status != STATUS.closed || status != STATUS.cancelled)) {
     SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
 };

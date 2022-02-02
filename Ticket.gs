@@ -76,7 +76,7 @@ class Ticket
     
     const qGen = new QRCodeAndBarcodeGenerator({url : this.url, jobnumber : this.jobnumber});
     const barcode = await qGen.GenerateBarCodeForTicketHeader();
-    Logger.log(`Barcode ----> ${barcode}`);
+    console.info(`Barcode ----> ${barcode}`);
 
     let material, part, note;
     let mat = [];
@@ -202,7 +202,7 @@ class Ticket
           [DocumentApp.Attribute.BORDER_WIDTH]: 0.5,
         });
     } catch (err) {
-      Logger.log(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
+      console.error(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
     }
 
     // Remove File from root and Add that file to a specific folder
@@ -213,15 +213,15 @@ class Ticket
         folder.next().addFile(docFile)
       }
     } catch (err) {
-      Logger.log(`Whoops : ${err}`);
+      console.error(`Whoops : ${err}`);
     }
 
     // Set permissions to 'anyone can edit' for that file
     let file = DriveApp.getFileById(docId);
     file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
 
-    // Logger.log(JSON.stringify(this.doc));
-    Logger.log(`DOC ----> ${this.doc.getUrl()}`);
+    // console.info(JSON.stringify(this.doc));
+    console.info(`DOC ----> ${this.doc.getUrl()}`);
     this.SetTicketURL();
     return this.doc;
   };
@@ -236,9 +236,9 @@ class Ticket
       const data = this.sheet.getDataRange().getValues();
       const col = data[0].indexOf('Printable Ticket') + 1;
       this.sheet.getRange(this.row, col).setValue(this.url);
-      Logger.log(`Set Ticket URL - Sheet: ${this.sheetName} Row: ${this.row} Col: ${col} Value: ${this.url}`);
+      console.info(`Set Ticket URL - Sheet: ${this.sheetName} Row: ${this.row} Col: ${col} Value: ${this.url}`);
     } catch (err) {
-      Logger.log(`${err} : Setting Ticket URL failed - Sheet: ${this.sheetName} Row: ${this.row} Col: ${col} Value: ${this.url}`);
+      console.error(`${err} : Setting Ticket URL failed - Sheet: ${this.sheetName} Row: ${this.row} Col: ${col} Value: ${this.url}`);
     }
   }
 
@@ -259,7 +259,7 @@ class Ticket
       r.getParent().asParagraph().insertInlineImage(0,imageBlob);
       return next;
     } catch (err) {
-      Logger.log(`${err} : Couldn't swap out text for images....`);
+      console.error(`${err} : Couldn't swap out text for images....`);
     }
   };
   
@@ -270,10 +270,11 @@ class Ticket
 
 
 const _testTicket = () => {
-  const jnum = 20211007000407;
+  console.time(`TicketGen Time `);
+  const jnum = 20220118033838;
   const tic = new Ticket({jobnumber : jnum,}).CreateTicket();
-
-  Logger.log(tic);
+  console.info(tic);
+  console.timeEnd(`TicketGen Time `);
 }
 
 

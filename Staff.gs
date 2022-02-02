@@ -136,7 +136,7 @@ const InvokeDS = (name, property) => {
     let _fullname = staff[i][1];
     let _email = staff[i][2];
     let _emailLink = staff[i][3];
-    // Logger.log(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
+    // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
 
     switch (property) {
       case "fullname":
@@ -172,7 +172,7 @@ const CreateDS = () => {
     let email = row[2];
     let link = row[3];
     let type = row[4];
-    // Logger.log(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
+    // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
     if(email && !link) {
       link = MakeLink(email);
       OTHERSHEETS.staff.getRange(OTHERSHEETS.staff.getLastRow() - 1, 4).setValue(link);
@@ -188,7 +188,7 @@ const CreateDS = () => {
       staff.push(ss);
     }
   });
-  Logger.log(JSON.stringify(staff));
+  console.info(JSON.stringify(staff));
   return staff;
 }
 
@@ -199,8 +199,8 @@ const _testDS = () => {
     fullname : "Mike Special",
     email : "some@email.com",
   })
-  Logger.log(ds.get())
-  Logger.log(`Name : ${ds.name}`)
+  console.info(ds.get())
+  console.info(`Name : ${ds.name}`)
 }
 
 

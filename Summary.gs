@@ -118,7 +118,7 @@ class SummaryBuilder
       'bcc': 'cparsell@berkeley.edu',
       'name': 'JPS DAILY SUMMARY'
     });
-    Logger.log('DS Team Emailed with Summary for the day.');
+    console.warn('DS Team Emailed with Summary for the day.');
   }
 }
 

@@ -79,7 +79,6 @@ class QRCodeAndBarcodeGenerator {
       let barcodeBlob = Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) ;
       barcode = await DriveApp.createFile( barcodeBlob );
       barcode.setTrashed(true);
-      console.info(barcode);
       return barcode;
     } else {
       console.error('Failed to GET Barcode');
@@ -118,7 +117,6 @@ class QRCodeAndBarcodeGenerator {
       barcode.setTrashed(true);
     } 
     else console.error('Failed to GET Barcode');
-    console.info(barcode);
     return barcode;
   }
   

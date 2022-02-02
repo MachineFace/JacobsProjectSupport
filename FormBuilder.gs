@@ -36,7 +36,7 @@ class ApprovalFormBuilder
       // Ask Questions
       let item;
       if (this.cost == "" || this.cost == undefined || this.cost == 0) {
-        Logger.log(`Approval form: No known cost. Cost = ${this.cost}`);
+        console.warn(`Approval form: No known cost. Cost = ${this.cost}`);
         item = this.form.addMultipleChoiceItem();
         item
           .setRequired(true)
@@ -49,7 +49,7 @@ class ApprovalFormBuilder
           ]);
       } else {
         let costFormatted = Utilities.formatString("$%.2f", this.cost);
-        Logger.log(`Approval form: Known Cost = ${costFormatted}`);
+        console.info(`Approval form: Known Cost = ${costFormatted}`);
         item = this.form.addMultipleChoiceItem();
         item
           .setRequired(true)
@@ -75,9 +75,9 @@ class ApprovalFormBuilder
           item3.createChoice(this.jobnumber)
         ]);
       this.url = this.form.getPublishedUrl();
-      Logger.log(`Created an Approval Form for the student.`);
+      console.info(`Created an Approval Form for the student.`);
     } catch (err) {
-      Logger.log(`${err} : Couldn't generate Approval Form`);
+      console.error(`${err} : Couldn't generate Approval Form`);
     }
 
     try {
@@ -88,9 +88,9 @@ class ApprovalFormBuilder
       while(this.destination.hasNext()) {
         this.destination.next().addFile(docFile);
       }
-      Logger.log(`Form Successfully Created : ${this.url}`);
+      console.info(`Form Successfully Created : ${this.url}`);
     } catch (err) {
-      Logger.log(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
+      console.error(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
     }
     return this.url;
   };
@@ -98,11 +98,13 @@ class ApprovalFormBuilder
 
 
 const _testApprovalForm = () => {
+  console.time(`FormBuilder Time`);
   const former = new ApprovalFormBuilder({
     name : "Dingus",
     jobnumber : 19238712398,
     cost : 50.00,
   });
+  console.timeEnd(`FormBuilder Time`);
 }
 
 
