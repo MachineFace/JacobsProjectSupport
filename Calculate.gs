@@ -257,7 +257,7 @@ class Calculate
       return second[1] - first[1];
     });
     items.splice(0,1);
-    this.writer.Info(items);
+    this.writer.Info(items.toString());
     
     return items;  
   }
@@ -335,7 +335,7 @@ class Calculate
         output.push([email, id[1]]);
       }
     })
-    this.writer.Info(output);
+    this.writer.Info(output.toString());
     return output;
   }
 
@@ -398,7 +398,7 @@ class Calculate
     const tiers = this.CountTiers();
     tiers.forEach( (tier, index) => {
       OTHERSHEETS.data.getRange(39 + index, 3, 1, 1).setValue(tier[1]);
-      this.writer.Info(tier)
+      this.writer.Info(tier.toString())
     });
   }
 
@@ -442,7 +442,7 @@ class Calculate
     OTHERSHEETS.data.getRange(8, 3, 1, 1).setValue(completed);
     OTHERSHEETS.data.getRange(9, 3, 1, 1).setValue(cancelled);
     OTHERSHEETS.data.getRange(10, 3, 1, 1).setValue(inprogress);
-    this.writer.Info(completed);
+    this.writer.Info(completed.toString());
   }
 
   AdvancedLabCounts () {
@@ -485,6 +485,7 @@ class Calculate
  * Used to Calculate Average Turnaround times and write to 'Data/Metrics' sheet
  */
 const Metrics = () => {
+  console.time(`Metrics Timer `)
   const calc = new Calculate();
   try {
     console.info(`Calculating Metrics .....`);
@@ -498,8 +499,9 @@ const Metrics = () => {
     calc.PrintDistributionNumbers();
     console.info(`Recalculated Metrics`);
   } catch (err) {
-    console.error(`${err} : Couldn't generate statistics on Metrics.`);
+    console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
   }
+  console.timeEnd(`Metrics Timer `)
 }
 
 const _testDist = () => {

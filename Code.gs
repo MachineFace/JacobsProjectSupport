@@ -555,12 +555,6 @@ const onChange = async (e) => {
       break;
   }
 
-  // Lastly Run these Metrics ignoring first 2 rows:
-  if (thisRow > 3) {
-    await Metrics();
-    writer.Info(`Recalculated Metrics....`);
-  }
-
   // Check priority one more time:
   if (priority == "STUDENT NOT FOUND!" && (status != STATUS.closed || status != STATUS.cancelled)) {
     SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
