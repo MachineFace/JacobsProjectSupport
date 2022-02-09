@@ -260,11 +260,11 @@ const BillFromSelected = async () => {
         boxMsg += `Customer Name : ${customer.first_name} ${customer.last_name} \\n`;
         boxMsg += `Job Number : ${jobnumber} \\n`;
         boxMsg += `Shopify ID : ${customer.id} \\n`;
-        boxMsg += `For Materials : \\n \\t • ${material1Quantity} of ${material1Name}\\n`;
-        if(material2Quantity) boxMsg += `\\t• ${material2Quantity} of ${material2Name}\\n`;
-        if(material3Quantity) boxMsg += `\\t• ${material3Quantity} of ${material3Name}\\n`;
-        if(material4Quantity) boxMsg += `\\t• ${material4Quantity} of ${material4Name}\\n`;
-        if(material5Quantity) boxMsg += `\\t• ${material5Quantity} of ${material5Name}\\n`;
+        boxMsg += `For Materials : \\n` + "\t" + `• ${material1Quantity} of ${material1Name}\\n`;
+        if(material2Quantity) boxMsg += "\t" + `• ${material2Quantity} of ${material2Name}\\n`;
+        if(material3Quantity) boxMsg += "\t" + `• ${material3Quantity} of ${material3Name}\\n`;
+        if(material4Quantity) boxMsg += "\t" + `• ${material4Quantity} of ${material4Name}\\n`;
+        if(material5Quantity) boxMsg += "\t" + `• ${material5Quantity} of ${material5Name}\\n`;
 
         //Make a nessage box
         try {
