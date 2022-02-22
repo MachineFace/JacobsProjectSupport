@@ -518,11 +518,11 @@ class Menu
         boxMsg += `Job Number : ${jobnumber} \\n`;
         boxMsg += `Shopify ID : ${shopify.customerID} \\n`;
         boxMsg += `For Materials : \\n\\n`
-        boxMsg += `⠀⠀⠀⠀1. ${material1Quantity} of ${material1Name} \\n`;
-        if(material2Quantity != 0) boxMsg += `⠀⠀⠀⠀2. ${material2Quantity} of ${material2Name} \\n`;
-        if(material3Quantity != 0) boxMsg += `⠀⠀⠀⠀3. ${material3Quantity} of ${material3Name} \\n`;
-        if(material4Quantity != 0) boxMsg += `⠀⠀⠀⠀4. ${material4Quantity} of ${material4Name} \\n`;
-        if(material5Quantity != 0) boxMsg += `⠀⠀⠀⠀5. ${material5Quantity} of ${material5Name} \\n`;
+        boxMsg += `1. ${material1Quantity} of ${material1Name} \\n`;
+        if(material2Quantity != 0) boxMsg += `2. ${material2Quantity} of ${material2Name} \\n`;
+        if(material3Quantity != 0) boxMsg += `3. ${material3Quantity} of ${material3Name} \\n`;
+        if(material4Quantity != 0) boxMsg += `4. ${material4Quantity} of ${material4Name} \\n`;
+        if(material5Quantity != 0) boxMsg += `5. ${material5Quantity} of ${material5Name} \\n`;
 
         // Make a nessage box
         try {
