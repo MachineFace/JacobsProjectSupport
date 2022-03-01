@@ -263,8 +263,8 @@ const onChange = async (e) => {
   let tempEmail = GetByHeader(thisSheet, "Email Address", thisRow);
   let tempSID = GetByHeader(thisSheet, "Your Student ID Number?", thisRow);
 
-  let tempPriority = await new Priority({email : tempEmail, sid : tempSID});
-  SetByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority.priority);
+  let tempPriority = await new Priority({email : tempEmail, sid : tempSID}).priority;
+  SetByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority);
   if (tempPriority == "STUDENT NOT FOUND") {
     SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
   }
@@ -325,7 +325,7 @@ const onChange = async (e) => {
   writer.Info(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
 
   // Ignore
-  if(priority == "STUDENT NOT FOUND!" || status == STATUS.closed ) return;
+  if(status == STATUS.closed || status == STATUS.cancelled ) return;
 
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
@@ -439,6 +439,7 @@ const onChange = async (e) => {
   writer.Info(`Sending email....`)
   switch (status) {
     case STATUS.received:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : ${STATUS.received}`, "", {
         htmlBody: Message.receivedMessage,
         from: supportAlias,
@@ -448,6 +449,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.pendingApproval:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Needs Your Approval`, "", {
           htmlBody: Message.pendingMessage,
           from: supportAlias,
@@ -457,6 +459,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.inProgress:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project Started`, "", {
           htmlBody: Message.inProgressMessage,
           from: supportAlias,
@@ -466,6 +469,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.completed:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project Completed`, "", {
           htmlBody: Message.completedMessage,
           from: supportAlias,
@@ -475,6 +479,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.pickedUp:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project Picked Up`, "", {
           htmlBody: Message.pickedUpMessage,
           from: supportAlias,
@@ -484,6 +489,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.shipped:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project Shipped`, "", {
           htmlBody: Message.shippedMessage,
           from: supportAlias,
@@ -493,6 +499,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.failed:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project has Failed`, "", {
           htmlBody: Message.failedMessage,
           from: supportAlias,
@@ -502,6 +509,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.rejectedByStudent:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project has been Declined`, "", {
           htmlBody: Message.rejectedByStudentMessage,
           from: supportAlias,
@@ -511,7 +519,8 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.rejectedByStaff:
-    case "Cancelled":
+    case STATUS.cancelled:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project has been Cancelled`, "", {
           htmlBody: Message.rejectedByStaffMessage,
           from: supportAlias,
@@ -521,6 +530,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.billed:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project Closed`, "", {
         htmlBody: Message.billedMessage,
         from: supportAlias,
@@ -530,6 +540,7 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.waitlist:
+      console.warn(`Sending ${status} email to student.`);
       GmailApp.sendEmail(email, `${gmailName} : Project Waitlisted`, "", {
           htmlBody: Message.waitlistMessage,
           from: supportAlias,
@@ -539,17 +550,15 @@ const onChange = async (e) => {
       });
       break;
     case STATUS.missingAccess:
-      if (priority == false) break;
-      else {
-        GmailApp.sendEmail(email, `${gmailName} : Missing Access`, "", {
-            htmlBody: Message.noAccessMessage,
-            from: supportAlias,
-            cc: designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
-            name: gmailName,
-        });
-        break;
-      }
+      console.warn(`Sending ${status} email to student.`);
+      GmailApp.sendEmail(email, `${gmailName} : Missing Access`, "", {
+          htmlBody: Message.noAccessMessage,
+          from: supportAlias,
+          cc: designspecialistemail,
+          bcc: InvokeDS("Chris", "email"),
+          name: gmailName,
+      });
+      break;   
     case "":
     case undefined:
       break;

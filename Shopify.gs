@@ -245,7 +245,7 @@ class ShopifyAPI
     //Fetch Customer
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (html.getResponseCode() == 200) {
       let user = JSON.parse(html.getContentText())['customers'][0];
       if(!user) {
