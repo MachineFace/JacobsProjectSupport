@@ -146,7 +146,7 @@ const PickupByBarcode = () => {
     if (searchFind != null) {
       searchRow = searchFind.getRow();
       
-      SetByHeader(searchSheet, "(INTERNAL) Status", searchRow, STATUS.pickedUp);
+      SetByHeader(searchSheet, HEADERNAMES.status, searchRow, STATUS.pickedUp);
       progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       console.info(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();

@@ -407,8 +407,8 @@ const CheckMissingAccessStudents = () => {
   if(results != null) {
     for(const [sheetName, values] of Object.entries(results)) {
       values.forEach( row => {
-        let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Email Address", row);
-        let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), "Your Student ID Number?", row)
+        let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.email, row);
+        let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.sid, row)
         const p = new Priority({email : email, side: sid});
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p.priority}`);
         if(p.priority != `STUDENT NOT FOUND!`) {
@@ -520,7 +520,7 @@ const _testSheetChecker = () => {
 const GetAllProjectNames = () => {
   let names = []
   for(const [key, sheet] of Object.entries(SHEETS)) {
-    let titles = GetColumnDataByHeader(sheet, "Project Name");
+    let titles = GetColumnDataByHeader(sheet, HEADERNAMES.projectName);
     titles = [].concat(...titles);
     let culled = titles.filter(Boolean);
     names.push(culled);
@@ -586,9 +586,77 @@ const ListInboxSnippets = () => {
 }
 
 
+/**
+ * Seeker Class to Search for Terms
+ */
+class Seeker
+{
+  constructor({value = "",}) {
+    this.value = value;
+  }
+  Search () {
+    if (this.value) this.value.toString().replace(/\s+/g, "");
+    let res = {};
+    Object.values(SHEETS).forEach(sheet => {
+      const finder = sheet.createTextFinder(this.value).findAll();
+      if (finder != null) {
+        let temp = [];
+        finder.forEach(result => temp.push(result.getRow()));
+        res[sheet.getName()] = temp;
+      }
+    });
+    console.info(JSON.stringify(res));
+    return res;
+  }
+  SearchSpecificSheet (sheet) {
+    if (this.value) this.value.toString().replace(/\s+/g, "");
 
+    const finder = sheet.createTextFinder(this.value).findNext();
+    if (finder != null) {
+      return finder.getRow();
+    } else return false;
+  }
+  SearchByJobNumber (jobnumber) {
+    // jobnumber = 20211025144607;  // test good jnum
+    if (jobnumber) jobnumber.toString().replace(/\s+/g, "");
+    let res = {};
+    Object.values(SHEETS).forEach(sheet => {
+      const finder = sheet.createTextFinder(jobnumber).findNext();
+      if (finder != null) {
+        res[sheet.getName()] = finder.getRow();
+      }
+    });
 
+    console.info(JSON.stringify(res));
+    return res;
+  }
+  SearchInColumn (sheet, column, data) {
+    let indexes = [];
+    let values = sheet.getRange(column + ":" + column).getValues(); // like A:A
+    let row = 2;
 
+    while (values[row] && values[row][0] !== data) row++;
+    if (values[row][0] === data) indexes.push(row + 1);
+    else return -1;
+    return indexes;
+  };
+  SearchInRow (sheet, data) {
+    let indexes = [];
+    let rows = sheet.getDataRange.getValues();
+
+    // Loop through all the rows and return a matching index
+    for (let r = 1; r < rows.length; r++) {
+      let index = rows[r].indexOf(data) + 1;
+      indexes.push(index);
+    }
+    return indexes;
+  };
+}
+
+const _testSeeker = () => {
+  const seeker = new Seeker({value : "Project",}).Search();
+  console.info(seeker);
+}
 
 
 

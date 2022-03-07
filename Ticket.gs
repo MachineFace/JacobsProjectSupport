@@ -36,15 +36,15 @@ class Ticket
         this.sheetName = sheet.getName();
       }
     }
-    this.designspecialist = this.GetByHeader(this.sheet, "(INTERNAL): DS Assigned", this.row) ? this.GetByHeader(this.sheet, "(INTERNAL): DS Assigned", this.row) : "A Design Specialist";
-    this.submissiontime = this.GetByHeader(this.sheet, "Timestamp", this.row);
-    this.email = this.GetByHeader(this.sheet, "Email Address", this.row);
-    this.name = this.GetByHeader(this.sheet, "What is your name?", this.row);
-    this.projectname = this.GetByHeader(this.sheet, "Project Name", this.row);
-    this.material1Name = this.GetByHeader(this.sheet, "(INTERNAL) Item 1", this.row);
-    this.material1Quantity = this.GetByHeader(this.sheet, "(INTERNAL) Material 1 Quantity", this.row);
-    this.material2Name = this.GetByHeader(this.sheet, "(INTERNAL) Item 2", this.row);
-    this.material2Quantity = this.GetByHeader(this.sheet, "(INTERNAL) Material 2 Quantity", this.row);
+    this.designspecialist = this.GetByHeader(this.sheet, HEADERNAMES.ds, this.row) ? this.GetByHeader(this.sheet, HEADERNAMES.ds, this.row) : "A Design Specialist";
+    this.submissiontime = this.GetByHeader(this.sheet, HEADERNAMES.timestamp, this.row);
+    this.email = this.GetByHeader(this.sheet, HEADERNAMES.email, this.row);
+    this.name = this.GetByHeader(this.sheet, HEADERNAMES.name, this.row);
+    this.projectname = this.GetByHeader(this.sheet, HEADERNAMES.projectName, this.row);
+    this.material1Name = this.GetByHeader(this.sheet, HEADERNAMES.mat1, this.row);
+    this.material1Quantity = this.GetByHeader(this.sheet, HEADERNAMES.mat1quantity, this.row);
+    this.material2Name = this.GetByHeader(this.sheet, HEADERNAMES.mat2, this.row);
+    this.material2Quantity = this.GetByHeader(this.sheet, HEADERNAMES.mat2quantity, this.row);
   }
 
   /**
@@ -136,15 +136,15 @@ class Ticket
         else notes.push("Notes: ", "None");
         break;
       case SHEETS.advancedlab.getName():
-        material = await this.GetByHeader(SHEETS.advancedlab, 'Which printer?', this.row);
+        material = await this.GetByHeader(SHEETS.advancedlab, HEADERNAMES.whichPrinter, this.row);
         if(material) mat.push( "Which Printer: ", material.toString());
         else mat.push("Materials: ", "None");
 
-        part = await this.GetByHeader(SHEETS.advancedlab, 'Total number of parts needed', this.row);
+        part = await this.GetByHeader(SHEETS.advancedlab, HEADERNAMES.numberOfParts, this.row);
         if(part) partcount.push( "Part Count:", part.toString());
         else partcount.push("Part Count: ", "None");
 
-        note = await this.GetByHeader(SHEETS.advancedlab, 'Other Notes About This Job', this.row);
+        note = await this.GetByHeader(SHEETS.advancedlab, HEADERNAMES.otherJobNotes, this.row);
         if(note) notes.push( "Notes:", note.toString());
         else notes.push("Notes: ", "None");
         break;

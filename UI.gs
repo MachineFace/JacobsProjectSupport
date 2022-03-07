@@ -41,9 +41,9 @@ const PopupCreateNewJobNumber = async () => {
     );
     return;
   } else {
-    const timestamp = GetByHeader(thisSheet, "Timestamp", thisRow);
+    const timestamp = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
     const jobnumber = new JobNumberGenerator(timestamp).jobnumber;
-    SetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber.toString());
+    SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber.toString());
     ui.alert(
       `JPS Runtime Message`,
       `Created a New Jobnumber : ${jobnumber}`,
@@ -64,7 +64,7 @@ const PopupCreateTicket = async () => {
   let thisSheet = SpreadsheetApp.getActiveSheet();
   let sheetname = thisSheet.getName();
   let thisRow = thisSheet.getActiveRange().getRow();
-  let jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
+  let jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
 
   if(CheckSheetIsForbidden(thisSheet) == true) {
     Browser.msgBox(
@@ -197,20 +197,20 @@ const BillFromSelected = async () => {
     return;
   }
 
-  const status = GetByHeader(thisSheet, "(INTERNAL) Status", thisRow);
-  const jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  const email = GetByHeader(thisSheet, "Email Address", thisRow);
-  const name = GetByHeader(thisSheet, "What is your name?", thisRow);
-  const material1Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
-  const material1Name = GetByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
-  const material2Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 2 Quantity",thisRow);
-  const material2Name = GetByHeader(thisSheet, "(INTERNAL) Item 2", thisRow);
-  const material3Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
-  const material3Name = GetByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
-  const material4Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 4 Quantity", thisRow );
-  const material4Name = GetByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
-  const material5Quantity = GetByHeader( thisSheet, "(INTERNAL) Material 5 Quantity", thisRow );
-  const material5Name = GetByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
+  const status = GetByHeader(thisSheet, HEADERNAMES.status, thisRow);
+  const jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
+  const email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
+  const name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
+  const material1Quantity = GetByHeader(thisSheet, HEADERNAMES.mat1quantity, thisRow);
+  const material1Name = GetByHeader(thisSheet, HEADERNAMES.mat1, thisRow);
+  const material2Quantity = GetByHeader(thisSheet, HEADERNAMES.mat2quantity,thisRow);
+  const material2Name = GetByHeader(thisSheet, HEADERNAMES.mat2, thisRow);
+  const material3Quantity = GetByHeader(thisSheet, HEADERNAMES.mat3quantity, thisRow);
+  const material3Name = GetByHeader(thisSheet, HEADERNAMES.mat3, thisRow);
+  const material4Quantity = GetByHeader( thisSheet, HEADERNAMES.mat4quantity, thisRow );
+  const material4Name = GetByHeader(thisSheet, HEADERNAMES.mat4, thisRow);
+  const material5Quantity = GetByHeader( thisSheet, HEADERNAMES.mat5quantity, thisRow );
+  const material5Name = GetByHeader(thisSheet, HEADERNAMES.mat5, thisRow);
   const quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
   console.info(status+jobnumber+email+name+material1Name+material1Quantity+material2Name+material2Quantity+material3Name+material3Quantity+material4Name+material4Quantity+material5Name+material5Quantity+quantityTotal)
 
@@ -277,7 +277,7 @@ const BillFromSelected = async () => {
             console.info('User clicked "Yes".');
             
             const order = await shopify.CreateOrder();
-            SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.billed);
+            SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
             console.info(order.toString());
             let lastOrder = await shopify.GetLastOrder();
             Browser.msgBox(

@@ -54,19 +54,19 @@ const onSubmission = async (e) => {
         break;
       }
     }
-    SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.received);
-    console.info(`Set status to 'Received'.`);
+    SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.received);
+    writer.Info(`Set status to 'Received'.`);
   } catch (err) {
     writer.Error(`${err}: Couldn't set status to 'Received'.`);
   }
 
   // Parse variables
-  var name = e.namedValues["What is your name?"][0] ? e.namedValues["What is your name?"][0] : GetByHeader(sheet, "What is your name?", lastRow);
-  var email = e.namedValues["Email Address"][0] ? e.namedValues["Email Address"][0] : GetByHeader(sheet, "Email Address", lastRow);
-  var sid = e.namedValues["Your Student ID Number?"][0] ? e.namedValues["Your Student ID Number?"][0] : GetByHeader(sheet, "Your Student ID Number?", lastRow);
-  var studentType = e.namedValues["What is your affiliation to the Jacobs Institute?"][0] ? e.namedValues["What is your affiliation to the Jacobs Institute?"][0] : GetByHeader(sheet, "What is your affiliation to the Jacobs Institute?", lastRow);
-  var projectname = e.namedValues["Project Name"][0] ? e.namedValues["Project Name"][0] : GetByHeader(sheet, "Project Name", lastRow);
-  var timestamp = e.namedValues["Timestamp"][0];
+  var name = e.namedValues[HEADERNAMES.name][0] ? e.namedValues[HEADERNAMES.name][0] : GetByHeader(sheet, HEADERNAMES.name, lastRow);
+  var email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
+  var sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
+  var studentType = e.namedValues[HEADERNAMES.afiliation][0] ? e.namedValues[HEADERNAMES.afiliation][0] : GetByHeader(sheet, HEADERNAMES.afiliation, lastRow);
+  var projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : GetByHeader(sheet, HEADERNAMES.projectName, lastRow);
+  var timestamp = e.namedValues[HEADERNAMES.timestamp][0];
 
   var values = e.namedValues;
 
@@ -74,11 +74,11 @@ const onSubmission = async (e) => {
 
   // Generate new Job number
   let jobnumber = await new JobNumberGenerator(timestamp).jobnumber;
-  SetByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
+  SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
   // Check Priority
   let priority = await new Priority({email : email, sid : sid});
-  SetByHeader(sheet, "(INTERNAL): Priority", lastRow, priority.priority);
+  SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority.priority);
 
 
   // Create Messages
@@ -106,26 +106,26 @@ const onSubmission = async (e) => {
     case SHEETS.shopbot.getName():
       designspecialistemail = InvokeDS("Adam", "email");
       //sheet.getRange("B" + lastRow).setValue("Adam");
-      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Adam");
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Adam");
       break;
     case SHEETS.advancedlab.getName():
     case SHEETS.creaform.getName():
       designspecialistemail = InvokeDS("Chris", "email");
       //sheet.getRange("B" + lastRow).setValue("Chris");
-      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Chris");
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Chris");
       break;
     case SHEETS.plotter.getName():
     case SHEETS.fablight.getName():
     case SHEETS.haas.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
-      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Cody");
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Cody");
       break;
     case SHEETS.waterjet.getName():
     case SHEETS.othertools.getName():
       designspecialistemail = InvokeDS("Gary", "email");
       //sheet.getRange("B" + lastRow).setValue("Gary");
-      SetByHeader(sheet, "(INTERNAL): DS Assigned", lastRow, "Gary");
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Gary");
       break;
     case SHEETS.laser.getName():
       //Nobody assigned / Everyone assigned.
@@ -136,12 +136,12 @@ const onSubmission = async (e) => {
     case SHEETS.vinyl.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
-      SetByHeader(sheet, "(INTERNAL): DS Assigned",  lastRow, "Cody");
+      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, "Cody");
       break;
     case undefined:
       designspecialistemail = InvokeDS("Staff", "email");
       //sheet.getRange("B" + lastRow).setValue("Staff");
-      SetByHeader(sheet, "(INTERNAL): DS Assigned",  lastRow, "Staff");
+      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, "Staff");
       break;
   }
 
@@ -160,7 +160,7 @@ const onSubmission = async (e) => {
 
   // Fix "Received" Status Issue
   let stat = sheet.getRange("A" + lastRow).getValue();
-  stat = stat ? stat : SetByHeader(sheet, "(INTERNAL) Status",  lastRow, STATUS.received); 
+  stat = stat ? stat : SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
   writer.Warning(`Status refixed to 'Received'.`);
 
   try {
@@ -181,7 +181,7 @@ const onSubmission = async (e) => {
   try {
     if (priority == "STUDENT NOT FOUND!" || priority == false) {
       // Set access to Missing Access
-      SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
+      SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
       //Email
       GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
@@ -196,13 +196,13 @@ const onSubmission = async (e) => {
     writer.Error(`${err} : Couldn't find student access boolean value`);
   } finally {
     if (priority == "STUDENT NOT FOUND!" || priority == false) {
-      SetByHeader(sheet, "(INTERNAL) Status", lastRow, STATUS.missingAccess);
+      SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
     }
   }
 
   // Check again
   jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator(timestamp).jobnumber;
-  SetByHeader(sheet, "(INTERNAL AUTO) Job Number", lastRow, jobnumber);
+  SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
 
   
@@ -252,21 +252,19 @@ const onChange = async (e) => {
   //Ignore Edits on background sheets like Logger and StoreItems - NICE!! /CG
   var thisSheetName = e.range.getSheet().getSheetName();
   for(const [key, sheet] of Object.entries(NONITERABLESHEETS)) {
-    if(thisSheetName == sheet.getSheetName()) {
-      return;
-    }
+    if(thisSheetName == sheet.getSheetName()) return;
   }
 
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
 
-  let tempEmail = GetByHeader(thisSheet, "Email Address", thisRow);
-  let tempSID = GetByHeader(thisSheet, "Your Student ID Number?", thisRow);
+  let tempEmail = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
+  let tempSID = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
 
   let tempPriority = await new Priority({email : tempEmail, sid : tempSID}).priority;
-  SetByHeader(thisSheet, "(INTERNAL): Priority", thisRow, tempPriority);
+  SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, tempPriority);
   if (tempPriority == "STUDENT NOT FOUND") {
-    SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
+    SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
   }
 
   // STATUS CHANGE TRIGGER
@@ -275,39 +273,39 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Parse Data
-  const status = GetByHeader(spreadSheet, "(INTERNAL) Status", thisRow);
+  const status = GetByHeader(spreadSheet, HEADERNAMES.status, thisRow);
 
-  var designspecialist = GetByHeader(thisSheet, "(INTERNAL): DS Assigned", thisRow);
-  var priority = GetByHeader(thisSheet, "(INTERNAL): Priority", thisRow);
-  var jobnumber = GetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow);
-  var studentApproval = GetByHeader(thisSheet, "Student Has Approved Job", thisRow);
-  var submissiontime = GetByHeader(thisSheet, "Timestamp", thisRow);
-  var email = GetByHeader(thisSheet, "Email Address", thisRow);
-  var name = GetByHeader(thisSheet, "What is your name?", thisRow);
-  var sid = GetByHeader(thisSheet, "Student ID Number", thisRow);
-  var studentType = GetByHeader(thisSheet, "What is your affiliation to the Jacobs Institute?", thisRow);
-  var projectname = GetByHeader(thisSheet, "Project Name", thisRow);
-  var cost = GetByHeader(thisSheet, "Estimate", thisRow);
+  var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow);
+  var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow);
+  var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
+  var studentApproval = GetByHeader(thisSheet, HEADERNAMES.studentApproved, thisRow);
+  var submissiontime = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
+  var email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
+  var name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
+  var sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
+  var studentType = GetByHeader(thisSheet, HEADERNAMES.afiliation, thisRow);
+  var projectname = GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow);
+  var cost = GetByHeader(thisSheet, HEADERNAMES.estimate, thisRow);
 
   //Materials
-  const material1Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 1 Quantity", thisRow);
-  const material1Name = GetByHeader(thisSheet, "(INTERNAL) Item 1", thisRow);
+  const material1Quantity = GetByHeader(thisSheet, HEADERNAMES.mat1quantity, thisRow);
+  const material1Name = GetByHeader(thisSheet, HEADERNAMES.mat1, thisRow);
   const material1URL = "";
 
-  const material2Quantity = GetByHeader(spreadSheet, "(INTERNAL) Material 2 Quantity", thisRow);
-  const material2Name = GetByHeader(spreadSheet, "(INTERNAL) Item 2", thisRow);
+  const material2Quantity = GetByHeader(spreadSheet, HEADERNAMES.mat2quantity, thisRow);
+  const material2Name = GetByHeader(spreadSheet, HEADERNAMES.mat2, thisRow);
   const material2URL = "";
 
-  const material3Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 3 Quantity", thisRow);
-  const material3Name = GetByHeader(thisSheet, "(INTERNAL) Item 3", thisRow);
+  const material3Quantity = GetByHeader(thisSheet, HEADERNAMES.mat3quantity, thisRow);
+  const material3Name = GetByHeader(thisSheet, HEADERNAMES.mat3, thisRow);
   const material3URL = "";
 
-  const material4Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 4 Quantity", thisRow);
-  const material4Name = GetByHeader(thisSheet, "(INTERNAL) Item 4", thisRow);
+  const material4Quantity = GetByHeader(thisSheet, HEADERNAMES.mat4quantity, thisRow);
+  const material4Name = GetByHeader(thisSheet, HEADERNAMES.mat4, thisRow);
   const material4URL = "";
 
-  const material5Quantity = GetByHeader(thisSheet, "(INTERNAL) Material 5 Quantity", thisRow);
-  const material5Name = GetByHeader(thisSheet, "(INTERNAL) Item 5", thisRow);
+  const material5Quantity = GetByHeader(thisSheet, HEADERNAMES.mat5quantity, thisRow);
+  const material5Name = GetByHeader(thisSheet, HEADERNAMES.mat5, thisRow);
   const material5URL = "";
 
   if (material1Name != "") var mat1 = true;
@@ -325,7 +323,7 @@ const onChange = async (e) => {
   writer.Info(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
 
   // Ignore
-  if(status == STATUS.closed || status == STATUS.cancelled ) return;
+  if(status == STATUS.closed ) return;
 
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
@@ -333,7 +331,7 @@ const onChange = async (e) => {
     writer.Warning(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).jobnumber;
-      SetByHeader(thisSheet, "(INTERNAL AUTO) Job Number", thisRow, jobnumber);
+      SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
@@ -361,11 +359,11 @@ const onChange = async (e) => {
         let time = await calc.CalculateDuration(new Date(submissiontime), endTime);
 
         // Write to Column - d h:mm:ss  
-        SetByHeader(thisSheet, "Elapsed Time", thisRow, time.toString());
+        SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
         writer.Info(`Turnaround Time = ${time}`);
 
         // Write Completed time
-        SetByHeader(thisSheet, "Date Completed", thisRow, endTime.toString());
+        SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
       }
     }
   } catch (err) {
@@ -566,7 +564,7 @@ const onChange = async (e) => {
 
   // Check priority one more time:
   if (priority == "STUDENT NOT FOUND!" && (status != STATUS.closed || status != STATUS.cancelled)) {
-    SetByHeader(thisSheet, "(INTERNAL) Status", thisRow, STATUS.missingAccess);
+    SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
   }
 };
 
