@@ -651,10 +651,39 @@ class Seeker
     }
     return indexes;
   };
+  SearchByHeader (sheet, columnName, row) {
+    try {
+      let data = sheet.getDataRange().getValues();
+      let col = data[0].indexOf(columnName);
+      if (col != -1) return data[row - 1][col];
+    } catch (err) {
+      console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
+    }
+  };
+  GetColumnDataByHeader (sheet, columnName) {
+    try {
+      const data = sheet.getDataRange().getValues();
+      const col = data[0].indexOf(columnName);
+      let colData = data.map(d => d[col]);
+      colData.splice(0, 1);
+      if (col != -1) return colData;
+    } catch (err) {
+      console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
+    }
+  };
+  SetByHeader (sheet, columnName, row, val) {
+    try {
+      const data = sheet.getDataRange().getValues();
+      const col = data[0].indexOf(columnName) + 1;
+      sheet.getRange(row, col).setValue(val);
+    } catch (err) {
+      console.error(`${err} : SetByHeader failed - Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
+    }
+  };
 }
 
 const _testSeeker = () => {
-  const seeker = new Seeker({value : "Project",}).Search();
+  const seeker = new Seeker({value : "Project",}).SearchSpecificSheet(SHEETS.laser);
   console.info(seeker);
 }
 
