@@ -2,6 +2,11 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Code Enumerations
  */
+
+const DaysRetentionNumber = 15; //How many days to hold a file
+const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
+
+
 const RESPONSECODES = {
 	200 : `OK`,
 	201 : `Created`,
@@ -94,18 +99,18 @@ const STATUS = {
  * Example: Calling 'SHEETS.laser' returns value sheet.
  */
 const SHEETS = {
-  laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), //Laser Sheet
-  ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), //Ultimaker Sheet
-  fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), //Fablight Sheet
-  waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), //Waterjet Sheet
-  advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced Lab"), //Advanced Lab Sheet
-  shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), //Shopbot Sheet
-  haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), //Haas Sheet
-  vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), //Vinyl Sheet
-  othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), //Othermill Sheet
-  creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), //Creaform Sheet
-  othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Other Tools"), //Other Sheet
-  plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), //Plotter Sheet
+  Laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Laser Cutter"), // Laser Sheet
+  Ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ultimaker"), // Ultimaker Sheet
+  Fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Fablight"), // Fablight Sheet
+  Waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waterjet"), // Waterjet Sheet
+  Advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced Lab"), // Advanced Lab Sheet
+  Shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Shopbot"), // Shopbot Sheet
+  Haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Haas & Tormach"), // Haas Sheet
+  Vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Vinyl Cutter"), // Vinyl Sheet
+  Othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Othermill"), // Othermill Sheet
+  Creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Creaform"), // Creaform Sheet
+  Othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Other Tools"), // Other Sheet
+  Plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Canon Plotter"), // Plotter Sheet
 };
 
 /**
@@ -113,13 +118,14 @@ const SHEETS = {
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const OTHERSHEETS = {
-  summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Summary"),
-  approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Student List DONOTDELETE"),
-  staff: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Staff List"),
-  logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Logger"),
-  data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Metrics"),
-  backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Background Data Mgmt"),
-  master : SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Master Intake Form Responses"),
+  Summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
+  Pickup : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Pickup`),
+  Approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
+  Staff: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Staff List`),
+  Logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Logger`),
+  Data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
+  Backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Background Data Mgmt`),
+  Master : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Master Intake Form Responses`),
 }
 
 
@@ -161,6 +167,17 @@ const FORMS = {
   othertools: "1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38",
   plotter: "1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34",
 };
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Drive Folder Locations
+ */
+const DRIVEFOLDERS = {
+  tickets : `1OJj0dxsa2Sf_tIBUnKm_BDmY7vFNMXYC`,
+  jobforms : `1G31sd5TZiAWCus4Gi_JSpFTSY1xVOV2o`,
+}
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -234,18 +251,18 @@ const HEADERNAMES = {
 
 
 const PAGESIZES = {
-  letter: {width: 612.283, height: 790.866},
-  tabloid: {width: 790.866,height: 1224.57},
-  legal: {width: 612.283, height: 1009.13},
-  statement: {width: 396.85, height: 612.283},
-  executive: {width: 521.575, height: 756.85},
-  folio: {width: 612.283, height: 935.433},
-  a3: {width: 841.89, height: 1190.55},
-  a4: {width: 595.276, height: 841.89},
-  a5: {width: 419.528, height: 595.276},
-  b4: {width: 708.661, height: 1000.63},
-  b5: {width: 498.898, height: 708.661},
-  custom: {width: 204.000, height: 566.000}
+  letter: { width: 612.283, height: 790.866 },
+  tabloid: { width: 790.866, height: 1224.57 },
+  legal: { width: 612.283, height: 1009.13 },
+  statement: { width: 396.85, height: 612.283 },
+  executive: { width: 521.575, height: 756.85 },
+  folio: { width: 612.283, height: 935.433 },
+  a3: { width: 841.89, height: 1190.55 },
+  a4: { width: 595.276, height: 841.89 },
+  a5: { width: 419.528, height: 595.276 },
+  b4: { width: 708.661, height: 1000.63 },
+  b5: { width: 498.898, height: 708.661 },
+  custom: { width: 204.000, height: 566.000 }
 }
 
 

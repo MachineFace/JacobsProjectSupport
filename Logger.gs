@@ -7,9 +7,9 @@ class WriteLogger
 {
   constructor() { 
     this.date = new Date().toUTCString();
-    this.sheet = OTHERSHEETS.logger;
-    this.row = OTHERSHEETS.logger.getLastRow() + 1;
-    this.sheetLength = OTHERSHEETS.logger.getMaxRows();
+    this.sheet = OTHERSHEETS.Logger;
+    this.row = OTHERSHEETS.Logger.getLastRow() + 1;
+    this.sheetLength = OTHERSHEETS.Logger.getMaxRows();
   }
   Error(message) {
     const text = [this.date, "ERROR!", message, ];

@@ -22,10 +22,8 @@
  * Gmail Constants
  */
 const supportAlias = GmailApp.getAliases()[0];
-const gmailName = "Jacobs Project Support";
+const gmailName = `Jacobs Project Support`;
 
-const DaysRetentionNumber = 15; //How many days to hold a file
-const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
 
 /**
  * =======================================================================================================================================================================
@@ -73,7 +71,7 @@ const onSubmission = async (e) => {
   writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let jobnumber = await new JobNumberGenerator(timestamp).jobnumber;
+  let jobnumber = await new JobNumberGenerator({ date : timestamp }).jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
   // Check Priority
@@ -82,7 +80,7 @@ const onSubmission = async (e) => {
 
 
   // Create Messages
-  const message = await new CreateSubmissionMessage(name, projectname, jobnumber);
+  const message = await new CreateSubmissionMessage({name : name, projectname : projectname, jobnumber : jobnumber});
 
   // Get DS-Specific Message
   let dsMessage = message.dsMessage;
@@ -102,38 +100,38 @@ const onSubmission = async (e) => {
   var designspecialistemail;
 
   switch (sheetName) {
-    case SHEETS.othermill.getName():
-    case SHEETS.shopbot.getName():
+    case SHEETS.Othermill.getName():
+    case SHEETS.Shopbot.getName():
       designspecialistemail = InvokeDS("Adam", "email");
       //sheet.getRange("B" + lastRow).setValue("Adam");
       SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Adam");
       break;
-    case SHEETS.advancedlab.getName():
-    case SHEETS.creaform.getName():
+    case SHEETS.Advancedlab.getName():
+    case SHEETS.Creaform.getName():
       designspecialistemail = InvokeDS("Chris", "email");
       //sheet.getRange("B" + lastRow).setValue("Chris");
       SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Chris");
       break;
-    case SHEETS.plotter.getName():
-    case SHEETS.fablight.getName():
-    case SHEETS.haas.getName():
+    case SHEETS.Plotter.getName():
+    case SHEETS.Fablight.getName():
+    case SHEETS.Haas.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
       SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Cody");
       break;
-    case SHEETS.waterjet.getName():
-    case SHEETS.othertools.getName():
+    case SHEETS.Waterjet.getName():
+    case SHEETS.Othertools.getName():
       designspecialistemail = InvokeDS("Gary", "email");
       //sheet.getRange("B" + lastRow).setValue("Gary");
       SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Gary");
       break;
-    case SHEETS.laser.getName():
+    case SHEETS.Laser.getName():
       //Nobody assigned / Everyone assigned.
       break;
-    case SHEETS.ultimaker.getName():
+    case SHEETS.Ultimaker.getName():
       designspecialistemail = InvokeDS("Nicole", lastRow, "email");
       break;
-    case SHEETS.vinyl.getName():
+    case SHEETS.Vinyl.getName():
       designspecialistemail = InvokeDS("Cody", "email");
       //sheet.getRange("B" + lastRow).setValue("Cody");
       SetByHeader(sheet, HEADERNAMES.ds,  lastRow, "Cody");
@@ -164,7 +162,7 @@ const onSubmission = async (e) => {
   writer.Warning(`Status refixed to 'Received'.`);
 
   try {
-    if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.creaform.getSheetName()) {
+    if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.Creaform.getSheetName()) {
       //Email
       GmailApp.sendEmail(email, "Jacobs Project Support : Creaform Part Drop-off Instructions", "", {
         htmlBody: message.creaformMessage,
@@ -201,7 +199,7 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator(timestamp).jobnumber;
+  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator({ date : timestamp }).jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
 
@@ -226,9 +224,7 @@ const onSubmission = async (e) => {
 const onChange = async (e) => {
   const writer = new WriteLogger();
   // Fetch Data from Sheets
-  var ss = e.range.getSheet();
-  var spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
-  var thisSheet = spreadSheet.getActiveSheet();
+  var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
   // Fetch Columns and rows and check validity
   var thisCol = e.range.getColumn();
@@ -239,11 +235,11 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Add link to DS List
-  const sLink = OTHERSHEETS.staff.getRange(thisRow, 4).getValue();
+  const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
   if (thisRow > 2) {
-    if ( sLink == undefined || sLink == null || (sLink == "" && OTHERSHEETS.staff.getRange(thisRow, 3).getValue() != "") ) {
-      const l = MakeLink(OTHERSHEETS.staff.getRange(thisRow, 3).getValue());
-      OTHERSHEETS.staff.getRange(thisRow, 4).setValue(l);
+    if ( sLink == undefined || sLink == null || (sLink == "" && OTHERSHEETS.Staff.getRange(thisRow, 3).getValue() != "") ) {
+      const l = MakeLink(OTHERSHEETS.Staff.getRange(thisRow, 3).getValue());
+      OTHERSHEETS.Staff.getRange(thisRow, 4).setValue(l);
     }
   }
   
@@ -330,7 +326,7 @@ const onChange = async (e) => {
   try {
     writer.Warning(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobnumber = jobnumber ? jobnumber : new JobNumberGenerator(submissiontime).jobnumber;
+      jobnumber = jobnumber ? jobnumber : new JobNumberGenerator({ date : submissiontime }).jobnumber;
       SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
@@ -408,30 +404,30 @@ const onChange = async (e) => {
   var designspecialistemail = InvokeDS(designspecialist, "email");
 
   // Create a Message and Return Appropriate Responses.
-  var Message = new CreateMessage(
-    name,
-    projectname,
-    jobnumber,
-    approvalURL,
-    material1URL,
-    material1Quantity,
-    material1Name,
-    material2URL,
-    material2Quantity,
-    material2Name,
-    material3URL,
-    material3Quantity,
-    material3Name,
-    material4URL,
-    material4Quantity,
-    material4Name,
-    material5URL,
-    material5Quantity,
-    material5Name,
-    designspecialist,
-    designspecialistemaillink,
-    cost
-  );
+  var Message = new CreateMessage({
+    name : name,
+    projectname : projectname, 
+    jobnumber : jobnumber,
+    approvalURL : approvalURL,
+    material1URL : material1URL,
+    material1Quantity : material1Quantity,
+    material1Name : material1Name,
+    material2URL :material2URL,
+    material2Quantity : material2Quantity,
+    material2Name : material2Name,
+    material3URL : material3URL,
+    material3Quantity : material3Quantity,
+    material3Name : material3Name,
+    material4URL : material4URL,
+    material4Quantity : material4Quantity,
+    material4Name : material4Name,
+    material5URL : material5URL,
+    material5Quantity : material5Quantity,
+    material5Name : material5Name,
+    designspecialist : designspecialist,
+    designspecialistemaillink : designspecialistemaillink,
+    cost : cost,
+  });
 
   // Send email with appropriate response and cc Chris and Cody.
   writer.Info(`Sending email....`)

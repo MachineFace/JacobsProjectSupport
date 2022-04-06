@@ -7,11 +7,11 @@
 class Priority
 {
   constructor({
-    email = `jacobsprojectsupport@berkeley.edu`,
-    sid = 19238471239847,
+    email : email,
+    sid : sid,
   }) {
-    this.email = email;
-    this.sid = sid;
+    this.email = email ? email.toString().replace(/\s+/g, "") : `jacobsprojectsupport@berkeley.edu`;
+    this.sid = sid ? sid.toString().replace(/\s+/g, "") : 19238471239847;
     this.GetPriority();
     this.priority;
   }
@@ -20,36 +20,37 @@ class Priority
     // Try email first
     try {
       if (this.email) {
-        this.email.toString().replace(/\s+/g, "");
-        let finder = OTHERSHEETS.approved.createTextFinder(this.email).findNext();
+        let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
         if (finder != null) {
           let row = finder.getRow();
-          this.priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
-          console.info(`ROW : ${row} : PRIORITY : ${this.priority}`);
+          this.priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
+          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${this.priority}`);
+          return this.priority;
         } else if (!finder) {
           // try SID
-          this.sid.toString().replace(/\s+/g, "");
-          finder = OTHERSHEETS.approved.createTextFinder(this.sid.toString()).findNext();
+          finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
           if (finder != null) {
             let row = finder.getRow();
-            this.priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
-            console.info(`ROW : ${row} : PRIORITY : ${this.priority}`);
+            this.priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
+            console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${this.priority}`);
+            return this.priority;
           } else if (!finder) {
             this.priority = "STUDENT NOT FOUND!";
-            console.warn(`PRIORITY : ${this.priority}`);
+            console.error(`EMAIL: ${this.email}, ${this.priority}`);
+            return this.priority;
           }
         }
       } else if(this.sid) {
-        // try SID
-        this.sid.toString().replace(/\s+/g, "");
-        finder = OTHERSHEETS.approved.createTextFinder(this.sid.toString()).findNext();
+        let finder = OTHERSHEETS.Approved.createTextFinder(this.sid.toString()).findNext();
         if (finder != null) {
           let row = finder.getRow();
-          this.priority = OTHERSHEETS.approved.getRange(row, 4, 1, 1).getValue();
-          console.info(`ROW : ${row} : PRIORITY : ${this.priority}`);
+          this.priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
+          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${this.priority}`);
+          return this.priority;
         } else if (!finder) {
           this.priority = "STUDENT NOT FOUND!";
-          console.warn(`PRIORITY : ${this.priority}`);
+          console.error(`PRIORITY : ${this.priority}`);
+          return this.priority;
         }
       } else this.priority = "STUDENT NOT FOUND!";
       
@@ -69,17 +70,35 @@ class Priority
 
 
 const _testPriority = () => {
+  let typesOfPriority = {
+    goodEgoodS : {
+      email : `ashchu@berkeley.edu`,
+      sid : 3034858776
+    },
+    goodEbadS : {
+      email : `ashchu@berkeley.edu`,
+      sid : 12938749123,
+    },
+    badEgoodS : {
+      email : `ding@bat.edu`,
+      sid : 3034858776,
+    },
+    badEbadS : {
+      email : `ding@bat.edu`,
+      sid : 2394872349587,
+    }
+  }
   console.time(`Priority`);
-  const priority = new Priority({
-    email : `effiejia@berkeley.edu`,
-    sid : 19238741293847,
-  });
-  console.info(priority.priority);
+  Object.entries(typesOfPriority).forEach(type => {
+    console.info(type[1])
+    const priority = new Priority({
+      email : type[1].email,
+      sid : type[1].sid,
+    });
+    console.info(priority.priority);
+  }) 
+  
   console.timeEnd(`Priority`);
-  // let p1 = GetPriority(`laxbop@berkeley.edu`,3036051329) // Good Email and Good SID
-  // let p2 = GetPriority(`laxbop@berkeley.edu`, 12938749123) // Good Email, Bad SID
-  // let p3 = GetPriority(`ding@bat.edu`, 3036051329) // Bad Email, Good SID
-  // let p4 = GetPriority(`ding@bat.edu`, 2394872349587) // Bad Email, Bad SID
 
 }
 
@@ -87,7 +106,7 @@ const _t = () => {
   // const e = `effiejia@berkeley.edu`;
   const e = `angelviolinist@berkeley.edu`;
   try{
-    let finder = OTHERSHEETS.staff.createTextFinder(e).findNext();
+    let finder = OTHERSHEETS.Staff.createTextFinder(e).findNext();
     if (finder != null) {
       let row = finder.getRow();
       console.info(row);

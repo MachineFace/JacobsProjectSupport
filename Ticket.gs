@@ -5,8 +5,10 @@
  */
 class Ticket 
 {
-  constructor({jobnumber = 202010010101,}){
-    this.jobnumber = jobnumber;
+  constructor({
+    jobnumber : jobnumber,
+  }){
+    this.jobnumber = jobnumber ? jobnumber : 202010010101;
     this.designspecialist;
     this.submissiontime;
     this.name;
@@ -57,9 +59,7 @@ class Ticket
   GetByHeader (sheet, colName, row) {
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(colName);
-    if (col != -1) {
-      return data[row - 1][col];
-    }
+    if (col != -1) return data[row - 1][col];
   };
 
   /**
@@ -68,8 +68,8 @@ class Ticket
    */
   async CreateTicket() {
     await this.GetInfo();
-    const folder = DriveApp.getFoldersByName(`Job Tickets`); //Set the correct folder
-    this.doc = DocumentApp.create(`Job Ticket-${this.jobnumber}`); //Make Document
+    const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
+    this.doc = DocumentApp.create(`Job Ticket-${this.jobnumber}`); // Make Document
     this.url = this.doc.getUrl();
     let body = this.doc.getBody();
     let docId = this.doc.getId();
@@ -83,68 +83,68 @@ class Ticket
     let partcount = [];
     let notes = [];
     switch(this.sheetName) {
-      case SHEETS.ultimaker.getName():
-        material = await this.GetByHeader(SHEETS.ultimaker, 'Does your project need the support material removed?', this.row);
+      case SHEETS.Ultimaker.getName():
+        material = await this.GetByHeader(SHEETS.Ultimaker, 'Does your project need the support material removed?', this.row);
         if(material) mat.push( "Needs Breakaway Removed:", material.toString());
         else mat.push("Materials: ", "None");
 
-        part = await this.GetByHeader(SHEETS.ultimaker, 'Part Count', this.row);
+        part = await this.GetByHeader(SHEETS.Ultimaker, 'Part Count', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
         else partcount.push("Part Count: ", "None");
 
-        note = await this.GetByHeader(SHEETS.ultimaker, 'Notes', this.row);
+        note = await this.GetByHeader(SHEETS.Ultimaker, 'Notes', this.row);
         if(note) notes.push( "Notes:", note.toString());
         else notes.push("Notes: ", "None");
         break;
-      case SHEETS.laser.getName():
-        material = await this.GetByHeader(SHEETS.laser, 'Rough dimensions of your part', this.row)
+      case SHEETS.Laser.getName():
+        material = await this.GetByHeader(SHEETS.Laser, 'Rough dimensions of your part', this.row)
         if(material) mat.push( "Rough Dimensions:", material.toString());
         else mat.push("Materials: ", "None");
 
-        part = await this.GetByHeader(SHEETS.laser, 'Total number of parts needed', this.row);
+        part = await this.GetByHeader(SHEETS.Laser, 'Total number of parts needed', this.row);
         if(part) partcount.push("Part Count:", part.toString());
         else partcount.push("Part Count: ", "None");
 
-        note = await this.GetByHeader(SHEETS.laser, 'Notes', this.row);
+        note = await this.GetByHeader(SHEETS.Laser, 'Notes', this.row);
         if(note) notes.push( "Notes:", note.toString());
         else notes.push("Notes: ", "None");
         break;
-      case SHEETS.fablight.getName():
-        material = await this.GetByHeader(SHEETS.fablight, 'Rough dimensions of your part?', this.row);
+      case SHEETS.Fablight.getName():
+        material = await this.GetByHeader(SHEETS.Fablight, 'Rough dimensions of your part?', this.row);
         if(material) mat.push( "Rough Dimensions:", material.toString());
         else mat.push("Materials: ", "None");
 
-        part = await this.GetByHeader(SHEETS.fablight, 'How many parts do you need?', this.row);
+        part = await this.GetByHeader(SHEETS.Fablight, 'How many parts do you need?', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
         else partcount.push("Part Count: ", "None");
 
-        note = await this.GetByHeader(SHEETS.fablight, 'Notes:', this.row);
+        note = await this.GetByHeader(SHEETS.Fablight, 'Notes:', this.row);
         if(note) notes.push( "Notes:", note.toString());
         else notes.push("Notes: ", "None");
         break;
-      case SHEETS.waterjet.getName():
-        material = await this.GetByHeader(SHEETS.waterjet, 'Rough dimensions of your part', this.row);
+      case SHEETS.Waterjet.getName():
+        material = await this.GetByHeader(SHEETS.Waterjet, 'Rough dimensions of your part', this.row);
         if(material) mat.push( "Rough Dimensions: ", material.toString());
         else mat.push("Materials: ", "None");
 
-        part = await this.GetByHeader(SHEETS.waterjet, 'How many parts do you need?', this.row);
+        part = await this.GetByHeader(SHEETS.Waterjet, 'How many parts do you need?', this.row);
         if(part) partcount.push( "Part Count:", part.toString());
         else partcount.push("Part Count: ", "None");
 
-        note = await this.GetByHeader(SHEETS.waterjet, 'Notes', this.row);
+        note = await this.GetByHeader(SHEETS.Waterjet, 'Notes', this.row);
         if(note) notes.push( "Notes: ", note.toString());
         else notes.push("Notes: ", "None");
         break;
-      case SHEETS.advancedlab.getName():
-        material = await this.GetByHeader(SHEETS.advancedlab, HEADERNAMES.whichPrinter, this.row);
+      case SHEETS.Advancedlab.getName():
+        material = await this.GetByHeader(SHEETS.Advancedlab, HEADERNAMES.whichPrinter, this.row);
         if(material) mat.push( "Which Printer: ", material.toString());
         else mat.push("Materials: ", "None");
 
-        part = await this.GetByHeader(SHEETS.advancedlab, HEADERNAMES.numberOfParts, this.row);
+        part = await this.GetByHeader(SHEETS.Advancedlab, HEADERNAMES.numberOfParts, this.row);
         if(part) partcount.push( "Part Count:", part.toString());
         else partcount.push("Part Count: ", "None");
 
-        note = await this.GetByHeader(SHEETS.advancedlab, HEADERNAMES.otherJobNotes, this.row);
+        note = await this.GetByHeader(SHEETS.Advancedlab, HEADERNAMES.otherJobNotes, this.row);
         if(note) notes.push( "Notes:", note.toString());
         else notes.push("Notes: ", "None");
         break;
@@ -271,8 +271,7 @@ class Ticket
 
 const _testTicket = () => {
   console.time(`TicketGen Time `);
-  const jnum = 20220118033838;
-  const tic = new Ticket({jobnumber : jnum,}).CreateTicket();
+  const tic = new Ticket({ jobnumber : 20220118033838, }).CreateTicket();
   console.info(tic);
   console.timeEnd(`TicketGen Time `);
 }

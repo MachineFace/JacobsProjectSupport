@@ -9,15 +9,15 @@
 class ApprovalFormBuilder
 {
   constructor({
-    name = `Some Name`,
-    jobnumber = 129384712398,
-    cost = 2.50,
+    name : name,
+    jobnumber : jobnumber,
+    cost : cost,
   }) {
-    this.name = name;
-    this.jobnumber = jobnumber;
-    this.cost = cost;
+    this.name = name ? name : `Some Name`;
+    this.jobnumber = jobnumber ? jobnumber : 129384712398;
+    this.cost = cost ? cost : 2.50;
     this.destination = DriveApp.getFoldersByName(`Job Forms`);
-    this.form = FormApp.create("Approval Form");
+    this.form = FormApp.create(`Approval Form`);
     this.CreateApprovalForm();
     this.url;
   }
@@ -99,7 +99,7 @@ class ApprovalFormBuilder
 
 const _testApprovalForm = () => {
   console.time(`FormBuilder Time`);
-  const former = new ApprovalFormBuilder({
+  new ApprovalFormBuilder({
     name : "Dingus",
     jobnumber : 19238712398,
     cost : 50.00,

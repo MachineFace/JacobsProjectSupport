@@ -64,8 +64,8 @@ class Calculate
         data.push([`${sheet.getName()} Turnaround`, this.CalculateAverageTurnaround(sheet)]);
       }
       data.forEach( (entry, index) => {
-        OTHERSHEETS.data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
-        OTHERSHEETS.data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
+        OTHERSHEETS.Data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
+        OTHERSHEETS.Data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
       })
     }
     catch (err) {
@@ -129,7 +129,7 @@ class Calculate
   }
   PrintActiveUsers () {
     const users = this.CountActiveUsers();
-    OTHERSHEETS.data.getRange("C4").setValue(users);
+    OTHERSHEETS.Data.getRange("C4").setValue(users);
   }
 
 
@@ -151,8 +151,8 @@ class Calculate
   PrintSubmissionData () {
     let data = this.CountEachSubmission();
     data.forEach( (entry, index) => {
-      OTHERSHEETS.data.getRange(13 + index , 2, 1, 1).setValue(entry[0]);
-      OTHERSHEETS.data.getRange(13 + index , 3, 1, 1).setValue(entry[1]);
+      OTHERSHEETS.Data.getRange(13 + index , 2, 1, 1).setValue(entry[0]);
+      OTHERSHEETS.Data.getRange(13 + index , 3, 1, 1).setValue(entry[1]);
     })
   }
 
@@ -174,8 +174,8 @@ class Calculate
 
     chop.forEach((pair, index) => {
       this.writer.Info(`${pair[0]} -----> ${pair[1]}`)
-      OTHERSHEETS.data.getRange(106+index,2,1,1).setValue(pair[0])
-      OTHERSHEETS.data.getRange(106+index,3,1,1).setValue(pair[1])
+      OTHERSHEETS.Data.getRange(106+index,2,1,1).setValue(pair[0])
+      OTHERSHEETS.Data.getRange(106+index,3,1,1).setValue(pair[1])
     })
 
     return chop;
@@ -223,7 +223,7 @@ class Calculate
     let items = Object.keys(occurrences).map((key) => occurrences[key]);
     items.sort((first, second) => second - first);
     this.writer.Info(items)
-    items.forEach( (item, index) => OTHERSHEETS.backgrounddata.getRange(2 + index, 22, 1, 1).setValue(item));
+    items.forEach( (item, index) => OTHERSHEETS.Backgrounddata.getRange(2 + index, 22, 1, 1).setValue(item));
   }
 
 
@@ -231,7 +231,7 @@ class Calculate
   CountTypes () {
     let userList = [];
     for(const [name, sheet] of Object.entries(SHEETS)) { 
-      if(sheet.getName() != SHEETS.advancedlab.getName()) {
+      if(sheet.getName() != SHEETS.Advancedlab.getName()) {
         let types = sheet.getRange(3, 24, sheet.getLastRow(), 1).getValues();
         types = [].concat(...types);
         types.forEach( type => {
@@ -241,7 +241,7 @@ class Calculate
         })
       }
     }
-    let adv = SHEETS.advancedlab.getRange(3, 27, SHEETS.advancedlab.getLastRow() -1, 1).getValues();
+    let adv = SHEETS.Advancedlab.getRange(3, 27, SHEETS.Advancedlab.getLastRow() -1, 1).getValues();
     adv = [].concat(...adv);
     adv.forEach(item => userList.push(item));
 
@@ -278,8 +278,8 @@ class Calculate
     nums.forEach(index => missingTypes.splice(index, 1));
     missingTypes.forEach(item => types.push([item, 0]));
     types.forEach( (item, index) => {
-      OTHERSHEETS.data.getRange(45 + index, 2, 1, 1).setValue(item[0]);
-      OTHERSHEETS.data.getRange(45 + index, 3, 1, 1).setValue(item[1]);
+      OTHERSHEETS.Data.getRange(45 + index, 2, 1, 1).setValue(item[0]);
+      OTHERSHEETS.Data.getRange(45 + index, 3, 1, 1).setValue(item[1]);
     })
     return types;
   }
@@ -288,7 +288,7 @@ class Calculate
     let count = {};
     let userList = [];
     for(const [name, sheet] of Object.entries(SHEETS)) {
-      if(sheet.getName() != SHEETS.advancedlab.getName()) {
+      if(sheet.getName() != SHEETS.Advancedlab.getName()) {
         let users = sheet.getRange(3, 11, sheet.getLastRow() -1, 1).getValues();
         users = [].concat(...users);
         users.forEach( user => {
@@ -298,7 +298,7 @@ class Calculate
         })
       } 
     }
-    let adv = SHEETS.advancedlab.getRange(3, 14, SHEETS.advancedlab.getLastRow() -1, 1).getValues();
+    let adv = SHEETS.Advancedlab.getRange(3, 14, SHEETS.Advancedlab.getLastRow() -1, 1).getValues();
     adv = [].concat(...adv);
     adv.forEach(id => {
       if(id !== null || id !== undefined || id !== "" || id !== " " ) {
@@ -326,12 +326,12 @@ class Calculate
     // Match ID with Email
     let output = [];
     chop.forEach(id => {
-      const finder = OTHERSHEETS.approved.createTextFinder(id[0]);
+      const finder = OTHERSHEETS.Approved.createTextFinder(id[0]);
       const search = finder.findNext();
       if (search != null) {
         let index = search.getRow();
         // console.info(`INDEX : ${index}`);
-        let email = OTHERSHEETS.approved.getRange(index, 2, 1, 1).getValue();
+        let email = OTHERSHEETS.Approved.getRange(index, 2, 1, 1).getValue();
         output.push([email, id[1]]);
       }
     })
@@ -372,14 +372,14 @@ class Calculate
   }
   PrintStatistics () {
     const mean = this.CalculateArithmeticMean();
-    OTHERSHEETS.data.getRange(102, 3, 1, 1).setValue(mean);
+    OTHERSHEETS.Data.getRange(102, 3, 1, 1).setValue(mean);
     const stand = this.CalculateStandardDeviation();
-    OTHERSHEETS.data.getRange(103, 3, 1, 1).setValue(stand);
+    OTHERSHEETS.Data.getRange(103, 3, 1, 1).setValue(stand);
   }
 
 
   CountTiers () {
-    let tiers = OTHERSHEETS.approved.getRange(3, 4, OTHERSHEETS.approved.getLastRow() -2, 1).getValues();
+    let tiers = OTHERSHEETS.Approved.getRange(3, 4, OTHERSHEETS.Approved.getLastRow() -2, 1).getValues();
     tiers = [].concat(...tiers);
 
     let occurrences = tiers.reduce( (acc, curr) => {
@@ -397,7 +397,7 @@ class Calculate
   PrintTiers () {
     const tiers = this.CountTiers();
     tiers.forEach( (tier, index) => {
-      OTHERSHEETS.data.getRange(39 + index, 3, 1, 1).setValue(tier[1]);
+      OTHERSHEETS.Data.getRange(39 + index, 3, 1, 1).setValue(tier[1]);
       this.writer.Info(tier.toString())
     });
   }
@@ -439,15 +439,15 @@ class Calculate
       if(status[0] == STATUS.cancelled) cancelled += status[1];
       if(status[0] == STATUS.inProgress) inprogress += status[1];
     })
-    OTHERSHEETS.data.getRange(8, 3, 1, 1).setValue(completed);
-    OTHERSHEETS.data.getRange(9, 3, 1, 1).setValue(cancelled);
-    OTHERSHEETS.data.getRange(10, 3, 1, 1).setValue(inprogress);
+    OTHERSHEETS.Data.getRange(8, 3, 1, 1).setValue(completed);
+    OTHERSHEETS.Data.getRange(9, 3, 1, 1).setValue(cancelled);
+    OTHERSHEETS.Data.getRange(10, 3, 1, 1).setValue(inprogress);
     this.writer.Info(completed.toString());
   }
 
   AdvancedLabCounts () {
 
-    let range = SHEETS.advancedlab.getRange(3, 5, SHEETS.advancedlab.getLastRow() -1, 1).getValues();
+    let range = SHEETS.Advancedlab.getRange(3, 5, SHEETS.Advancedlab.getLastRow() -1, 1).getValues();
     range = [].concat(...range);
     let printers = []
     printers = range.filter(Boolean);
@@ -509,7 +509,7 @@ const _testDist = () => {
   let start = new Date().toDateString();
   let end = new Date(3,10,2020,10,32,42);
   // c.CalculateDuration(start, end);
-  c.CalculateAverageTurnaround(SHEETS.laser)
+  c.CalculateAverageTurnaround(SHEETS.Laser)
 }
 
 

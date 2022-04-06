@@ -5,14 +5,12 @@
  * @required {number} jobnumber
  */
 class QRCodeAndBarcodeGenerator {
-  constructor(
-    {
-      url = 'jps.jacobshall.org/', 
-      jobnumber = +Number.parseFloat(Math.floor(Math.random() * 100000)),
-    }
-  ) {
-    this.url = url;
-    this.jobnumber = jobnumber;
+  constructor({
+    url : url, 
+    jobnumber : jobnumber,
+  }) {
+    this.url = url ? url : `jps.jacobshall.org/`;
+    this.jobnumber = jobnumber ? jobnumber : +Number.parseFloat(Math.floor(Math.random() * 100000));
   }
 
   /**
@@ -35,7 +33,7 @@ class QRCodeAndBarcodeGenerator {
     const responseCode = html.getResponseCode();
     console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
-      let qrBlob = Utilities.newBlob(html.getContent()).setName('QRCode' + this.jobnumber );
+      let qrBlob = Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
       qrCode = await DriveApp.createFile( qrBlob );
       qrCode.setTrashed(true);
       console.info(qrCode);
@@ -76,7 +74,7 @@ class QRCodeAndBarcodeGenerator {
     const responseCode = html.getResponseCode();
     console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
-      let barcodeBlob = Utilities.newBlob(html.getContent()).setName(`Barcode : ${this.jobnumber}`) ;
+      let barcodeBlob = Utilities.newBlob(html.getContent()).setName(`Barcode-${this.jobnumber}`) ;
       barcode = await DriveApp.createFile( barcodeBlob );
       barcode.setTrashed(true);
       return barcode;
@@ -113,7 +111,7 @@ class QRCodeAndBarcodeGenerator {
     const responseCode = res.getResponseCode();
     console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200) {
-      barcode = await DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      barcode = await DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode-${this.jobnumber}`) );
       barcode.setTrashed(true);
     } 
     else console.error('Failed to GET Barcode');
@@ -129,7 +127,7 @@ class QRCodeAndBarcodeGenerator {
  * Searches for job number found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
  */
 const PickupByBarcode = () => {
-  const searchUISheet = SpreadsheetApp.getActive().getSheetByName('Pickup');
+  const searchUISheet = OTHERSHEETS.Pickup;
   const jobnumber = searchUISheet.getRange(3,2).getValue();
   let progress = searchUISheet.getRange(4,2);
 
@@ -138,23 +136,20 @@ const PickupByBarcode = () => {
     progress.setValue(`No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
     return;
   }
-
-  for (const [key, value] of Object.entries(SHEETS)) {
-    const searchSheet = SHEETS[key];
-    const textFinder = searchSheet.createTextFinder(jobnumber);
+  Object.values(SHEETS).forEach(sheet => {
+    const textFinder = sheet.createTextFinder(jobnumber);
     const searchFind = textFinder.findNext();
     if (searchFind != null) {
-      searchRow = searchFind.getRow();
-      
-      SetByHeader(searchSheet, HEADERNAMES.status, searchRow, STATUS.pickedUp);
-      progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
-      console.info(`Job number ${jobnumber} marked as picked up. Sheet: ${searchSheet.getSheetName()} row: ${searchRow}`);
+      let searchRow = searchFind.getRow();
+      SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.pickedUp);
+      progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+      console.info(`Job number ${jobnumber} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();
       //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
       return;
     }
-  }
-  progress.setValue('Job number not found. Try again.');
+  });
+  progress.setValue(`Job number not found. Try again.`);
 } 
 
 

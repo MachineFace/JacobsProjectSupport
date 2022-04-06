@@ -69,7 +69,7 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Calc Average Turnaround`, (t) => {
-    const x = calc.CalculateAverageTurnaround(SHEETS.ultimaker);
+    const x = calc.CalculateAverageTurnaround(SHEETS.Ultimaker);
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
@@ -172,7 +172,7 @@ const _gastTestRunner = async () => {
   })
 
   await test(`JobNumber`, (t) => {
-    const x = new JobNumberGenerator(new Date()).jobnumber;
+    const x = new JobNumberGenerator({ date : new Date() }).jobnumber;
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })

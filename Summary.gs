@@ -105,7 +105,7 @@ class SummaryBuilder
    * This generates a summary email to all the Design Specialists (triggered daily at 6am)
    */
   async CreateSummaryEmail () {
-    let dataRange = OTHERSHEETS.summary.getRange(1, 1, OTHERSHEETS.summary.getLastRow(), 22).getValues();
+    let dataRange = OTHERSHEETS.Summary.getRange(1, 1, OTHERSHEETS.Summary.getLastRow(), 22).getValues();
 
     let items = await this._GetData(dataRange);
     let htmlBodyText = await this._GetEmailHtml(items);

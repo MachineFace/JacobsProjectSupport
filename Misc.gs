@@ -65,7 +65,7 @@ const FindByJobNumber = (jobnumber) => {
  * @param {number} RetentionPeriod
  */
 const DeleteOldFiles = () => {
-  const folder = DriveApp.getFoldersByName("Job Forms");
+  const folder = DriveApp.getFoldersByName(`Job Forms`);
   const processFolder = (folder) => {
     var files = folder.getFiles();
     while (files.hasNext()) {
@@ -173,32 +173,32 @@ const materials = (index, quantity, name, url) => {
  */
 const CreateTimeDrivenTrigger = () => {
   // Trigger every 6 hours.
-  //ScriptApp.newTrigger('myFunction').timeBased().everyHours(6).create();
+  // ScriptApp.newTrigger('myFunction').timeBased().everyHours(6).create();
 
-  var timetoEmail = 6;
-  // Trigger summary email to every DS every Weekday at 07:00.
+  const timetoEmail = 6; // Trigger summary email to every DS every Weekday at 07:00.
+  const triggerName = `CreateSummaryEmail`;
   try {
-    ScriptApp.newTrigger("CreateSummaryEmail")
+    ScriptApp.newTrigger(triggerName)
       .timeBased()
       .onWeekDay(ScriptApp.WeekDay.MONDAY)
       .atHour(timetoEmail)
       .create();
-    ScriptApp.newTrigger("CreateSummaryEmail")
+    ScriptApp.newTrigger(triggerName)
       .timeBased()
       .onWeekDay(ScriptApp.WeekDay.TUESDAY)
       .atHour(timetoEmail)
       .create();
-    ScriptApp.newTrigger("CreateSummaryEmail")
+    ScriptApp.newTrigger(triggerName)
       .timeBased()
       .onWeekDay(ScriptApp.WeekDay.WEDNESDAY)
       .atHour(timetoEmail)
       .create();
-    ScriptApp.newTrigger("CreateSummaryEmail")
+    ScriptApp.newTrigger(triggerName)
       .timeBased()
       .onWeekDay(ScriptApp.WeekDay.THURSDAY)
       .atHour(timetoEmail)
       .create();
-    ScriptApp.newTrigger("CreateSummaryEmail")
+    ScriptApp.newTrigger(triggerName)
       .timeBased()
       .onWeekDay(ScriptApp.WeekDay.FRIDAY)
       .atHour(timetoEmail)
@@ -219,9 +219,9 @@ const RemoveTimedTriggers = () => {
   try {
     triggers.forEach( trigger => {
       if (trigger.getEventType() == ScriptApp.EventType.ON_EDIT)
-        console.info(`OnEdit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+        console.info(`OnEdit Trigger : ${trigger.getUniqueId()}`); // KEEP THIS TRIGGER
       if (trigger.getEventType() == ScriptApp.EventType.ON_FORM_SUBMIT)
-        console.info(`OnFormSubmit Trigger : ${trigger.getUniqueId()}`); //KEEP THIS TRIGGER
+        console.info(`OnFormSubmit Trigger : ${trigger.getUniqueId()}`); // KEEP THIS TRIGGER
       if (trigger.getEventType() == ScriptApp.EventType.CLOCK) {
         console.info(`TimeBased Trigger : ${trigger.getUniqueId()}`);
         ScriptApp.deleteTrigger(trigger);
@@ -337,7 +337,6 @@ Array.prototype.findIndex = (search) => {
   return -1;
 };
 
-
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Test if value is a date and return true or false
@@ -349,50 +348,12 @@ const isValidDate = (d) => {
   return !isNaN(d.getTime());
 };
 
-
 /**
- *
- * Test Async
+ * Convert Datetime to Date
+ * @param {date} d
+ * @return {date} date
  */
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Calculate Turnaround Time
- * @param {time} start
- * @param {time} end
- * @returns {duration} formatted time
- */
-const TimeDiff = (start, end) => {
-  try {
-    end = end ? end : new Date(); //if supplied with nothing, set end time to now
-    start = start ? start : new Date(end - 87000000); //if supplied with nothing, set start time to now minus 24 hours.
-
-    let timeDiff = Math.abs((end - start) / 1000); //Milliseconds to sec
-
-    let secs = Math.floor(timeDiff % 60); //Calc seconds
-    timeDiff = Math.floor(timeDiff / 60); //Difference seconds to minutes
-    let secondsAsString = secs < 10 ? "0" + secs : secs + ""; //Pad with a zero
-
-    let mins = timeDiff % 60; //Calc mins
-    timeDiff = Math.floor(timeDiff / 60); //Difference mins to hrs
-    let minutesAsString = mins < 10 ? "0" + mins : mins + ""; //Pad with a zero
-
-    let hrs = timeDiff % 24; //Calc hrs
-    timeDiff = Math.floor(timeDiff / 24); //Difference hrs to days
-    let days = timeDiff;
-
-    //Write
-    let formatted =
-      days + " " + hrs + ":" + minutesAsString + ":" + secondsAsString;
-    console.info("Duration = " + formatted);
-
-    return new Promise((resolve) => {
-      resolve(formatted);
-      console.info(formatted);
-    });
-  } catch (err) {
-    console.error(`${err} : Calculating the duration has failed for some reason.`);
-  }
-};
+const datetimeToDate = (d) => new Date(d.getYear(), d.getMonth(), d.getDate());
 
 
 
@@ -409,7 +370,7 @@ const CheckMissingAccessStudents = () => {
       values.forEach( row => {
         let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.email, row);
         let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.sid, row)
-        const p = new Priority({email : email, side: sid});
+        const p = new Priority({email : email, sid : sid});
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p.priority}`);
         if(p.priority != `STUDENT NOT FOUND!`) {
           list.push(email);
@@ -440,12 +401,15 @@ const CheckSheetIsForbidden = (someSheet) => {
     return true;
   }
 }
-
-
-
-const datetimeToDate = (d) => {
-  return new Date(d.getYear(), d.getMonth(), d.getDate());
+const _testSheetChecker = () => {
+  const val = CheckSheetIsForbidden(OTHERSHEETS.Logger);
+  console.info(`Logger Should be true-forbidden : ${val}`);
+  const val2 = CheckSheetIsForbidden(SHEETS.Fablight);
+  console.info(`Fablight Should be false-not_forbidden: ${val2}`);
+  const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
+  console.info(`Store Should be true-forbidden: ${val3}`);
 }
+
 
 const FindMissingElementsInArrays = (array1, array2) => {
   let indexes = [];
@@ -465,67 +429,67 @@ const FindMissingElementsInArrays = (array1, array2) => {
  */
 class JobNumberGenerator
 {
-  constructor(date){
+  constructor({
+    date : date,
+  }){
     this.date = date ? new Date(date) : new Date();
     this.jobnumber;
     this.Create();
   }
 
   Create() {
-    let testedDate = this.IsValidDate();
     try {
-      if ( this.date == undefined || this.date == null || this.date == "" || testedDate == false ) {
-        this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
+      if (!this.IsValidDate()) this.jobnumber = this.FormatDateAsJobnumber(new Date());
+      else if (!this.date || !this.IsValidDate()) {
+        this.jobnumber = this.FormatDateAsJobnumber(new Date());
         console.warn(`Set Jobnumber to a new time because timestamp was missing.`);
+        return this.jobnumber;
       } else {
-        this.jobnumber = +Utilities.formatDate(this.date, `PST`, `yyyyMMddhhmmss`);
+        this.jobnumber = this.FormatDateAsJobnumber(this.date);
         console.info(`Input time: ${this.date}, Set Jobnumber: ${this.jobnumber}`);
+        return this.jobnumber;
       }
     } catch (err) {
       console.error(`${err} : Couldn't fix jobnumber.`);
-    }
-    if (this.jobnumber == undefined || testedDate == false) {
-      this.jobnumber = +Utilities.formatDate(new Date(), `PST`, `yyyyMMddHHmmss`);
     }
     console.info(`Returned Job Number : ${this.jobnumber}`);
     return this.jobnumber.toString();
   };
 
-  Format() {
+  FormatDate() {
     return new Date(this.date.getYear(), this.date.getMonth(), this.date.getDate() -1);
+  }
+
+  FormatDateAsJobnumber (date) {
+    return +Utilities.formatDate(date, `PST`, `yyyyMMddHHmmss`)
   }
 
   IsValidDate() {
     if (Object.prototype.toString.call(this.date) !== "[object Date]") return false;
-    return !isNaN(this.date.getTime());
+    else return !isNaN(this.date.getTime());
   };
 }
 
 const _testJobNumberGen = () => {
-  const num = new JobNumberGenerator(new Date(2015, 10, 3));
-  console.info(num.jobnumber.toString());
+  const jobnumbertypes = {
+    GoodDate : new Date(2015, 10, 3),
+    BadDate : `20200505`,
+  }
+  Object.values(jobnumbertypes).forEach(date => {
+    const num = new JobNumberGenerator({ date : date });
+    console.info(num.jobnumber.toString());
+  })
 }
 
-const _testSheetChecker = () => {
-  const val = CheckSheetIsForbidden(OTHERSHEETS.logger);
-  console.info(`Logger Should be true-forbidden : ${val}`);
-  const val2 = CheckSheetIsForbidden(SHEETS.fablight);
-  console.info(`Fablight Should be false-not_forbidden: ${val2}`);
-  const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
-  console.info(`Store Should be true-forbidden: ${val3}`);
-
-}
 
 
 const GetAllProjectNames = () => {
-  let names = []
-  for(const [key, sheet] of Object.entries(SHEETS)) {
-    let titles = GetColumnDataByHeader(sheet, HEADERNAMES.projectName);
-    titles = [].concat(...titles);
+  let names = {}
+  Object.values(SHEETS).forEach(sheet => {
+    titles = [].concat(...GetColumnDataByHeader(sheet, HEADERNAMES.projectName));
     let culled = titles.filter(Boolean);
-    names.push(culled);
-  }
-  names = [].concat(...names);
+    names[sheet.getName()] = [...new Set(culled)];
+  });
   console.info(names);
   return names;
 }
@@ -536,156 +500,9 @@ const GetAllProjectNames = () => {
 
 
 
-const CountTotalEmailsSent = async () => {
-  let count = 0;
-  try {
-    let pageToken;
-    do {
-      const threadList = Gmail.Users.Threads.list('me', {
-        q: `label:Jacobs Project Support/JPS Notifications`,
-        pageToken: pageToken
-      });
-      count += threadList.threads.length;
-      // if (threadList.threads && threadList.threads.length > 0) {
-      //   threadList.threads.forEach(thread => {
-      //     console.info(`Snip: ${thread.snippet}`);
-      //   });
-      // }
-      pageToken = threadList.nextPageToken;
-    } while (pageToken);
-  } catch (err) {
-    console.error(`Whoops ----> ${err}`);
-  }
-  console.warn(`Total Emails Sent : ${count}`);
-  return count;
-}
 
 
-/**
- * Lists, for each thread in the user's Inbox, a
- * snippet associated with that thread.
- */
-const ListInboxSnippets = () => {
-  try {
-    let pageToken;
-    do {
-      const threadList = Gmail.Users.Threads.list('me', {
-        q: `label:inbox`,
-        pageToken: pageToken
-      });
-      if (threadList.threads && threadList.threads.length > 0) {
-        threadList.threads.forEach(thread => {
-          console.info(`Snip: ${thread.snippet}`);
-        });
-      }
-      pageToken = threadList.nextPageToken;
-    } while (pageToken);
-  } catch (err) {
-    console.error(`Whoops ----> ${err}`);
-  }
-}
 
-
-/**
- * Seeker Class to Search for Terms
- */
-class Seeker
-{
-  constructor({value = "",}) {
-    this.value = value;
-  }
-  Search () {
-    if (this.value) this.value.toString().replace(/\s+/g, "");
-    let res = {};
-    Object.values(SHEETS).forEach(sheet => {
-      const finder = sheet.createTextFinder(this.value).findAll();
-      if (finder != null) {
-        let temp = [];
-        finder.forEach(result => temp.push(result.getRow()));
-        res[sheet.getName()] = temp;
-      }
-    });
-    console.info(JSON.stringify(res));
-    return res;
-  }
-  SearchSpecificSheet (sheet) {
-    if (this.value) this.value.toString().replace(/\s+/g, "");
-
-    const finder = sheet.createTextFinder(this.value).findNext();
-    if (finder != null) {
-      return finder.getRow();
-    } else return false;
-  }
-  SearchByJobNumber (jobnumber) {
-    // jobnumber = 20211025144607;  // test good jnum
-    if (jobnumber) jobnumber.toString().replace(/\s+/g, "");
-    let res = {};
-    Object.values(SHEETS).forEach(sheet => {
-      const finder = sheet.createTextFinder(jobnumber).findNext();
-      if (finder != null) {
-        res[sheet.getName()] = finder.getRow();
-      }
-    });
-
-    console.info(JSON.stringify(res));
-    return res;
-  }
-  SearchInColumn (sheet, column, data) {
-    let indexes = [];
-    let values = sheet.getRange(column + ":" + column).getValues(); // like A:A
-    let row = 2;
-
-    while (values[row] && values[row][0] !== data) row++;
-    if (values[row][0] === data) indexes.push(row + 1);
-    else return -1;
-    return indexes;
-  };
-  SearchInRow (sheet, data) {
-    let indexes = [];
-    let rows = sheet.getDataRange.getValues();
-
-    // Loop through all the rows and return a matching index
-    for (let r = 1; r < rows.length; r++) {
-      let index = rows[r].indexOf(data) + 1;
-      indexes.push(index);
-    }
-    return indexes;
-  };
-  SearchByHeader (sheet, columnName, row) {
-    try {
-      let data = sheet.getDataRange().getValues();
-      let col = data[0].indexOf(columnName);
-      if (col != -1) return data[row - 1][col];
-    } catch (err) {
-      console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
-    }
-  };
-  GetColumnDataByHeader (sheet, columnName) {
-    try {
-      const data = sheet.getDataRange().getValues();
-      const col = data[0].indexOf(columnName);
-      let colData = data.map(d => d[col]);
-      colData.splice(0, 1);
-      if (col != -1) return colData;
-    } catch (err) {
-      console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
-    }
-  };
-  SetByHeader (sheet, columnName, row, val) {
-    try {
-      const data = sheet.getDataRange().getValues();
-      const col = data[0].indexOf(columnName) + 1;
-      sheet.getRange(row, col).setValue(val);
-    } catch (err) {
-      console.error(`${err} : SetByHeader failed - Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
-    }
-  };
-}
-
-const _testSeeker = () => {
-  const seeker = new Seeker({value : "Project",}).SearchSpecificSheet(SHEETS.laser);
-  console.info(seeker);
-}
 
 
 

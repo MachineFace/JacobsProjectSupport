@@ -7,15 +7,15 @@
 class DesignSpecialist
 {
   constructor({
-    name = `DS`, 
-    fullname = `Design Specialist`, 
-    email = `jacobsprojectsupport@berkeley.edu`
+    name : name, 
+    fullname : fullname, 
+    email : email,
   }) {
-    this.name = name;
-    this.fullname = fullname;
-    this.email = email;
-    this.link = '<a href = "' + this.email + '">' + this.email + '</a>';
-    this.type = 'Design Specialist';
+    this.name = name ? name : `DS`;
+    this.fullname = fullname ? fullname : `Design Specialist`;
+    this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
+    this.link = `<a href = "${this.email}">${this.email}</a>`;
+    this.type = `Design Specialist`;
     this.isAdmin = true;
     this.shortCode = `DS`;
   }
@@ -43,16 +43,16 @@ class DesignSpecialist
 class StudentSupervisor extends DesignSpecialist
 {
   constructor({
-    name = `SS`, 
-    fullname = `Student Supervisor`, 
-    email = `jacobsprojectsupport@berkeley.edu`
+    name : name, 
+    fullname : fullname, 
+    email : email,
   }) {
     // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
     super(name, fullname, email);
-    this.name = name;
-    this.fullname = fullname;
-    this.email = email;
-    this.link = '<a href = "' + this.email + '">' + this.email + '</a>';
+    this.name = name ? name : `SS`;
+    this.fullname = fullname ? fullname : `Student Supervisor`;
+    this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
+    this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = 'Student Supervisor';
     this.isAdmin = false;
     this.shortCode = `SS`;
@@ -80,16 +80,16 @@ class StudentSupervisor extends DesignSpecialist
 class Manager extends DesignSpecialist 
 { 
   constructor({
-    name = `MA`, 
-    fullname = `Manager`, 
-    email = `jacobsprojectsupport@berkeley.edu`
+    name : name, 
+    fullname : fullname, 
+    email : email,
   }) 
   {
     super(name, fullname, email);
-    this.name = name;
-    this.fullname = fullname;
-    this.email = email;
-    this.link = '<a href = "' + this.email + '">' + this.email + '</a>';
+    this.name = name ? name : `MA`;
+    this.fullname = fullname ? fullname : `Manager`;
+    this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
+    this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = 'Manager';
     this.isAdmin = true;
     this.shortCode = `MA`;
@@ -116,7 +116,7 @@ class Manager extends DesignSpecialist
  * Return Staff Email as a string.
  */
 const StaffEmailAsString = () => {
-  let emaillist = OTHERSHEETS.staff.getRange(2, 3, OTHERSHEETS.staff.getLastRow() - 1, 1).getValues();
+  let emaillist = OTHERSHEETS.Staff.getRange(2, 3, OTHERSHEETS.Staff.getLastRow() - 1, 1).getValues();
   return emaillist.toString();
 }
 
@@ -129,7 +129,7 @@ const StaffEmailAsString = () => {
  * @returns {string} fullname, email, or email link
  */
 const InvokeDS = (name, property) => {
-  let staff = OTHERSHEETS.staff.getRange(2, 1, OTHERSHEETS.staff.getLastRow(), 4).getValues();
+  let staff = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow(), 4).getValues();
 
   for (let i in staff) {
     let _name = staff[i][0];
@@ -163,7 +163,7 @@ const MakeLink = (email) => `<a href = "${email}">${email}</a>`;
  */
 const CreateDS = () => {
   let staff = [];
-  let range = OTHERSHEETS.staff.getRange(2, 1, OTHERSHEETS.staff.getLastRow() - 1, 5).getValues();
+  let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
   let culled = range.filter(Boolean);
 
   culled.forEach( row => {
@@ -175,7 +175,7 @@ const CreateDS = () => {
     // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
     if(email && !link) {
       link = MakeLink(email);
-      OTHERSHEETS.staff.getRange(OTHERSHEETS.staff.getLastRow() - 1, 4).setValue(link);
+      OTHERSHEETS.Staff.getRange(OTHERSHEETS.Staff.getLastRow() - 1, 4).setValue(link);
     }
     if(type == "DS") {
       let ds = new DesignSpecialist({name : name, fullname : fullname, email : email});

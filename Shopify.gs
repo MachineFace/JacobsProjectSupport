@@ -6,36 +6,36 @@
 class ShopifyAPI 
 {
   constructor({
-    jobnumber = 202010011925,
-    email = "jacobsinstitutestore@gmail.com",
-    material1Name = "None",
-    material1Quantity = 0,
-    material2Name = "None",
-    material2Quantity = 0,
-    material3Name = "None",
-    material3Quantity = 0,
-    material4Name = "None",
-    material4Quantity = 0,
-    material5Name = "None",
-    material5Quantity = 0,
+    jobnumber : jobnumber,
+    email : email,
+    material1Name : material1Name,
+    material1Quantity : material1Quantity,
+    material2Name : material2Name,
+    material2Quantity : material2Quantity,
+    material3Name : material3Name,
+    material3Quantity : material3Quantity,
+    material4Name : material4Name,
+    material4Quantity : material4Quantity,
+    material5Name : material5Name,
+    material5Quantity : material5Quantity,
   }){
-    this.jobnumber = jobnumber;
     this.root = 'https://jacobs-student-store.myshopify.com/admin/api/2021-10/';
     this.api_key = '1e70652225e070b078def8bf6e154e98';
     this.api_pass = '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';
-    this.email = email;
     this.writer = new WriteLogger();
 
-    this.material1Name = material1Name;
-    this.material1Quantity = material1Quantity;
-    this.material2Name = material2Name;
-    this.material2Quantity = material2Quantity;
-    this.material3Name = material3Name;
-    this.material3Quantity = material3Quantity;
-    this.material4Name = material4Name;
-    this.material4Quantity = material4Quantity;
-    this.material5Name = material5Name;
-    this.material5Quantity = material5Quantity;
+    this.jobnumber = jobnumber ? jobnumber : 202010011925;
+    this.email = email ? email : `jacobsinstitutestore@gmail.com`;
+    this.material1Name = material1Name ? material1Name : `None`;
+    this.material1Quantity = material1Quantity ? material1Quantity : 0;
+    this.material2Name = material2Name ? material2Name : `None`;
+    this.material2Quantity = material2Quantity ? material2Quantity : 0;
+    this.material3Name = material3Name ? material3Name : `None`;
+    this.material3Quantity = material3Quantity ? material3Quantity : 0;
+    this.material4Name = material4Name ? material4Name : `None`;
+    this.material4Quantity = material4Quantity ? material4Quantity : 0;
+    this.material5Name = material5Name ? material5Name : `None`;
+    this.material5Quantity = material5Quantity ? material5Quantity : 0;
     this.customer;
     this.customerID;
     this.pack = this._PackageMaterials();
