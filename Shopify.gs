@@ -46,7 +46,7 @@ class ShopifyAPI
    * ----------------------------------------------------------------------------------------------------------------
    * Get Info from sheet by looking up Jobnumber
    */
-  GetInfo() {
+  _SetInfo() {
     for(const [key, sheet] of Object.entries(SHEETS)) {
       const finder = sheet.createTextFinder(this.jobnumber).findNext();
       if (finder != null) {
@@ -55,20 +55,20 @@ class ShopifyAPI
         this.sheetName = sheet.getName();
       }
     }
-    this.designspecialist = this.GetByHeader(this.sheet, HEADERNAMES.ds, this.row);
-    this.email = this.GetByHeader(this.sheet, HEADERNAMES.email, this.row);
-    this.name = this.GetByHeader(this.sheet, HEADERNAMES.name, this.row);
-    this.projectname = this.GetByHeader(this.sheet, HEADERNAMES.projectName, this.row);
-    this.material1Name = this.GetByHeader(this.sheet, HEADERNAMES.mat1, this.row);
-    this.material1Quantity = this.GetByHeader(this.sheet, HEADERNAMES.mat1quantity, this.row);
-    this.material2Name = this.GetByHeader(this.sheet, HEADERNAMES.mat2, this.row);
-    this.material2Quantity = this.GetByHeader(this.sheet, HEADERNAMES.mat2quantity, this.row);
-    this.material3Name = this.GetByHeader(this.sheet, HEADERNAMES.mat3, this.row);
-    this.material3Quantity = this.GetByHeader(this.sheet, HEADERNAMES.mat3quantity, this.row);
-    this.material4Name = this.GetByHeader(this.sheet, HEADERNAMES.mat4, this.row);
-    this.material4Quantity = this.GetByHeader(this.sheet, HEADERNAMES.mat4quantity, this.row);
-    this.material5Name = this.GetByHeader(this.sheet, HEADERNAMES.mat5, this.row);
-    this.material5Quantity = this.GetByHeader(this.sheet, HEADERNAMES.mat5quantity, this.row);
+    this.designspecialist = this._GetByHeader(this.sheet, HEADERNAMES.ds, this.row);
+    this.email = this._GetByHeader(this.sheet, HEADERNAMES.email, this.row);
+    this.name = this._GetByHeader(this.sheet, HEADERNAMES.name, this.row);
+    this.projectname = this._GetByHeader(this.sheet, HEADERNAMES.projectName, this.row);
+    this.material1Name = this._GetByHeader(this.sheet, HEADERNAMES.mat1, this.row);
+    this.material1Quantity = this._GetByHeader(this.sheet, HEADERNAMES.mat1quantity, this.row);
+    this.material2Name = this._GetByHeader(this.sheet, HEADERNAMES.mat2, this.row);
+    this.material2Quantity = this._GetByHeader(this.sheet, HEADERNAMES.mat2quantity, this.row);
+    this.material3Name = this._GetByHeader(this.sheet, HEADERNAMES.mat3, this.row);
+    this.material3Quantity = this._GetByHeader(this.sheet, HEADERNAMES.mat3quantity, this.row);
+    this.material4Name = this._GetByHeader(this.sheet, HEADERNAMES.mat4, this.row);
+    this.material4Quantity = this._GetByHeader(this.sheet, HEADERNAMES.mat4quantity, this.row);
+    this.material5Name = this._GetByHeader(this.sheet, HEADERNAMES.mat5, this.row);
+    this.material5Quantity = this._GetByHeader(this.sheet, HEADERNAMES.mat5quantity, this.row);
   }
 
   /**
@@ -78,7 +78,7 @@ class ShopifyAPI
    * @param {string} column name
    * @param {int} row
    */
-  GetByHeader (sheet, colName, row) {
+  _GetByHeader (sheet, colName, row) {
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(colName);
     if (col != -1) {
@@ -97,7 +97,7 @@ class ShopifyAPI
     if(!material) return;
     else {
       let productID;
-      for (const [key, sheet] of Object.entries(STORESHEETS)) {
+      Object.values(STORESHEETS).forEach(sheet => {
         const find = SearchSpecificSheet(sheet, material);
         if(find !== false) {
           let index = find;
@@ -109,7 +109,7 @@ class ShopifyAPI
           // out["link"] = link;
           // out["price"] = price;
         }
-      } 
+      })
       return productID.toString();
     }
   }
