@@ -38,7 +38,7 @@ const _gastTestRunner = async () => {
 
   await test(`Generate Barcode: `, async(t) => {
     const jobnumber = `20210301140515`;
-    const qgen = new QRCodeAndBarcodeGenerator({jobnumber : jobnumber});
+    const qgen = new BarcodeGenerator({jobnumber : jobnumber});
     const x = await qgen.GenerateBarCode();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
@@ -47,8 +47,8 @@ const _gastTestRunner = async () => {
   await test(`Generate QRCode: `, async(t) => {
     const jobnumber = `20210301140515`;
     const url = `http://www.codyglen.com/`;
-    const qgen = new QRCodeAndBarcodeGenerator({url : url, jobnumber : jobnumber});
-    const x = await qgen.GenerateQRCode();
+    const qgen = new QRCodeGenerator({url : url,});
+    const x = await qgen;
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })

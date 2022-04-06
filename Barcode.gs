@@ -1,47 +1,16 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Creating a Barcode and QR Code
- * @required {string} url
+ * Class for Creating a Barcode
  * @required {number} jobnumber
  */
-class QRCodeAndBarcodeGenerator {
+class BarcodeGenerator {
   constructor({
-    url : url, 
     jobnumber : jobnumber,
   }) {
-    this.url = url ? url : `jps.jacobshall.org/`;
-    this.jobnumber = jobnumber ? jobnumber : +Number.parseFloat(Math.floor(Math.random() * 100000));
-  }
-
-  /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Generate QR Code
-   */
-  async GenerateQRCode(){
-    console.info(`QRCode URL : ${this.url} For ---> Jobnumber : ${this.jobnumber}`);
-    const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
-    const params = {
-      "method" : "GET",
-      "headers" : { "Authorization" : "Basic" },
-      "contentType" : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true
-    };
-
-    let qrCode;
-    const html = UrlFetchApp.fetch(loc, params);
-    const responseCode = html.getResponseCode();
-    console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      let qrBlob = Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
-      qrCode = await DriveApp.createFile( qrBlob );
-      qrCode.setTrashed(true);
-      console.info(qrCode);
-      return qrCode;
-    } else {
-      console.error('Failed to GET QRCode');
-      return false;
-    }
+    this.jobnumber = jobnumber ? jobnumber : new JobNumberGenerator().jobnumber;
+    this.GenerateBarCodeForTicketHeader();
+    this.url;
+    this.blob;
   }
 
   /**
@@ -58,7 +27,7 @@ class QRCodeAndBarcodeGenerator {
     const postfx = '&includetext';
 
     //let barcodeLoc = 'http://bwipjs-api.metafloor.com/?bcid=code128&text=1234567890&includetext';  //KNOWN WORKING LOCATION
-    const barcodeLoc = root + type + ts + this.jobnumber + scale +postfx;
+    const barcodeLoc = root + type + ts + this.jobnumber + scale + postfx;
 
     const params = {
       "method" : "GET",
@@ -70,19 +39,19 @@ class QRCodeAndBarcodeGenerator {
     
     let barcode;
 
-    const html = UrlFetchApp.fetch(barcodeLoc, params);
+    const html = await UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = html.getResponseCode();
     console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
-      let barcodeBlob = Utilities.newBlob(html.getContent()).setName(`Barcode-${this.jobnumber}`) ;
-      barcode = await DriveApp.createFile( barcodeBlob );
-      barcode.setTrashed(true);
+      this.blob = Utilities.newBlob(html.getContent()).setName(`Barcode-${this.jobnumber}`) ;
+      barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
+      this.url = barcode.getUrl();
+      console.info(`Barcode ---> ${this.url}`);
       return barcode;
     } else {
       console.error('Failed to GET Barcode');
       return false;
     }
-
 
   }
 
@@ -107,15 +76,63 @@ class QRCodeAndBarcodeGenerator {
     
     let barcode;
 
-    const res = UrlFetchApp.fetch(barcodeLoc, params);
+    const res = await UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = res.getResponseCode();
     console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200) {
-      barcode = await DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode-${this.jobnumber}`) );
-      barcode.setTrashed(true);
+      this.blob = Utilities.newBlob(res.getContent()).setName(`Barcode-${this.jobnumber}`)
+      barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
+      this.url = barcode.getUrl();
+      console.info(`Barcode ---> ${this.url}`);
+      return barcode;
     } 
-    else console.error('Failed to GET Barcode');
-    return barcode;
+    else {
+      console.error('Failed to GET Barcode');
+      return false;
+    }
+  }
+  
+}
+
+/**
+ * QR Code Generator
+ * @required {string} url
+ */
+class QRCodeGenerator {
+  constructor({ url : url, }) {
+    this.url = url ? url : `jps.jacobshall.org/`;
+    this.GenerateQRCode();
+    this.blob;
+  }
+
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * Generate QR Code
+   */
+  async GenerateQRCode(){
+    console.info(`QRCode URL : ${this.url}`);
+    const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
+    const params = {
+      "method" : "GET",
+      "headers" : { "Authorization" : "Basic" },
+      "contentType" : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : true
+    };
+
+    let qrCode;
+    const html = await UrlFetchApp.fetch(loc, params);
+    const responseCode = html.getResponseCode();
+    console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    if (responseCode == 200 || responseCode == 201) {
+      this.blob = Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
+      qrCode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
+      console.info(`QR CODE ---> ${qrCode.getUrl()}`);
+      return qrCode;
+    } else {
+      console.error('Failed to GET QRCode');
+      return false;
+    }
   }
   
 }
@@ -127,9 +144,8 @@ class QRCodeAndBarcodeGenerator {
  * Searches for job number found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
  */
 const PickupByBarcode = () => {
-  const searchUISheet = OTHERSHEETS.Pickup;
-  const jobnumber = searchUISheet.getRange(3,2).getValue();
-  let progress = searchUISheet.getRange(4,2);
+  const jobnumber = OTHERSHEETS.Pickup.getRange(3,2).getValue();
+  let progress = OTHERSHEETS.Pickup.getRange(4,2);
 
   progress.setValue(`Searching for job number...`);
   if (jobnumber == null || jobnumber == "") {
@@ -154,9 +170,10 @@ const PickupByBarcode = () => {
 
 
 const _testQRCode = () => {
-  const q = new QRCodeAndBarcodeGenerator({url: `https://www.codyglen.com/`, jobnumber: 0101010101});
-  const qr = q.GenerateQRCode();
-  console.info(qr)
+  const b = new BarcodeGenerator({ jobnumber: 0101010101 });
+  console.info(b);
+  const q = new QRCodeGenerator({ url : `https://www.codyglen.com/`, });
+  console.info(q)
 }
 
 

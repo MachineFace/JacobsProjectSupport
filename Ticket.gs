@@ -9,27 +9,27 @@ class Ticket
     jobnumber : jobnumber,
   }){
     this.jobnumber = jobnumber ? jobnumber : 202010010101;
-    this.designspecialist;
-    this.submissiontime;
-    this.name;
-    this.email;
-    this.projectname;
-    this.material1Name;
-    this.material1Quantity;
-    this.material2Name;
-    this.material2Quantity;
-    this.sheetName;
-    this.sheet;
-    this.row;
+    this.designspecialist = `Staff`;
+    this.submissiontime = new Date();
+    this.name = `Unknown`;
+    this.email = `Unknown`;
+    this.projectname = `Unknown`;
+    this.material1Name = `Unknown`;
+    this.material1Quantity = 0;
+    this.material2Name = `Unknown`;
+    this.material2Quantity = 0;
+    this.sheetName = SHEETS.Laser.getSheetName();
+    this.sheet = SHEETS.Laser;
+    this.row = 2;
     this.doc;
-    this.url;
+    this.url = ``;
   }
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
-   * Get Info by Looking up JobNumber
+   * Set Info by Looking up JobNumber
    */
-  GetInfo() {
+  SetInfo() {
     for(const [key, sheet] of Object.entries(SHEETS)) {
       const finder = sheet.createTextFinder(this.jobnumber).findNext();
       if (finder != null) {
@@ -67,16 +67,16 @@ class Ticket
    * Create Ticket MAIN
    */
   async CreateTicket() {
-    await this.GetInfo();
-    const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
+    await this.SetInfo();
+    const folder = DriveApp.getFoldersByName(`Job Tickets`); // Set the correct folder
     this.doc = DocumentApp.create(`Job Ticket-${this.jobnumber}`); // Make Document
     this.url = this.doc.getUrl();
     let body = this.doc.getBody();
     let docId = this.doc.getId();
     
-    const qGen = new QRCodeAndBarcodeGenerator({url : this.url, jobnumber : this.jobnumber});
-    const barcode = await qGen.GenerateBarCodeForTicketHeader();
-    console.info(`Barcode ----> ${barcode}`);
+    const barcode = new BarcodeGenerator({ jobnumber : this.jobnumber });
+
+    console.info(`Barcode ----> ${barcode.url}`);
 
     let material, part, note;
     let mat = [];
@@ -165,10 +165,17 @@ class Ticket
         .setMarginBottom(2)
         .setMarginLeft(2)
         .setMarginRight(2);
-      
-      body.insertImage(0, barcode)
+    } catch (err) {
+      console.error(`${err} : Couldn't set ticket main properties.`);
+    }
+    try {
+      body.insertImage(0, barcode.blob)
         .setWidth(260)
         .setHeight(100);
+    } catch (err) {
+      console.error(`${err} : Couldn't insert image into ticket.`);
+    }
+    try {
       body.insertHorizontalRule(1);
       
       body.insertParagraph(2, `Name: ${this.name.toString()}`)
@@ -202,7 +209,7 @@ class Ticket
           [DocumentApp.Attribute.BORDER_WIDTH]: 0.5,
         });
     } catch (err) {
-      console.error(`${err} : Couldn't append info to ticket. Ya dun goofed.`);
+      console.error(`${err} : Couldn't append info to ticket.`);
     }
 
     // Remove File from root and Add that file to a specific folder

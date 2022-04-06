@@ -44,30 +44,30 @@ class CreateMessage
     cost : cost,
   }) {
     this.name = name ? name.toString() : `Unknown Name`;
-    this.projectname = projectname ? projectname.toString() : projectname;
-    this.jobnumber = jobnumber ? jobnumber.toString() : jobnumber;
-    this.approvalURL = approvalURL ? approvalURL.toString() : approvalURL;
+    this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
+    this.jobnumber = jobnumber ? jobnumber.toString() : new JobNumberGenerator().jobnumber;
+    this.approvalURL = approvalURL ? approvalURL.toString() : `Unknown Approval URL`;
 
-    this.material1Name = material1Name ? material1Name.toString() : material1Name;
-    this.material2Name = material2Name ? material2Name.toString() : material2Name;
-    this.material3Name = material3Name ? material3Name.toString() : material3Name;
-    this.material4Name = material4Name ? material4Name.toString() : material4Name;
-    this.material5Name = material5Name ? material5Name.toString() : material5Name;
+    this.material1Name = material1Name ? material1Name.toString() : `Material 1 Name`;
+    this.material2Name = material2Name ? material2Name.toString() : `Material 2 Name`;
+    this.material3Name = material3Name ? material3Name.toString() : `Material 3 Name`;
+    this.material4Name = material4Name ? material4Name.toString() : `Material 4 Name`;
+    this.material5Name = material5Name ? material5Name.toString() : `Material 5 Name`;
 
-    this.material1Quantity = material1Quantity ? material1Quantity.toString() : material1Quantity;
-    this.material2Quantity = material2Quantity ? material2Quantity.toString() : material2Quantity;
-    this.material3Quantity = material3Quantity ? material3Quantity.toString() : material3Quantity;
-    this.material4Quantity = material4Quantity ? material4Quantity.toString() : material4Quantity;
-    this.material5Quantity = material5Quantity ? material5Quantity.toString() : material5Quantity;
+    this.material1Quantity = material1Quantity ? material1Quantity.toString() : 0;
+    this.material2Quantity = material2Quantity ? material2Quantity.toString() : 0;
+    this.material3Quantity = material3Quantity ? material3Quantity.toString() : 0;
+    this.material4Quantity = material4Quantity ? material4Quantity.toString() : 0;
+    this.material5Quantity = material5Quantity ? material5Quantity.toString() : 0;
 
-    this.material1URL = material1URL ? material1URL.toString() : material1URL;
-    this.material2URL = material2URL ? material2URL.toString() : material2URL;
-    this.material3URL = material3URL ? material3URL.toString() : material3URL;
-    this.material4URL = material4URL ? material4URL.toString() : material4URL;
-    this.material5URL = material5URL ? material5URL.toString() : material5URL;
+    this.material1URL = material1URL ? material1URL.toString() : `Unknown URL`;
+    this.material2URL = material2URL ? material2URL.toString() : `Unknown URL`;
+    this.material3URL = material3URL ? material3URL.toString() : `Unknown URL`;
+    this.material4URL = material4URL ? material4URL.toString() : `Unknown URL`;
+    this.material5URL = material5URL ? material5URL.toString() : `Unknown URL`;
 
-    this.designspecialist = designspecialist ? designspecialist.toString() : designspecialist;
-    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink.toString() : designspecialistemaillink;
+    this.designspecialist = designspecialist ? designspecialist.toString() : `Staff`;
+    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>`;
     this.cost = cost ? cost : 0;
     this.costFormatted = `$ ${this.cost.toString()}`;
   }
