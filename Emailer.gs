@@ -7,67 +7,152 @@
 class Emailer
 {
   constructor({ 
-    headsetID,
-    status,
-    name,
-    email, 
-    checkedOutDate,
-    returnedDate, 
-    designspecialist,
-    designspecialistemail,
-    designspecialistemaillink, 
+    name : name, 
+    status : status,
+    email : email,    
+    designspecialistemail : designspecialistemail,
+    message : message,
   }) {
-    this.headsetID = headsetID ? headsetID : `1000001`;
-    this.status = status ? status : STATUS.checkedOut;
-    this.name = name ? name : `Your Name`;
+    this.name = name ? name.toString() : `Unknown Name`;
+    this.status = status ? status : STATUS.received;
     this.email = email ? email : `Unknown Email`;
-    this.gmailName = `Jacobs VR Hardware Tracking Bot`;
-    this.checkedOutDate = checkedOutDate ? checkedOutDate : Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
-    this.returnedDate = returnedDate ? returnedDate : Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
-
-    this.supportAlias = GmailApp.getAliases()[0];
-    this.designspecialist = designspecialist ? designspecialist : `Staff`;
     this.designspecialistemail = designspecialistemail ? designspecialistemail : `jacobsprojectsupport@berkeley.edu`;
-    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href="mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>`;
+    this.message = message;
 
-    this.message = new CreateMessage({
-      name : name, 
-      headsetID : headsetID,
-      checkedOutDate : checkedOutDate,
-      returnedDate : returnedDate, 
-      designspecialist : designspecialist,
-      designspecialistemaillink : designspecialistemaillink,
-    });
+    this.gmailName = `Jacobs Project Support`;
+    this.supportAlias = GmailApp.getAliases()[0];
+
     this.SendEmail();
   }
 
   SendEmail () {
     switch (this.status) {
-      case STATUS.checkedOut:
-        GmailApp.sendEmail(this.email, `${this.gmailName} : Headset Checked Out`, "", {
-          htmlBody: this.message.checkedOutMessage,
+      case STATUS.received:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : ${STATUS.received}`, "", {
+          htmlBody: this.message.receivedMessage,
           from: this.supportAlias,
           cc: this.designspecialistemail,
-          bcc: "",
+          bcc: InvokeDS("Chris", "email"),
           name: this.gmailName,
         });
-        console.warn(`Student ${this.name} emailed ${this.status} message...`);
         break;
-      case STATUS.checkedIn:
-        GmailApp.sendEmail(this.email, `${this.gmailName} : Headset Returned`, "", {
-            htmlBody: this.message.returnedMessage,
+      case STATUS.pendingApproval:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Needs Your Approval`, "", {
+            htmlBody: this.message.pendingMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: "",
+            bcc: InvokeDS("Chris", "email"),
             name: this.gmailName,
         });
-        console.warn(`Student ${this.name} emailed ${this.status} message...`);
         break;
+      case STATUS.inProgress:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project Started`, "", {
+            htmlBody: this.message.inProgressMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.completed:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project Completed`, "", {
+            htmlBody: this.message.completedMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.pickedUp:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project Picked Up`, "", {
+            htmlBody: this.message.pickedUpMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.shipped:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project Shipped`, "", {
+            htmlBody: this.message.shippedMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.failed:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project has Failed`, "", {
+            htmlBody: this.message.failedMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.rejectedByStudent:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project has been Declined`, "", {
+            htmlBody: this.message.rejectedByStudentMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.rejectedByStaff:
+      case STATUS.cancelled:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project has been Cancelled`, "", {
+            htmlBody: this.message.rejectedByStaffMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.billed:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project Closed`, "", {
+          htmlBody: this.message.billedMessage,
+          from: this.supportAlias,
+          cc: this.designspecialistemail,
+          bcc: InvokeDS("Chris", "email"),
+          name: this.gmailName,
+        });
+        break;
+      case STATUS.waitlist:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project Waitlisted`, "", {
+            htmlBody: this.message.waitlistMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;
+      case STATUS.missingAccess:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Missing Access`, "", {
+            htmlBody: this.message.noAccessMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: InvokeDS("Chris", "email"),
+            name: this.gmailName,
+        });
+        break;   
       case "":
       case undefined:
-        console.warn(`Student ${this.name} NOT emailed...`);
         break;
     }
+
   }
 }
 
@@ -76,17 +161,24 @@ class Emailer
  * Unit Test for Emailer
  */
 const _testEmailer = () => {
+  const name = `Dingus Dongus`; 
+  const email = "codyglen@berkeley.edu";
+  const jobnumber = new JobNumberGenerator({ date : new Date()}).jobnumber;
+  const projectname = `Some Kinda Project`;
+  const message = new CreateMessage({
+    name : name,
+    jobnumber : jobnumber,
+    projectname : projectname,
+  });
   Object.values(STATUS).forEach(async (status) => {
     await new Emailer({
-      headsetID : `1000001`,
-      checkedOutDate : Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString(),
-      returnedDate : Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString(), 
-      email : "codyglen@berkeley.edu",
+      name : name,
       status : status,
-      name : `Dingus Dongus`,
+      email : email,
       designspecialist : `Cody Glen`,
       designspecialistemail : `codyglen@berkeley.edu`,
-      designspecialistemaillink : `<a href="mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a>`, 
+      designspecialistemaillink : `<a href="mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a>`,
+      message : message, 
     })
   })
 }

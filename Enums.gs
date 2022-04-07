@@ -5,7 +5,7 @@
 
 const DaysRetentionNumber = 15; //How many days to hold a file
 const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
-
+const PickupHours = `Monday - Friday: 11am - 1pm & 4pm - 6pm.`
 
 const RESPONSECODES = {
 	200 : `OK`,

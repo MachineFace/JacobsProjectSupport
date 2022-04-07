@@ -102,11 +102,13 @@ class CreateMessage
       message += `Pending approval, your Jacobs Store account will be billed for: <br/> `;
       if (this.material1Name) message += `<p><ul>`; //start bulletpoint list
       if (this.material1Name) message += `<li><a href = "${this.material1URL}">${this.material1Quantity} of ${this.material1Name}</a></li>`;  
-      if (this.material2Name) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`;
-      if (this.material3Name) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
-      if (this.material4Name) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
-      if (this.material5Name) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`; 
-      else message += `<ul/><li>Your Jacobs Store account will be billed for the materials</a> required. </li><br/> `;
+      if (this.material2Name != `Material 2 Name`) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`;
+      if (this.material3Name != `Material 3 Name`) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
+      if (this.material4Name != `Material 4 Name`) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
+      if (this.material5Name != `Material 5 Name`) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`; 
+      else if(!this.material1Name && !this.material2Name && !this.material3Name && !this.material4Name && !this.material5Name) {
+        message += `<li>Your Jacobs Store account will be billed for the materials</a> required.</li><br/> `;
+      }
       message += `</ul>`;     // end bulletpoint list
       message += `</p><br/>`;
       message += `If you have questions or need assistance please email ${InvokeDS("Staff", "emaillink")}.<br/>`;
@@ -134,14 +136,14 @@ class CreateMessage
       message += `Your Jacobs Store account will be billed for: <br/> `;
       message += `<p><ul>`;
       if (this.material1Name) message += `<li><a href = "${this.material1URL}">${this.material1Quantity} of ${this.material1Name}</a></li>`;   
-      if (this.material2Name) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`; 
-      if (this.material3Name) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
-      if (this.material4Name) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
-      if (this.material5Name) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`;  
+      if (this.material2Name != `Material 2 Name`) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`; 
+      if (this.material3Name != `Material 3 Name`) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
+      if (this.material4Name != `Material 4 Name`) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
+      if (this.material5Name != `Material 5 Name`) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`;  
       else message += `Your Jacobs Store account will be billed for the materials used. <br/> `;    
       message += `</ul>`;     // dont forget to end the bullet point list (unordered list)
       if (this.cost == "" || this.cost == undefined){
-          message += `<p>The cost is not specified. Speak to a Design Specialist about this if you have questions before approving. <br /><p></br>`;
+        message += `<p>The cost is not specified. Speak to a Design Specialist about this if you have questions before approving. <br /><p></br>`;
       }
       else message += `<p>The cost is estimated to be ${this.costFormatted} <br /><p></br>`;
       message += `<br/>`;
@@ -150,7 +152,7 @@ class CreateMessage
       message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby. <br/>`; 
       message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
       message += `<b>Pick-Up Hours:<br/>`;
-      message += `Monday - Friday: 11am - 1pm & 4pm - 6pm.</b><br/><br/>`
+      message += `${PickupHours}</b><br/><br/>`
       message += `If you have any further questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
       message += `<p>Please take a moment to take our survey so we can improve JPS : `
       message += `<a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>`;
@@ -232,20 +234,21 @@ class CreateMessage
       message += `Job Number: <i>${this.jobnumber}</i>. Your Jacobs Store account has been billed for: <br/> `;
       message += `<p><ul>`;
       if (this.material1Name) message += `<li><a href = "${this.material1URL}">${this.material1Quantity} of ${this.material1Name}</a></li>`;  
-      if (this.material2Name) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`; 
-      if (this.material3Name) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
-      if (this.material4Name) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
-      if (this.material5Name) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`;  
+      if (this.material2Name != `Material 2 Name`) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`; 
+      if (this.material3Name != `Material 3 Name`) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
+      if (this.material4Name != `Material 4 Name`) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
+      if (this.material5Name != `Material 5 Name`) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`;  
       else message += `Materials Used, unless you provided your own material, in which case, you will not be charged.<br/> `; 
       message += `</ul>`;     // dont forget to end the bullet point list (unordered list)
       if (this.cost == "" || this.cost == undefined || this.cost == 0){
-          message += `<p>The cost is not specified. Speak to a Design Specialist about this if you have questions before approving. <br /><p></br>`;
+        message += `<p>The cost is not specified. Speak to a Design Specialist about this if you have questions before approving. <br /><p></br>`;
       }
       else message += `<p>The cost is estimated to be ${this.costFormatted} <br /><p></br>`;
       message += `<br/>`;
       message += `If you have not picked up your parts, they can be picked up in-person.<br/><br/>`;
       message += `If you have any further questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
-      message += `<p>Please take a moment to take our survey so we can improve JPS : <a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>`;
+      message += `<p>Please take a moment to take our survey so we can improve JPS : `
+      message += `<a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>`;
       message += `<p>Best,<br />Jacobs Hall Staff</p>`;
     return message;
   }
@@ -319,7 +322,7 @@ class CreateSubmissionMessage
       message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>`; 
       message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
       message += `<b>Drop-off Hours:<br/>`;
-      message += `Monday - Friday: 11am - 1pm  & 4pm - 6pm.</b><br/><br/>`
+      message += `${PickupHours}</b><br/><br/>`
       message += `Please email ${InvokeDS("Chris", "fullname")} at ${InvokeDS("Chris", "emaillink")} for further details.<br/>`;
       message += `If you have any further questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
       message += `<p>Best,<br />Jacobs Hall Staff</p>`;

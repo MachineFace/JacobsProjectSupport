@@ -38,6 +38,7 @@ const gmailName = `Jacobs Project Support`;
  */
 const onSubmission = async (e) => {
   const writer = new WriteLogger();
+  const staff = BuildStaff();
   // Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var sheetName = e.range.getSheet().getName();
@@ -102,44 +103,36 @@ const onSubmission = async (e) => {
   switch (sheetName) {
     case SHEETS.Othermill.getName():
     case SHEETS.Shopbot.getName():
-      designspecialistemail = InvokeDS("Adam", "email");
-      //sheet.getRange("B" + lastRow).setValue("Adam");
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Adam");
+      designspecialistemail = staff.Adam.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Adam.name);
       break;
     case SHEETS.Advancedlab.getName():
     case SHEETS.Creaform.getName():
-      designspecialistemail = InvokeDS("Chris", "email");
-      //sheet.getRange("B" + lastRow).setValue("Chris");
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Chris");
+      designspecialistemail = staff.Chris.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
       break;
     case SHEETS.Plotter.getName():
     case SHEETS.Fablight.getName():
     case SHEETS.Haas.getName():
-      designspecialistemail = InvokeDS("Cody", "email");
-      //sheet.getRange("B" + lastRow).setValue("Cody");
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Cody");
+    case SHEETS.Vinyl.getName():
+      designspecialistemail = staff.Cody.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
       break;
     case SHEETS.Waterjet.getName():
     case SHEETS.Othertools.getName():
-      designspecialistemail = InvokeDS("Gary", "email");
-      //sheet.getRange("B" + lastRow).setValue("Gary");
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, "Gary");
+      designspecialistemail = staff.Gary.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
       break;
     case SHEETS.Laser.getName():
-      //Nobody assigned / Everyone assigned.
+      // Nobody assigned / Everyone assigned.
       break;
     case SHEETS.Ultimaker.getName():
-      designspecialistemail = InvokeDS("Nicole", lastRow, "email");
-      break;
-    case SHEETS.Vinyl.getName():
-      designspecialistemail = InvokeDS("Cody", "email");
-      //sheet.getRange("B" + lastRow).setValue("Cody");
-      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, "Cody");
+      designspecialistemail = staff.Nicole.email;
       break;
     case undefined:
-      designspecialistemail = InvokeDS("Staff", "email");
+      designspecialistemail = staff.Staff.email;
       //sheet.getRange("B" + lastRow).setValue("Staff");
-      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, "Staff");
+      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
   }
 
@@ -148,7 +141,7 @@ const onSubmission = async (e) => {
     GmailApp.sendEmail(designspecialistemail, "Jacobs Project Support Notification", "", {
       htmlBody: dsMessage,
       from: supportAlias,
-      bcc: InvokeDS("Chris", "email"),
+      bcc: staff.Chris.email,
       name: gmailName,
     });
     writer.Info(`Design Specialist has been emailed.`);
@@ -167,7 +160,7 @@ const onSubmission = async (e) => {
       GmailApp.sendEmail(email, "Jacobs Project Support : Creaform Part Drop-off Instructions", "", {
         htmlBody: message.creaformMessage,
         from: supportAlias,
-        bcc: InvokeDS("Chris", "email"),
+        bcc: staff.Chris.email,
         name: gmailName,
       });
       writer.Info(`Creaform instruction email sent.`);
@@ -185,7 +178,7 @@ const onSubmission = async (e) => {
       GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
         htmlBody: message.missingAccessMessage,
         from: supportAlias,
-        bcc: InvokeDS("Chris", "email"),
+        bcc: staff.Chris.email,
         name: "Jacobs Project Support",
       });
       writer.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
@@ -223,6 +216,7 @@ const onSubmission = async (e) => {
  */
 const onChange = async (e) => {
   const writer = new WriteLogger();
+  const staff = BuildStaff();
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
@@ -269,11 +263,12 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Parse Data
-  const status = GetByHeader(spreadSheet, HEADERNAMES.status, thisRow);
+  const status = GetByHeader(thisSheet, HEADERNAMES.status, thisRow);
 
   var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow);
   var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow);
   var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
+  var ticket = GetByHeader(thisSheet, HEADERNAMES.ticket, thisRow);
   var studentApproval = GetByHeader(thisSheet, HEADERNAMES.studentApproved, thisRow);
   var submissiontime = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
   var email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
@@ -288,8 +283,8 @@ const onChange = async (e) => {
   const material1Name = GetByHeader(thisSheet, HEADERNAMES.mat1, thisRow);
   const material1URL = "";
 
-  const material2Quantity = GetByHeader(spreadSheet, HEADERNAMES.mat2quantity, thisRow);
-  const material2Name = GetByHeader(spreadSheet, HEADERNAMES.mat2, thisRow);
+  const material2Quantity = GetByHeader(thisSheet, HEADERNAMES.mat2quantity, thisRow);
+  const material2Name = GetByHeader(thisSheet, HEADERNAMES.mat2, thisRow);
   const material2URL = "";
 
   const material3Quantity = GetByHeader(thisSheet, HEADERNAMES.mat3quantity, thisRow);
@@ -367,12 +362,11 @@ const onChange = async (e) => {
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  // Trigger for generating a "Ticket"
-  if ( status == STATUS.received || status == STATUS.inProgress || status == STATUS.pendingApproval ) {
-    writer.Warning(`Attempting to create a ticket`)
-    const ticketGenerator = new Ticket({jobnumber : jobnumber});
+  // Generating a "Ticket"
+  if ( status != STATUS.closed ) {
     try {
-      const ticket = ticketGenerator.CreateTicket();
+      writer.Warning(`Attempting to create a ticket`)
+      new Ticket({jobnumber : jobnumber}).CreateTicket();
     } catch (err) {
       writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
     }
@@ -430,133 +424,142 @@ const onChange = async (e) => {
   });
 
   // Send email with appropriate response and cc Chris and Cody.
-  writer.Info(`Sending email....`)
-  switch (status) {
-    case STATUS.received:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : ${STATUS.received}`, "", {
-        htmlBody: Message.receivedMessage,
-        from: supportAlias,
-        cc: designspecialistemail,
-        bcc: InvokeDS("Chris", "email"),
-        name: gmailName,
-      });
-      break;
-    case STATUS.pendingApproval:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Needs Your Approval`, "", {
-          htmlBody: Message.pendingMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.inProgress:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project Started`, "", {
-          htmlBody: Message.inProgressMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.completed:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project Completed`, "", {
-          htmlBody: Message.completedMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.pickedUp:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project Picked Up`, "", {
-          htmlBody: Message.pickedUpMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.shipped:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project Shipped`, "", {
-          htmlBody: Message.shippedMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.failed:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project has Failed`, "", {
-          htmlBody: Message.failedMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.rejectedByStudent:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project has been Declined`, "", {
-          htmlBody: Message.rejectedByStudentMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.rejectedByStaff:
-    case STATUS.cancelled:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project has been Cancelled`, "", {
-          htmlBody: Message.rejectedByStaffMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.billed:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project Closed`, "", {
-        htmlBody: Message.billedMessage,
-        from: supportAlias,
-        cc: designspecialistemail,
-        bcc: InvokeDS("Chris", "email"),
-        name: gmailName,
-      });
-      break;
-    case STATUS.waitlist:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Project Waitlisted`, "", {
-          htmlBody: Message.waitlistMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;
-    case STATUS.missingAccess:
-      console.warn(`Sending ${status} email to student.`);
-      GmailApp.sendEmail(email, `${gmailName} : Missing Access`, "", {
-          htmlBody: Message.noAccessMessage,
-          from: supportAlias,
-          cc: designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
-          name: gmailName,
-      });
-      break;   
-    case "":
-    case undefined:
-      break;
-  }
+  writer.Info(`Sending email....`);
+  const emailer = new Emailer({
+    name : name, 
+    status : status,
+    email : email,    
+    designspecialistemail : designspecialistemail,
+    message : Message,
+  })
+
+
+  // switch (status) {
+  //   case STATUS.received:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : ${STATUS.received}`, "", {
+  //       htmlBody: Message.receivedMessage,
+  //       from: supportAlias,
+  //       cc: designspecialistemail,
+  //       bcc: InvokeDS("Chris", "email"),
+  //       name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.pendingApproval:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Needs Your Approval`, "", {
+  //         htmlBody: Message.pendingMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.inProgress:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project Started`, "", {
+  //         htmlBody: Message.inProgressMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.completed:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project Completed`, "", {
+  //         htmlBody: Message.completedMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.pickedUp:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project Picked Up`, "", {
+  //         htmlBody: Message.pickedUpMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.shipped:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project Shipped`, "", {
+  //         htmlBody: Message.shippedMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.failed:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project has Failed`, "", {
+  //         htmlBody: Message.failedMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.rejectedByStudent:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project has been Declined`, "", {
+  //         htmlBody: Message.rejectedByStudentMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.rejectedByStaff:
+  //   case STATUS.cancelled:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project has been Cancelled`, "", {
+  //         htmlBody: Message.rejectedByStaffMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.billed:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project Closed`, "", {
+  //       htmlBody: Message.billedMessage,
+  //       from: supportAlias,
+  //       cc: designspecialistemail,
+  //       bcc: InvokeDS("Chris", "email"),
+  //       name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.waitlist:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Project Waitlisted`, "", {
+  //         htmlBody: Message.waitlistMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;
+  //   case STATUS.missingAccess:
+  //     console.warn(`Sending ${status} email to student.`);
+  //     GmailApp.sendEmail(email, `${gmailName} : Missing Access`, "", {
+  //         htmlBody: Message.noAccessMessage,
+  //         from: supportAlias,
+  //         cc: designspecialistemail,
+  //         bcc: InvokeDS("Chris", "email"),
+  //         name: gmailName,
+  //     });
+  //     break;   
+  //   case "":
+  //   case undefined:
+  //     break;
+  // }
 
   // Check priority one more time:
   if (priority == "STUDENT NOT FOUND!" && (status != STATUS.closed || status != STATUS.cancelled)) {

@@ -10,6 +10,7 @@ class DesignSpecialist
     name : name, 
     fullname : fullname, 
     email : email,
+    areas : areas,
   }) {
     this.name = name ? name : `DS`;
     this.fullname = fullname ? fullname : `Design Specialist`;
@@ -18,6 +19,8 @@ class DesignSpecialist
     this.type = `Design Specialist`;
     this.isAdmin = true;
     this.shortCode = `DS`;
+    this.areas = areas ? areas : [];
+    this.SetAreas();
   }
   
   get() {
@@ -29,6 +32,30 @@ class DesignSpecialist
       type : this.type,
       isAdmin : this.isAdmin,
       shortCode : this.shortCode,
+      areas : this.areas,
+    }
+  }
+
+  SetAreas () {
+    switch (this.name) {
+      case "Adam":
+        this.areas = [SHEETS.Othermill.getName(), SHEETS.Shopbot.getName(),];
+        break;
+      case "Chris":
+        this.areas = [SHEETS.Advancedlab.getName(), SHEETS.Creaform.getName(),];
+        break;
+      case "Cody":
+        this.areas = [SHEETS.Plotter.getName(), SHEETS.Fablight.getName(), SHEETS.Haas.getName(), SHEETS.Vinyl.getName()];
+        break;
+      case "Gary":
+        this.areas = [SHEETS.Waterjet.getName(), SHEETS.Othertools.getName(),];
+        break;
+      case "Nicole":
+        this.areas = [SHEETS.Ultimaker.getName(),];
+        break;
+      case undefined:
+        this.areas = [];
+        break;
     }
   }
 
@@ -46,9 +73,10 @@ class StudentSupervisor extends DesignSpecialist
     name : name, 
     fullname : fullname, 
     email : email,
+    areas : areas,
   }) {
     // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
-    super(name, fullname, email);
+    super(name, fullname, email, areas);
     this.name = name ? name : `SS`;
     this.fullname = fullname ? fullname : `Student Supervisor`;
     this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
@@ -56,6 +84,7 @@ class StudentSupervisor extends DesignSpecialist
     this.type = 'Student Supervisor';
     this.isAdmin = false;
     this.shortCode = `SS`;
+    this.areas = areas ? areas : [];
   }
 
   get() {
@@ -67,6 +96,7 @@ class StudentSupervisor extends DesignSpecialist
       type : this.type,
       isAdmin : this.isAdmin,
       shortCode : this.shortCode,
+      areas : this.areas,
     }
   }
 
@@ -83,9 +113,10 @@ class Manager extends DesignSpecialist
     name : name, 
     fullname : fullname, 
     email : email,
+    areas : areas,
   }) 
   {
-    super(name, fullname, email);
+    super(name, fullname, email, areas);
     this.name = name ? name : `MA`;
     this.fullname = fullname ? fullname : `Manager`;
     this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
@@ -93,6 +124,7 @@ class Manager extends DesignSpecialist
     this.type = 'Manager';
     this.isAdmin = true;
     this.shortCode = `MA`;
+    this.areas = areas ? areas : [];
   }
 
   get() {
@@ -104,9 +136,58 @@ class Manager extends DesignSpecialist
       type : this.type,
       isAdmin : this.isAdmin,
       shortCode : this.shortCode,
+      areas : this.areas,
     }
   }
   
+}
+
+
+
+class MakeStaff
+{
+  constructor() {
+    let staff = {};
+    let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
+    let culled = range.filter(Boolean);
+
+    culled.forEach( (row, index) => {
+      let name = row[0];
+      let fullname = row[1];
+      let email = row[2];
+      let link = row[3];
+      let type = row[4];
+      // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
+      if(email && !link) {
+        link = `<a href = "${email}">${email}</a>`;
+        OTHERSHEETS.Staff.getRange(OTHERSHEETS.Staff.getLastRow() - 1, 4).setValue(link);
+      }
+      if(type == "DS") {
+        let ds = new DesignSpecialist({
+          name : name, 
+          fullname : fullname, 
+          email : email
+        });
+        staff[name] = ds;
+      } else if(type == "MA") {
+        let ma = new Manager({
+          name : name, 
+          fullname : fullname, 
+          email : email
+        });
+        staff[name] = ma;
+      } else if(type == "SS") {
+        let ss = new StudentSupervisor({
+          name : name, 
+          fullname : fullname, 
+          email : email
+        });
+        staff[name] = ss;
+      }
+    });
+    // console.info(JSON.stringify(staff));
+    return staff;
+  }
 }
 
 
@@ -149,10 +230,7 @@ const InvokeDS = (name, property) => {
   }
 }
 
-/**
- * Helper Make Link Function
- */
-const MakeLink = (email) => `<a href = "${email}">${email}</a>`;
+
 
 
 
@@ -161,12 +239,12 @@ const MakeLink = (email) => `<a href = "${email}">${email}</a>`;
  * Create a Design Specialist from spreadsheet and return a list
  * @returns {[string]} DSList
  */
-const CreateDS = () => {
-  let staff = [];
+const BuildStaff = () => {
+  let staff = {};
   let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
   let culled = range.filter(Boolean);
 
-  culled.forEach( row => {
+  culled.forEach( (row, index) => {
     let name = row[0];
     let fullname = row[1];
     let email = row[2];
@@ -174,21 +252,33 @@ const CreateDS = () => {
     let type = row[4];
     // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
     if(email && !link) {
-      link = MakeLink(email);
+      link = `<a href = "${email}">${email}</a>`;
       OTHERSHEETS.Staff.getRange(OTHERSHEETS.Staff.getLastRow() - 1, 4).setValue(link);
     }
     if(type == "DS") {
-      let ds = new DesignSpecialist({name : name, fullname : fullname, email : email});
-      staff.push(ds);
+      let ds = new DesignSpecialist({
+        name : name, 
+        fullname : fullname, 
+        email : email
+      });
+      staff[name] = ds;
     } else if(type == "MA") {
-      let ma = new Manager({name : name, fullname : fullname, email : email});
-      staff.push(ma)
+      let ma = new Manager({
+        name : name, 
+        fullname : fullname, 
+        email : email
+      });
+      staff[name] = ma;
     } else if(type == "SS") {
-      let ss = new StudentSupervisor({name : name, fullname : fullname, email : email});
-      staff.push(ss);
+      let ss = new StudentSupervisor({
+        name : name, 
+        fullname : fullname, 
+        email : email
+      });
+      staff[name] = ss;
     }
   });
-  console.info(JSON.stringify(staff));
+  // console.info(JSON.stringify(staff));
   return staff;
 }
 
@@ -200,11 +290,19 @@ const _testDS = () => {
     email : "some@email.com",
   })
   console.info(ds.get())
-  console.info(`Name : ${ds.name}`)
+  console.info(`Name : ${ds.name}`);
+}
+
+const _testStaff = () => {
+  const staff = BuildStaff();
+  console.info(staff)
 }
 
 
-
+const _tt = () => {
+  const s = new MakeStaff();
+  console.info(s);
+}
 
 
 
