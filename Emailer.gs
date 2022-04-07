@@ -26,6 +26,7 @@ class Emailer
   }
 
   SendEmail () {
+    const staff = BuildStaff();
     switch (this.status) {
       case STATUS.received:
         console.warn(`Sending ${this.status} email to student.`);
@@ -33,7 +34,7 @@ class Emailer
           htmlBody: this.message.receivedMessage,
           from: this.supportAlias,
           cc: this.designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
+          bcc: staff.Chris.email,
           name: this.gmailName,
         });
         break;
@@ -43,7 +44,7 @@ class Emailer
             htmlBody: this.message.pendingMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -53,7 +54,7 @@ class Emailer
             htmlBody: this.message.inProgressMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -63,7 +64,7 @@ class Emailer
             htmlBody: this.message.completedMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -73,7 +74,7 @@ class Emailer
             htmlBody: this.message.pickedUpMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -83,7 +84,7 @@ class Emailer
             htmlBody: this.message.shippedMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -93,7 +94,7 @@ class Emailer
             htmlBody: this.message.failedMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -103,7 +104,7 @@ class Emailer
             htmlBody: this.message.rejectedByStudentMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -114,7 +115,7 @@ class Emailer
             htmlBody: this.message.rejectedByStaffMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -124,7 +125,7 @@ class Emailer
           htmlBody: this.message.billedMessage,
           from: this.supportAlias,
           cc: this.designspecialistemail,
-          bcc: InvokeDS("Chris", "email"),
+          bcc: staff.Chris.email,
           name: this.gmailName,
         });
         break;
@@ -134,7 +135,7 @@ class Emailer
             htmlBody: this.message.waitlistMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;
@@ -144,7 +145,7 @@ class Emailer
             htmlBody: this.message.noAccessMessage,
             from: this.supportAlias,
             cc: this.designspecialistemail,
-            bcc: InvokeDS("Chris", "email"),
+            bcc: staff.Chris.email,
             name: this.gmailName,
         });
         break;   
