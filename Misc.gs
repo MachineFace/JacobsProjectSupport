@@ -560,7 +560,7 @@ const SetConditionalFormatting = () => {
         .whenFormulaSatisfied(`=$A2="${STATUS.missingAccess}"`)
         .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
         .setBackground(COLORS.orange_light)
-        .setFontColor(COLORS.orange_dark_2)
+        .setFontColor(COLORS.orange_bright)
         .build()
       ,
       SpreadsheetApp.newConditionalFormatRule()
@@ -573,7 +573,7 @@ const SetConditionalFormatting = () => {
       SpreadsheetApp.newConditionalFormatRule()
         .whenFormulaSatisfied(`=$A2="${STATUS.completed}"`)
         .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.grey_light)
+        .setBackground(COLORS.green_light)
         .setFontColor(COLORS.grey)
         .build()
       ,
@@ -595,7 +595,7 @@ const SetConditionalFormatting = () => {
         .whenFormulaSatisfied(`=$A2="${STATUS.failed}"`)
         .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
         .setBackground(COLORS.red_light)
-        .setFontColor(COLORS.red_dark_1)
+        .setFontColor(COLORS.red)
         .build()
       ,
       SpreadsheetApp.newConditionalFormatRule()

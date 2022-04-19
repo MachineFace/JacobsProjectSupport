@@ -17,6 +17,7 @@ const COLORS = {
   yellow_dark : `#f1c232`,
   yellow_dark_2 : `#bf9000`,
   orange_light : `#fce5cd`,
+  orange_bright : `#ff9900`,
   orange : `#f6b26b`,
   orange_dark : `#e69138`, 
   orange_dark_2 : `#b45f06`,
