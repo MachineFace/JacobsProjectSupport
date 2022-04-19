@@ -612,6 +612,13 @@ const SetConditionalFormatting = () => {
         .setFontColor(COLORS.red_dark_berry_2)
         .build()
       ,
+      SpreadsheetApp.newConditionalFormatRule()
+        .whenFormulaSatisfied(`=$A2="${STATUS.waitlist}"`)
+        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
+        .setBackground(COLORS.orange)
+        .setFontColor(COLORS.orange_dark_2)
+        .build()
+      ,
     ];
     // let existingRules = sheet.getConditionalFormatRules();
     // console.warn(existingRules)
