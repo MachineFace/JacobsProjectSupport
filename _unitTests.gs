@@ -45,7 +45,6 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Generate QRCode: `, async(t) => {
-    const jobnumber = `20210301140515`;
     const url = `http://www.codyglen.com/`;
     const qgen = new QRCodeGenerator({url : url,});
     const x = await qgen;
@@ -55,15 +54,12 @@ const _gastTestRunner = async () => {
 
   await test(`Staff Functions`, (t) => {
     const x = new DesignSpecialist(`Testa`, `Testa Nama`, `some@thing.com`);
-    StaffEmailAsString();
-    InvokeDS(`Cody`,`email`);
-    CreateDS();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
   await test(`Staff Functions`, (t) => {
-    const x = MakeLink(`some@thing.com`);
+    const x = BuildStaff();
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
@@ -136,13 +132,18 @@ const _gastTestRunner = async () => {
   })
 
   await test(`OnChange Messages`, (t) => {
-    const message = new CreateMessage('Cody', 'Test Project', '101293874098', 'url',
-      'material1URL', 45, 'TestPLA',
-      'material2URL', 15, 'TestBreakaway',
-      'mat3URL', 23, 'Steel',
-      'mat4URL', 24, 'Aluminum',
-      'mat5URL', 75, 'Plastic',
-      'designspecialist', 'cody@glen.com', 45.50)
+    const message = new CreateMessage({
+      name : 'Cody', 
+      projectname : 'Test Project',
+      jobnumber : '101293874098', 
+      approvalURL : 'url',
+      material1URL : 'material1URL', material1Quantity : 45, material1Name : 'TestPLA',
+      material2URL : 'material2URL', material2Quantity : 15, material2Name : 'TestBreakaway',
+      material3URL : 'mat3URL', material3Quantity : 23, material3Name : 'Steel',
+      material4URL : 'mat4URL', material4Quantity : 24, material4Name : 'Aluminum',
+      material5URL : 'mat5URL', material5Quantity : 75, material5Name : 'Plastic',
+      designspecialist : 'designspecialist', designspecialistemaillink : 'cody@glen.com', cost : 45.50,
+    });
 
     const a = `DEFAULT ${message.defaultMessage}`;
     const b = `RECEIVED ${message.receivedMessage}`;
@@ -162,7 +163,11 @@ const _gastTestRunner = async () => {
   })
 
   await test(`Submission Messages`, (t) => {
-    const message = new CreateSubmissionMessage('Cody', 'SomeProject', 102938471431 );
+    const message = new CreateSubmissionMessage({ 
+      name : 'Cody', 
+      projectname : 'SomeProject', 
+      jobnumber : 102938471431,
+    } );
     const w = `DS MESSAGE : ${message.dsMessage}`;
     const x = `CREAFORM MESSAGE : ${message.creaformMessage}`;
     const y = `MISSING ACCESS : ${message.missingAccessMessage}`;

@@ -59,13 +59,8 @@ const PopupCreateNewJobNumber = async () => {
  * Create a pop-up to Create a new Ticket if one is missing.
  */
 const PopupCreateTicket = async () => {
-  let ui = SpreadsheetApp.getUi();
-
   let thisSheet = SpreadsheetApp.getActiveSheet();
-  let sheetname = thisSheet.getName();
-  let thisRow = thisSheet.getActiveRange().getRow();
-  let jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
-
+  let ui = SpreadsheetApp.getUi();
   if(CheckSheetIsForbidden(thisSheet) == true) {
     Browser.msgBox(
       "Incorrect Sheet Active",
@@ -74,15 +69,26 @@ const PopupCreateTicket = async () => {
     );
     return;
   } else {
-    const ticketMaker = new Ticket({jobnumber : jobnumber});
-    try {
-      const ticket = ticketMaker.CreateTicket();
-    } catch (err) {
-      console.error(`${err} : Couldn't create a ticket.`);
-    }
+    let thisRow = thisSheet.getActiveRange().getRow();
+    let jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
+    let data = await GetRowData(thisSheet, thisRow);
+    let ticket = await new Ticket({
+      jobnumber : jobnumber,
+      designspecialist : data.ds,
+      submissiontime : data.timestamp,
+      name : data.name,
+      email : data.email,
+      projectname : data.projectName,
+      material1Name : data.material1Name,
+      material1Quantity : data.material1Quantity,
+      material2Name : data.material2Name,
+      material2Quantity : data.material2Quantity,
+    });
+    let t = await ticket.CreateTicket();
+    SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
     ui.alert(
       `JPS Runtime Message`,
-      `Ticket Created for : ${ticketMaker.name}, Job Number : ${jobnumber}`,
+      `Ticket Created for : ${data?.name}, Job Number : ${jobnumber}`,
       ui.ButtonSet.OK
     );
   }

@@ -48,7 +48,7 @@ const onSubmission = async (e) => {
     var searchRange = sheet.getRange(2, 8, sheet.getLastRow()).getValues(); //search timestamp rows for last row
     var lastRow;
     for (var i = 0; i < searchRange.length; i++) {
-      if (searchRange[i][0].toString() == "") {
+      if (searchRange[i][0].toString() == ``) {
         lastRow = i + 1;
         break;
       }
@@ -88,14 +88,14 @@ const onSubmission = async (e) => {
 
   // Create array summary of student's entry and append it to the message
   var values = e.namedValues;
-  dsMessage += "<ul>";
+  dsMessage += `<ul>`;
   for (Key in values) {
     let label = Key;
     let data = values[Key];
-    dsMessage += "<li>" + label + ": " + data + "</li>";
+    dsMessage += `<li>` + label + `: ` + data + `</li>`;
   }
-  dsMessage += "</ul>";
-  dsMessage += "<div>";
+  dsMessage += `</ul>`;
+  dsMessage += `<div>`;
 
   // Notify Staff via email and set their assignment
   var designspecialistemail;
@@ -131,14 +131,14 @@ const onSubmission = async (e) => {
       break;
     case undefined:
       designspecialistemail = staff.Staff.email;
-      //sheet.getRange("B" + lastRow).setValue("Staff");
+      //sheet.getRange(`B` + lastRow).setValue(`Staff`);
       SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
   }
 
   // Email each DS
   try {
-    GmailApp.sendEmail(designspecialistemail, "Jacobs Project Support Notification", "", {
+    GmailApp.sendEmail(designspecialistemail, `Jacobs Project Support Notification`, ``, {
       htmlBody: dsMessage,
       from: supportAlias,
       bcc: staff.Chris.email,
@@ -149,15 +149,15 @@ const onSubmission = async (e) => {
     writer.Error(`${err} : Couldn't email DS. Something went wrong.`);
   }
 
-  // Fix "Received" Status Issue
-  let stat = sheet.getRange("A" + lastRow).getValue();
+  // Fix `Received` Status Issue
+  let stat = sheet.getRange(`A` + lastRow).getValue();
   stat = stat ? stat : SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
   writer.Warning(`Status refixed to 'Received'.`);
 
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.Creaform.getSheetName()) {
       //Email
-      GmailApp.sendEmail(email, "Jacobs Project Support : Creaform Part Drop-off Instructions", "", {
+      GmailApp.sendEmail(email, `Jacobs Project Support : Creaform Part Drop-off Instructions`, ``, {
         htmlBody: message.creaformMessage,
         from: supportAlias,
         bcc: staff.Chris.email,
@@ -170,23 +170,23 @@ const onSubmission = async (e) => {
   }
 
   try {
-    if (priority == "STUDENT NOT FOUND!" || priority == false) {
+    if (priority == `STUDENT NOT FOUND!` || priority == false) {
       // Set access to Missing Access
       SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
       //Email
-      GmailApp.sendEmail(email, "Jacobs Project Support : Missing Access", "", {
+      GmailApp.sendEmail(email, `Jacobs Project Support : Missing Access`, ``, {
         htmlBody: message.missingAccessMessage,
         from: supportAlias,
         bcc: staff.Chris.email,
-        name: "Jacobs Project Support",
+        name: `Jacobs Project Support`,
       });
       writer.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
     writer.Error(`${err} : Couldn't find student access boolean value`);
   } finally {
-    if (priority == "STUDENT NOT FOUND!" || priority == false) {
+    if (priority == `STUDENT NOT FOUND!` || priority == false) {
       SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
     }
   }
@@ -199,7 +199,7 @@ const onSubmission = async (e) => {
   
 
   // Fix wrapping issues
-  let driveloc = sheet.getRange("D" + lastRow);
+  let driveloc = sheet.getRange(`D` + lastRow);
   FormatCell(driveloc);
 };
 
@@ -231,7 +231,7 @@ const onChange = async (e) => {
   // Add link to DS List
   const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
   if (thisRow > 2) {
-    if ( sLink == undefined || sLink == null || (sLink == "" && OTHERSHEETS.Staff.getRange(thisRow, 3).getValue() != "") ) {
+    if ( sLink == undefined || sLink == null || (sLink == `` && OTHERSHEETS.Staff.getRange(thisRow, 3).getValue() != ``) ) {
       const l = MakeLink(OTHERSHEETS.Staff.getRange(thisRow, 3).getValue());
       OTHERSHEETS.Staff.getRange(thisRow, 4).setValue(l);
     }
@@ -241,31 +241,29 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   //Ignore Edits on background sheets like Logger and StoreItems - NICE!! /CG
   var thisSheetName = e.range.getSheet().getSheetName();
-  for(const [key, sheet] of Object.entries(NONITERABLESHEETS)) {
+  Object.values(NONITERABLESHEETS).forEach(sheet => {
     if(thisSheetName == sheet.getSheetName()) return;
-  }
+  });
+
 
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
+  let status = GetByHeader(thisSheet, HEADERNAMES.status, thisRow);
 
   let tempEmail = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
   let tempSID = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
 
   let tempPriority = await new Priority({email : tempEmail, sid : tempSID}).priority;
   SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, tempPriority);
-  if (tempPriority == "STUDENT NOT FOUND") {
-    SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
-  }
+  if (tempPriority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
 
-  // STATUS CHANGE TRIGGER
-  // Only look at Column 1 for email trigger.... Also 52 is live.
-  if (thisCol > 1 && thisCol != 3 && thisCol != 52) return;
+  // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
+  if (thisCol > 1 && thisCol != 3) return;
 
   //----------------------------------------------------------------------------------------------------------------
   // Parse Data
-  const status = GetByHeader(thisSheet, HEADERNAMES.status, thisRow);
 
-  var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow);
+  var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) : `a Design Specialist`;
   var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow);
   var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
   var ticket = GetByHeader(thisSheet, HEADERNAMES.ticket, thisRow);
@@ -275,46 +273,46 @@ const onChange = async (e) => {
   var name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
   var sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
   var studentType = GetByHeader(thisSheet, HEADERNAMES.afiliation, thisRow);
-  var projectname = GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow);
+  var projectname = GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow) : `Your Project`;
   var cost = GetByHeader(thisSheet, HEADERNAMES.estimate, thisRow);
 
   //Materials
   const material1Quantity = GetByHeader(thisSheet, HEADERNAMES.mat1quantity, thisRow);
   const material1Name = GetByHeader(thisSheet, HEADERNAMES.mat1, thisRow);
-  const material1URL = "";
+  const material1URL = ``;
 
   const material2Quantity = GetByHeader(thisSheet, HEADERNAMES.mat2quantity, thisRow);
   const material2Name = GetByHeader(thisSheet, HEADERNAMES.mat2, thisRow);
-  const material2URL = "";
+  const material2URL = ``;
 
   const material3Quantity = GetByHeader(thisSheet, HEADERNAMES.mat3quantity, thisRow);
   const material3Name = GetByHeader(thisSheet, HEADERNAMES.mat3, thisRow);
-  const material3URL = "";
+  const material3URL = ``;
 
   const material4Quantity = GetByHeader(thisSheet, HEADERNAMES.mat4quantity, thisRow);
   const material4Name = GetByHeader(thisSheet, HEADERNAMES.mat4, thisRow);
-  const material4URL = "";
+  const material4URL = ``;
 
   const material5Quantity = GetByHeader(thisSheet, HEADERNAMES.mat5quantity, thisRow);
   const material5Name = GetByHeader(thisSheet, HEADERNAMES.mat5, thisRow);
-  const material5URL = "";
+  const material5URL = ``;
 
-  if (material1Name != "") var mat1 = true;
+  if (material1Name != ``) var mat1 = true;
   else mat1 = false;
-  if (material2Name != "") var mat2 = true;
+  if (material2Name != ``) var mat2 = true;
   else mat2 = false;
-  if (material3Name != "") var mat3 = true;
+  if (material3Name != ``) var mat3 = true;
   else mat3 = false;
-  if (material4Name != "") var mat4 = true;
+  if (material4Name != ``) var mat4 = true;
   else mat4 = false;
-  if (material5Name != "") var mat5 = true;
+  if (material5Name != ``) var mat5 = true;
   else mat5 = false;
 
   // Log submission info to sheet
   writer.Info(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
 
   // Ignore
-  if(status == STATUS.closed ) return;
+  if(status == STATUS.closed || status == STATUS.cancelled) return;
 
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
@@ -330,21 +328,12 @@ const onChange = async (e) => {
   }
 
   //----------------------------------------------------------------------------------------------------------------
-  // Fix empty variables
-  try {
-    designspecialist = designspecialist ? designspecialist : "a Design Specialist";
-    projectname = projectname ? projectname : "Your Project";
-  } catch (err) {
-    writer.Error( `${err} : Fixing empty or corrupted variables has failed for some reason.` );
-  }
-
-  //----------------------------------------------------------------------------------------------------------------
   // Calculate Turnaround Time only when cell is empty
   try {
     writer.Warning(`Attempting to Calculate turnaround times`);
     const calc = new Calculate();
     let elapsedCell = thisSheet.getRange(thisRow, 43).getValue();
-    if (elapsedCell !== undefined || elapsedCell !== null || elapsedCell !== "") {
+    if (elapsedCell) {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
         let time = await calc.CalculateDuration(new Date(submissiontime), endTime);
@@ -361,16 +350,6 @@ const onChange = async (e) => {
     writer.Error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
-  //----------------------------------------------------------------------------------------------------------------
-  // Generating a "Ticket"
-  if ( status != STATUS.closed ) {
-    try {
-      writer.Warning(`Attempting to create a ticket`)
-      new Ticket({jobnumber : jobnumber}).CreateTicket();
-    } catch (err) {
-      writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
-    }
-  }
 
 
   //----------------------------------------------------------------------------------------------------------------
@@ -393,9 +372,105 @@ const onChange = async (e) => {
     }
   }
 
+  //----------------------------------------------------------------------------------------------------------------
+  // Generating a "Ticket"
+  if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
+    let ticket;
+    try {
+      writer.Warning(`Attempting to create a ticket`);
+      let material, part, note;
+      let mat = [];
+      let partcount = [];
+      let notes = [];
+      switch(thisSheet.getSheetName()) {
+        case SHEETS.Laser.getSheetName():
+          material = GetByHeader(SHEETS.Laser, `Rough dimensions of your part`, thisRow);
+          if(!material) mat.push(`Materials: `, `None`);
+          else mat.push( `Rough Dimensions:`, material.toString());
+
+          part = GetByHeader(SHEETS.Laser, `Total number of parts needed`, thisRow);
+          if(!part) partcount.push(`Part Count: `, `None`);
+          else partcount.push(`Part Count:`, part.toString());
+
+          note = GetByHeader(SHEETS.Laser, `Notes`, thisRow);
+          if(!note) notes.push(`Notes: `, `None`);
+          else notes.push( `Notes:`, note.toString());
+          break;
+        case SHEETS.Fablight.getSheetName():
+          material = GetByHeader(SHEETS.Fablight, `Rough dimensions of your part?`, thisRow);
+          if(!material) mat.push(`Materials: `, `None`);
+          else mat.push( `Rough Dimensions:`, material.toString());
+
+          part = GetByHeader(SHEETS.Fablight, `How many parts do you need?`, thisRow);
+          if(!part) partcount.push(`Part Count: `, `None`);
+          else partcount.push( `Part Count:`, part.toString());
+
+          note = GetByHeader(SHEETS.Fablight, `Notes:`, thisRow);
+          if(!note) notes.push(`Notes: `, `None`);
+          else notes.push( `Notes:`, note.toString());
+          break;
+        case SHEETS.Waterjet.getSheetName():
+          material = GetByHeader(SHEETS.Waterjet, `Rough dimensions of your part`, thisRow);
+          if(!material) mat.push(`Materials: `, `None`);
+          else mat.push( `Rough Dimensions: `, material.toString());
+
+          part = GetByHeader(SHEETS.Waterjet, `How many parts do you need?`, thisRow);
+          if(!part) partcount.push(`Part Count: `, `None`);
+          else partcount.push( `Part Count:`, part.toString());
+
+          note = GetByHeader(SHEETS.Waterjet, `Notes`, thisRow);
+          if(!note) notes.push(`Notes: `, `None`);
+          else notes.push( `Notes: `, note.toString());
+          break;
+        case SHEETS.Advancedlab.getSheetName():
+          material = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.whichPrinter, thisRow);
+          if(!material) mat.push(`Materials: `, `None`);
+          else mat.push( `Which Printer: `, material.toString());
+
+          part = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.numberOfParts, thisRow);
+          if(!part) partcount.push(`Part Count: `, `None`);
+          else partcount.push( `Part Count:`, part.toString());
+
+          note = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.otherJobNotes, thisRow);
+          if(!note) notes.push(`Notes: `, `None`);
+          else notes.push( `Notes:`, note.toString());
+          break;
+        default:
+          mat.push(`Materials: `, `None`);
+          partcount.push(`Part Count: `, `None`);
+          notes.push(`Notes: `, `None`);
+          break;
+      }
+      ticket = new Ticket({
+        jobnumber : jobnumber,
+        designspecialist : designspecialist,
+        submissiontime : submissiontime,
+        name : name,
+        email : email,
+        projectname : projectname,
+        material1Name : material1Name,
+        material1Quantity : material1Quantity,
+        material2Name : material2Name,
+        material2Quantity : material2Quantity,
+        materials : mat,
+        partCount : partcount,
+        notes : notes,
+      });
+      ticket.CreateTicket();
+    } catch (err) {
+      writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+    }
+    try {
+      SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
+      console.info(`Set Ticket URL - Sheet: ${thisSheet} Row: ${thisRow}, URL: ${ticket.url}`);
+    } catch (err) {
+      console.error(`${err} : Setting Ticket URL failed - Sheet: ${thisSheet} Row: ${thisRow} URL: ${ticket.url}`);
+    }
+  }
+
   // Case switch for different Design Specialists email
-  var designspecialistemaillink = InvokeDS(designspecialist, "emaillink");
-  var designspecialistemail = InvokeDS(designspecialist, "email");
+  var designspecialistemaillink = InvokeDS(designspecialist, `emaillink`);
+  var designspecialistemail = InvokeDS(designspecialist, `email`);
 
   // Create a Message and Return Appropriate Responses.
   var Message = new CreateMessage({
@@ -434,7 +509,7 @@ const onChange = async (e) => {
   })
 
   // Check priority one more time:
-  if (priority == "STUDENT NOT FOUND!" && (status != STATUS.closed || status != STATUS.cancelled)) {
+  if (priority == `STUDENT NOT FOUND!` && (status != STATUS.closed || status != STATUS.cancelled)) {
     SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
   }
 };

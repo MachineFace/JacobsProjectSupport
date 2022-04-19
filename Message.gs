@@ -147,7 +147,7 @@ class CreateMessage
       }
       else message += `<p>The cost is estimated to be ${this.costFormatted} <br /><p></br>`;
       message += `<br/>`;
-      message += `Completed projects can be picked up in-person, unless otherwise noted with your instructor, or unless you have elected to have your parts shipped.<br/><br/>`;
+      message += `Completed projects can be picked up in-person.<br/><br/>`;
       message += `<b>Pick-Up Location:<br/>`;
       message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby. <br/>`; 
       message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
@@ -164,6 +164,24 @@ class CreateMessage
       message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> have been picked up and the project is now CLOSED. Job Number: <i>${this.jobnumber}</i><br />`;
       message += `Please email ${this.designspecialist} at ${this.designspecialistemaillink} if you have any additional questions.<br/>`;
+      message += `<p>Please take a moment to take our survey so we can improve JPS : `
+      message += `<a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>`;
+      message += `<p>Best,<br />Jacobs Hall Staff</p>`; 
+    return message;
+  }
+  get abandonedMessage() {
+    let message = `<p>Hi ${this.name},</p>`;
+      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished and have not been picket up yet. Job Number: <i>${this.jobnumber}</i><br />`;
+      message += `<font style="color:#FF0000";><b>Please pick up your parts SOON before they are disposed of in the free-prints bin.</b></font><br />`;
+      message += `Please email ${this.designspecialist} at ${this.designspecialistemaillink} if you have questions or concerns.<br/>`;
+      message += `Completed projects can be picked up in-person.<br/><br/>`;
+      message += `<b>Pick-Up Location:<br/>`;
+      message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby. <br/>`; 
+      message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
+      message += `<b>Pick-Up Hours:<br/>`;
+      message += `${PickupHours}</b><br/><br/>`
+      message += `If you have any further questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
       message += `<p>Please take a moment to take our survey so we can improve JPS : `
       message += `<a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>`;
       message += `<p>Best,<br />Jacobs Hall Staff</p>`; 

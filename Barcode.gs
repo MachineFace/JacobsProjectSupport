@@ -7,10 +7,7 @@ class BarcodeGenerator {
   constructor({
     jobnumber : jobnumber,
   }) {
-    this.jobnumber = jobnumber ? jobnumber : new JobNumberGenerator().jobnumber;
-    this.GenerateBarCodeForTicketHeader();
-    this.url;
-    this.blob;
+    this.jobnumber = jobnumber ? jobnumber : `10000001`;
   }
 
   /**
@@ -37,17 +34,15 @@ class BarcodeGenerator {
       muteHttpExceptions : true
     };
     
-    let barcode;
-
     const html = await UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = html.getResponseCode();
     console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       this.blob = Utilities.newBlob(html.getContent()).setName(`Barcode-${this.jobnumber}`) ;
-      barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
-      this.url = barcode.getUrl();
+      this.barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(this.blob);
+      this.url = this.barcode.getUrl();
       console.info(`Barcode ---> ${this.url}`);
-      return barcode;
+      return this.barcode;
     } else {
       console.error('Failed to GET Barcode');
       return false;
@@ -73,23 +68,36 @@ class BarcodeGenerator {
       followRedirects : true,
       muteHttpExceptions : true,
     };
-    
-    let barcode;
 
-    const res = await UrlFetchApp.fetch(barcodeLoc, params);
+    let barcode;
+    const res = UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = res.getResponseCode();
-    console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
+    // console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200) {
-      this.blob = Utilities.newBlob(res.getContent()).setName(`Barcode-${this.jobnumber}`)
-      barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
-      this.url = barcode.getUrl();
-      console.info(`Barcode ---> ${this.url}`);
-      return barcode;
+      barcode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      barcode.setTrashed(true);
     } 
-    else {
-      console.error('Failed to GET Barcode');
-      return false;
-    }
+    else console.error('Failed to GET Barcode');
+    console.info(`BARCODE CREATED ---> ${barcode?.getId()?.toString()}`);
+    return barcode;
+    
+    // let barcode;
+    // const res = await UrlFetchApp.fetch(barcodeLoc, params);
+    // const responseCode = res.getResponseCode();
+    // // console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
+    // if (responseCode == 200) {
+    //   let blob = Utilities.newBlob(res.getContent()).setName(`Barcode-${this.jobnumber}`);
+    //   barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
+    //   this.blob = blob;
+    //   this.barcode = barcode;
+    //   this.url = barcode.getUrl();
+    //   console.info(`Barcode ---> ${barcode.getUrl()}`);
+    //   return barcode;
+    // } 
+    // else {
+    //   console.error('Failed to GET Barcode');
+    //   return false;
+    // }
   }
   
 }
@@ -168,12 +176,62 @@ const PickupByBarcode = () => {
   progress.setValue(`Job number not found. Try again.`);
 } 
 
+/**
+ * Mark a job as abandoned and email student.
+ */
+const MarkAsAbandonedByBarcode = async () => {
+  const jobnumber = OTHERSHEETS.Pickup.getRange(3,2).getValue();
+  let progress = OTHERSHEETS.Pickup.getRange(4,2);
 
-const _testQRCode = () => {
-  const b = new BarcodeGenerator({ jobnumber: 0101010101 });
+  progress.setValue(`Searching for job number...`);
+  if (jobnumber == null || jobnumber == "") {
+    progress.setValue(`No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
+    return;
+  }
+  Object.values(SHEETS).forEach(sheet => {
+    const textFinder = sheet.createTextFinder(jobnumber);
+    const searchFind = textFinder.findNext();
+    if (searchFind != null) {
+      let searchRow = searchFind.getRow();
+      SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.abandoned);
+      progress.setValue(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+      console.info(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+
+      const email = GetByHeader(sheet, HEADERNAMES.email, searchRow);
+      const name = GetByHeader(sheet, HEADERNAMES.name, searchRow);
+      const projectname = GetByHeader(sheet, HEADERNAMES.filename, searchRow);
+      const material1Quantity = GetByHeader(sheet, HEADERNAMES.materials, searchRow);
+      const material1Name = GetByHeader(sheet, HEADERNAMES.mat1, searchRow);
+      const designspecialist = GetByHeader(sheet, HEADERNAMES.ds, searchRow);
+      var message = new CreateMessage({
+        name : name,
+        projectname : projectname, 
+        jobnumber : jobnumber,
+        material1Quantity : material1Quantity,
+        material1Name : material1Name,
+        designspecialist : designspecialist,
+      });
+      new Emailer({
+        email : email,
+        name : name, 
+        status : STATUS.abandoned,
+        projectname : projectname,
+        jobnumber : jobnumber,
+        material1Quantity : material1Quantity,
+        message : message,
+      });
+      console.warn(`Student: ${name} emailed ABANDONED message.`)
+      return;
+    }
+  });
+  progress.setValue(`Job number not found. Try again.`);
+}
+
+const _testBarcode = async () => {
+  const b = await new BarcodeGenerator({ jobnumber : 123847687 }).GenerateBarCodeForTicketHeader();
   console.info(b);
-  const q = new QRCodeGenerator({ url : `https://www.codyglen.com/`, });
-  console.info(q)
+  // const q = new QRCodeGenerator({ url : `https://www.codyglen.com/`, });
+  // console.info(q)
 }
 
 

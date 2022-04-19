@@ -39,19 +39,18 @@ class DesignSpecialist
   SetAreas () {
     switch (this.name) {
       case "Adam":
-        this.areas = [SHEETS.Othermill.getName(), SHEETS.Shopbot.getName(),];
+        this.areas = [SHEETS.Othermill.getSheetName(), SHEETS.Shopbot.getSheetName(),];
         break;
       case "Chris":
-        this.areas = [SHEETS.Advancedlab.getName(), SHEETS.Creaform.getName(),];
+        this.areas = [SHEETS.Advancedlab.getSheetName(), SHEETS.Creaform.getSheetName(),];
         break;
       case "Cody":
-        this.areas = [SHEETS.Plotter.getName(), SHEETS.Fablight.getName(), SHEETS.Haas.getName(), SHEETS.Vinyl.getName()];
+        this.areas = [SHEETS.Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Haas.getSheetName(), SHEETS.Vinyl.getSheetName()];
         break;
       case "Gary":
-        this.areas = [SHEETS.Waterjet.getName(), SHEETS.Othertools.getName(),];
+        this.areas = [SHEETS.Waterjet.getSheetName(), SHEETS.Othertools.getSheetName(),];
         break;
       case "Nicole":
-        this.areas = [SHEETS.Ultimaker.getName(),];
         break;
       case undefined:
         this.areas = [];

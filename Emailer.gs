@@ -68,6 +68,16 @@ class Emailer
             name: this.gmailName,
         });
         break;
+      case STATUS.abandoned:
+        console.warn(`Sending ${this.status} email to student.`);
+        GmailApp.sendEmail(this.email, `${this.gmailName} : Project waiting for you to pick up!`, "", {
+            htmlBody: this.message.abandonedMessage,
+            from: this.supportAlias,
+            cc: this.designspecialistemail,
+            bcc: staff.Chris.email,
+            name: this.gmailName,
+        });
+        break;
       case STATUS.pickedUp:
         console.warn(`Sending ${this.status} email to student.`);
         GmailApp.sendEmail(this.email, `${this.gmailName} : Project Picked Up`, "", {
@@ -185,7 +195,8 @@ const _testEmailer = () => {
 }
 
 
-
+/** 
+ * @NOTIMPLEMENTED
 const CountTotalEmailsSent = async () => {
   let count = 0;
   try {
@@ -209,7 +220,7 @@ const CountTotalEmailsSent = async () => {
   console.warn(`Total Emails Sent : ${count}`);
   return count;
 }
-
+*/
 
 /**
  * Lists, for each thread in the user's Inbox, a
