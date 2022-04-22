@@ -205,7 +205,7 @@ class ShopifyAPI
 
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = JSON.parse(html.getContentText());
       this.writer.Info(`Posted Order! : ${content}`);
@@ -229,8 +229,8 @@ class ShopifyAPI
    */
   async GetCustomerByEmail(email) {
 
-    let fields = '&fields=id,first_name,last_name,total_spent';
-    let scope = 'customers/search.json?query=email:' + email;
+    let fields = `&fields=id,first_name,last_name,total_spent`;
+    let scope = `customers/search.json?query=email:${email}`;
     let repo = scope + fields;
 
     //Stuff into Params
@@ -294,7 +294,7 @@ class ShopifyAPI
       // Fetch Products
       let html = await UrlFetchApp.fetch(this.root + repo, params);
       let responseCode = html.getResponseCode();
-      this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
       if (responseCode == 200 || responseCode == 201) {
         let parsed = JSON.parse(html.getContentText())['product'];
 
@@ -343,7 +343,7 @@ class ShopifyAPI
     // Fetch Products
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       var parsed = JSON.parse(html.getContentText())['orders'][0];
       this.writer.Info(`ORDER PLACED ----> TIME : ${parsed.created_at}\\n ORDER NUMBER : ${parsed.name}\\n TO : ${parsed.email}\\n FOR : $${parsed.total_price}`);
@@ -372,7 +372,7 @@ class ShopifyAPI
     // Fetch Products
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = JSON.parse(html.getContentText())["order"];
       return content;  
@@ -408,7 +408,7 @@ class ShopifyAPI
     // Fetch Products
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       var parsed = JSON.parse(html.getContentText())['orders'];
 
@@ -457,7 +457,7 @@ class ShopifyAPI
     
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let parsed = JSON.parse(html.getContentText())['orders'];
 
@@ -516,7 +516,7 @@ class ShopifyAPI
     
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     this.writer.Info(`Content -----> ${html.getContentText()}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = html.getContentText();
@@ -556,7 +556,7 @@ class ShopifyAPI
     // Fetch Reports
     let html = await UrlFetchApp.fetch(this.root, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
 
     if (responseCode == 200 || responseCode == 201) {
       let content = html.getContentText()
@@ -587,7 +587,7 @@ class ShopifyAPI
     // Fetch Reports
     let html = await UrlFetchApp.fetch(this.root, params);
     let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
     if (responseCode == 200 || responseCode == 201) {
       let content = html.getContentText();

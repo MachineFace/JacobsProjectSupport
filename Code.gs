@@ -227,6 +227,10 @@ const onChange = async (e) => {
   // Skip the first 2 rows of data.
   if (thisRow <= 1) return;
 
+  // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
+  if (thisCol > 1 && thisCol != 3) return;
+
+
   //----------------------------------------------------------------------------------------------------------------
   // Add link to DS List
   const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
@@ -255,17 +259,18 @@ const onChange = async (e) => {
 
   let tempPriority = await new Priority({email : tempEmail, sid : tempSID}).priority;
   SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, tempPriority);
-  if (tempPriority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+  if (tempPriority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) {
+    SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+  }
 
-  // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
-  if (thisCol > 1 && thisCol != 3) return;
+  
 
   //----------------------------------------------------------------------------------------------------------------
   // Parse Data
 
   var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) : `a Design Specialist`;
-  var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow);
-  var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
+  var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) : await new Priority({email : tempEmail, sid : tempSID}).priority;
+  var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) : new JobNumberGenerator({ date : new Date() }).jobnumber;
   var ticket = GetByHeader(thisSheet, HEADERNAMES.ticket, thisRow);
   var studentApproval = GetByHeader(thisSheet, HEADERNAMES.studentApproved, thisRow);
   var submissiontime = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);

@@ -150,12 +150,16 @@ const GetRowData = (sheet, row) => {
     headers.forEach( (header, index) => {
       dict[header] = data[index];
     });
-    console.info(dict);
+    dict[`sheetName`] = sheet.getSheetName();
+    dict[`row`] = row;
+    // console.info(dict);
     return dict;
   } catch (err) {
     console.error(`${err} : GetRowData failed - Sheet: ${sheet} Row: ${row}`);
   }
 }
+
+
 
 
 
@@ -177,6 +181,29 @@ const SetByHeader = (sheet, columnName, row, val) => {
   }
 };
 
+
+/**
+ * Search all Sheets for one specific value
+ * @required {string} value
+ * @returns {[sheet, [number]]} [sheetname, row]
+ */
+const FindOne = (value) => {
+  if (value) value.toString().replace(/\s+/g, "");
+  let res = {};
+  for(const [key, sheet] of Object.entries(SHEETS)) {
+    const finder = sheet.createTextFinder(value).findNext();
+    if (finder != null) {
+      // res[key] = finder.getRow();
+      res = GetRowData(sheet, finder.getRow());
+    }
+  }
+  return res;
+}
+const _testFindOne = () => {
+  num = 20220302070954;
+  const res = FindOne(num);
+  console.info(res);
+}
 
 
 

@@ -194,10 +194,21 @@ const _testEmailer = () => {
   })
 }
 
+/** 
+const __thing__ = () => {
+  const message = new CreateMessage({
+    name : `Cingus`,
+    jobnumber : 192384712938,
+    projectname : `P Funk`,
+  });
+  if(message instanceof CreateMessage) console.warn(`Message is instance of Message Class...`);
+  else console.warn(`message is NOT instance of Message class.`)
+}
+*/
 
 /** 
  * @NOTIMPLEMENTED
-const CountTotalEmailsSent = async () => {
+const __CountTotalEmailsSent__ = async () => {
   let count = 0;
   try {
     let pageToken;
@@ -225,8 +236,9 @@ const CountTotalEmailsSent = async () => {
 /**
  * Lists, for each thread in the user's Inbox, a
  * snippet associated with that thread.
- */
-const ListInboxSnippets = () => {
+ *
+ * 
+const __ListInboxSnippets__ = () => {
   try {
     let pageToken;
     do {
@@ -245,7 +257,7 @@ const ListInboxSnippets = () => {
     console.error(`Whoops ----> ${err}`);
   }
 }
-
+*/
 
 
 

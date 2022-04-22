@@ -1,3 +1,80 @@
+
+/**
+ * Mark a job as abandoned and send an email to that student
+ */
+const PopUpMarkAsAbandoned = async () => {
+  let ui = SpreadsheetApp.getUi(); 
+  let response = ui.prompt(`Mark Job as Abandoned`, `Scan a ticket with this cell selected and press "OK".`, ui.ButtonSet.OK_CANCEL);
+
+  // Process the user's response.
+  if (response.getSelectedButton() == ui.Button.OK) {
+    let jobnumber = response.getResponseText();
+    console.warn(`Finding ${jobnumber}`);
+    let res = FindOne(jobnumber);
+    if(res == null) {
+      progressUpdate.setValue(`Job number not found. Try again.`);
+    } else {
+      let sheet = SHEETS[res.sheetName];
+      let row = res.row;
+      let email = res.email;
+      SetByHeader(sheet, HEADERNAMES.status, row, STATUS.abandoned);
+      console.info(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${row}`);
+      const message = await new CreateMessage({
+        name : res.name, 
+        projectname : res.projectName, 
+        jobnumber : jobnumber, 
+        designspecialist : res.ds, 
+      })
+      await new Emailer({
+        email : email, 
+        status : STATUS.abandoned,
+        projectname : res.projectName,
+        jobnumber : jobnumber,
+        message : message,
+      })
+      console.warn(`Owner ${email} of abandoned job: ${jobnumber} emailed...`);
+      ui.alert(`Marked as Abandoned`, `${email}, Job: ${jobnumber} emailed... Sheet: ${sheet.getSheetName()} row: ${row}`, ui.ButtonSet.OK);
+    }
+  } else if (response.getSelectedButton() == ui.Button.CANCEL) {
+    console.warn(`User chose not to send an email...`);
+  } else {
+    console.warn(`User cancelled.`);
+  }
+    
+}
+
+/**
+ * Mark a job as abandoned and send an email to that student
+ */
+const PopUpMarkAsPickedUp = async () => {
+  let ui = SpreadsheetApp.getUi(); 
+  let response = ui.prompt(`Mark Print as Picked Up`, `Scan a ticket with this cell selected and press "OK".`, ui.ButtonSet.OK_CANCEL);
+
+  // Process the user's response.
+  if (response.getSelectedButton() == ui.Button.OK) {
+    let jobnumber = response.getResponseText();
+    console.warn(`Finding ${jobnumber}`);
+    let res = FindOne(jobnumber);
+    if(res == null) {
+      console.warn(`Job number not found. Try again.`);
+    } else {
+      let sheet = SHEETS[res.sheetName];
+      let row = res.row;
+      let email = res.email;
+      SetByHeader(sheet, HEADERNAMES.status, row, STATUS.pickedUp);
+      console.warn(`${email}, Job: ${jobnumber} marked as picked up... Sheet: ${sheet.getSheetName()} row: ${row}`);
+      ui.alert(`Marked as Picked Up`, `${email}, Job: ${jobnumber}... Sheet: ${sheet.getSheetName()} row: ${row}`, ui.ButtonSet.OK);
+    }
+  } else if (response.getSelectedButton() == ui.Button.CANCEL) {
+    console.warn(`User chose not to mark as picked up...`);
+  } else {
+    console.warn(`User cancelled.`);
+  }
+    
+}
+
+
+
 /** 
  * Creates a pop-up for counting users.
  */
@@ -150,6 +227,9 @@ const BarMenu = () => {
     .createMenu("JPS Menu")
     .addItem("Generate Bill to Selected Student", "BillFromSelected")
     .addItem("Generate a New JobNumber", "PopupCreateNewJobNumber")
+    .addSeparator()
+    .addItem(`Mark as Abandoned`, `PopUpMarkAsAbandoned`)
+    .addItem(`Mark as Picked Up`, `PopUpMarkAsPickedUp`)
     .addSeparator()
     .addItem("Barcode Scanning Tool", "OpenBarcodeTab")
     .addSeparator()

@@ -77,13 +77,11 @@ class HackyStoreAutomation
    * @return {float} none
    */
   async UpdatePriceUsingShopifyAPI () {
-    // Object.values(STORESHEETS).forEach(sheet => {
-    //   console.info(sheet)
-    // })
-    for(const [key, sheet] of Object.entries(STORESHEETS)) {
+    Object.values(STORESHEETS).forEach(sheet => {
+      // console.info(sheet)
       this.UpdatePricePerSheet(sheet);
       Utilities.sleep(1000);
-    }
+    });
   }
 
   /**
