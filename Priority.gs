@@ -21,11 +21,15 @@ class Priority
     try {
       if (this.email) {
         let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
-        if (finder != null) {
+        if (finder) {
           let row = finder.getRow();
           this.priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
           console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${this.priority}`);
           return this.priority;
+        } else if (!finder) {
+          // try staff
+          let secondsearch = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
+          if (secondsearch) this.priority = 1;
         } else if (!finder) {
           // try SID
           finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();

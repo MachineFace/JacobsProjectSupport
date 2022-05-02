@@ -11,17 +11,16 @@
  * @returns {[sheet, [values]]} list of sheets with lists of indexes
  */
 const Search = (value) => {
-  // value = "laxbop@berkeley.edu";  // test good sid
   if (value) value.toString().replace(/\s+/g, "");
   let res = {};
-  for(const [key, sheet] of Object.entries(SHEETS)) {
+  Object.values(SHEETS).forEach(sheet => {
     const finder = sheet.createTextFinder(value).findAll();
     if (finder != null) {
       temp = [];
       finder.forEach(result => temp.push(result.getRow()));
       res[sheet.getName()] = temp;
     }
-  }
+  })
   console.info(JSON.stringify(res));
   return res;
 }
@@ -49,12 +48,12 @@ const FindByJobNumber = (jobnumber) => {
   jobnumber = 20211025144607;  // test good jnum
   if (jobnumber) jobnumber.toString().replace(/\s+/g, "");
   let res = {};
-  for(const [key, sheet] of Object.entries(SHEETS)) {
+  Object.values(SHEETS).forEach(sheet => {
     const finder = sheet.createTextFinder(jobnumber).findNext();
     if (finder != null) {
       res[sheet.getName()] = finder.getRow();
     }
-  }
+  })
   console.info(JSON.stringify(res));
   return res;
 }
@@ -436,6 +435,9 @@ const CheckMissingAccessStudents = () => {
 };
 
 
+
+
+
 /**
  * Check if this sheet is forbidden
  * @param {sheet} sheet to check
@@ -563,6 +565,7 @@ const SetStatusDropdowns = () => {
 
 /**
  * Set the Conditional Formatting for each page
+ * @TRIGGERED
  */
 const SetConditionalFormatting = () => {
   Object.values(SHEETS).forEach(sheet => {
@@ -655,8 +658,30 @@ const SetConditionalFormatting = () => {
 }
 
 
+/**
+ * Resize the Summary page Rows back to Default
+ * @TRIGGERED
+ */
+const SetRowHeight = () => {
+  OTHERSHEETS.Summary.setRowHeightsForced(3, OTHERSHEETS.Summary.getMaxRows() - 3, 21);
+  OTHERSHEETS.Summary.getRange(3, 1, OTHERSHEETS.Summary.getMaxRows() -1, OTHERSHEETS.Summary.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+}
 
 
+/**
+ * Helper Method for TitleCasing Names
+ * @param {string} string
+ * @returns {string} titlecased
+ */
+const TitleCase = (str) => {
+  str = str
+    .toLowerCase()
+    .split(' ');
+  for (var i = 0; i < str.length; i++) {
+    str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+  }
+  return str.join(' ');
+}
 
 
 

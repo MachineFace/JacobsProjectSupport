@@ -60,7 +60,7 @@ const onSubmission = async (e) => {
   }
 
   // Parse variables
-  var name = e.namedValues[HEADERNAMES.name][0] ? e.namedValues[HEADERNAMES.name][0] : GetByHeader(sheet, HEADERNAMES.name, lastRow);
+  var name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : GetByHeader(sheet, HEADERNAMES.name, lastRow);
   var email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
   var sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
   var studentType = e.namedValues[HEADERNAMES.afiliation][0] ? e.namedValues[HEADERNAMES.afiliation][0] : GetByHeader(sheet, HEADERNAMES.afiliation, lastRow);
@@ -170,7 +170,7 @@ const onSubmission = async (e) => {
   }
 
   try {
-    if (priority == `STUDENT NOT FOUND!` || priority == false) {
+    if (priority.priority == `STUDENT NOT FOUND!` || priority.priority == false) {
       // Set access to Missing Access
       SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
@@ -179,7 +179,7 @@ const onSubmission = async (e) => {
         htmlBody: message.missingAccessMessage,
         from: supportAlias,
         bcc: staff.Chris.email,
-        name: `Jacobs Project Support`,
+        name: gmailName,
       });
       writer.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
@@ -227,10 +227,6 @@ const onChange = async (e) => {
   // Skip the first 2 rows of data.
   if (thisRow <= 1) return;
 
-  // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
-  if (thisCol > 1 && thisCol != 3) return;
-
-
   //----------------------------------------------------------------------------------------------------------------
   // Add link to DS List
   const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
@@ -249,6 +245,8 @@ const onChange = async (e) => {
     if(thisSheetName == sheet.getSheetName()) return;
   });
 
+  // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
+  if (thisCol > 1 && thisCol != 3) return;
 
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
@@ -259,7 +257,7 @@ const onChange = async (e) => {
 
   let tempPriority = await new Priority({email : tempEmail, sid : tempSID}).priority;
   SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, tempPriority);
-  if (tempPriority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) {
+  if (tempPriority == `STUDENT NOT FOUND` || !tempPriority && (status != STATUS.cancelled || status != STATUS.closed)) {
     SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
   }
 
@@ -330,6 +328,14 @@ const onChange = async (e) => {
     }
   } catch (err) {
     writer.Error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+  }
+  
+  //----------------------------------------------------------------------------------------------------------------
+  // Fix Casing on the name field
+  try {
+    if(name) SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
+  } catch (err) {
+    writer.Error(`${err} : Couldn't fix their name.....`)
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -514,7 +520,7 @@ const onChange = async (e) => {
   })
 
   // Check priority one more time:
-  if (priority == `STUDENT NOT FOUND!` && (status != STATUS.closed || status != STATUS.cancelled)) {
+  if (priority == `STUDENT NOT FOUND!` || !priority && (status != STATUS.closed || status != STATUS.cancelled)) {
     SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
   }
 };

@@ -40,15 +40,15 @@ class WriteLogger
     this._CleanupSheet();
   }
   _PopItem() {
-    if(this.row > 100) {
-      this.sheet.deleteRows(1, 1);
+    if(this.row > 500) {
+      this.sheet.deleteRows(2, 1);
     } else {
       this.sheet.insertRowAfter(this.sheetLength - 1);
     }
   }
   _CleanupSheet() {
     if(this.row > 2000) {
-      this.sheet.deleteRows(1, 1999);
+      this.sheet.deleteRows(2, 1999);
     } else return;
   }
   
