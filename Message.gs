@@ -45,7 +45,7 @@ class CreateMessage
   }) {
     this.name = name ? name.toString() : `Unknown Name`;
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
-    this.jobnumber = jobnumber ? jobnumber.toString() : new JobNumberGenerator().jobnumber;
+    this.jobnumber = jobnumber ? jobnumber.toString() : new CreateJobnumber({ date : new Date() }).Jobnumber;
     this.approvalURL = approvalURL ? approvalURL.toString() : `Unknown Approval URL`;
 
     this.material1Name = material1Name ? material1Name.toString() : `Material 1 Name`;
@@ -304,7 +304,7 @@ class CreateSubmissionMessage
   }) {
     this.name = name ? name : `Unknown Name`;
     this.projectname = projectname ? projectname : `Unknown Project Name`;
-    this.jobnumber = jobnumber ? jobnumber : new JobNumberGenerator().jobnumber;
+    this.jobnumber = jobnumber ? jobnumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
   }
   get dsMessage() {
     let message = `<p>Hello!</p> `;

@@ -220,7 +220,6 @@ const SHEETS = {
   Creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
   Othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Other Tools`), // Other Sheet
   Plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Canon Plotter`), // Plotter Sheet
-  // Ultimaker: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Ultimaker`), // Ultimaker Sheet
 };
 
 /**

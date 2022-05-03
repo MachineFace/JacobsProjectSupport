@@ -48,7 +48,11 @@ const PopUpMarkAsAbandoned = async () => {
  */
 const PopUpMarkAsPickedUp = async () => {
   let ui = SpreadsheetApp.getUi(); 
-  let response = ui.prompt(`Mark Print as Picked Up`, `Scan a ticket with this cell selected and press "OK".`, ui.ButtonSet.OK_CANCEL);
+  let response = ui.prompt(
+    `Mark Print as Picked Up`, 
+    `Scan a ticket with this cell selected and press "OK".`, 
+    ui.ButtonSet.OK_CANCEL
+  );
 
   // Process the user's response.
   if (response.getSelectedButton() == ui.Button.OK) {
@@ -119,7 +123,7 @@ const PopupCreateNewJobNumber = async () => {
     return;
   } else {
     const timestamp = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
-    const jobnumber = new JobNumberGenerator(timestamp).jobnumber;
+    const jobnumber = new CreateJobnumber({ date : timestamp}).Jobnumber;
     SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber.toString());
     ui.alert(
       `JPS Runtime Message`,

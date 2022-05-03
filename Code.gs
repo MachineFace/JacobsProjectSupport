@@ -72,7 +72,7 @@ const onSubmission = async (e) => {
   writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let jobnumber = await new JobNumberGenerator({ date : timestamp }).jobnumber;
+  let jobnumber = await new CreateJobnumber({ date : timestamp }).Jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
   // Check Priority
@@ -192,7 +192,7 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new JobNumberGenerator({ date : timestamp }).jobnumber;
+  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
 
@@ -268,7 +268,7 @@ const onChange = async (e) => {
 
   var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) : `a Design Specialist`;
   var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) : await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
-  var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) : new JobNumberGenerator({ date : new Date() }).jobnumber;
+  var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) : new CreateJobnumber({ date : new Date() }).Jobnumber;
   var ticket = GetByHeader(thisSheet, HEADERNAMES.ticket, thisRow);
   var studentApproval = GetByHeader(thisSheet, HEADERNAMES.studentApproved, thisRow);
   var submissiontime = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
@@ -322,7 +322,7 @@ const onChange = async (e) => {
   try {
     writer.Warning(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobnumber = jobnumber ? jobnumber : new JobNumberGenerator({ date : submissiontime }).jobnumber;
+      jobnumber = jobnumber ? jobnumber : new CreateJobnumber({ date : submissiontime }).Jobnumber;
       SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }

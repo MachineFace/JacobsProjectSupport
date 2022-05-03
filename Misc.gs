@@ -409,29 +409,7 @@ const datetimeToDate = (d) => new Date(d.getYear(), d.getMonth(), d.getDate());
 
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Check Students with Missing Access for their Priority Number if it exists.
- */
-const CheckMissingAccessStudents = () => {
-  let list = [];
-  let results = Search("STUDENT NOT FOUND!");
-  if(results != null) {
-    for(const [sheetName, values] of Object.entries(results)) {
-      values.forEach( row => {
-        let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.email, row);
-        let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.sid, row)
-        const p = new CheckPriority({email : email, sid : sid}).Priority;
-        console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
-        if(p != `STUDENT NOT FOUND!`) {
-          list.push(email);
-          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(p);
-        }
-      })
-    }
-  }
-  return list;
-};
+
 
 
 
@@ -475,65 +453,7 @@ const FindMissingElementsInArrays = (array1, array2) => {
 }
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Generate new Job number from a date
- * @param {time} date
- * @return {number} job number
- */
-class JobNumberGenerator
-{
-  constructor({
-    date : date,
-  }){
-    this.date = date ? new Date(date) : new Date();
-    this.jobnumber;
-    this.Create();
-  }
 
-  Create() {
-    try {
-      if (!this.IsValidDate()) this.jobnumber = this.FormatDateAsJobnumber(new Date());
-      else if (!this.date || !this.IsValidDate()) {
-        this.jobnumber = this.FormatDateAsJobnumber(new Date());
-        console.warn(`Set Jobnumber to a new time because timestamp was missing.`);
-        return this.jobnumber;
-      } else {
-        this.jobnumber = this.FormatDateAsJobnumber(this.date);
-        console.info(`Input time: ${this.date}, Set Jobnumber: ${this.jobnumber}`);
-        return this.jobnumber;
-      }
-    } catch (err) {
-      console.error(`${err} : Couldn't fix jobnumber.`);
-    }
-    console.info(`Returned Job Number : ${this.jobnumber}`);
-    return this.jobnumber.toString();
-  };
-
-  FormatDate() {
-    return new Date(this.date.getYear(), this.date.getMonth(), this.date.getDate() -1);
-  }
-
-  FormatDateAsJobnumber (date) {
-    return +Utilities.formatDate(date, `PST`, `yyyyMMddHHmmss`)
-  }
-
-  IsValidDate() {
-    if (Object.prototype.toString.call(this.date) !== "[object Date]") return false;
-    else return !isNaN(this.date.getTime());
-  };
-}
-
-const _testJobNumberGen = () => {
-  const jobnumbertypes = {
-    GoodDate : new Date(2015, 10, 3),
-    BadDate : `20200505`,
-  }
-  Object.values(jobnumbertypes).forEach(date => {
-    const num = new JobNumberGenerator({ date : date });
-    console.info(num.jobnumber.toString());
-  })
-}
 
 
 
@@ -552,6 +472,7 @@ const GetAllProjectNames = () => {
 
 /**
  * Set Dropdowns for status
+ * @TRIGGERED
  */
 const SetStatusDropdowns = () => {
   Object.values(SHEETS).forEach(sheet => {

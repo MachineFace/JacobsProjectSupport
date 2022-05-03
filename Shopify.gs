@@ -586,7 +586,7 @@ class ShopifyAPI
 
 
 const _testAPI = async () => {
-  const jobnumber = new JobNumberGenerator().jobnumber;
+  const jobnumber = new CreateJobnumber({ date : new Date() }).Jobnumber;
   // const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
   const shopify = new ShopifyAPI({
     jobnumber : jobnumber,

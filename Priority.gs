@@ -18,49 +18,42 @@ class CheckPriority
     // Try email first
     try {
       let priority = ``;
-      if (this.email) {
-        console.warn(`Checking priority via email....`);
-        let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
-        if (finder) {
-          let row = finder.getRow();
-          priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
-          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
-          return priority;
-        } else if (!finder) {
-          // try staff
-          console.warn(`Checking if this person is staff....`)
-          let secondsearch = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
-          if (secondsearch) priority = 1;
-          return priority;
-        } else if (!finder) {
-          // try SID
-          console.warn(`Checking via email failed. Trying via SID`)
-          finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
-          if (finder != null) {
-            let row = finder.getRow();
-            priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
-            console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
-            return priority;
-          } else if (!finder) {
-            priority = "STUDENT NOT FOUND!";
-            console.error(`NOT FOUND ---> EMAIL: ${this.email}, ${priority}`);
-            return priority;
-          }
-        }
-      } else if(!this.email && this.sid) {
-        console.warn(`Checking via email failed. Trying via SID`)
-        let finder = OTHERSHEETS.Approved.createTextFinder(this.sid.toString()).findNext();
+      console.warn(`Checking priority via email for ${this.email}....`);
+      let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
+      if (finder) {
+        let row = finder.getRow();
+        priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
+        console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
+      } else if (!finder) {
+        // try staff
+        console.warn(`Checking if ${this.email} is staff....`)
+        let secondsearch = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
+        if (secondsearch) priority = `1`;
+      } else if (!finder) {
+        // try SID
+        console.warn(`Checking via email failed. Trying via SID : ${this.sid}`)
+        finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
         if (finder != null) {
           let row = finder.getRow();
-          priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
-          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
-          return priority;
+          priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
+          console.info(`EMAIL: ${this.sid}, ROW: ${row}, PRIORITY: ${priority}`);
         } else if (!finder) {
-          priority = "STUDENT NOT FOUND!";
-          console.error(`NOT FOUND ---> PRIORITY : ${priority}`);
-          return priority;
+          priority = `STUDENT NOT FOUND!`;
+          console.error(`NOT FOUND ---> EMAIL: ${this.email}, SID: ${this.sid}, PRIORITY: ${priority}`);
         }
-      } else priority = "STUDENT NOT FOUND!";
+      }
+
+      console.warn(`Checking via email failed. Trying via SID: ${this.sid}`)
+      let finder2 = OTHERSHEETS.Approved.createTextFinder(this.sid.toString()).findNext();
+      if (finder2 != null) {
+        let row = finder2.getRow();
+        priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
+        console.info(`EMAIL: ${this.sid}, ROW: ${row}, PRIORITY: ${priority}`);
+      } else if (!finder2) {
+        priority = `STUDENT NOT FOUND!`;
+        console.error(`NOT FOUND ---> PRIORITY : ${priority}`);
+      }
+
       return priority;      
     } catch (err) {
       console.error(`Whoops ---> ${err}`);
@@ -71,15 +64,11 @@ class CheckPriority
 }
 
 
-
-
-
-
 const _testPriority = () => {
   let typesOfPriority = {
     goodEgoodS : {
       email : `ashchu@berkeley.edu`,
-      sid : 3034858776
+      sid : 3033841568
     },
     goodEbadS : {
       email : `ashchu@berkeley.edu`,
@@ -87,7 +76,7 @@ const _testPriority = () => {
     },
     badEgoodS : {
       email : `ding@bat.edu`,
-      sid : 3034858776,
+      sid : 3033841568,
     },
     badEbadS : {
       email : `ding@bat.edu`,
@@ -96,7 +85,7 @@ const _testPriority = () => {
   }
   console.time(`Priority`);
   Object.entries(typesOfPriority).forEach(type => {
-    console.info(type[1])
+    // console.info(type[1])
     const p = new CheckPriority({
       email : type[1].email,
       sid : type[1].sid,
@@ -108,23 +97,30 @@ const _testPriority = () => {
 
 }
 
-const _t = () => {
-  // const e = `effiejia@berkeley.edu`;
-  const e = `angelviolinist@berkeley.edu`;
-  try{
-    let finder = OTHERSHEETS.Staff.createTextFinder(e).findNext();
-    if (finder != null) {
-      let row = finder.getRow();
-      console.info(row);
-      return 1;
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Check Students with Missing Access for their Priority Number if it exists.
+ */
+const CheckMissingAccessStudents = () => {
+  let list = [];
+  let results = Search("STUDENT NOT FOUND!");
+  if(results != null) {
+    for(const [sheetName, values] of Object.entries(results)) {
+      values.forEach( row => {
+        let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.email, row);
+        let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.sid, row)
+        const p = new CheckPriority({email : email, sid : sid}).Priority;
+        console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
+        if(p != `STUDENT NOT FOUND!`) {
+          list.push(email);
+          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(p);
+        }
+      })
     }
-    else console.warn(`Nothing found.`);
   }
-  catch (err) {
-    console.error(`Whoops ---> ${err}`);
-  }
-  
-}
+  return list;
+};
 
 
 
