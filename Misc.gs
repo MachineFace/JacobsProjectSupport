@@ -32,7 +32,6 @@ const Search = (value) => {
  */
 const SearchSpecificSheet = (sheet, value) => {
   if (value) value.toString().replace(/\s+/g, "");
-
   const finder = sheet.createTextFinder(value).findNext();
   if (finder != null) {
     return finder.getRow();
@@ -422,11 +421,11 @@ const CheckMissingAccessStudents = () => {
       values.forEach( row => {
         let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.email, row);
         let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.sid, row)
-        const p = new Priority({email : email, sid : sid});
-        console.info(`Email : ${email}, SID : ${sid}, Priority : ${p.priority}`);
-        if(p.priority != `STUDENT NOT FOUND!`) {
+        const p = new CheckPriority({email : email, sid : sid}).Priority;
+        console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
+        if(p != `STUDENT NOT FOUND!`) {
           list.push(email);
-          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(p.priority);
+          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(p);
         }
       })
     }

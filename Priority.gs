@@ -4,7 +4,7 @@
  * @param {string} email
  * @param {string} sid
  */
-class Priority
+class CheckPriority
 {
   constructor({
     email : email,
@@ -12,54 +12,56 @@ class Priority
   }) {
     this.email = email ? email.toString().replace(/\s+/g, "") : `jacobsprojectsupport@berkeley.edu`;
     this.sid = sid ? sid.toString().replace(/\s+/g, "") : 19238471239847;
-    this.GetPriority();
-    this.priority;
   }
 
-  GetPriority () {
+  get Priority () {
     // Try email first
     try {
+      let priority = ``;
       if (this.email) {
+        console.warn(`Checking priority via email....`);
         let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
         if (finder) {
           let row = finder.getRow();
-          this.priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
-          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${this.priority}`);
-          return this.priority;
+          priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
+          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
+          return priority;
         } else if (!finder) {
           // try staff
+          console.warn(`Checking if this person is staff....`)
           let secondsearch = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
-          if (secondsearch) this.priority = 1;
+          if (secondsearch) priority = 1;
+          return priority;
         } else if (!finder) {
           // try SID
+          console.warn(`Checking via email failed. Trying via SID`)
           finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
           if (finder != null) {
             let row = finder.getRow();
-            this.priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
-            console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${this.priority}`);
-            return this.priority;
+            priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
+            console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
+            return priority;
           } else if (!finder) {
-            this.priority = "STUDENT NOT FOUND!";
-            console.error(`EMAIL: ${this.email}, ${this.priority}`);
-            return this.priority;
+            priority = "STUDENT NOT FOUND!";
+            console.error(`NOT FOUND ---> EMAIL: ${this.email}, ${priority}`);
+            return priority;
           }
         }
-      } else if(this.sid) {
+      } else if(!this.email && this.sid) {
+        console.warn(`Checking via email failed. Trying via SID`)
         let finder = OTHERSHEETS.Approved.createTextFinder(this.sid.toString()).findNext();
         if (finder != null) {
           let row = finder.getRow();
-          this.priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
-          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${this.priority}`);
-          return this.priority;
+          priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue();
+          console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
+          return priority;
         } else if (!finder) {
-          this.priority = "STUDENT NOT FOUND!";
-          console.error(`PRIORITY : ${this.priority}`);
-          return this.priority;
+          priority = "STUDENT NOT FOUND!";
+          console.error(`NOT FOUND ---> PRIORITY : ${priority}`);
+          return priority;
         }
-      } else this.priority = "STUDENT NOT FOUND!";
-      
-      return this.priority;
-      
+      } else priority = "STUDENT NOT FOUND!";
+      return priority;      
     } catch (err) {
       console.error(`Whoops ---> ${err}`);
     }
@@ -95,11 +97,11 @@ const _testPriority = () => {
   console.time(`Priority`);
   Object.entries(typesOfPriority).forEach(type => {
     console.info(type[1])
-    const priority = new Priority({
+    const p = new CheckPriority({
       email : type[1].email,
       sid : type[1].sid,
-    });
-    console.info(priority.priority);
+    }).Priority;
+    console.info(p);
   }) 
   
   console.timeEnd(`Priority`);

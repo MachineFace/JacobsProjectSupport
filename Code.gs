@@ -76,8 +76,8 @@ const onSubmission = async (e) => {
   SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
   // Check Priority
-  let priority = await new Priority({email : email, sid : sid});
-  SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority.priority);
+  let priority = await new CheckPriority({email : email, sid : sid}).Priority;
+  SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority);
 
 
   // Create Messages
@@ -255,7 +255,7 @@ const onChange = async (e) => {
   let tempEmail = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
   let tempSID = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
 
-  let tempPriority = await new Priority({email : tempEmail, sid : tempSID}).priority;
+  let tempPriority = await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
   SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, tempPriority);
   if (tempPriority == `STUDENT NOT FOUND` || !tempPriority && (status != STATUS.cancelled || status != STATUS.closed)) {
     SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
@@ -267,7 +267,7 @@ const onChange = async (e) => {
   // Parse Data
 
   var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) : `a Design Specialist`;
-  var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) : await new Priority({email : tempEmail, sid : tempSID}).priority;
+  var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) : await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
   var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) : new JobNumberGenerator({ date : new Date() }).jobnumber;
   var ticket = GetByHeader(thisSheet, HEADERNAMES.ticket, thisRow);
   var studentApproval = GetByHeader(thisSheet, HEADERNAMES.studentApproved, thisRow);

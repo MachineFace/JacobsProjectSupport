@@ -21,8 +21,8 @@ const _gastTestRunner = async () => {
   // })
 
   await test(`Priority Test`, async(t) => {
-    const x = await new Priority({email : `codyglen@berkeley.edu`, sid : 91283741923});
-    t.pass(`Good : ${x.priority}`);
+    const x = await new CheckPriority({email : `codyglen@berkeley.edu`, sid : 91283741923}).Priority;
+    t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   })
 
