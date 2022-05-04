@@ -38,7 +38,7 @@ const gmailName = `Jacobs Project Support`;
  */
 const onSubmission = async (e) => {
   const writer = new WriteLogger();
-  const staff = BuildStaff();
+  const staff = new MakeStaff().Staff;
   // Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var sheetName = e.range.getSheet().getName();
@@ -216,7 +216,7 @@ const onSubmission = async (e) => {
  */
 const onChange = async (e) => {
   const writer = new WriteLogger();
-  const staff = BuildStaff();
+  const staff = new MakeStaff().Staff;
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 

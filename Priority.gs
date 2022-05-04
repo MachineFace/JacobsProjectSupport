@@ -24,34 +24,42 @@ class CheckPriority
         let row = finder.getRow();
         priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
         console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
+        return priority;
       } else if (!finder) {
         // try staff
         console.warn(`Checking if ${this.email} is staff....`)
         let secondsearch = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
-        if (secondsearch) priority = `1`;
+        if (secondsearch) {
+          priority = `1`;
+          return priority;
+        }
       } else if (!finder) {
         // try SID
         console.warn(`Checking via email failed. Trying via SID : ${this.sid}`)
         finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
-        if (finder != null) {
+        if (finder) {
           let row = finder.getRow();
           priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
           console.info(`EMAIL: ${this.sid}, ROW: ${row}, PRIORITY: ${priority}`);
+          return priority;
         } else if (!finder) {
           priority = `STUDENT NOT FOUND!`;
           console.error(`NOT FOUND ---> EMAIL: ${this.email}, SID: ${this.sid}, PRIORITY: ${priority}`);
+          return priority;
         }
       }
 
       console.warn(`Checking via email failed. Trying via SID: ${this.sid}`)
       let finder2 = OTHERSHEETS.Approved.createTextFinder(this.sid.toString()).findNext();
-      if (finder2 != null) {
+      if (finder2) {
         let row = finder2.getRow();
         priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
         console.info(`EMAIL: ${this.sid}, ROW: ${row}, PRIORITY: ${priority}`);
+        return priority;
       } else if (!finder2) {
         priority = `STUDENT NOT FOUND!`;
         console.error(`NOT FOUND ---> PRIORITY : ${priority}`);
+        return priority;
       }
 
       return priority;      
@@ -81,7 +89,11 @@ const _testPriority = () => {
     badEbadS : {
       email : `ding@bat.edu`,
       sid : 2394872349587,
-    }
+    },
+    other : {
+      email : `ggrigoriadis@berkeley.edu`,
+      sid : 29384762983472,
+    },
   }
   console.time(`Priority`);
   Object.entries(typesOfPriority).forEach(type => {

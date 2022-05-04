@@ -104,21 +104,14 @@ class Calculate
 
 
   CountActiveUsers () {
-    let persons = []
+    let persons = [];
     Object.values(SHEETS).forEach(sheet => {
       let peeps = GetColumnDataByHeader(sheet, HEADERNAMES.name);
       let culled = peeps.filter(Boolean);
-      culled.forEach(person => {
-        if(person != "FORMULA ROW" || person != null || person != undefined || person != "Test" || person != "" || person != " ") persons.push(person);
-      })
+      persons.push(...culled);
     })
-
-    //Filter out duplicate entries in the list
-    let unique = persons.filter((c, index) => {
-      return persons.indexOf(c) === index;
-    });
-
-    let count = unique.length - 1; //Removes the space.
+    let unique = new Set(persons);
+    let count = unique.size;
     this.writer.Info(`Active JPS Users : ${count}`);
     return count;
   }
@@ -148,6 +141,20 @@ class Calculate
       OTHERSHEETS.Data.getRange(13 + index , 2, 1, 1).setValue(entry[0]);
       OTHERSHEETS.Data.getRange(13 + index , 3, 1, 1).setValue(entry[1]);
     })
+  }
+  PrintTotalSubmissions () {
+    let projects = [];
+    Object.values(SHEETS).forEach(sheet => {
+      let projectnames = GetColumnDataByHeader(sheet, HEADERNAMES.projectName);
+      let culled = projectnames.filter(Boolean);
+      let filtered = culled.filter(name => name !== `FORMULA ROW`);
+      projects.push(...filtered);
+    })
+    let projectSet = [...new Set(projects)];
+    let size = projectSet.length;
+    console.info(`Size of Set --> ${size}`);
+    OTHERSHEETS.Data.getRange(6, 2, 1, 1).setValue(`TOTAL PROJECTS SUBMISSION:`);
+    OTHERSHEETS.Data.getRange(6, 3, 1, 1).setValue(size);
   }
 
 
@@ -187,14 +194,9 @@ class Calculate
     let userList = [];
     Object.values(SHEETS).forEach(sheet => {
       let users = GetColumnDataByHeader(sheet, HEADERNAMES.name);
-      users.forEach( user => {
-        if(!user || user == `FORMULA ROW` || user == `Test`) {
-          // Do nothing
-        }
-        else {
-          userList.push(user);
-        }
-      });
+      users.forEach(user => {
+        if(user != `FORMULA ROW` || user != `Test`) userList.push(user);
+      })
     });
     let culled = userList.filter(Boolean);
     let occurrences = culled.reduce( (acc, curr) => {
@@ -213,6 +215,9 @@ class Calculate
     console.warn(items);
     return items;  
   }
+  /**
+   * Defunct
+   */
   PrintDistributionNumbers () {
     let userList = [];
     Object.values(SHEETS).forEach(sheet => {
@@ -291,8 +296,9 @@ class Calculate
     let mean = values.reduce((a, b) => a + b) / n;
     console.warn(`Mean = ${mean}`);
 
-    let standardDeviation = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-    console.warn(`Standard Deviation for Number of Submissions : ${standardDeviation}`);
+    let s = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+    let standardDeviation = s - mean;
+    console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
     return standardDeviation;
   }
 
@@ -308,15 +314,15 @@ class Calculate
     let mean = values.reduce((a, b) => a + b) / n;
     console.warn(`Mean = ${mean}`);
 
-    return mean;
+    return mean.toFixed(3);
   }
   PrintStatistics () {
     const mean = this.CalculateArithmeticMean();
-    OTHERSHEETS.Data.getRange(102, 2, 1, 1).setValue(`Arithmetic Mean for Project Submissions : `)
+    OTHERSHEETS.Data.getRange(102, 2, 1, 1).setValue(`Arithmetic Mean for Number of Project Submissions : `)
     OTHERSHEETS.Data.getRange(102, 3, 1, 1).setValue(mean);
     const stand = this.CalculateStandardDeviation();
-    OTHERSHEETS.Data.getRange(103, 2, 1, 1).setValue(`Standard Deviation for Project Submissions : `);
-    OTHERSHEETS.Data.getRange(103, 3, 1, 1).setValue(stand);
+    OTHERSHEETS.Data.getRange(103, 2, 1, 1).setValue(`Standard Deviation for Number of Project Submissions : `);
+    OTHERSHEETS.Data.getRange(103, 3, 1, 1).setValue(`+/- ${stand}`);
   }
 
 
@@ -359,40 +365,47 @@ class Calculate
       return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
     }, {});
 
-    let items = Object.keys(occurrences).map((key) => {
-      if (key != "" || key != undefined || key != null || key != " ") {
-        return [key, occurrences[key]];
-      }
-    });
-    items.sort((first, second) => {
-      return second[1] - first[1];
-    });
-    items.splice(0,1);
-    console.warn(items);
-    return items; 
+    return occurrences; 
   }
   PrintStatusCounts () {
     let data = this.CountStatuses();
-    let completed = 0;
-    let cancelled = 0;
-    let inprogress = 0;
-    data.forEach( status => {
-      console.warn(`Status : ${status[0]}, Value : ${status[1]}`);
-      if(status[0] == `completed` || status[0] == `billed` || status[0] == `closed` || status[0] == `pickedUp`) {
-        completed += status[1];
+    for(const [status, count] of Object.entries(data)) {
+      if(status == `completed` || status == `billed` || status == `closed` || status == `pickedUp` || status == `abandoned`) {
+        data.completed += count;
       }
-      else if(status[0] == `cancelled`) cancelled += status[1];
-      else if(status[0] == `inProgress`) inprogress += status[1];
+    }
+    delete data[`billed`]; delete data[`closed`]; delete data[`pickedUp`]; delete data[`abandoned`];
+    console.warn(data);
+    OTHERSHEETS.Data.getRange(7, 2, 1, 1).setValue(`COMPLETED JOBS`);
+    OTHERSHEETS.Data.getRange(7, 3, 1, 1).setValue(data.completed);
+
+    OTHERSHEETS.Data.getRange(8, 2, 1, 1).setValue(`CANCELLED JOBS`);
+    OTHERSHEETS.Data.getRange(8, 3, 1, 1).setValue(data.cancelled);
+
+    OTHERSHEETS.Data.getRange(9, 2, 1, 1).setValue(`IN-PROGRESS JOBS`)
+    OTHERSHEETS.Data.getRange(9, 3, 1, 1).setValue(data.inProgress);
+
+    OTHERSHEETS.Data.getRange(10, 2, 1, 1).setValue(`FAILED JOBS`);
+    OTHERSHEETS.Data.getRange(10, 3, 1, 1).setValue(data.failed);
+  }
+
+  CountFunding () {
+    let subtotals = [];
+    Object.values(SHEETS).forEach(sheet => {
+      let estimates = GetColumnDataByHeader(sheet, HEADERNAMES.estimate);
+      let culled = estimates.filter(Boolean);
+      let reduced = culled.reduce((a, b) => a + b, 0);
+      subtotals.push(reduced);
     })
-    OTHERSHEETS.Data.getRange(8, 2, 1, 1).setValue(`COMPLETED JOBS`);
-    OTHERSHEETS.Data.getRange(8, 3, 1, 1).setValue(completed);
-
-    OTHERSHEETS.Data.getRange(9, 2, 1, 1).setValue(`CANCELLED JOBS`);
-    OTHERSHEETS.Data.getRange(9, 3, 1, 1).setValue(cancelled);
-
-    OTHERSHEETS.Data.getRange(10, 2, 1, 1).setValue(`IN-PROGRESS JOBS`)
-    OTHERSHEETS.Data.getRange(10, 3, 1, 1).setValue(inprogress);
-    console.warn(`Completed : ${completed}, Cancelled : ${cancelled}, In-Progress : ${inprogress}`);
+    let sum = subtotals.reduce((a, b) => a + b, 0);
+    // console.info(`Subtotals ---> ${subtotals}`);
+    // console.info(`Funding = $${sum.toFixed(2)}`);
+    return sum.toFixed(2);
+  }
+  PrintFundingSum () {
+    let sum = this.CountFunding();
+    OTHERSHEETS.Data.getRange(99, 2, 1, 1).setValue(`Total Funds`);
+    OTHERSHEETS.Data.getRange(99, 3, 1, 1).setValue(`$${sum}`);
   }
 
 }
@@ -409,13 +422,14 @@ const Metrics = () => {
   try {
     console.info(`Calculating Metrics .....`);
     calc.PrintActiveUsers();
+    calc.PrintTotalSubmissions();
     calc.PrintTiers();
     calc.PrintStatusCounts();
     calc.PrintStatistics();
     calc.PrintTypesCount();
     calc.PrintSubmissionData();
     calc.PrintTurnaroundTimes();
-    calc.PrintDistributionNumbers();
+    calc.PrintFundingSum();
     console.info(`Recalculated Metrics`);
   } catch (err) {
     console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
@@ -425,11 +439,11 @@ const Metrics = () => {
 
 const _testDist = () => {
   const c = new Calculate();
-  let start = new Date().toDateString();
-  let end = new Date(3,10,2020,10,32,42);
+  // let start = new Date().toDateString();
+  // let end = new Date(3,10,2020,10,32,42);
   // c.CalculateDuration(start, end);
   // c.CalculateAverageTurnaround(SHEETS.Laser);
-  c.CreateTopTen()
+  c.PrintStatusCounts()
 }
 
 

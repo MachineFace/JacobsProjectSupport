@@ -142,10 +142,16 @@ class Manager extends DesignSpecialist
 }
 
 
-
+/**
+ * @NOTIMPLEMENTED
+ */
 class MakeStaff
 {
   constructor() {
+    
+  }
+
+  get Staff () {
     let staff = {};
     let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
     let culled = range.filter(Boolean);
@@ -156,48 +162,54 @@ class MakeStaff
       let email = row[2];
       let link = row[3];
       let type = row[4];
-      // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
       if(email && !link) {
         link = `<a href = "${email}">${email}</a>`;
         OTHERSHEETS.Staff.getRange(OTHERSHEETS.Staff.getLastRow() - 1, 4).setValue(link);
       }
-      if(type == "DS") {
-        let ds = new DesignSpecialist({
-          name : name, 
-          fullname : fullname, 
-          email : email
-        });
-        staff[name] = ds;
-      } else if(type == "MA") {
-        let ma = new Manager({
-          name : name, 
-          fullname : fullname, 
-          email : email
-        });
-        staff[name] = ma;
-      } else if(type == "SS") {
-        let ss = new StudentSupervisor({
-          name : name, 
-          fullname : fullname, 
-          email : email
-        });
-        staff[name] = ss;
+      switch(type) {
+        case `DS`:
+          staff[name] = new DesignSpecialist({
+            name : name, 
+            fullname : fullname, 
+            email : email
+          });
+          break;
+        case `MA`:
+          staff[name] = new Manager({
+            name : name, 
+            fullname : fullname, 
+            email : email
+          });
+          break;
+        case `SS`:
+          staff[name] = new StudentSupervisor({
+            name : name, 
+            fullname : fullname, 
+            email : email
+          });
+          break;
       }
     });
     // console.info(JSON.stringify(staff));
     return staff;
   }
 }
-
+const _testMakeStaffClass = () => {
+  const staff = new MakeStaff().Staff;
+  console.info(staff.Adam);
+}
 
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Return Staff Email as a string.
+ * Return All Staff Email as a string.
+ * @USED in Daily Email Summary
  */
 const StaffEmailAsString = () => {
-  let emaillist = OTHERSHEETS.Staff.getRange(2, 3, OTHERSHEETS.Staff.getLastRow() - 1, 1).getValues();
-  return emaillist.toString();
+  let emaillist = GetColumnDataByHeader(OTHERSHEETS.Staff, `EMAIL`);
+  let culled = emaillist.filter(Boolean);
+  let f = [...new Set(culled)].toString();
+  return f;
 }
 
 
@@ -282,26 +294,13 @@ const BuildStaff = () => {
 }
 
 
-const _testDS = () => {
-  const ds = new DesignSpecialist({
-    name : "Mike",
-    fullname : "Mike Special",
-    email : "some@email.com",
-  })
-  console.info(ds.get())
-  console.info(`Name : ${ds.name}`);
-}
-
 const _testStaff = () => {
   const staff = BuildStaff();
   console.info(staff)
 }
 
 
-const _tt = () => {
-  const s = new MakeStaff();
-  console.info(s);
-}
+
 
 
 
