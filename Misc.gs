@@ -111,7 +111,9 @@ const GetRowData = (sheet, row) => {
   try {
     let headers = sheet.getRange(1, 1, 1, sheet.getMaxColumns()).getValues()[0];
     headers.forEach( (name, index) => {
-      headers[index] = Object.keys(HEADERNAMES).find(key => HEADERNAMES[key] === name);
+      let linkedKey = Object.keys(HEADERNAMES).find(key => HEADERNAMES[key] === name);
+      if(!linkedKey) headers[index] = name;
+      else headers[index] = linkedKey;
     })
     let data = sheet.getRange(row, 1, 1, sheet.getMaxColumns()).getValues()[0];
     headers.forEach( (header, index) => {
@@ -125,7 +127,10 @@ const GetRowData = (sheet, row) => {
     console.error(`${err} : GetRowData failed - Sheet: ${sheet} Row: ${row}`);
   }
 }
-
+const _testGetRowData = () => {
+  let t = GetRowData(SHEETS.Advancedlab, 5);
+  console.info(t)
+}
 
 
 

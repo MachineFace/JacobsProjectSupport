@@ -209,17 +209,17 @@ const STATUS = {
  * Example: Calling 'SHEETS.laser' returns value sheet.
  */
 const SHEETS = {
-  Laser: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Laser Cutter`), // Laser Sheet
-  Fablight: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Fablight`), // Fablight Sheet
-  Waterjet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Waterjet`), // Waterjet Sheet
-  Advancedlab: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Advanced Lab`), // Advanced Lab Sheet
-  Shopbot: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Shopbot`), // Shopbot Sheet
-  Haas: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Haas & Tormach`), // Haas Sheet
-  Vinyl: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Vinyl Cutter`), // Vinyl Sheet
-  Othermill: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Othermill`), // Othermill Sheet
-  Creaform: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
-  Othertools: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Other Tools`), // Other Sheet
-  Plotter: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Canon Plotter`), // Plotter Sheet
+  Laser : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Laser Cutter`), // Laser Sheet
+  Fablight : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Fablight`), // Fablight Sheet
+  Waterjet : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Waterjet`), // Waterjet Sheet
+  Advancedlab : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Advanced Lab`), // Advanced Lab Sheet
+  Shopbot : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Shopbot`), // Shopbot Sheet
+  Haas : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Haas & Tormach`), // Haas Sheet
+  Vinyl : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Vinyl Cutter`), // Vinyl Sheet
+  Othermill : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Othermill`), // Othermill Sheet
+  Creaform : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
+  Othertools : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Other Tools`), // Other Sheet
+  Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Canon Plotter`), // Plotter Sheet
 };
 
 /**
@@ -227,13 +227,13 @@ const SHEETS = {
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const OTHERSHEETS = {
-  Summary: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
+  Summary : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
   Pickup : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Pickup`),
-  Approved: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
-  Staff: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Staff List`),
-  Logger: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Logger`),
-  Data: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
-  Backgrounddata: SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Background Data Mgmt`),
+  Approved : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
+  Staff : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Staff List`),
+  Logger : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Logger`),
+  Data : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
+  Backgrounddata : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Background Data Mgmt`),
   Master : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Master Intake Form Responses`),
 }
 
@@ -312,7 +312,7 @@ const HEADERNAMES = {
   staffNotes : `(INTERNAL) Staff Notes`,
   priority : `(INTERNAL): Priority`,	
   whichPrinter: `Which printer?`,	
-  files : `Files for fabrication`, 	
+  files : `Files for fabrication`,
   ticket : `Printable Ticket`,	
   numberOfParts : `Total number of parts needed`,	
   name : `What is your name?`,	

@@ -104,7 +104,7 @@ const onSubmission = async (e) => {
     case SHEETS.Othermill.getName():
     case SHEETS.Shopbot.getName():
       designspecialistemail = staff.Adam.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Adam.name);
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Joey.name);
       break;
     case SHEETS.Advancedlab.getName():
     case SHEETS.Creaform.getName():
@@ -195,9 +195,6 @@ const onSubmission = async (e) => {
   jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
-
-  
-
   // Fix wrapping issues
   let driveloc = sheet.getRange(`D` + lastRow);
   FormatCell(driveloc);
@@ -219,6 +216,7 @@ const onChange = async (e) => {
   const staff = new MakeStaff().Staff;
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var thisSheetName = e.range.getSheet().getSheetName();
 
   // Fetch Columns and rows and check validity
   var thisCol = e.range.getColumn();
@@ -228,19 +226,18 @@ const onChange = async (e) => {
   if (thisRow <= 1) return;
 
   //----------------------------------------------------------------------------------------------------------------
-  // Add link to DS List
-  const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
-  if (thisRow > 2) {
-    if ( sLink == undefined || sLink == null || (sLink == `` && OTHERSHEETS.Staff.getRange(thisRow, 3).getValue() != ``) ) {
-      const l = MakeLink(OTHERSHEETS.Staff.getRange(thisRow, 3).getValue());
+  // Add link to DS List on Staff Sheet
+  if(thisSheet.getSheetName() == OTHERSHEETS.Staff.getSheetName() && thisRow >= 2) {
+    const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
+    const staffEmail = OTHERSHEETS.Staff.getRange(thisRow, 3).getValue();
+    if ( sLink == undefined || sLink == null || (sLink == `` && staffEmail != ``) ) {
+      const l = MakeLink(staffEmail);
       OTHERSHEETS.Staff.getRange(thisRow, 4).setValue(l);
     }
   }
-  
 
   //----------------------------------------------------------------------------------------------------------------
   //Ignore Edits on background sheets like Logger and StoreItems - NICE!! /CG
-  var thisSheetName = e.range.getSheet().getSheetName();
   Object.values(NONITERABLESHEETS).forEach(sheet => {
     if(thisSheetName == sheet.getSheetName()) return;
   });
@@ -249,11 +246,16 @@ const onChange = async (e) => {
   if (thisCol > 1 && thisCol != 3) return;
 
   //----------------------------------------------------------------------------------------------------------------
-  // Check Priority
-  let status = GetByHeader(thisSheet, HEADERNAMES.status, thisRow);
+  // Parse Data
+  let rowData = GetRowData(thisSheet, thisRow);
+  console.info(rowData)
 
-  let tempEmail = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
-  let tempSID = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
+  //----------------------------------------------------------------------------------------------------------------
+  // Check Priority
+  let status = rowData.status;
+
+  let tempEmail = rowData.email;
+  let tempSID = rowData.sid;
 
   let tempPriority = await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
   SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, tempPriority);
@@ -261,43 +263,38 @@ const onChange = async (e) => {
     SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
   }
 
-  
-
-  //----------------------------------------------------------------------------------------------------------------
-  // Parse Data
-
-  var designspecialist = GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.ds, thisRow) : `a Design Specialist`;
-  var priority = GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.priority, thisRow) : await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
-  var jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow) : new CreateJobnumber({ date : new Date() }).Jobnumber;
-  var ticket = GetByHeader(thisSheet, HEADERNAMES.ticket, thisRow);
-  var studentApproval = GetByHeader(thisSheet, HEADERNAMES.studentApproved, thisRow);
-  var submissiontime = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
-  var email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
-  var name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
-  var sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
-  var studentType = GetByHeader(thisSheet, HEADERNAMES.afiliation, thisRow);
-  var projectname = GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow) ? GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow) : `Your Project`;
-  var cost = GetByHeader(thisSheet, HEADERNAMES.estimate, thisRow);
+  var designspecialist = rowData.ds ? rowData.ds : `a Design Specialist`;
+  var priority = rowData.priority ? rowData.priority : await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
+  var jobnumber = rowData.jobNumber ? rowData.jobNumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
+  var ticket = rowData.ticket;
+  var studentApproval = rowData.studentApproved;
+  var submissiontime = rowData.timestamp;
+  var email = rowData.email;
+  var name = rowData.name;
+  var sid = rowData.sid;
+  var studentType = rowData.afiliation;
+  var projectname = rowData.projectName ? rowData.projectName : `Your Project`;
+  var cost = rowData.estimate;
 
   //Materials
-  const material1Quantity = GetByHeader(thisSheet, HEADERNAMES.mat1quantity, thisRow);
-  const material1Name = GetByHeader(thisSheet, HEADERNAMES.mat1, thisRow);
+  const material1Quantity = rowData.mat1quantity;
+  const material1Name = rowData.mat1;
   const material1URL = ``;
 
-  const material2Quantity = GetByHeader(thisSheet, HEADERNAMES.mat2quantity, thisRow);
-  const material2Name = GetByHeader(thisSheet, HEADERNAMES.mat2, thisRow);
+  const material2Quantity = rowData.mat2quantity;
+  const material2Name = rowData.mat2;
   const material2URL = ``;
 
-  const material3Quantity = GetByHeader(thisSheet, HEADERNAMES.mat3quantity, thisRow);
-  const material3Name = GetByHeader(thisSheet, HEADERNAMES.mat3, thisRow);
+  const material3Quantity = rowData.mat3quantity;
+  const material3Name = rowData.mat3;
   const material3URL = ``;
 
-  const material4Quantity = GetByHeader(thisSheet, HEADERNAMES.mat4quantity, thisRow);
-  const material4Name = GetByHeader(thisSheet, HEADERNAMES.mat4, thisRow);
+  const material4Quantity = rowData.mat4quantity;
+  const material4Name = rowData.mat4;
   const material4URL = ``;
 
-  const material5Quantity = GetByHeader(thisSheet, HEADERNAMES.mat5quantity, thisRow);
-  const material5Name = GetByHeader(thisSheet, HEADERNAMES.mat5, thisRow);
+  const material5Quantity = rowData.mat5quantity;
+  const material5Name = rowData.mat5;
   const material5URL = ``;
 
   if (material1Name != ``) var mat1 = true;

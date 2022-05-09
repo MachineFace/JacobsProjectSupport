@@ -39,6 +39,27 @@ const CreateTimeDrivenTrigger = () => {
   } catch (err) {
     console.error(`${err} : Could not create triggers`);
   }
+  try {
+    ScriptApp.newTrigger(`SetRowHeight`)
+      .timeBased()
+      .everyMinutes(5)
+      .create();
+    ScriptApp.newTrigger(`Metrics`)
+      .timeBased()
+      .everyMinutes(10)
+      .create();
+    ScriptApp.newTrigger(`GenerateMissingTickets`)
+      .timeBased()
+      .everyMinutes(5)
+      .create();
+    ScriptApp.newTrigger(`SetConditionalFormatting`)
+      .timeBased()
+      .onMonthDay(1)
+      .atHour(2)
+      .create();
+  } catch (err) {
+    console.error(`${err} : Could not create triggers`);
+  }
 };
 
 
