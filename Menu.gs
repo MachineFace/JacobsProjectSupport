@@ -170,135 +170,7 @@ const PopupCreateNewJobNumber = async () => {
       ui.ButtonSet.OK
     );
   }
-  
-  
-
 };
-
-/**
- * Create a pop-up to Create a new Ticket if one is missing.
- */
-const PopupCreateTicket = async () => {
-  let thisSheet = SpreadsheetApp.getActiveSheet();
-  let ui = SpreadsheetApp.getUi();
-  if(CheckSheetIsForbidden(thisSheet) == true) {
-    Browser.msgBox(
-      `Incorrect Sheet Active`,
-      `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
-      Browser.Buttons.OK
-    );
-    return;
-  } else {
-    let thisRow = thisSheet.getActiveRange().getRow();
-    let jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
-    let data = await GetRowData(thisSheet, thisRow);
-    let ticket = await new Ticket({
-      jobnumber : jobnumber,
-      designspecialist : data.ds,
-      submissiontime : data.timestamp,
-      name : data.name,
-      email : data.email,
-      projectname : data.projectName,
-      material1Name : data.material1Name,
-      material1Quantity : data.material1Quantity,
-      material2Name : data.material2Name,
-      material2Quantity : data.material2Quantity,
-    });
-    let t = await ticket.CreateTicket();
-    SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
-    ui.alert(
-      `JPS Ticket Creation`,
-      `Ticket Created for : ${data?.name}, Job Number : ${jobnumber}`,
-      ui.ButtonSet.OK
-    );
-  }
-};
-
-/**
- * Builds HTML file for the modal pop-up from the help list.
- */
-const BuildHTMLHELP = () => {
-  let items = [
-    `Note : All status changes trigger an email to the student except for 'CLOSED' status`,
-    `New Project comes into a sheet and status will automatically be set to 'Received'.`,
-    `Assign yourself as the DS / SS and fill in the materials as best you can.`,
-    `Change the status to 'In-Progress' when you're ready to start the project.`,
-    `Wait 30 seconds for the printable ticket to generate, and print it.`,
-    `Fabricate the project.`,
-    `When it's done, bag the project + staple the ticket to the bag and change the status to 'Completed'.`,
-    `Select any cell in the row and choose 'Generate Bill' to bill the student. The status will change itself to 'Billed'.`,
-    `If you don't need to bill the student, choose 'CLOSED' status.`,
-    `If you need to cancel the job, choose 'Cancelled'. `,
-    `If the project can't be fabricated at all, choose 'FAILED', and email the student why it failed.`,
-    `If you need student approval before proceeding, choose 'Pending Approval'. `,
-    `'Missing Access' will be set automatically, and you should not choose this as an option.`,
-    `If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. `,
-    `See Cody or Chris for additional help + protips.`,
-  ];
-  let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`;
-  html += `<h3 style="font-family:Roboto">How to Use JPS : </h3>`;
-  html += `<hr>`;
-  html += `<p>${items[0]}</p>`;
-  html += `<ol style="font-family:Roboto font-size:10">`;
-  items.forEach((item, index) => {
-    if (index > 0 && index < items.length - 1) html += `<li>${item}</li>`;
-  });
-  html += `</ol>`;
-  html += `<p>${items[items.length - 1]}</p>`;
-
-  console.info(html);
-  return html;
-};
-
-/**
- * Creates a modal pop-up for the help text.
- */
-const PopupHelp = async () => {
-  let ui = await SpreadsheetApp.getUi();
-  let htmlOutput = HtmlService.createHtmlOutput(await BuildHTMLHELP())
-    .setWidth(640)
-    .setHeight(480);
-  ui.showModalDialog(htmlOutput, `JPS HELP!!`);
-};
-
-/**
- * Builds our JPS Menu and sets functions.
- */
-const BarMenu = () => {
-  SpreadsheetApp.getUi()
-    .createMenu(`JPS Menu`)
-    .addItem(`Generate Bill to Selected Student`, `BillFromSelected`)
-    .addItem(`Generate a New JobNumber`, `PopupCreateNewJobNumber`)
-    .addSeparator()
-    .addItem(`Mark as Abandoned`, `PopUpMarkAsAbandoned`)
-    .addItem(`Mark as Picked Up`, `PopUpMarkAsPickedUp`)
-    .addSeparator()
-    .addItem(`Barcode Scanning Tool`, `OpenBarcodeTab`)
-    .addSeparator()
-    .addItem(`Check All Missing Access Students`, `PopupCheckMissingAccessStudents`)
-    .addItem(`Check Specific Student's Access`, `PopupGetSingleStudentPriority`)
-    .addSeparator()
-    .addItem(`Count Active Users`, `PopupCountUsers`)
-    .addItem(`Create a Ticket for a User`, `PopupCreateTicket`)
-    .addSubMenu(
-      SpreadsheetApp.getUi()
-        .createMenu(`Calculate`)
-        .addItem(`Count Total Emails Sent`, `CountTotalEmailsSent`)
-        .addItem(`Generate Metrics`, `Metrics`)
-        .addItem(`Generate Top Ten`, `RunTopTen`)
-        .addItem(`Generate Standard Deviation`, `RunStandardDeviation`)
-    )
-    .addSeparator()
-    .addItem(`Help`, `PopupHelp`)
-    //.addSeparator()
-    //.addSubMenu(SpreadsheetApp.getUi().createMenu('Chris + Cody ONLY')
-    //    .addItem('ENABLE JPS', 'EnableJPS')
-    //    .addItem('DISABLE JPS', 'DisableJPS'))
-    .addToUi();
-};
-
-const RunStandardDeviation = () => new Calculate().CalculateStandardDeviation();
-const RunTopTen = () => new Calculate().CreateTopTen();
 
 
 /**
@@ -422,6 +294,139 @@ const BillFromSelected = async () => {
 
   console.info(`Completed BillFromSelected`);
 };
+
+
+/**
+ * Create a pop-up to Create a new Ticket if one is missing.
+ */
+const PopupCreateTicket = async () => {
+  let thisSheet = SpreadsheetApp.getActiveSheet();
+  let ui = SpreadsheetApp.getUi();
+  if(CheckSheetIsForbidden(thisSheet) == true) {
+    Browser.msgBox(
+      `Incorrect Sheet Active`,
+      `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+      Browser.Buttons.OK
+    );
+    return;
+  } else {
+    let thisRow = thisSheet.getActiveRange().getRow();
+    let jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
+    let data = await GetRowData(thisSheet, thisRow);
+    let ticket = await new Ticket({
+      jobnumber : jobnumber,
+      designspecialist : data.ds,
+      submissiontime : data.timestamp,
+      name : data.name,
+      email : data.email,
+      projectname : data.projectName,
+      material1Name : data.material1Name,
+      material1Quantity : data.material1Quantity,
+      material2Name : data.material2Name,
+      material2Quantity : data.material2Quantity,
+    });
+    let t = await ticket.CreateTicket();
+    SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
+    ui.alert(
+      `JPS Ticket Creation`,
+      `Ticket Created for : ${data?.name}, Job Number : ${jobnumber}`,
+      ui.ButtonSet.OK
+    );
+  }
+};
+
+/**
+ * Builds HTML file for the modal pop-up from the help list.
+ */
+const BuildHTMLHELP = () => {
+  let items = [
+    `Note : All status changes trigger an email to the student except for 'CLOSED' status`,
+    `New Project comes into a sheet and status will automatically be set to 'Received'.`,
+    `Assign yourself as the DS / SS and fill in the materials as best you can.`,
+    `Change the status to 'In-Progress' when you're ready to start the project.`,
+    `Wait 30 seconds for the printable ticket to generate, and print it.`,
+    `Fabricate the project.`,
+    `When it's done, bag the project + staple the ticket to the bag and change the status to 'Completed'.`,
+    `Select any cell in the row and choose 'Generate Bill' to bill the student. The status will change itself to 'Billed'.`,
+    `If you don't need to bill the student, choose 'CLOSED' status.`,
+    `If you need to cancel the job, choose 'Cancelled'. `,
+    `If the project can't be fabricated at all, choose 'FAILED', and email the student why it failed.`,
+    `If you need student approval before proceeding, choose 'Pending Approval'. `,
+    `'Missing Access' will be set automatically, and you should not choose this as an option.`,
+    `If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. `,
+    `See Cody or Chris for additional help + protips.`,
+  ];
+  let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`;
+  html += `<h3 style="font-family:Roboto">How to Use JPS : </h3>`;
+  html += `<hr>`;
+  html += `<p>${items[0]}</p>`;
+  html += `<ol style="font-family:Roboto font-size:10">`;
+  items.forEach((item, index) => {
+    if (index > 0 && index < items.length - 1) html += `<li>${item}</li>`;
+  });
+  html += `</ol>`;
+  html += `<p>${items[items.length - 1]}</p>`;
+
+  console.info(html);
+  return html;
+};
+
+/**
+ * Creates a modal pop-up for the help text.
+ */
+const PopupHelp = async () => {
+  let ui = await SpreadsheetApp.getUi();
+  let htmlOutput = HtmlService.createHtmlOutput(await BuildHTMLHELP())
+    .setWidth(640)
+    .setHeight(480);
+  ui.showModalDialog(htmlOutput, `JPS HELP!!`);
+};
+
+/**
+ * Builds our JPS Menu and sets functions.
+ */
+const BarMenu = () => {
+  SpreadsheetApp.getUi()
+    .createMenu(`JPS Menu`)
+    .addItem(`Generate Bill to Selected Student`, `BillFromSelected`)
+    .addItem(`Generate a New JobNumber`, `PopupCreateNewJobNumber`)
+    .addSeparator()
+    .addItem(`Mark as Abandoned`, `PopUpMarkAsAbandoned`)
+    .addItem(`Mark as Picked Up`, `PopUpMarkAsPickedUp`)
+    .addSeparator()
+    .addItem(`Barcode Scanning Tool`, `OpenBarcodeTab`)
+    .addSeparator()
+    .addItem(`Check All Missing Access Students`, `PopupCheckMissingAccessStudents`)
+    .addItem(`Check Specific Student's Access`, `PopupGetSingleStudentPriority`)
+    .addSeparator()
+    .addItem(`Count Active Users`, `PopupCountUsers`)
+    .addItem(`Create a Ticket for a User`, `PopupCreateTicket`)
+    .addSubMenu(
+      SpreadsheetApp.getUi()
+        .createMenu(`Calculate`)
+        .addItem(`Count Total Emails Sent`, `CountTotalEmailsSent`)
+        .addItem(`Generate Metrics`, `Metrics`)
+        .addItem(`Generate Top Ten`, `RunTopTen`)
+        .addItem(`Generate Standard Deviation`, `RunStandardDeviation`)
+    )
+    .addSeparator()
+    .addSubMenu(
+      SpreadsheetApp
+        .getUi()
+        .createMenu('Chris & Cody ONLY')
+        .addItem(`DO NOT USE THESE FUNCTIONS UNLESS YOU ARE CHRIS OR CODY!`, `_testStaff`)
+        .addItem('ENABLE JPS', 'EnableJPS')
+        .addItem('DISABLE JPS', 'DisableJPS')
+    )
+    .addSeparator()
+    .addItem(`Help`, `PopupHelp`)
+    .addToUi();
+};
+
+const RunStandardDeviation = () => new Calculate().CalculateStandardDeviation();
+const RunTopTen = () => new Calculate().CreateTopTen();
+
+
 
 
 /**
