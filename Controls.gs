@@ -81,6 +81,10 @@ const RemoveTimedTriggers = () => {
         ScriptApp.deleteTrigger(trigger);
       }
     })
+    ScriptApp.newTrigger(`Metrics`)
+      .timeBased()
+      .everyMinutes(10)
+      .create();
     console.info(`Removed Triggers for Summary Emails`);
   } catch (err) {
     console.error(`${err} : Couldnt remove triggers for whatever reason.`);
