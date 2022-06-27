@@ -190,7 +190,7 @@ const RESPONSECODES = {
 
 const STATUS = {
   received : `Received`,
-  pendingApproval : `Pending Approval`,
+  // pendingApproval : `Pending Approval`,
   inProgress : `In-Progress`,
   completed : `Completed`,
   pickedUp : `Picked Up`,
