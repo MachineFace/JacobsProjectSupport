@@ -81,23 +81,6 @@ class BarcodeGenerator {
     console.info(`BARCODE CREATED ---> ${barcode?.getId()?.toString()}`);
     return barcode;
     
-    // let barcode;
-    // const res = await UrlFetchApp.fetch(barcodeLoc, params);
-    // const responseCode = res.getResponseCode();
-    // // console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
-    // if (responseCode == 200) {
-    //   let blob = Utilities.newBlob(res.getContent()).setName(`Barcode-${this.jobnumber}`);
-    //   barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
-    //   this.blob = blob;
-    //   this.barcode = barcode;
-    //   this.url = barcode.getUrl();
-    //   console.info(`Barcode ---> ${barcode.getUrl()}`);
-    //   return barcode;
-    // } 
-    // else {
-    //   console.error('Failed to GET Barcode');
-    //   return false;
-    // }
   }
   
 }
