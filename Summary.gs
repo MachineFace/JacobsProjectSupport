@@ -54,10 +54,9 @@ class SummaryBuilder
       item.mat2num = value[15];
       item.mat2type = value[16];
       item.mat2url = value[17];
-      item.shipping = value[18];
-      item.affiliation = value[19];
-      item.partcount = value[20];
-      item.quality = value[21];
+      item.affiliation = value[18];
+      item.partcount = value[19];
+      item.quality = value[20];
 
       items.push(item);
     })
@@ -88,13 +87,13 @@ class SummaryBuilder
    * Summary Text
    */
   _SummaryText () {
-    let text = '<p>Hello!</p> ';
-      text += '<p>Here is a summary of all the recent submissions.<br />';
-      text += 'If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>. </p>';
-      text += '<p>Best,<br />Jacobs Project Support</p>';
-      text += '<br/>';
-      text += 'SUMMARY:';
-      text += '<br/>';
+    let text = `<p>Hello!</p> `;
+      text += `<p>Here is a summary of all the recent submissions.<br />`;
+      text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>. </p>`;
+      text += `<p>Best,<br />${SERVICE_NAME}</p>`;
+      text += `<br/>`;
+      text += `SUMMARY:`;
+      text += `<br/>`;
     return text;
   }
 

@@ -5,7 +5,6 @@
  * @param {string} name
  * @param {string} projectname
  * @param {number} jobnumber
- * @param {string} approvalURL
  * @param {string} mat1
  * @param {string} material1URL
  * @param {number} material1Quantity
@@ -23,7 +22,6 @@ class CreateMessage
     name : name, 
     projectname : projectname, 
     jobnumber : jobnumber, 
-    approvalURL : approvalURL,
     material1URL : material1URL, 
     material1Quantity : material1Quantity, 
     material1Name : material1Name,
@@ -46,7 +44,6 @@ class CreateMessage
     this.name = name ? name.toString() : `Unknown Name`;
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
     this.jobnumber = jobnumber ? jobnumber.toString() : new CreateJobnumber({ date : new Date() }).Jobnumber;
-    this.approvalURL = approvalURL ? approvalURL.toString() : `Unknown Approval URL`;
 
     this.material1Name = material1Name ? material1Name.toString() : `Material 1 Name`;
     this.material2Name = material2Name ? material2Name.toString() : `Material 2 Name`;
@@ -74,7 +71,7 @@ class CreateMessage
 
   get defaultMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for applying to Jacobs Project Support.<br/><br/>`;
+      message += `<p>Thank you for applying to ${SERVICE_NAME}.<br/><br/>`;
       message += `A Design Specialist is reviewing you application, and will respond to you shortly.<br/><br/>`;
       message += `If you have questions or need assistance please email ${this.email}. <br/></p>`;
       message += `<p>Best,<br />Jacobs Hall Staff</p>`; 
@@ -82,7 +79,7 @@ class CreateMessage
   }
   get receivedMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `Your project, <b><i>${this.projectname}</i></b> has been received.<br/>`;
       message += `Your part or parts have been assigned a job number: <i>${this.jobnumber}</i>.<br/>`;
       message += `If you have questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
@@ -90,35 +87,9 @@ class CreateMessage
       message += `<p>Best,<br />Jacobs Hall Staff</p>`;
     return message;
   }
-  get pendingMessage() {
-    let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support. Your project is awaiting an approval or rejection from you. <br />`;
-      if (this.cost == "" || this.cost == undefined){
-        message += `<p>The cost is not specified. Speak to a Design Specialist about this if you have questions before approving. <br /><p></br>`;
-      }
-      else message += `<p>The cost is estimated to be ${this.costFormatted} <br /><p></br>`;
-      message += `Your project: <b><i>${this.projectname}</i></b> with the job number <i>${this.jobnumber}</i>, can be approved or rejected by clicking this link and approving or rejecting:`;
-      message += `<br/><br/><b>${this.approvalURL}</b><br/><br/>`;
-      message += `Pending approval, your Jacobs Store account will be billed for: <br/> `;
-      if (this.material1Name) message += `<p><ul>`; //start bulletpoint list
-      if (this.material1Name) message += `<li><a href = "${this.material1URL}">${this.material1Quantity} of ${this.material1Name}</a></li>`;  
-      if (this.material2Name != `Material 2 Name`) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`;
-      if (this.material3Name != `Material 3 Name`) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
-      if (this.material4Name != `Material 4 Name`) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
-      if (this.material5Name != `Material 5 Name`) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`; 
-      else if(!this.material1Name && !this.material2Name && !this.material3Name && !this.material4Name && !this.material5Name) {
-        message += `<li>Your Jacobs Store account will be billed for the materials</a> required.</li><br/> `;
-      }
-      message += `</ul>`;     // end bulletpoint list
-      message += `</p><br/>`;
-      message += `If you have questions or need assistance please email ${InvokeDS("Staff", "emaillink")}.<br/>`;
-      message += `. <br />We will update you when it has been started.</p>`;
-      message += `<p>Best,<br />Jacobs Hall Staff</p>`;
-    return message;
-  }
   get inProgressMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support. Your project has started. <br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}. Your project has started. <br />`;
       message += `Your job number: <i>${this.jobnumber}</i>.<br/>`;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> has been started by ${this.designspecialist}.<br/>`;
       message += `Please email ${this.designspecialistemaillink} for further details.<br/>`;
@@ -129,7 +100,7 @@ class CreateMessage
   }
   get completedMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished. Job Number: <i>${this.jobnumber}</i><br />`;
       message += `Your parts are now available for pickup.<br />`;
       message += `Please email ${this.designspecialist} at ${this.designspecialistemaillink} for further details.<br/>`;
@@ -161,7 +132,7 @@ class CreateMessage
   }
   get pickedUpMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> have been picked up and the project is now CLOSED. Job Number: <i>${this.jobnumber}</i><br />`;
       message += `Please email ${this.designspecialist} at ${this.designspecialistemaillink} if you have any additional questions.<br/>`;
       message += `<p>Please take a moment to take our survey so we can improve JPS : `
@@ -171,7 +142,7 @@ class CreateMessage
   }
   get abandonedMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished and have not been picket up yet. Job Number: <i>${this.jobnumber}</i><br />`;
       message += `<font style="color:#FF0000";><b>Please pick up your parts SOON before they are disposed of in the free-prints bin.</b></font><br />`;
       message += `Please email ${this.designspecialist} at ${this.designspecialistemaillink} if you have questions or concerns.<br/>`;
@@ -187,30 +158,9 @@ class CreateMessage
       message += `<p>Best,<br />Jacobs Hall Staff</p>`; 
     return message;
   }
-  get shippingQuestion() {
-    let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
-      message += `You have requested shipping for your part <b><i>${this.projectname}</i></b>. Job Number: <i>${this.jobnumber}</i><br/>`;
-      message += `In order to send your parts to you, please fill out this form:<br />`;
-      message += `<a href="https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform"><b>Shipping Form</b></a>`;
-      message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}for further details.<br/>`;
-      message += `If you have any questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
-      message += `<p>Best,<br />Jacobs Hall Staff</p>`;
-    return message;
-  }
-  get shippedMessage() {
-    let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
-      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished. Job Number: <i>${this.jobnumber}</i><br/>`;
-      message += `Your parts will be shipped shortly.<br />`;
-      message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}for further details.<br/>`;
-      message += `If you have any questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
-      message += `<p>Best,<br />Jacobs Hall Staff</p>`;
-    return message;
-  }
   get failedMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `Your project, <b><i>${this.projectname}</i></b> has unfortunately failed. Job Number: <i>${this.jobnumber}</i><br /><br />`;
       message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}<br /><br />`;
       message += `If you have any questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
@@ -219,7 +169,7 @@ class CreateMessage
   }
   get rejectedByStudentMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `You have elected not to proceed with the design process. Job Number: <i>${this.jobnumber}</i><br /><br />`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br /><br />`;
       message += `If you have any questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
@@ -228,7 +178,7 @@ class CreateMessage
   }
   get rejectedByStaffMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `A staff member has cancelled and/or declined this job with the Project Name: <b><i>${this.projectname}</b></i>. Job Number: <i>${this.jobnumber}</i><br /><br />`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br /><br />`;
       message += `You may also choose to resubmit this job as a new submission.<br/>`;
@@ -238,7 +188,7 @@ class CreateMessage
   }
   get waitlistMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `Your project, <b><i>${this.projectname}</i></b> has been temporarily waitlisted. `;
       message += `You will be notified when your job starts. Job Number: <b><i>${this.jobnumber}</i></b><br /><br />`;
       message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}. No action is required at this time.<br /><br />`;
@@ -248,7 +198,7 @@ class CreateMessage
   }
   get billedMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support. Your project <b><i>${this.projectname}</b></i> is now <b>CLOSED.</b><br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}. Your project <b><i>${this.projectname}</b></i> is now <b>CLOSED.</b><br />`;
       message += `Job Number: <i>${this.jobnumber}</i>. Your Jacobs Store account has been billed for: <br/> `;
       message += `<p><ul>`;
       if (this.material1Name) message += `<li><a href = "${this.material1URL}">${this.material1Quantity} of ${this.material1Name}</a></li>`;  
@@ -272,7 +222,7 @@ class CreateMessage
   }
   get noAccessMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support. `;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}. `;
       message += `Your project: <b><i>${this.projectname}</i></b> has been prevented from advancing until we have received confirmation of your approval. <br/><br/>`;
       message += `DES INV and affiliated courses students are approved automatically upon registration submission. `; 
       message += `Researchers are added when we receive IOC payment approval from their PI. `; 
@@ -311,28 +261,15 @@ class CreateSubmissionMessage
       message += `<p>You have a new submission to your area.<br />`;
       message += `Please assign yourself as the DS in the <a href = "https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/">Spreadsheet</a><br />`;
       message += `Reminder: Only changing the status of the job will trigger emails to you and the student. Below is a summary of the student submission.<br/>`;
-      message += `<p>Best,<br />Jacobs Project Support</p>`;
+      message += `<p>Best,<br />${SERVICE_NAME}</p>`;
       message += `<br/>`;
       message += `SUMMARY:`;
       message += `<br/>`;
     return message;
   }
-  get shippingMessage() {
-    let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Hall Project Support.<br />`;
-      message += `You have requested shipping for your part <b><i>${this.projectname}</i></b>. `; 
-      message += `You MUST fill out this form EVERY time you request shipping. Your information will not be retained for the next shipment.<br/><br/>`;
-      message += `In order to send your parts to you, please fill out this form:<br/><br/>`;
-      message += `<a href="https://docs.google.com/forms/d/e/1FAIpQLSdgk5-CjHOWJmAGja3Vk7L8a7ddLwTsyJhGicqNK7G-I5RjIQ/viewform"><b>Shipping Form</b></a><br/><br/>`;
-      message += `Please note, shipping adds an additional flat-rate cost for your parts (between $5 and $12) for domestic FEDEX shipping. `;
-      message += `International shipping will be handled seperately, and you are encouraged to talk with a staff member if you need special considerations.<br/><br/>`;
-      message += `If you have any questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
-      message += `<p>Best,<br />Jacobs Hall Staff</p>`;
-    return message;
-  }
   get creaformMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support.<br />`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
       message += `Part scanning has been requested for your project. Job Number: <i>${this.jobnumber}</i><br />`;
       message += `<br/>`;
       message += `Parts can be dropped off in-person safely at our touchless dropoff window. <br/><br/>`;
@@ -348,7 +285,7 @@ class CreateSubmissionMessage
   }
   get missingAccessMessage() {
     let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing Jacobs Project Support. Your project: <b><i>${this.projectname}</i></b> has been prevented from advancing until we have received confirmation of your approval. `;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}. Your project: <b><i>${this.projectname}</i></b> has been prevented from advancing until we have received confirmation of your approval. `;
       message += `If you recently applied, please allow approximately 3 days for the approval to move through the system, and disregard this email.<br/><br/>`;
       message += `DES INV and affiliated courses students are approved automatically upon registration submission. Researchers are added when we receive IOC payment approval from their PI. `;
       message += `Researchers are urged to contact their PI to ensure they have appropriate approval.<br/>`;

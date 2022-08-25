@@ -3,6 +3,10 @@
  * Code Enumerations
  */
 
+
+const SUPPORT_ALIAS = GmailApp.getAliases()[0];
+const SERVICE_NAME = `Jacobs Project Support`;
+
 const DaysRetentionNumber = 15; //How many days to hold a file
 const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
 const PickupHours = `Monday - Friday: 11am - 1pm.`  //`Monday - Friday: 11am - 1pm & 4pm - 6pm.`
@@ -337,7 +341,6 @@ const HEADERNAMES = {
   mat5quantity : `(INTERNAL) Material 5 Quantity`,	
   mat5 : `(INTERNAL) Item 5`,	
   otherNotes : `Other Notes About This Job`,	
-  shipping : `Do you need your parts shipped to you?`,	
   afiliation : `What is your affiliation to the Jacobs Institute?`,	
   layerThickness : `Layer Thickness`,	
   density : `Density`,	

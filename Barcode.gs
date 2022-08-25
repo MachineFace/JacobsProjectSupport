@@ -115,15 +115,14 @@ class QRCodeGenerator {
     const html = await UrlFetchApp.fetch(loc, params);
     const responseCode = html.getResponseCode();
     console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      this.blob = Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
-      qrCode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
-      console.info(`QR CODE ---> ${qrCode.getUrl()}`);
-      return qrCode;
-    } else {
+    if (responseCode != 200 || responseCode != 201) {
       console.error('Failed to GET QRCode');
       return false;
     }
+    this.blob = Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
+    qrCode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
+    console.info(`QR CODE ---> ${qrCode.getUrl()}`);
+    return qrCode;
   }
   
 }

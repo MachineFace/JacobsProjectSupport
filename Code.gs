@@ -17,12 +17,7 @@
  * @NotOnlyCurrentDoc
  */
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Gmail Constants
- */
-const supportAlias = GmailApp.getAliases()[0];
-const gmailName = `Jacobs Project Support`;
+
 
 
 /**
@@ -138,11 +133,11 @@ const onSubmission = async (e) => {
 
   // Email each DS
   try {
-    GmailApp.sendEmail(designspecialistemail, `Jacobs Project Support Notification`, ``, {
+    GmailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
       htmlBody: dsMessage,
-      from: supportAlias,
+      from: SUPPORT_ALIAS,
       bcc: staff.Chris.email,
-      name: gmailName,
+      name: SERVICE_NAME,
     });
     writer.Info(`Design Specialist has been emailed.`);
   } catch (err) {
@@ -157,11 +152,11 @@ const onSubmission = async (e) => {
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.Creaform.getSheetName()) {
       //Email
-      GmailApp.sendEmail(email, `Jacobs Project Support : Creaform Part Drop-off Instructions`, ``, {
+      GmailApp.sendEmail(email, `${SERVICE_NAME} : Creaform Part Drop-off Instructions`, ``, {
         htmlBody: message.creaformMessage,
-        from: supportAlias,
+        from: SUPPORT_ALIAS,
         bcc: staff.Chris.email,
-        name: gmailName,
+        name: SERVICE_NAME,
       });
       writer.Info(`Creaform instruction email sent.`);
     }
@@ -170,16 +165,16 @@ const onSubmission = async (e) => {
   }
 
   try {
-    if (priority.priority == `STUDENT NOT FOUND!` || priority.priority == false) {
+    if (priority == `STUDENT NOT FOUND!` || priority == false) {
       // Set access to Missing Access
       SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
       //Email
-      GmailApp.sendEmail(email, `Jacobs Project Support : Missing Access`, ``, {
+      GmailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
         htmlBody: message.missingAccessMessage,
-        from: supportAlias,
+        from: SUPPORT_ALIAS,
         bcc: staff.Chris.email,
-        name: gmailName,
+        name: SERVICE_NAME,
       });
       writer.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
@@ -267,7 +262,6 @@ const onChange = async (e) => {
   var priority = rowData.priority ? rowData.priority : await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
   var jobnumber = rowData.jobNumber ? rowData.jobNumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
   var ticket = rowData.ticket;
-  var studentApproval = rowData.studentApproved;
   var submissiontime = rowData.timestamp;
   var email = rowData.email;
   var name = rowData.name;
@@ -359,29 +353,6 @@ const onChange = async (e) => {
   }
 
 
-  /**
-   * 
-   *
-  //----------------------------------------------------------------------------------------------------------------
-  // Make an approval form on demand
-  // Create a new form, then add a checkbox question, a multiple choice question,
-  let approvalURL;
-  if (status == STATUS.pendingApproval) {
-    writer.Warning(`Attempting to create an approval form.`)
-    try {
-      const approvalform = await new ApprovalFormBuilder({
-        name : name,
-        jobnumber : jobnumber,
-        cost : cost,
-      })
-      approvalURL = approvalform.url;
-      writer.Info(`Approval Form generated and sent to user.`);
-    }
-    catch (err) {
-      writer.Error(`${err} : Couldn't generate an approval form` );
-    }
-  }
-  */
 
   //----------------------------------------------------------------------------------------------------------------
   // Generating a "Ticket"
@@ -488,7 +459,6 @@ const onChange = async (e) => {
     name : name,
     projectname : projectname, 
     jobnumber : jobnumber,
-    approvalURL : approvalURL,
     material1URL : material1URL,
     material1Quantity : material1Quantity,
     material1Name : material1Name,

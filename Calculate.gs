@@ -107,9 +107,11 @@ class Calculate
     let persons = [];
     Object.values(SHEETS).forEach(sheet => {
       let peeps = GetColumnDataByHeader(sheet, HEADERNAMES.name);
-      let culled = peeps.filter(Boolean);
-      persons.push(...culled);
-    })
+      peeps.forEach(entry => {
+        if(entry && entry != `FORMULA ROW`) persons.push(entry);
+      });
+    });
+    console.info(persons)
     let unique = new Set(persons);
     let count = unique.size;
     this.writer.Info(`Active JPS Users : ${count}`);
@@ -125,11 +127,9 @@ class Calculate
   CountEachSubmission () {
     let data = []
     Object.values(SHEETS).forEach(sheet => {
-      let range = GetColumnDataByHeader(sheet, HEADERNAMES.timestamp);
-      let culled = range.filter(Boolean);
-      let count = culled.length - 2;
+      let range = GetColumnDataByHeader(sheet, HEADERNAMES.timestamp).filter(Boolean);
+      let count = range ? range.length - 2 : 0;
       if(count < 0) count = 0;
-      // this.writer.Info(`Sheet : ${sheet.getName()}, Count : ${count}`);
       data.push([sheet.getSheetName(), count]);
     })
     console.warn(data)
@@ -145,9 +145,8 @@ class Calculate
   PrintTotalSubmissions () {
     let projects = [];
     Object.values(SHEETS).forEach(sheet => {
-      let projectnames = GetColumnDataByHeader(sheet, HEADERNAMES.projectName);
-      let culled = projectnames.filter(Boolean);
-      let filtered = culled.filter(name => name !== `FORMULA ROW`);
+      let projectnames = GetColumnDataByHeader(sheet, HEADERNAMES.projectName).filter(Boolean);
+      let filtered = projectnames ? projectnames.filter(name => name !== `FORMULA ROW`) : 0;
       projects.push(...filtered);
     })
     let projectSet = [...new Set(projects)];
@@ -193,13 +192,13 @@ class Calculate
   CalculateDistribution () {
     let userList = [];
     Object.values(SHEETS).forEach(sheet => {
-      let users = GetColumnDataByHeader(sheet, HEADERNAMES.name);
-      users.forEach(user => {
-        if(user != `FORMULA ROW` || user != `Test`) userList.push(user);
-      })
+      let users = GetColumnDataByHeader(sheet, HEADERNAMES.name)
+        .filter(Boolean)
+        .filter((x) => x != `FORMULA ROW`)
+        .filter((x) => x != `Test`);
+      userList.push(...users);
     });
-    let culled = userList.filter(Boolean);
-    let occurrences = culled.reduce( (acc, curr) => {
+    let occurrences = userList.reduce( (acc, curr) => {
       return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
     }, {});
 
@@ -237,13 +236,11 @@ class Calculate
   CountTypes () {
     let userList = [];
     Object.values(SHEETS).forEach(sheet => {
-      let types = GetColumnDataByHeader(sheet, HEADERNAMES.afiliation);
-      let culled = types.filter(Boolean);
-      culled.forEach( type => {
-        if(type != null || type != undefined || type != "" || type != " " || type != "Test" || type != "FORMULA ROW") {
-          userList.push(type);
-        }
-      });
+      let types = GetColumnDataByHeader(sheet, HEADERNAMES.afiliation)
+        .filter(Boolean)
+        .filter(x => x != `Test`)
+        .filter(x => x != `FORMULA ROW`)
+      userList.push(...types);
     });
 
     let occurrences = userList.reduce( (acc, curr) => {
@@ -291,7 +288,7 @@ class Calculate
     // console.info(`n = ${n}`);
 
     let values = [];
-    distribution.forEach(person => values.push(person[1]))
+    distribution.forEach(x => values.push(x[1]))
     // console.info(values)
     let mean = values.reduce((a, b) => a + b) / n;
     console.warn(`Mean = ${mean}`);
@@ -299,7 +296,7 @@ class Calculate
     let s = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
     let standardDeviation = s - mean;
     console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
-    return standardDeviation;
+    return Number(standardDeviation).toFixed(2);
   }
 
 
@@ -327,7 +324,8 @@ class Calculate
 
 
   CountTiers () {
-    let tiers = OTHERSHEETS.Approved.getRange(3, 4, OTHERSHEETS.Approved.getLastRow() -2, 1).getValues();
+    let tiers = OTHERSHEETS.Approved.getRange(3, 4, OTHERSHEETS.Approved.getLastRow() -2, 1).getValues()
+      .filter(Boolean);
     tiers = [].concat(...tiers);
 
     let occurrences = tiers.reduce( (acc, curr) => {
@@ -356,9 +354,9 @@ class Calculate
   CountStatuses () {
     let statuses = [];
     Object.values(SHEETS).forEach(sheet => {
-      let stats = GetColumnDataByHeader(sheet, HEADERNAMES.status);
-      let culled = stats.filter(Boolean);
-      culled.forEach( status => statuses.push( Object.keys(STATUS).find(key => STATUS[key] === status)))
+      GetColumnDataByHeader(sheet, HEADERNAMES.status)
+        .filter(Boolean)
+        .forEach( status => statuses.push( Object.keys(STATUS).find(key => STATUS[key] === status)))
     })
 
     let occurrences = statuses.reduce( (acc, curr) => {
@@ -370,7 +368,7 @@ class Calculate
   PrintStatusCounts () {
     let data = this.CountStatuses();
     for(const [status, count] of Object.entries(data)) {
-      if(status == `completed` || status == `billed` || status == `closed` || status == `pickedUp` || status == `abandoned`) {
+      if(status == STATUS.completed || status == STATUS.billed || status == STATUS.closed || status == STATUS.pickedUp || status == STATUS.abandoned) {
         data.completed += count;
       }
     }
@@ -443,7 +441,7 @@ const _testDist = () => {
   // let end = new Date(3,10,2020,10,32,42);
   // c.CalculateDuration(start, end);
   // c.CalculateAverageTurnaround(SHEETS.Laser);
-  c.PrintStatusCounts()
+  c.Pr()
 }
 
 

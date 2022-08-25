@@ -136,7 +136,6 @@ const _gastTestRunner = async () => {
       name : 'Cody', 
       projectname : 'Test Project',
       jobnumber : '101293874098', 
-      approvalURL : 'url',
       material1URL : 'material1URL', material1Quantity : 45, material1Name : 'TestPLA',
       material2URL : 'material2URL', material2Quantity : 15, material2Name : 'TestBreakaway',
       material3URL : 'mat3URL', material3Quantity : 23, material3Name : 'Steel',
@@ -150,15 +149,13 @@ const _gastTestRunner = async () => {
     const c = `PENDING ${message.pendingMessage}`;
     const d = `IN-PROGRESS ${message.inProgressMessage}`;
     const e = `COMPLETED ${message.completedMessage}`;
-    const f = `SHIPPING QUESTION ${message.shippingQuestion}`;
-    const g = `SHIPPED ${message.shippedMessage}`;
-    const h = `FAILED ${message.failedMessage}`;
-    const i = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
-    const j = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
-    const k = `BILLED ${message.billedMessage}`;
-    const l = `PICKED UP ${message.pickedUpMessage}`;
+    const f = `FAILED ${message.failedMessage}`;
+    const g = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
+    const h = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
+    const i = `BILLED ${message.billedMessage}`;
+    const j = `PICKED UP ${message.pickedUpMessage}`;
 
-    t.pass(`Good : ${a,b,c,d,e,f,g,h,i,j,k,l}`);
+    t.pass(`Good : ${a,b,c,d,e,f,g,h,i,j}`);
     t.fail(`Bad`);
   })
 
@@ -171,8 +168,7 @@ const _gastTestRunner = async () => {
     const w = `DS MESSAGE : ${message.dsMessage}`;
     const x = `CREAFORM MESSAGE : ${message.creaformMessage}`;
     const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
-    const z = `SHIPPING MESSAGE : ${message.shippingMessage}`;
-    t.pass(`Good : ${w,x,y,z}`);
+    t.pass(`Good : ${w,x,y}`);
     t.fail(`Bad`)
   })
 

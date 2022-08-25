@@ -7,8 +7,8 @@
 class CheckPriority
 {
   constructor({
-    email : email,
-    sid : sid,
+    email : email = `jacobsprojectsupport@berkeley.edu`,
+    sid : sid = 1293487129348,
   }) {
     this.email = email ? email.toString().replace(/\s+/g, "") : `jacobsprojectsupport@berkeley.edu`;
     this.sid = sid ? sid.toString().replace(/\s+/g, "") : 19238471239847;
@@ -17,55 +17,63 @@ class CheckPriority
   get Priority () {
     // Try email first
     try {
-      let priority = ``;
-      console.warn(`Checking priority via email for ${this.email}....`);
-      let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
-      if (finder) {
-        let row = finder.getRow();
-        priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
-        console.info(`EMAIL: ${this.email}, ROW: ${row}, PRIORITY: ${priority}`);
-        return priority;
-      } else if (!finder) {
-        // try staff
-        console.warn(`Checking if ${this.email} is staff....`)
-        let secondsearch = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
-        if (secondsearch) {
-          priority = `1`;
-          return priority;
-        }
-      } else if (!finder) {
-        // try SID
-        console.warn(`Checking via email failed. Trying via SID : ${this.sid}`)
-        finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
-        if (finder) {
-          let row = finder.getRow();
-          priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
-          console.info(`EMAIL: ${this.sid}, ROW: ${row}, PRIORITY: ${priority}`);
-          return priority;
-        } else if (!finder) {
-          priority = `STUDENT NOT FOUND!`;
-          console.error(`NOT FOUND ---> EMAIL: ${this.email}, SID: ${this.sid}, PRIORITY: ${priority}`);
-          return priority;
-        }
-      }
-
-      console.warn(`Checking via email failed. Trying via SID: ${this.sid}`)
-      let finder2 = OTHERSHEETS.Approved.createTextFinder(this.sid.toString()).findNext();
-      if (finder2) {
-        let row = finder2.getRow();
-        priority = OTHERSHEETS.Approved.getRange(row, 4, 1, 1).getValue().toString();
-        console.info(`EMAIL: ${this.sid}, ROW: ${row}, PRIORITY: ${priority}`);
-        return priority;
-      } else if (!finder2) {
-        priority = `STUDENT NOT FOUND!`;
-        console.error(`NOT FOUND ---> PRIORITY : ${priority}`);
-        return priority;
-      }
-
+      let priority = this._CheckForStaff();
+      if(priority == false) priority = this._CheckViaEmail();
+      if(priority == false) priority = this._CheckViaSID();
+      if(priority == false) priority = `STUDENT NOT FOUND!`;
       return priority;      
     } catch (err) {
       console.error(`Whoops ---> ${err}`);
     }
+  }
+
+  _CheckForStaff () {
+    try {
+      console.warn(`Checking if ${this.email} is staff....`);
+      let finder = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
+      if(!finder) {
+        console.warn(`${this.email} is not staff.`)
+        return false;
+      }
+      return 1;
+    } catch (err) {
+      console.error(`${err} : Whoops, couldn't check if this person is staff`);
+    } 
+  }
+
+  _CheckViaEmail () {
+    try {
+      console.warn(`Checking priority via email for ${this.email}....`);
+      let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
+      if(!finder) {
+        console.warn(`${this.email} not found.`)
+        return false;
+      }
+      let row = finder.getRow();
+      let priority = GetByHeader(OTHERSHEETS.Approved, `Tier`, row);
+      console.info(`${this.email} is registered. Priority: ${priority}`);
+      return priority;
+    } catch(err) {
+      console.error(`${err} : Whoops, checking via email failed....`);
+    }
+  }
+
+  _CheckViaSID () {
+    try {
+      console.warn(`Checking priority via SID for ${this.email}....`);
+      let finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
+      if(!finder) {
+        console.warn(`${this.email} not found.`);
+        return false;
+      }
+      let row = finder.getRow();
+      let priority = GetByHeader(OTHERSHEETS.Approved, `Tier`, row);
+      console.info(`${this.email}, ${this.sid} is registered. Priority: ${priority}`);
+      return priority;
+    } catch(err) {
+      console.error(`${err}: Whoops, couldn't check via SID`);
+    } 
+
   }
 
   
@@ -75,34 +83,34 @@ class CheckPriority
 const _testPriority = () => {
   let typesOfPriority = {
     goodEgoodS : {
-      email : `ashchu@berkeley.edu`,
-      sid : 3033841568
+      email : `sequin@cs.berkeley.edu`,
+      sid : 3038201402
     },
-    goodEbadS : {
-      email : `ashchu@berkeley.edu`,
-      sid : 12938749123,
-    },
+    // goodEbadS : {
+    //   email : `sequin@cs.berkeley.edu`,
+    //   sid : 12938749123,
+    // },
     badEgoodS : {
       email : `ding@bat.edu`,
-      sid : 3033841568,
+      sid : 3038201402,
     },
     badEbadS : {
       email : `ding@bat.edu`,
       sid : 2394872349587,
     },
-    other : {
-      email : `ggrigoriadis@berkeley.edu`,
-      sid : 29384762983472,
-    },
+    // other : {
+    //   email : `ggrigoriadis@berkeley.edu`,
+    //   sid : 29384762983472,
+    // },
   }
   console.time(`Priority`);
   Object.entries(typesOfPriority).forEach(type => {
-    // console.info(type[1])
+    console.info(type[1])
     const p = new CheckPriority({
       email : type[1].email,
       sid : type[1].sid,
     }).Priority;
-    console.info(p);
+    console.info(`Testing produced ---> ${p}`);
   }) 
   
   console.timeEnd(`Priority`);
