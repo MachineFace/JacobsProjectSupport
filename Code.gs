@@ -356,97 +356,100 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Generating a "Ticket"
+  
   if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
-    let ticket;
-    try {
-      writer.Warning(`Attempting to create a ticket`);
-      let material, part, note;
-      let mat = [];
-      let partcount = [];
-      let notes = [];
-      switch(thisSheet.getSheetName()) {
-        case SHEETS.Laser.getSheetName():
-          material = GetByHeader(SHEETS.Laser, `Rough dimensions of your part`, thisRow);
-          if(!material) mat.push(`Materials: `, `None`);
-          else mat.push( `Rough Dimensions:`, material.toString());
+    if (ticket == null || ticket !== undefined) {
+      let ticket;
+      try {
+        writer.Warning(`Attempting to create a ticket`);
+        let material, part, note;
+        let mat = [];
+        let partcount = [];
+        let notes = [];
+        switch(thisSheet.getSheetName()) {
+          case SHEETS.Laser.getSheetName():
+            material = GetByHeader(SHEETS.Laser, `Rough dimensions of your part`, thisRow);
+            if(!material) mat.push(`Materials: `, `None`);
+            else mat.push( `Rough Dimensions:`, material.toString());
 
-          part = GetByHeader(SHEETS.Laser, `Total number of parts needed`, thisRow);
-          if(!part) partcount.push(`Part Count: `, `None`);
-          else partcount.push(`Part Count:`, part.toString());
+            part = GetByHeader(SHEETS.Laser, `Total number of parts needed`, thisRow);
+            if(!part) partcount.push(`Part Count: `, `None`);
+            else partcount.push(`Part Count:`, part.toString());
 
-          note = GetByHeader(SHEETS.Laser, `Notes`, thisRow);
-          if(!note) notes.push(`Notes: `, `None`);
-          else notes.push( `Notes:`, note.toString());
-          break;
-        case SHEETS.Fablight.getSheetName():
-          material = GetByHeader(SHEETS.Fablight, `Rough dimensions of your part?`, thisRow);
-          if(!material) mat.push(`Materials: `, `None`);
-          else mat.push( `Rough Dimensions:`, material.toString());
+            note = GetByHeader(SHEETS.Laser, `Notes`, thisRow);
+            if(!note) notes.push(`Notes: `, `None`);
+            else notes.push( `Notes:`, note.toString());
+            break;
+          case SHEETS.Fablight.getSheetName():
+            material = GetByHeader(SHEETS.Fablight, `Rough dimensions of your part?`, thisRow);
+            if(!material) mat.push(`Materials: `, `None`);
+            else mat.push( `Rough Dimensions:`, material.toString());
 
-          part = GetByHeader(SHEETS.Fablight, `How many parts do you need?`, thisRow);
-          if(!part) partcount.push(`Part Count: `, `None`);
-          else partcount.push( `Part Count:`, part.toString());
+            part = GetByHeader(SHEETS.Fablight, `How many parts do you need?`, thisRow);
+            if(!part) partcount.push(`Part Count: `, `None`);
+            else partcount.push( `Part Count:`, part.toString());
 
-          note = GetByHeader(SHEETS.Fablight, `Notes:`, thisRow);
-          if(!note) notes.push(`Notes: `, `None`);
-          else notes.push( `Notes:`, note.toString());
-          break;
-        case SHEETS.Waterjet.getSheetName():
-          material = GetByHeader(SHEETS.Waterjet, `Rough dimensions of your part`, thisRow);
-          if(!material) mat.push(`Materials: `, `None`);
-          else mat.push( `Rough Dimensions: `, material.toString());
+            note = GetByHeader(SHEETS.Fablight, `Notes:`, thisRow);
+            if(!note) notes.push(`Notes: `, `None`);
+            else notes.push( `Notes:`, note.toString());
+            break;
+          case SHEETS.Waterjet.getSheetName():
+            material = GetByHeader(SHEETS.Waterjet, `Rough dimensions of your part`, thisRow);
+            if(!material) mat.push(`Materials: `, `None`);
+            else mat.push( `Rough Dimensions: `, material.toString());
 
-          part = GetByHeader(SHEETS.Waterjet, `How many parts do you need?`, thisRow);
-          if(!part) partcount.push(`Part Count: `, `None`);
-          else partcount.push( `Part Count:`, part.toString());
+            part = GetByHeader(SHEETS.Waterjet, `How many parts do you need?`, thisRow);
+            if(!part) partcount.push(`Part Count: `, `None`);
+            else partcount.push( `Part Count:`, part.toString());
 
-          note = GetByHeader(SHEETS.Waterjet, `Notes`, thisRow);
-          if(!note) notes.push(`Notes: `, `None`);
-          else notes.push( `Notes: `, note.toString());
-          break;
-        case SHEETS.Advancedlab.getSheetName():
-          material = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.whichPrinter, thisRow);
-          if(!material) mat.push(`Materials: `, `None`);
-          else mat.push( `Which Printer: `, material.toString());
+            note = GetByHeader(SHEETS.Waterjet, `Notes`, thisRow);
+            if(!note) notes.push(`Notes: `, `None`);
+            else notes.push( `Notes: `, note.toString());
+            break;
+          case SHEETS.Advancedlab.getSheetName():
+            material = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.whichPrinter, thisRow);
+            if(!material) mat.push(`Materials: `, `None`);
+            else mat.push( `Which Printer: `, material.toString());
 
-          part = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.numberOfParts, thisRow);
-          if(!part) partcount.push(`Part Count: `, `None`);
-          else partcount.push( `Part Count:`, part.toString());
+            part = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.numberOfParts, thisRow);
+            if(!part) partcount.push(`Part Count: `, `None`);
+            else partcount.push( `Part Count:`, part.toString());
 
-          note = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.otherJobNotes, thisRow);
-          if(!note) notes.push(`Notes: `, `None`);
-          else notes.push( `Notes:`, note.toString());
-          break;
-        default:
-          mat.push(`Materials: `, `None`);
-          partcount.push(`Part Count: `, `None`);
-          notes.push(`Notes: `, `None`);
-          break;
+            note = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.otherJobNotes, thisRow);
+            if(!note) notes.push(`Notes: `, `None`);
+            else notes.push( `Notes:`, note.toString());
+            break;
+          default:
+            mat.push(`Materials: `, `None`);
+            partcount.push(`Part Count: `, `None`);
+            notes.push(`Notes: `, `None`);
+            break;
+        }
+        ticket = new Ticket({
+          jobnumber : jobnumber,
+          designspecialist : designspecialist,
+          submissiontime : submissiontime,
+          name : name,
+          email : email,
+          projectname : projectname,
+          material1Name : material1Name,
+          material1Quantity : material1Quantity,
+          material2Name : material2Name,
+          material2Quantity : material2Quantity,
+          materials : mat,
+          partCount : partcount,
+          notes : notes,
+        });
+        ticket.CreateTicket();
+      } catch (err) {
+        writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
       }
-      ticket = new Ticket({
-        jobnumber : jobnumber,
-        designspecialist : designspecialist,
-        submissiontime : submissiontime,
-        name : name,
-        email : email,
-        projectname : projectname,
-        material1Name : material1Name,
-        material1Quantity : material1Quantity,
-        material2Name : material2Name,
-        material2Quantity : material2Quantity,
-        materials : mat,
-        partCount : partcount,
-        notes : notes,
-      });
-      ticket.CreateTicket();
-    } catch (err) {
-      writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
-    }
-    try {
-      SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
-      console.info(`Set Ticket URL - Sheet: ${thisSheet} Row: ${thisRow}, URL: ${ticket.url}`);
-    } catch (err) {
-      console.error(`${err} : Setting Ticket URL failed - Sheet: ${thisSheet} Row: ${thisRow} URL: ${ticket.url}`);
+      try {
+        SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
+        console.info(`Set Ticket URL - Sheet: ${thisSheet} Row: ${thisRow}, URL: ${ticket.url}`);
+      } catch (err) {
+        console.error(`${err} : Setting Ticket URL failed - Sheet: ${thisSheet} Row: ${thisRow} URL: ${ticket.url}`);
+      }
     }
   }
 
