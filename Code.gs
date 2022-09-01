@@ -358,7 +358,11 @@ const onChange = async (e) => {
   // Generating a "Ticket"
   
   if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
-    if (ticket == null || ticket !== undefined) {
+    if (ticket !== null || ticket !== undefined) {
+      writer.Warning("Already seems to have a ticket.");
+    }
+    writer.Warning("current ticket: " + ticket);
+    if (ticket == null || ticket == undefined) {
       let ticket;
       try {
         writer.Warning(`Attempting to create a ticket`);
