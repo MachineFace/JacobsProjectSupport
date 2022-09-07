@@ -256,6 +256,7 @@ const SetConditionalFormatting = () => {
 const SetRowHeight = () => {
   OTHERSHEETS.Summary.setRowHeightsForced(3, OTHERSHEETS.Summary.getMaxRows() - 3, 21);
   OTHERSHEETS.Summary.getRange(3, 1, OTHERSHEETS.Summary.getMaxRows() -1, OTHERSHEETS.Summary.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  console.info(`Set Row Height.`)
 }
 
 

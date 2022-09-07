@@ -7,9 +7,9 @@
 class CreateJobnumber
 {
   constructor({
-    date : date,
+    date : date = new Date(),
   }){
-    this.date = date instanceof Date ? date : new Date(date);
+    this.date = date;
   }
 
   get Jobnumber() {

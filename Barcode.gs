@@ -37,17 +37,15 @@ class BarcodeGenerator {
     const html = await UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = html.getResponseCode();
     console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      this.blob = Utilities.newBlob(html.getContent()).setName(`Barcode-${this.jobnumber}`) ;
-      this.barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(this.blob);
-      this.url = this.barcode.getUrl();
-      console.info(`Barcode ---> ${this.url}`);
-      return this.barcode;
-    } else {
+    if (responseCode != 200 || responseCode != 201) {
       console.error('Failed to GET Barcode');
       return false;
     }
-
+    this.blob = Utilities.newBlob(html.getContent()).setName(`Barcode-${this.jobnumber}`) ;
+    this.barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(this.blob);
+    this.url = this.barcode.getUrl();
+    console.info(`Barcode ---> ${this.url}`);
+    return this.barcode;
   }
 
   async GenerateBarCodeForTicketHeader() {
@@ -73,11 +71,11 @@ class BarcodeGenerator {
     const res = UrlFetchApp.fetch(barcodeLoc, params);
     const responseCode = res.getResponseCode();
     // console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200) {
-      barcode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
-      barcode.setTrashed(true);
-    } 
-    else console.error('Failed to GET Barcode');
+    if (responseCode != 200 || responseCode != 201) {
+      console.error('Failed to GET Barcode');
+    }
+    barcode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+    barcode.setTrashed(true);
     console.info(`BARCODE CREATED ---> ${barcode?.getId()?.toString()}`);
     return barcode;
     

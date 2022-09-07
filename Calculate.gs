@@ -191,11 +191,14 @@ class Calculate
 
   CalculateDistribution () {
     let userList = [];
+    let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
     Object.values(SHEETS).forEach(sheet => {
       let users = GetColumnDataByHeader(sheet, HEADERNAMES.name)
         .filter(Boolean)
-        .filter((x) => x != `FORMULA ROW`)
-        .filter((x) => x != `Test`);
+        .filter(x => x != `FORMULA ROW`)
+        .filter(x => x != `Formula Row`)
+        .filter(x => x != `Test`)
+        .filter(x => !staff.includes(x))
       userList.push(...users);
     });
     let occurrences = userList.reduce( (acc, curr) => {
@@ -220,9 +223,9 @@ class Calculate
   PrintDistributionNumbers () {
     let userList = [];
     Object.values(SHEETS).forEach(sheet => {
-      let users = GetColumnDataByHeader(sheet, HEADERNAMES.name);
-      let culled = users.filter(Boolean);
-      culled.forEach( user => userList.push(user));
+      GetColumnDataByHeader(sheet, HEADERNAMES.name)
+        .filter(Boolean)
+        .forEach(x => userList.push(x));
     })
     let occurrences = userList.reduce( (acc, curr) => {
       return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
@@ -236,11 +239,11 @@ class Calculate
   CountTypes () {
     let userList = [];
     Object.values(SHEETS).forEach(sheet => {
-      let types = GetColumnDataByHeader(sheet, HEADERNAMES.afiliation)
+      GetColumnDataByHeader(sheet, HEADERNAMES.afiliation)
         .filter(Boolean)
         .filter(x => x != `Test`)
         .filter(x => x != `FORMULA ROW`)
-      userList.push(...types);
+        .forEach(x => userList.push(x));
     });
 
     let occurrences = userList.reduce( (acc, curr) => {
@@ -428,6 +431,7 @@ const Metrics = () => {
     calc.PrintSubmissionData();
     calc.PrintTurnaroundTimes();
     calc.PrintFundingSum();
+    calc.CreateTopTen();
     console.info(`Recalculated Metrics`);
   } catch (err) {
     console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
@@ -440,8 +444,8 @@ const _testDist = () => {
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
   // c.CalculateDuration(start, end);
-  // c.CalculateAverageTurnaround(SHEETS.Laser);
-  c.Pr()
+  c.CreateTopTen();
+  // c.PrintTypesCount()
 }
 
 

@@ -10,9 +10,9 @@
 class ApprovalFormBuilder
 {
   constructor({
-    name : name,
-    jobnumber : jobnumber,
-    cost : cost,
+    name : name = `Some Name`,
+    jobnumber : jobnumber = 1239487123,
+    cost : cost = 2.50,
   }) {
     this.name = name ? name : `Some Name`;
     this.jobnumber = jobnumber ? jobnumber : 129384712398;

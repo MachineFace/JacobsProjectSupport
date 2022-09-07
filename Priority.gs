@@ -17,9 +17,9 @@ class CheckPriority
   get Priority () {
     // Try email first
     try {
-      let priority = this._CheckForStaff();
-      if(priority == false) priority = this._CheckViaEmail();
+      let priority = this._CheckViaEmail();
       if(priority == false) priority = this._CheckViaSID();
+      if(priority == false) priority = this._CheckForStaff();
       if(priority == false) priority = `STUDENT NOT FOUND!`;
       return priority;      
     } catch (err) {

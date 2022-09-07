@@ -166,3 +166,44 @@ class HackyStoreAutomation
 
 const RunHackySheetUpdater = () => new HackyStoreAutomation();
 
+
+
+class MaterialLookup
+{
+  constructor({
+    materialName : matertialName = `Canon Poster Printer: 36" wide (priced per foot)`,
+  }){
+    this.materialName = matertialName;
+  }
+
+  get URL(){
+    let url = ``;
+    try {
+      console.warn(`Getting URL for ${this.materialName}....`);
+      Object.values(STORESHEETS).forEach(sheet => {
+        let finder = sheet.createTextFinder(this.materialName).findNext();
+        if(finder) {
+          let row = finder.getRow();
+          url = GetByHeader(sheet, `Link`, row);
+          console.info(`Name: ${this.materialName}, URL: ${url}`);
+        }
+      })
+      return url;
+    } catch(err) {
+      console.error(`${err} : Whoops, failed....`);
+    }
+  }
+}
+
+const _testURL = () => {
+  let m = new MaterialLookup({}).URL;
+  console.info(`Result ${m}`)
+}
+
+
+
+
+
+
+
+

@@ -220,7 +220,7 @@ const onChange = async (e) => {
   // Skip the first 2 rows of data.
   if (thisRow <= 1) return;
 
-  //----------------------------------------------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------------------------------------------
   // Add link to DS List on Staff Sheet
   if(thisSheet.getSheetName() == OTHERSHEETS.Staff.getSheetName() && thisRow >= 2) {
     const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
@@ -231,11 +231,14 @@ const onChange = async (e) => {
     }
   }
 
-  //----------------------------------------------------------------------------------------------------------------
-  //Ignore Edits on background sheets like Logger and StoreItems - NICE!! /CG
-  Object.values(NONITERABLESHEETS).forEach(sheet => {
-    if(thisSheetName == sheet.getSheetName()) return;
-  });
+  // ----------------------------------------------------------------------------------------------------------------
+  // Ignore Edits on background sheets like Logger and StoreItems 
+  let forbiddenSheets = Object.values(NONITERABLESHEETS);
+  if (forbiddenSheets.includes(thisSheet)) {
+    console.info(`${thisSheet.getSheetName()} is forbidden from editing... Skipping.`);
+    return;
+  }
+
 
   // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
   if (thisCol > 1 && thisCol != 3) return;
@@ -356,13 +359,13 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Generating a "Ticket"
-  
   if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
     if (ticket !== null || ticket !== undefined) {
-      writer.Warning("Already seems to have a ticket.");
+    writer.Warning("Already seems to have a ticket.");
     }
     writer.Warning("current ticket: " + ticket);
     if (ticket == null || ticket == undefined) {
+
       let ticket;
       try {
         writer.Warning(`Attempting to create a ticket`);
@@ -423,6 +426,12 @@ const onChange = async (e) => {
             if(!note) notes.push(`Notes: `, `None`);
             else notes.push( `Notes:`, note.toString());
             break;
+          case SHEETS.Plotter.getSheetName():
+            material = GetByHeader(SHEETS.Plotter, `Total number of prints needed`, thisRow) ? GetByHeader(SHEETS.Plotter, `Total number of prints needed`, thisRow) : 0;
+            mat.push(`Materials: `, `Canon Poster Printer: 36" wide (priced per foot)`);
+            partcount.push(`Part Count: `, material.toString());
+            notes.push(`Notes: `, `None`);
+            break;
           default:
             mat.push(`Materials: `, `None`);
             partcount.push(`Part Count: `, `None`);
@@ -456,7 +465,7 @@ const onChange = async (e) => {
       }
     }
   }
-
+  
   // Case switch for different Design Specialists email
   var designspecialistemaillink = InvokeDS(designspecialist, `emaillink`);
   var designspecialistemail = InvokeDS(designspecialist, `email`);

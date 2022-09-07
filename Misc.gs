@@ -313,9 +313,10 @@ const FindMissingElementsInArrays = (array1, array2) => {
 const GetAllProjectNames = () => {
   let names = {}
   Object.values(SHEETS).forEach(sheet => {
-    titles = [].concat(...GetColumnDataByHeader(sheet, HEADERNAMES.projectName));
-    let culled = titles.filter(Boolean);
-    names[sheet.getName()] = [...new Set(culled)];
+    let titles = GetColumnDataByHeader(sheet, HEADERNAMES.projectName)
+      .filter(Boolean)
+      .filter(x => x != `FORMULA ROW`);
+    names[sheet.getName()] = [...new Set(titles)];
   });
   console.info(names);
   return names;
@@ -341,8 +342,17 @@ const TitleCase = (str) => {
 }
 
 
+const _t = () => {
+  let testg = OTHERSHEETS.Data;
+  let testa = SHEETS.Fablight;
 
-
+  let d = Object.values(NONITERABLESHEETS)
+  console.info(d.includes(testg))
+  // for(let i = 0; i < Object.entries(NONITERABLESHEETS).length; i++) {
+  //   console.info(`Checking if ${thisSheet.getSheetName()} is ${Object.values(NONITERABLESHEETS)[i].getSheetName()}`);
+  //   if(thisSheet === Object.values(NONITERABLESHEETS)[i]) return;
+  // }
+}
 
 
 

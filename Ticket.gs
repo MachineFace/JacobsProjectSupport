@@ -43,17 +43,13 @@ class Ticket
     const barcode = await new BarcodeGenerator({ jobnumber : this.jobnumber }).GenerateBarCodeForTicketHeader();
     console.info(`Barcode ----> ${barcode.url}`);
 
-    const folder = DriveApp.getFoldersByName(`Job Tickets`); // Set the correct folder
-    // const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets);
-    this.doc = DocumentApp.create(`Job Ticket-${this.jobnumber}`); // Make Document
+    const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
+    this.doc = DocumentApp.create(`JPS-Ticket-${this.jobnumber}`); // Make Document
     this.url = this.doc.getUrl();
     let body = this.doc.getBody();
     let docId = this.doc.getId();
-    
-
 
     // Append Document with Info
-    let header;
     try {
       body
         .setPageWidth(PAGESIZES.custom.width)
@@ -112,18 +108,12 @@ class Ticket
     // Remove File from root and Add that file to a specific folder
     try {
       const docFile = DriveApp.getFileById(docId);
-      DriveApp.removeFile(docFile);
-      while(folder.hasNext()) {
-        folder.next().addFile(docFile)
-      }
+      docFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
+      docFile.moveTo(folder)
     } catch (err) {
       console.error(`Whoops : ${err}`);
     }
-
-    // Set permissions to 'anyone can edit' for that file
-    let file = DriveApp.getFileById(docId);
-    file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
-
+    
     // console.info(JSON.stringify(this.doc));
     console.info(`DOC ----> ${this.doc.getUrl()}`);
     return this.doc;

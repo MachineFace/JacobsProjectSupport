@@ -7,16 +7,16 @@
 class Emailer
 {
   constructor({ 
-    name : name, 
-    status : status,
-    email : email,    
-    designspecialistemail : designspecialistemail,
-    message : message,
+    name : name = `Unknown Name`, 
+    status : status = STATUS.received,
+    email : email = `Unknown Email`,    
+    designspecialistemail : designspecialistemail = `jacobsprojectsupport@berkeley.edu`,
+    message : message = ``,
   }) {
-    this.name = name ? name.toString() : `Unknown Name`;
-    this.status = status ? status : STATUS.received;
-    this.email = email ? email : `Unknown Email`;
-    this.designspecialistemail = designspecialistemail ? designspecialistemail : `jacobsprojectsupport@berkeley.edu`;
+    this.name = name;
+    this.status = status;
+    this.email = email;
+    this.designspecialistemail = designspecialistemail;
     this.message = message;
 
     this.SendEmail();
@@ -163,9 +163,7 @@ const _testEmailer = () => {
       name : name,
       status : status,
       email : email,
-      designspecialist : `Cody Glen`,
       designspecialistemail : `codyglen@berkeley.edu`,
-      designspecialistemaillink : `<a href="mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a>`,
       message : message, 
     })
   })
