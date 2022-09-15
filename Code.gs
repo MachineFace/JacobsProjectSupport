@@ -506,8 +506,12 @@ const onChange = async (e) => {
   })
 
   // Check priority one more time:
-  if (priority == `STUDENT NOT FOUND!` || !priority && (status != STATUS.closed || status != STATUS.cancelled)) {
-    SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+  if(priority == `STUDENT NOT FOUND!`){
+    if(status == STATUS.cancelled || status == STATUS.closed) return;
+  } else if (!priority) {
+    if(status != STATUS.closed && status != STATUS.cancelled ) {
+      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+    }
   }
 };
 

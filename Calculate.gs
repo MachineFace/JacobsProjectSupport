@@ -106,10 +106,13 @@ class Calculate
   CountActiveUsers () {
     let persons = [];
     Object.values(SHEETS).forEach(sheet => {
-      let peeps = GetColumnDataByHeader(sheet, HEADERNAMES.name);
-      peeps.forEach(entry => {
-        if(entry && entry != `FORMULA ROW`) persons.push(entry);
-      });
+      let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
+      GetColumnDataByHeader(sheet, HEADERNAMES.name)
+        .filter(x => x != `FORMULA ROW`)
+        .filter(x => x != `Formula Row`)
+        .filter(x => x != `Test`)
+        .filter(x => !staff.includes(x))
+        .forEach(x => persons.push(x));
     });
     console.info(persons)
     let unique = new Set(persons);
@@ -222,9 +225,11 @@ class Calculate
    */
   PrintDistributionNumbers () {
     let userList = [];
+    let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
     Object.values(SHEETS).forEach(sheet => {
       GetColumnDataByHeader(sheet, HEADERNAMES.name)
         .filter(Boolean)
+        .filter(x => !staff.includes(x))
         .forEach(x => userList.push(x));
     })
     let occurrences = userList.reduce( (acc, curr) => {
@@ -243,6 +248,7 @@ class Calculate
         .filter(Boolean)
         .filter(x => x != `Test`)
         .filter(x => x != `FORMULA ROW`)
+        .filter(x => x != `Formula Row`)
         .forEach(x => userList.push(x));
     });
 
@@ -444,7 +450,7 @@ const _testDist = () => {
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
   // c.CalculateDuration(start, end);
-  c.CreateTopTen();
+  c.CountActiveUsers();
   // c.PrintTypesCount()
 }
 
