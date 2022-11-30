@@ -266,7 +266,40 @@ const isValidDate = (d) => {
 const datetimeToDate = (d) => new Date(d.getYear(), d.getMonth(), d.getDate());
 
 
-
+/**
+ * Parse a string to date
+ * @param {string} date string
+ * @returns {Date} actual date
+ */
+const ParseStringToDate = (dateString) => {
+  let array = dateString.toString().split(" ");
+  let months = [
+    `Jan.`, `Jan`, `January`, `1`, 
+    `Feb.`, `Feb`, `February`, `2`,
+    `Mar.`, `Mar`, `March`, `3`,
+    `Apr.`, `Apr`, `April`, `4`,
+    `May`, `5`,	`June`, `6`, `July`, `7`,	
+    `Aug.`, `Aug`, `August`, `8`,
+    `Sept.`, `Sept`, `September`, `9`,
+    `Oct.`, `Oct`, `October`, `10`,
+    `Nov.`, `Nov`, `November`, `11`,
+    `Dec.`, `Dec`, `December`, `12`,
+  ];
+  let month = array[4].toLowerCase();
+  months.find(m => {
+    if(m.toLowerCase() == month) {
+      month = new Date(Date.parse(`${array[4]} 1, ${new Date().getFullYear()}`)).getMonth();
+    }
+  });
+  let day =  !isNaN(Number(array[5])) ? Number(array[5]) : 1;
+  let year = !isNaN(Number(array[6])) ? Number(array[6]) : new Date().getFullYear();
+  console.info(`${new Date(year, month, day)}`);
+  return new Date(year, month, day);
+}
+const _testParseDate = () => {
+  const cell = OTHERSHEETS.Summary.getRange(1, 6).getValue();
+  ParseStringToDate(cell);
+}
 
 /**
  * Check if this sheet is forbidden

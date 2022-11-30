@@ -91,6 +91,16 @@ const RemoveTimedTriggers = () => {
   }
 };
 
+const DisableByDate = () => {
+  const cell = OTHERSHEETS.Summary.getRange(1, 6).getValue();
+  let array = cell.toString().split(" ");
+  console.info(array);
+  
+  //let date = ParseStringToDate(date);
+  const today = new Date();
+  const target = new Date(2022, 12, 9);
+  // if(today >= target) DisableJPS();
+}
 
 /**
  * ----------------------------------------------------------------------------------------------------------------

@@ -99,7 +99,7 @@ const onSubmission = async (e) => {
     case SHEETS.Othermill.getName():
     case SHEETS.Shopbot.getName():
       designspecialistemail = staff.Adam.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Joey.name);
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Adam.name);
       break;
     case SHEETS.Advancedlab.getName():
     case SHEETS.Creaform.getName():
