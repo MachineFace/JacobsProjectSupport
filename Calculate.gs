@@ -262,7 +262,10 @@ class Calculate
     // console.warn(items);
 
     for( const [idx, [key, val]] of Object.entries(items)) {
-      typeTuple.set(key, val);
+      if(TYPES.includes(key)) {
+        typeTuple.set(key, val);
+      } else console.warn(`Wrong type: ${key}, skipping....`);
+      
     }
     console.info([...typeTuple]);
 
@@ -271,9 +274,9 @@ class Calculate
 
 
   PrintTypesCount () {
-    let indexes = [];
     let types = this.CountTypes();
-
+    OTHERSHEETS.Data.getRange(44, 2, 1, 1).setValue(`Student Type`);
+    OTHERSHEETS.Data.getRange(44, 3, 1, 1).setValue(`Count`);
     types.forEach( (item, index) => {
       OTHERSHEETS.Data.getRange(45 + index, 2, 1, 1).setValue(item[0]);
       OTHERSHEETS.Data.getRange(45 + index, 3, 1, 1).setValue(item[1]);

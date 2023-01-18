@@ -163,7 +163,6 @@ class HackyStoreAutomation
 
   }
 }
-
 const RunHackySheetUpdater = () => new HackyStoreAutomation();
 
 
@@ -194,11 +193,109 @@ class MaterialLookup
     }
   }
 }
-
 const _testURL = () => {
   let m = new MaterialLookup({}).URL;
   console.info(`Result ${m}`)
 }
+
+
+class HackySemesterDateLookup
+{
+  constructor() {
+    this.url = `https://jacobsinstitute.berkeley.edu/making-at-jacobs/`;
+    this.startDate = ``;
+    this.endDate = ``;
+    this.nextDate = ``;
+  }
+
+  /**
+   * ----------------------------------------------------------------------------------------------------------------
+   * DEFUNCT : Get Price From Shopify Store URL (NOT USING SHOPIFY API)
+   * Used in "WritePrice()" function
+   * @param {string} url
+   * @return {float} price
+   */
+  async _GetDates () {
+    try
+    {
+      const param = {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+        muteHttpExceptions: true,
+      };
+
+      const html = await UrlFetchApp.fetch(this.url, param);
+
+      const responseCode = html.getResponseCode();
+      console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(responseCode == 200 || responseCode == 201) {
+        const content = html.getContentText();
+        const index = content.search(`Key Dates`);
+
+        if (index >= 0) {
+          let chunk = content
+            .substring(index, index + 1200)
+            .replace(/<\/?[^>]+(>|$)/g, "");
+          // console.info(chunk);
+
+          // Start Date
+          let serviceStartIdx = chunk.search(`JPS Service`);
+          if (serviceStartIdx >= 0) {
+            this.startDate = chunk
+              .substring(serviceStartIdx + 20, serviceStartIdx + 26) + `, ` + new Date().getFullYear();
+            console.info(this.startDate);
+          }
+
+          // End Date
+          let serviceEndIdx = chunk.search(`Last day to submit`);
+          if (serviceEndIdx >= 0) {
+            this.endDate = chunk
+              .substring(serviceEndIdx + 28, serviceEndIdx + 33) + `, ` + new Date().getFullYear();
+            console.info(this.endDate);
+          }
+
+          // Next
+          let end = new Date(this.endDate);
+          this.nextDate = new Date(end.getFullYear(), end.getMonth() + 3, end.getDay() + 20 ). toDateString();
+        }
+      }
+    }
+    catch(err){
+      console.error(`${err} : Couldn't fetch info.`);
+    }
+
+    return await { start : this.startDate, end : this.endDate, next : this.nextDate }
+  }
+
+  async PrintDates() {
+    const { start, end, next } = await this._GetDates();
+    console.info(start);
+    OTHERSHEETS.Summary.getRange(1, 6, 1, 1).setValue(`Start of JPS Service:\n ${start}`);
+    OTHERSHEETS.Summary.getRange(1, 8, 1, 1).setValue(`Last Day to Submit:\n ${end}`);
+    OTHERSHEETS.Summary.getRange(1, 10, 1, 1).setValue(`JPS Service Resumes: \n ${next}`);
+  }
+
+}
+const PrintServiceDates = () => {
+  let m = new HackySemesterDateLookup({});
+  m.PrintDates();
+}
+
+/**
+ * <p><strong>Key Dates for Spring 2023:</strong></p>
+<ul>
+<li data-stringify-indent="1" data-stringify-border="0">Maker Pass &amp; JPS Registration opens: Jan 10</li>
+<li data-stringify-indent="1" data-stringify-border="0">JPS Service begins: Jan 17</li>
+<li data-stringify-indent="1" data-stringify-border="0">Makerspace access begins: Jan 17</li>
+<li data-stringify-indent="1" data-stringify-border="0">Hands-on trainings begin: Jan 23</li>
+<li data-stringify-indent="1" data-stringify-border="0">Last day of hands-on trainings: Mar 3</li>
+<li data-stringify-indent="1" data-stringify-border="0"><strong>Spring Recess (no makerspace access or JPS service):</strong> Mar 27-31</li>
+<li data-stringify-indent="1" data-stringify-border="0">Last day to submit JPS job: May 5</li>
+<li data-stringify-indent="1" data-stringify-border="0">Makerspace early closure (at 7pm): May 8-12</li>
+<li data-stringify-indent="1" data-stringify-border="0">Last day to pick up JPS jobs: May 12</li>
+<li data-stringify-indent="1" data-stringify-border="0">Last day to access Makerspace: May 12</li>
+</ul>
+ */
 
 
 
