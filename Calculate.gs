@@ -242,48 +242,38 @@ class Calculate
   }
 
   CountTypes () {
-    let userList = [];
+    let typeTuple = new Map(Object.keys(TYPES).map(key => [TYPES[key], 0]));
+
+    let typeList = [];
     Object.values(SHEETS).forEach(sheet => {
       GetColumnDataByHeader(sheet, HEADERNAMES.afiliation)
         .filter(Boolean)
         .filter(x => x != `Test`)
         .filter(x => x != `FORMULA ROW`)
         .filter(x => x != `Formula Row`)
-        .forEach(x => userList.push(x));
+        .forEach(x => typeList.push(x));
     });
 
-    let occurrences = userList.reduce( (acc, curr) => {
+    let occurrences = typeList.reduce( (acc, curr) => {
       return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
     }, {});
 
-    let items = Object.keys(occurrences).map((key) => {
-      if (key != "" || key != undefined || key != null || key != " ") {
-        return [key, occurrences[key]];
-      }
-    });
-    items.sort((first, second) => {
-      return second[1] - first[1];
-    });
-    items.splice(0,1);
-    console.warn(items);
-    return items;  
+    let items = Object.keys(occurrences).map((key) => [key, occurrences[key]]);
+    // console.warn(items);
+
+    for( const [idx, [key, val]] of Object.entries(items)) {
+      typeTuple.set(key, val);
+    }
+    console.info([...typeTuple]);
+
+    return [...typeTuple];  
   }
+
+
   PrintTypesCount () {
     let indexes = [];
     let types = this.CountTypes();
-    types.forEach(type => {
-      let name = type[0];
-      indexes.push(TYPES.indexOf(name));
-    })
-    let missingTypes = [];
-    TYPES.forEach(type => missingTypes.push(type));
 
-    let temp1 = []
-    types.forEach(item => temp1.push(item[0]));
-
-    let nums = FindMissingElementsInArrays(temp1, missingTypes);
-    nums.forEach(index => missingTypes.splice(index, 1));
-    missingTypes.forEach(item => types.push([item, 0]));
     types.forEach( (item, index) => {
       OTHERSHEETS.Data.getRange(45 + index, 2, 1, 1).setValue(item[0]);
       OTHERSHEETS.Data.getRange(45 + index, 3, 1, 1).setValue(item[1]);
@@ -333,9 +323,10 @@ class Calculate
 
 
   CountTiers () {
-    let tiers = OTHERSHEETS.Approved.getRange(3, 4, OTHERSHEETS.Approved.getLastRow() -2, 1).getValues()
+    let tiers = GetColumnDataByHeader(OTHERSHEETS.Approved, `Tier`)
       .filter(Boolean);
     tiers = [].concat(...tiers);
+    tiers.push(...[`1`, `2`, `3`, `4`]);
 
     let occurrences = tiers.reduce( (acc, curr) => {
       return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
@@ -346,7 +337,7 @@ class Calculate
         return [key, occurrences[key]];
       }
     });
-    // console.info(items);
+    console.info(items);
     return items;  
   }
   PrintTiers () {
@@ -450,8 +441,9 @@ const _testDist = () => {
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
   // c.CalculateDuration(start, end);
-  c.CountActiveUsers();
-  // c.PrintTypesCount()
+  // c.CountActiveUsers();
+  c.PrintTypesCount();
+
 }
 
 

@@ -307,7 +307,8 @@ const TYPES = [
   `Jacobs Staff (Including Work-studies)`,
   `Students in Jacobs-affiliated courses (NON-DES INV)`,
   `Club and/or Team`,
-  `Other: Berkeley Faculty, Berkeley Staff, and Students`,
+  `Other: Berkeley Faculty, Berkeley Staff`,
+  `General Students`,
 ];
 
 const HEADERNAMES = {
