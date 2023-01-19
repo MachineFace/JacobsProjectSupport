@@ -216,14 +216,14 @@ class HackySemesterDateLookup
    * @return {float} price
    */
   async _GetDates () {
+    const param = {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+      muteHttpExceptions: true,
+    };
+
     try
     {
-      const param = {
-        method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
-        muteHttpExceptions: true,
-      };
-
       const html = await UrlFetchApp.fetch(this.url, param);
 
       const responseCode = html.getResponseCode();

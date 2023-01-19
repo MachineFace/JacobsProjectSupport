@@ -73,6 +73,7 @@ const GetByHeader = (sheet, columnName, row) => {
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(columnName);
     if (col != -1) return data[row - 1][col];
+    else throw new Error(`Getting data by header fucking failed...`);
   } catch (err) {
     console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
   }
@@ -93,6 +94,7 @@ const GetColumnDataByHeader = (sheet, columnName) => {
     let colData = data.map(d => d[col]);
     colData.splice(0, 1);
     if (col != -1) return colData;
+    else throw new Error(`Getting column data by header fucking failed...`);
   } catch (err) {
     console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
   }
@@ -319,14 +321,7 @@ const CheckSheetIsForbidden = (someSheet) => {
     return true;
   }
 }
-const _testSheetChecker = () => {
-  const val = CheckSheetIsForbidden(OTHERSHEETS.Logger);
-  console.info(`Logger Should be true-forbidden : ${val}`);
-  const val2 = CheckSheetIsForbidden(SHEETS.Fablight);
-  console.info(`Fablight Should be false-not_forbidden: ${val2}`);
-  const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
-  console.info(`Store Should be true-forbidden: ${val3}`);
-}
+
 
 
 const FindMissingElementsInArrays = (array1, array2) => {

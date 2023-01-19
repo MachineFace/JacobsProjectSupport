@@ -194,10 +194,7 @@ class MakeStaff
     return staff;
   }
 }
-const _testMakeStaffClass = () => {
-  const staff = new MakeStaff().Staff;
-  console.info(staff.Adam);
-}
+
 
 
 /**

@@ -114,7 +114,7 @@ class Calculate
         .filter(x => !staff.includes(x))
         .forEach(x => persons.push(x));
     });
-    console.info(persons)
+    // console.info(persons)
     let unique = new Set(persons);
     let count = unique.size;
     this.writer.Info(`Active JPS Users : ${count}`);
@@ -167,8 +167,8 @@ class Calculate
 
     chop.forEach((pair, index) => {
       let email = this.FindEmail(pair[0]);
-      console.warn(email)
-      console.warn(`${pair[0]} -----> ${pair[1]}`)
+      // console.warn(email)
+      // console.warn(`${pair[0]} -----> ${pair[1]}`)
       OTHERSHEETS.Data.getRange(106 + index, 1, 1, 1).setValue(index + 1)
       OTHERSHEETS.Data.getRange(106 + index, 2, 1, 1).setValue(pair[0])
       OTHERSHEETS.Data.getRange(106 + index, 3, 1, 1).setValue(pair[1])

@@ -21,11 +21,41 @@ const _gastTestRunner = async () => {
   // })
 
   await test(`Priority Test`, async(t) => {
-    const x = await new CheckPriority({email : `codyglen@berkeley.edu`, sid : 91283741923}).Priority;
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+    let types = {
+      staff : {
+        email : `codyglen@berkeley.edu`,
+        sid : 91283741923,
+      },
+      goodEgoodS : {
+        email : `cassidypowers@berkeley.edu`,
+        sid : 3034682275
+      },
+      goodEbadS : {
+        email : `cassidypowers@berkeley.edu`,
+        sid : 12938749123,
+      },
+      badEgoodS : {
+        email : `ding@bat.edu`,
+        sid : 3034682275,
+      },
+      badEbadS : {
+        email : `ding@bat.edu`,
+        sid : 2394872349587,
+      },
+    }
+    const st = await new CheckPriority({email : types.staff.email, sid : types.staff.sid }).Priority;
+    t.equal(st, 1, `DEFAULT priority for staff : Expected 1, Actual ${st}`);
+    const gg = await new CheckPriority({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
+    t.equal(gg, 3, `Expected 3, Actual ${gg}`);
+    const gb = await new CheckPriority({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
+    t.equal(gb, 3, `Expected 3, Actual ${gb}`);
+    const bg = await new CheckPriority({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
+    t.equal(bg, 3, `Expected 3, Actual ${bg}`);
+    const bb = await new CheckPriority({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
+    t.equal(bb, `STUDENT NOT FOUND!`, `Expected "STUDENT NOT FOUND!", Actual ${bb}`);
 
+  });
+  
   await test(`FormBuilder Test`, async(t) => {
     const x = new ApprovalFormBuilder({
       name : "Dingus",
@@ -34,15 +64,14 @@ const _gastTestRunner = async () => {
     });
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
-  })
-
+  });
+  
   await test(`Generate Barcode: `, async(t) => {
-    const jobnumber = `20210301140515`;
-    const qgen = new BarcodeGenerator({jobnumber : jobnumber});
-    const x = await qgen.GenerateBarCode();
-    t.pass(`Good : ${x}`);
+    const barcode = await new BarcodeGenerator({ jobnumber : 20230119105523 }).GenerateBarCodeForTicketHeader();
+    console.info(`Barcode ----> ${barcode.url}`);
+    t.pass(`Good : ${barcode.url}`);
     t.fail(`Bad`);
-  })
+  });
 
   await test(`Generate QRCode: `, async(t) => {
     const url = `http://www.codyglen.com/`;
@@ -50,88 +79,129 @@ const _gastTestRunner = async () => {
     const x = await qgen;
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
-  })
+  });
+  
+  await test(`Design Specialist Creation`, (t) => {
+    const x = new DesignSpecialist({ name : `Testa`, fullname : `Testa Nama`, email: `some@thing.com` });
+    t.equal(x.fullname, `Testa Nama`, `DS ${x.name} created.`);
+    t.notEqual(x.isAdmin, false, `Admin check should be true.`);
+  });
 
-  await test(`Staff Functions`, (t) => {
-    const x = new DesignSpecialist(`Testa`, `Testa Nama`, `some@thing.com`);
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+  await test(`Manager Creation`, (t) => {
+    const x = new Manager({ name : `Testa`, fullname : `Testa Nama`, email: `some@thing.com` });
+    t.equal(x.fullname, `Testa Nama`, `DS ${x.name} created.`);
+    t.notEqual(x.isAdmin, false, `Admin check should be true.`);
+  });
 
-  await test(`Staff Functions`, (t) => {
-    const x = BuildStaff();
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
-
+  await test(`StudentSupervisor Creation`, (t) => {
+    const x = new StudentSupervisor({ name : `Testa`, fullname : `Testa Nama`, email: `some@thing.com` });
+    t.equal(x.fullname, `Testa Nama`, `DS ${x.name} created.`);
+    t.notEqual(x.isAdmin, false, `Admin check should be true.`);
+  });
+  
+  await test(`Make Staff`, (t) => {
+    const staff = new MakeStaff().Staff;
+    t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
+  });
+  
   await test(`Calc Average Turnaround`, (t) => {
-    const x = calc.CalculateAverageTurnaround(SHEETS.Ultimaker);
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
-
+    const x = calc.CalculateAverageTurnaround(SHEETS.Laser);
+    t.ok(x, `Time string is ok.`);
+  });
+  
   await test(`Calc Duration`, (t) => {
-    const x = calc.CalculateDuration( new Date(1992,03,27), new Date() );
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
-
+    const x = calc.CalculateDuration( new Date(1992,03,27), new Date(2022,01,01) );
+    t.equal(x.toString(), `10872 1:00:00`, `Good calc`);
+    t.notEqual(x, new Date(), `Not Equal to a new date.`);
+  });
+  
   await test(`Count Active Users`, (t) => {
     const x = calc.CountActiveUsers();
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+    t.notEqual(x, undefined, `Count of active users should not return undefined.`);
+  });
+  
+  await test(`Count Each Submission`, (t) => {
+    const x = calc.CountEachSubmission();
+    t.notEqual(x, undefined, `Count Each Submission should not return undefined.`);
+  });
+  
+  await test(`Create Top Ten`, async(t) => {
+    const x = await calc.CreateTopTen();
+    t.notEqual(x, undefined || null, `Top Ten should not return undefined or null.`);
+  });
+  
+  await test(`Find an Email.`, (t) => {
+    const x = calc.FindEmail(`Cody`);
+    t.equal(x, `codyglen@berkeley.edu`, `Function should find my email: ${x}.`);
+    t.notEqual(x, undefined || null, `Find an Email should not return undefined or null.`);
+  });
 
   await test(`Calc Distribution`, (t) => {
     const x = calc.CalculateDistribution();
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+    t.notEqual(x, undefined, `Distribution should not return undefined.`);
+  });
 
+  await test(`Count Types`, (t) => {
+    const x = calc.CountTypes();
+    t.notEqual(x, undefined, `Count Types should not return undefined.`);
+  });
+  
   await test(`Calc Standard Deviation`, (t) => {
     const x = calc.CalculateStandardDeviation();
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+    t.notEqual(x, undefined || null, `Standard Deviation should not return undefined or null.`);
+  });
 
-  await test(`Calc Metrics`, (t) => {
-    const x = Metrics();
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+  await test(`Calculate Arithmetic Mean`, (t) => {
+    const x = calc.CalculateArithmeticMean();
+    t.notEqual(x, undefined || null, `Arithmetic Mean should not return undefined or null.`);
+  });
+  
+  await test(`Count Tiers`, (t) => {
+    const x = calc.CountTiers();
+    t.notEqual(x, undefined || null, `Count Tiers should not return undefined or null.`);
+  });
+  
+  await test(`Count Statuses`, (t) => {
+    const x = calc.CountStatuses();
+    t.notEqual(x, undefined || null, `Count Statuses should not return undefined or null.`);
+  });
+  
+  await test(`Count Funding`, (t) => {
+    const x = calc.CountFunding();
+    console.warn(x);
+    t.notEqual(x, undefined || null, `Count Funding should not return undefined or null.`);
+  });
 
-  await test(`Get Last Shopify Order`, (t) => {
-    const x = shopify.GetLastOrder();
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+  await test(`Get Last Shopify Order`, async(t) => {
+    const x = await shopify.GetLastOrder();
+    console.info(x);
+    t.notEqual(x, undefined || null, `Get Last Shopify Order should not return undefined or null.`);
+  });
+  
+  await test(`Get Shopify Orders List`, async(t) => {
+    const x = await shopify.GetOrdersList();
+    t.notEqual(x, undefined || null, `Get Shopify Orders List should not return undefined or null.`);
+  });
 
-  await test(`Get Shopify Orders List`, (t) => {
-    const x = shopify.GetOrdersList();
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+  await test(`Shopify Lookup Product ID`, async (t) => {
+    const x = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
+    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null.`);
+  });
 
-  await test(`Shopify Lookup Product ID`, (t) => {
-    const x = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+  await test(`Shopify GetCustomerByEmail`, async (t) => {
+    const x = await shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
+    t.notEqual(x, undefined || null, `GetCustomerByEmail for eli_lee@berkeley.edu should not return undefined or null.`);
+    t.equal(JSON.stringify(x), `{"id":4592317137062,"first_name":"Elijah","last_name":"Lee","total_spent":"0.00"}`, `Should be formatted.`);
+  });
 
-  await test(`Shopify Functions`, (t) => {
-    const x = shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
-    t.pass(`Good : ${JSON.stringify(x)}`);
-    t.fail(`Bad`);
-  })
+  await test(`Shopify _LookupStoreProductDetails`, async (t) => {
+    const p = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
+    const x = await shopify.GetProductByID(p);
+    console.info(JSON.stringify(x));
+    t.notEqual(x, undefined || null, `_LookupStoreProductDetails for Fortus Red ABS-M30 should not return undefined or null.`);
+  });
 
-  await test(`Shopify Functions`, (t) => {
-    const p = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-    const x = shopify.GetProductByID(p);
-    t.pass(`Good : ${JSON.stringify(x)}`);
-    t.fail(`Bad`);
-  })
-
-  await test(`OnChange Messages`, (t) => {
+  await test(`Create Message`, (t) => {
     const message = new CreateMessage({
       name : 'Cody', 
       projectname : 'Test Project',
@@ -145,19 +215,27 @@ const _gastTestRunner = async () => {
     });
 
     const a = `DEFAULT ${message.defaultMessage}`;
+    t.notEqual(a, undefined || null, `DEFAULT message should not return undefined or null. \n${a}`);
     const b = `RECEIVED ${message.receivedMessage}`;
+    t.notEqual(b, undefined || null, `RECEIVED message should not return undefined or null. \n${b}`);
     const c = `PENDING ${message.pendingMessage}`;
+    t.notEqual(c, undefined || null, `PENDING message should not return undefined or null. \n${c}`);
     const d = `IN-PROGRESS ${message.inProgressMessage}`;
+    t.notEqual(d, undefined || null, `IN-PROGRESS message should not return undefined or null. \n${d}`);
     const e = `COMPLETED ${message.completedMessage}`;
+    t.notEqual(e, undefined || null, `COMPLETED message should not return undefined or null. \n${e}`);
     const f = `FAILED ${message.failedMessage}`;
+    t.notEqual(f, undefined || null, `FAILED message should not return undefined or null. \n${f}`);
     const g = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
+    t.notEqual(g, undefined || null, `REJECTED BY STUDENT message should not return undefined or null. \n${g}`);
     const h = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
+    t.notEqual(h, undefined || null, `REJECTED BY STAFF message should not return undefined or null. \n${h}`);
     const i = `BILLED ${message.billedMessage}`;
+    t.notEqual(i, undefined || null, `BILLED message should not return undefined or null. \n${i}`);
     const j = `PICKED UP ${message.pickedUpMessage}`;
+    t.notEqual(j, undefined || null, `PICKED UP message should not return undefined or null. \n${j}`);
 
-    t.pass(`Good : ${a,b,c,d,e,f,g,h,i,j}`);
-    t.fail(`Bad`);
-  })
+  });
 
   await test(`Submission Messages`, (t) => {
     const message = new CreateSubmissionMessage({ 
@@ -166,28 +244,57 @@ const _gastTestRunner = async () => {
       jobnumber : 102938471431,
     } );
     const w = `DS MESSAGE : ${message.dsMessage}`;
+    t.notEqual(w, undefined || null, `DS MESSAGE message should not return undefined or null. \n${w}`);
     const x = `CREAFORM MESSAGE : ${message.creaformMessage}`;
+    t.notEqual(x, undefined || null, `CREAFORM MESSAGE message should not return undefined or null. \n${x}`);
     const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
-    t.pass(`Good : ${w,x,y}`);
-    t.fail(`Bad`)
-  })
+    t.notEqual(y, undefined || null, `MISSING ACCESS message should not return undefined or null. \n${y}`);
+  });
 
   await test(`JobNumber`, (t) => {
-    const x = new JobNumberGenerator({ date : new Date() }).jobnumber;
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
-  })
+    const x = new CreateJobnumber({ date : new Date(1986, 01, 02) }).Jobnumber;
+    t.equal(x, 19860202000000, `Standard Job Number for 01, 02, 1986 should equal 19860202000000.`);
+    const y = new CreateJobnumber({}).Jobnumber;
+    t.notEqual(y, undefined || null, `DEFAULT / EMPTY jobnumber should not return undefined or null, ${y}`);
 
+    const jtypes = {
+      GoodDate : new Date(2015, 10, 3),
+      BadDate : `20220505`,
+      AnotherBad : `5/3/2022 8:29:08`,
+      AnotherBadString : `Thu, 27 Jan 2022 18:34:48 GMT`,
+    }
+
+    const goodDate = new CreateJobnumber({ date : jtypes.GoodDate }).Jobnumber;
+    t.equal(goodDate, 20151103000000, `Job Number for ${jtypes.GoodDate} should return 20151103000000`);
+    const badDate = new CreateJobnumber({ date : jtypes.BadDate }).Jobnumber;
+    t.notEqual(badDate, undefined || null, `Bad date should still return good jobnumber, ${badDate}`);
+    const anotherBad = new CreateJobnumber({ date : jtypes.AnotherBad }).Jobnumber;
+    t.notEqual(anotherBad, undefined || null, `Bad string date should still return good jobnumber, ${anotherBad}`);
+    const anotherBadString = new CreateJobnumber({ date : jtypes.AnotherBadString }).Jobnumber;
+    t.notEqual(anotherBadString, undefined || null, `Bad string date should still return good jobnumber, ${anotherBadString}`);
+  
+  });
+  
   await test(`Logger Test`, (t) => {
-
     const write = new WriteLogger();
     const x = write.Warning(`Warning Test ----> Message`);
     const y = write.Info(`Info Test ----> Message`);
     const z = write.Error(`ERROR Test ----> Message`);
     const w = write.Debug(`Debugging Test ----> Message`);
-    t.pass(`Good : ${x,y,z,w}`);
+    t.pass(`Logger is Good`);
     t.fail(`Bad`);
-  })
+  });
+
+  await test(`Sheet Permitted Check`, (t) => {
+    const val = CheckSheetIsForbidden(OTHERSHEETS.Logger);
+    t.equal(true, val, `Logger Should be true-forbidden : ${val}`);
+
+    const val2 = CheckSheetIsForbidden(SHEETS.Fablight);
+    t.equal(false, val2, `Fablight Should be false-not_forbidden: ${val2}`);
+
+    const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
+    t.equal(true, val3, `Store Should be true-forbidden: ${val3}`);
+  });
 
   await test.finish();
 }
