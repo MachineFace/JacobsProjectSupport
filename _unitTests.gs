@@ -7,13 +7,11 @@
 /**
  * Test with GasT
  */
-const _gastTestRunner = async () => {
+const _gasTMainTesting = async () => {
   if ((typeof GasTap) === 'undefined') { 
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
   } 
   const test = new GasTap();
-  const calc = new Calculate();
-  const shopify = new ShopifyAPI({jobnumber : 1129384729384});
 
   // await test(`Checking...`, (t) => {    
   //     let i = 3 + 4
@@ -105,101 +103,6 @@ const _gastTestRunner = async () => {
     t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
   });
   
-  // ------------------------------------------------------------------------------------------------------------------------------
-  await test(`Calc Average Turnaround`, (t) => {
-    const x = calc.CalculateAverageTurnaround(SHEETS.Laser);
-    t.ok(x, `Time string is ok.`);
-  });
-  
-  await test(`Calc Duration`, (t) => {
-    const x = calc.CalculateDuration( new Date(1992,03,27), new Date(2022,01,01) );
-    t.equal(x.toString(), `10872 1:00:00`, `Good calc`);
-    t.notEqual(x, new Date(), `Not Equal to a new date.`);
-  });
-  
-  await test(`Count Active Users`, (t) => {
-    const x = calc.CountActiveUsers();
-    t.notEqual(x, undefined, `Count of active users should not return undefined.`);
-  });
-  
-  await test(`Count Each Submission`, (t) => {
-    const x = calc.CountEachSubmission();
-    t.notEqual(x, undefined, `Count Each Submission should not return undefined.`);
-  });
-  
-  await test(`Create Top Ten`, async(t) => {
-    const x = await calc.CreateTopTen();
-    t.notEqual(x, undefined || null, `Top Ten should not return undefined or null.`);
-  });
-  
-  await test(`Find an Email.`, (t) => {
-    const x = calc.FindEmail(`Cody`);
-    t.equal(x, `codyglen@berkeley.edu`, `Function should find my email: ${x}.`);
-    t.notEqual(x, undefined || null, `Find an Email should not return undefined or null.`);
-  });
-
-  await test(`Calc Distribution`, (t) => {
-    const x = calc.CalculateDistribution();
-    t.notEqual(x, undefined, `Distribution should not return undefined.`);
-  });
-
-  await test(`Count Types`, (t) => {
-    const x = calc.CountTypes();
-    t.notEqual(x, undefined, `Count Types should not return undefined.`);
-  });
-  
-  await test(`Calc Standard Deviation`, (t) => {
-    const x = calc.CalculateStandardDeviation();
-    t.notEqual(x, undefined || null, `Standard Deviation should not return undefined or null.`);
-  });
-
-  await test(`Calculate Arithmetic Mean`, (t) => {
-    const x = calc.CalculateArithmeticMean();
-    t.notEqual(x, undefined || null, `Arithmetic Mean should not return undefined or null.`);
-  });
-  
-  await test(`Count Tiers`, (t) => {
-    const x = calc.CountTiers();
-    t.notEqual(x, undefined || null, `Count Tiers should not return undefined or null.`);
-  });
-  
-  await test(`Count Statuses`, (t) => {
-    const x = calc.CountStatuses();
-    t.notEqual(x, undefined || null, `Count Statuses should not return undefined or null.`);
-  });
-  
-  await test(`Count Funding`, (t) => {
-    const x = calc.CountFunding();
-    console.warn(x);
-    t.notEqual(x, undefined || null, `Count Funding should not return undefined or null.`);
-  });
-
-  // ------------------------------------------------------------------------------------------------------------------------------
-  await test(`Get Last Shopify Order`, async(t) => {
-    const x = await shopify.GetLastOrder();
-    console.info(x);
-    t.notEqual(x, undefined || null, `Get Last Shopify Order should not return undefined or null.`);
-  });
-  
-  await test(`Get Shopify Orders List`, async(t) => {
-    const x = await shopify.GetOrdersList();
-    t.notEqual(x, undefined || null, `Get Shopify Orders List should not return undefined or null.`);
-  });
-
-  await test(`Shopify _LookupStoreProductDetails`, (t) => {
-    const x = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${x}`);
-  });
-
-  await test(`Shopify GetProductByID`, async (t) => {
-    const x = await shopify.GetProductByID(3940700420);
-    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${JSON.stringify(x)}`);
-  });
-
-  await test(`Shopify GetCustomerByEmail`, async (t) => {
-    const x = await shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
-    t.notEqual(x, undefined || null, `GetCustomerByEmail for eli_lee@berkeley.edu should not return undefined or null: ${JSON.stringify(x)}`);
-  });
   
   // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Create Message`, (t) => {
@@ -378,11 +281,143 @@ const _gastTestRunner = async () => {
 
   });
 
+  await test.finish();
+}
+
+
+/**
+ * Test Calculations with GasT
+ */
+const _gasTCalculationTesting = async () => {
+  if ((typeof GasTap) === 'undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap();
+  const calc = new Calculate();
+
+  // ------------------------------------------------------------------------------------------------------------------------------
+  await test(`Calc Average Turnaround`, (t) => {
+    const x = calc.CalculateAverageTurnaround(SHEETS.Laser);
+    t.ok(x, `Time string is ok.`);
+  });
+  
+  await test(`Calc Duration`, (t) => {
+    const x = calc.CalculateDuration( new Date(1992,03,27), new Date(2022,01,01) );
+    t.equal(x.toString(), `10872 1:00:00`, `Good calc`);
+    t.notEqual(x, new Date(), `Not Equal to a new date.`);
+  });
+  
+  await test(`Count Active Users`, (t) => {
+    const x = calc.CountActiveUsers();
+    t.notEqual(x, undefined, `Count of active users should not return undefined.`);
+  });
+  
+  await test(`Count Each Submission`, (t) => {
+    const x = calc.CountEachSubmission();
+    t.notEqual(x, undefined, `Count Each Submission should not return undefined.`);
+  });
+  
+  await test(`Create Top Ten`, async(t) => {
+    const x = await calc.CreateTopTen();
+    t.notEqual(x, undefined || null, `Top Ten should not return undefined or null.`);
+  });
+  
+  await test(`Find an Email.`, (t) => {
+    const x = calc.FindEmail(`Cody`);
+    t.equal(x, `codyglen@berkeley.edu`, `Function should find my email: ${x}.`);
+    t.notEqual(x, undefined || null, `Find an Email should not return undefined or null.`);
+  });
+
+  await test(`Calc Distribution`, (t) => {
+    const x = calc.CalculateDistribution();
+    t.notEqual(x, undefined, `Distribution should not return undefined.`);
+  });
+
+  await test(`Count Types`, (t) => {
+    const x = calc.CountTypes();
+    t.notEqual(x, undefined, `Count Types should not return undefined.`);
+  });
+  
+  await test(`Calc Standard Deviation`, (t) => {
+    const x = calc.CalculateStandardDeviation();
+    t.notEqual(x, undefined || null, `Standard Deviation should not return undefined or null.`);
+  });
+
+  await test(`Calculate Arithmetic Mean`, (t) => {
+    const x = calc.CalculateArithmeticMean();
+    t.notEqual(x, undefined || null, `Arithmetic Mean should not return undefined or null.`);
+  });
+  
+  await test(`Count Tiers`, (t) => {
+    const x = calc.CountTiers();
+    t.notEqual(x, undefined || null, `Count Tiers should not return undefined or null.`);
+  });
+  
+  await test(`Count Statuses`, (t) => {
+    const x = calc.CountStatuses();
+    t.notEqual(x, undefined || null, `Count Statuses should not return undefined or null.`);
+  });
+  
+  await test(`Count Funding`, (t) => {
+    const x = calc.CountFunding();
+    console.warn(x);
+    t.notEqual(x, undefined || null, `Count Funding should not return undefined or null.`);
+  });
 
   await test.finish();
 }
 
 
+/**
+ * Test Shopify API with GasT
+ */
+const _gasTShopifyTesting = async () => {
+  if ((typeof GasTap) === 'undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap();
+  const shopify = new ShopifyAPI({jobnumber : 1129384729384});
+
+
+  // ------------------------------------------------------------------------------------------------------------------------------
+  await test(`Get Last Shopify Order`, async(t) => {
+    const x = await shopify.GetLastOrder();
+    console.info(x);
+    t.notEqual(x, undefined || null, `Get Last Shopify Order should not return undefined or null.`);
+  });
+  
+  await test(`Get Shopify Orders List`, async(t) => {
+    const x = await shopify.GetOrdersList();
+    t.notEqual(x, undefined || null, `Get Shopify Orders List should not return undefined or null.`);
+  });
+
+  await test(`Shopify _LookupStoreProductDetails`, (t) => {
+    const x = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
+    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${x}`);
+  });
+
+  await test(`Shopify GetProductByID`, async (t) => {
+    const x = await shopify.GetProductByID(3940700420);
+    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${JSON.stringify(x)}`);
+  });
+
+  await test(`Shopify GetCustomerByEmail`, async (t) => {
+    const x = await shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
+    t.notEqual(x, undefined || null, `GetCustomerByEmail for eli_lee@berkeley.edu should not return undefined or null: ${JSON.stringify(x)}`);
+  });
+
+  await test.finish();
+}
+
+
+/**
+ * Test All with GasT
+ */
+const _gasTTestAll = async () => {
+  _gasTMainTesting();
+  _gasTCalculationTesting();
+  _gasTShopifyTesting();
+}
 
 // /**
 //  * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 
