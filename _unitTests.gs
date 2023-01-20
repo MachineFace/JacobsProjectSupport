@@ -18,7 +18,7 @@ const _gasTMainTesting = async () => {
   //     t.equal(i, 7, `Calc : 3 + 4 = 7  : Correct`)
   // })
 
-  await test(`Priority Test`, async(t) => {
+  await test(`Priority Test`, (t) => {
     let types = {
       staff : {
         email : `codyglen@berkeley.edu`,
@@ -41,20 +41,20 @@ const _gasTMainTesting = async () => {
         sid : 2394872349587,
       },
     }
-    const st = await new CheckPriority({email : types.staff.email, sid : types.staff.sid }).Priority;
+    const st = new CheckPriority({email : types.staff.email, sid : types.staff.sid }).Priority;
     t.equal(st, 1, `DEFAULT priority for staff : Expected 1, Actual ${st}`);
-    const gg = await new CheckPriority({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
+    const gg = new CheckPriority({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
     t.equal(gg, 3, `Expected 3, Actual ${gg}`);
-    const gb = await new CheckPriority({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
+    const gb = new CheckPriority({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
     t.equal(gb, 3, `Expected 3, Actual ${gb}`);
-    const bg = await new CheckPriority({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
+    const bg = new CheckPriority({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
     t.equal(bg, 3, `Expected 3, Actual ${bg}`);
-    const bb = await new CheckPriority({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
+    const bb = new CheckPriority({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
     t.equal(bb, `STUDENT NOT FOUND!`, `Expected "STUDENT NOT FOUND!", Actual ${bb}`);
 
   });
   
-  await test(`FormBuilder Test`, async(t) => {
+  await test(`FormBuilder Test`, (t) => {
     const x = new ApprovalFormBuilder({
       name : "Dingus",
       jobnumber : 19238712398,
@@ -73,11 +73,11 @@ const _gasTMainTesting = async () => {
 
   await test(`Generate QRCode: `, async(t) => {
     t.skip(`#Not implemented`);
-    const url = `http://www.codyglen.com/`;
-    const qgen = new QRCodeGenerator({url : url,});
-    const x = await qgen;
-    t.pass(`Good : ${x}`);
-    t.fail(`Bad`);
+    // const url = `http://www.codyglen.com/`;
+    // const qgen = new QRCodeGenerator({url : url,});
+    // const x = await qgen;
+    // t.pass(`Good : ${x}`);
+    // t.fail(`Bad`);
   });
   
   await test(`Design Specialist Creation`, (t) => {
@@ -199,6 +199,20 @@ const _gasTMainTesting = async () => {
     const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
     t.equal(true, val3, `Store Should be true-forbidden: ${val3}`);
   });
+
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
+
+
+/**
+ * Test Misc with GasT
+ */
+const _gasTMiscTesting = async () => {
+  if ((typeof GasTap) === 'undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Search`, (t) => {
@@ -415,6 +429,7 @@ const _gasTShopifyTesting = async () => {
  */
 const _gasTTestAll = async () => {
   _gasTMainTesting();
+  _gasTMiscTesting();
   _gasTCalculationTesting();
   _gasTShopifyTesting();
 }
