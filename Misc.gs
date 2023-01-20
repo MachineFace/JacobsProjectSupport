@@ -129,10 +129,6 @@ const GetRowData = (sheet, row) => {
     console.error(`${err} : GetRowData failed - Sheet: ${sheet} Row: ${row}`);
   }
 }
-const _testGetRowData = () => {
-  let t = GetRowData(SHEETS.Advancedlab, 5);
-  console.info(t)
-}
 
 
 
@@ -173,11 +169,7 @@ const FindOne = (value) => {
   }
   return res;
 }
-const _testFindOne = () => {
-  num = 20220302070954;
-  const res = FindOne(num);
-  console.info(res);
-}
+
 
 
 

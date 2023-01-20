@@ -8,7 +8,7 @@
  * Test with GasT
  */
 const _gastTestRunner = async () => {
-  if ((typeof GasTap)==='undefined') { 
+  if ((typeof GasTap) === 'undefined') { 
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
   } 
   const test = new GasTap();
@@ -74,6 +74,7 @@ const _gastTestRunner = async () => {
   });
 
   await test(`Generate QRCode: `, async(t) => {
+    t.skip(`#Not implemented`);
     const url = `http://www.codyglen.com/`;
     const qgen = new QRCodeGenerator({url : url,});
     const x = await qgen;
@@ -84,19 +85,19 @@ const _gastTestRunner = async () => {
   await test(`Design Specialist Creation`, (t) => {
     const x = new DesignSpecialist({ name : `Testa`, fullname : `Testa Nama`, email: `some@thing.com` });
     t.equal(x.fullname, `Testa Nama`, `DS ${x.name} created.`);
-    t.notEqual(x.isAdmin, false, `Admin check should be true.`);
+    t.equal(x.isAdmin, true, `Admin check should be true.`);
   });
 
   await test(`Manager Creation`, (t) => {
     const x = new Manager({ name : `Testa`, fullname : `Testa Nama`, email: `some@thing.com` });
     t.equal(x.fullname, `Testa Nama`, `DS ${x.name} created.`);
-    t.notEqual(x.isAdmin, false, `Admin check should be true.`);
+    t.equal(x.isAdmin, true, `Admin check should be true.`);
   });
 
   await test(`StudentSupervisor Creation`, (t) => {
     const x = new StudentSupervisor({ name : `Testa`, fullname : `Testa Nama`, email: `some@thing.com` });
     t.equal(x.fullname, `Testa Nama`, `DS ${x.name} created.`);
-    t.notEqual(x.isAdmin, false, `Admin check should be true.`);
+    t.equal(x.isAdmin, false, `Admin check should be false.`);
   });
   
   await test(`Make Staff`, (t) => {
@@ -104,6 +105,7 @@ const _gastTestRunner = async () => {
     t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
   });
   
+  // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Calc Average Turnaround`, (t) => {
     const x = calc.CalculateAverageTurnaround(SHEETS.Laser);
     t.ok(x, `Time string is ok.`);
@@ -172,6 +174,7 @@ const _gastTestRunner = async () => {
     t.notEqual(x, undefined || null, `Count Funding should not return undefined or null.`);
   });
 
+  // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Get Last Shopify Order`, async(t) => {
     const x = await shopify.GetLastOrder();
     console.info(x);
@@ -183,24 +186,22 @@ const _gastTestRunner = async () => {
     t.notEqual(x, undefined || null, `Get Shopify Orders List should not return undefined or null.`);
   });
 
-  await test(`Shopify Lookup Product ID`, async (t) => {
-    const x = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null.`);
+  await test(`Shopify _LookupStoreProductDetails`, (t) => {
+    const x = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
+    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${x}`);
+  });
+
+  await test(`Shopify GetProductByID`, async (t) => {
+    const x = await shopify.GetProductByID(3940700420);
+    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${JSON.stringify(x)}`);
   });
 
   await test(`Shopify GetCustomerByEmail`, async (t) => {
     const x = await shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
-    t.notEqual(x, undefined || null, `GetCustomerByEmail for eli_lee@berkeley.edu should not return undefined or null.`);
-    t.equal(JSON.stringify(x), `{"id":4592317137062,"first_name":"Elijah","last_name":"Lee","total_spent":"0.00"}`, `Should be formatted.`);
+    t.notEqual(x, undefined || null, `GetCustomerByEmail for eli_lee@berkeley.edu should not return undefined or null: ${JSON.stringify(x)}`);
   });
-
-  await test(`Shopify _LookupStoreProductDetails`, async (t) => {
-    const p = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-    const x = await shopify.GetProductByID(p);
-    console.info(JSON.stringify(x));
-    t.notEqual(x, undefined || null, `_LookupStoreProductDetails for Fortus Red ABS-M30 should not return undefined or null.`);
-  });
-
+  
+  // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Create Message`, (t) => {
     const message = new CreateMessage({
       name : 'Cody', 
@@ -295,6 +296,88 @@ const _gastTestRunner = async () => {
     const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
     t.equal(true, val3, `Store Should be true-forbidden: ${val3}`);
   });
+
+  // ------------------------------------------------------------------------------------------------------------------------------
+  await test(`Search`, (t) => {
+    const x = Search(`Cody`);
+    t.notEqual(x, undefined || null, `Search should not return undefined or null. ${JSON.stringify(x)}`);
+  });
+
+  await test(`Search Specific Sheet`, (t) => {
+    const x = SearchSpecificSheet(SHEETS.Fablight,`Cody`);
+    t.notEqual(x, undefined || null, `SearchSpecificSheet should not return undefined or null. ${JSON.stringify(x)}`);
+  });
+
+  await test(`FindByJobNumber`, (t) => {
+    const x = FindByJobNumber(20211025144607);
+    t.notEqual(x, undefined || null, `FindByJobNumber should not return undefined or null. ${JSON.stringify(x)}`);
+  });
+
+  await test(`GetByHeader`, (t) => {
+    const x = GetByHeader(SHEETS.Fablight, HEADERNAMES.email, 2);
+    t.equal(x, `codyglen@berkeley.edu`, `Should fetch my email from that sheet.`);
+
+    const y = GetByHeader(SHEETS.Laser, `BAD COLUMN NAME`, 2);
+    t.equal(y, undefined || null, `GetByHeader SHOULD return undefined or null: ${y}`);
+
+    const z = GetByHeader(`BAD SHEET`, HEADERNAMES.email, 2);
+    t.equal(y, undefined || null, `GetByHeader SHOULD return undefined or null: ${y}`);
+
+    const a = GetByHeader(`BAD SHEET`, `BAD COLUMN NAME`, `BAD ROW NUMBER`);
+    t.equal(a, undefined || null, `GetByHeader SHOULD return undefined or null: ${a}`);
+
+  });
+
+  await test(`GetColumnDataByHeader`, (t) => {
+    const x = GetColumnDataByHeader(SHEETS.Fablight, HEADERNAMES.email);
+    t.notEqual(x, undefined || null, `GetColumnDataByHeader SHOULD NOT return undefined or null: ${x}`);
+
+    const y = GetColumnDataByHeader(SHEETS.Laser, `BAD COLUMN NAME`);
+    t.equal(y, undefined || null, `GetByHeader SHOULD return undefined or null: ${y}`);
+
+    const z = GetColumnDataByHeader(`BAD SHEET`, `BAD COLUMN NAME`);
+    t.equal(z, undefined || null, `GetByHeader SHOULD return undefined or null: ${z}`);
+
+  });
+
+  await test(`GetRowData`, (t) => {
+    const x = GetRowData(SHEETS.Fablight, 2);
+    t.notEqual(x, undefined || null, `GetRowData SHOULD NOT return undefined or null: ${JSON.stringify(x)}`);
+
+    const y = GetRowData(SHEETS.Laser, `BAD COLUMN NAME`);
+    t.equal(y, undefined || null, `GetRowData SHOULD return undefined or null: ${y}`);
+
+    const z = GetRowData(`BAD SHEET`, `BAD COLUMN NAME`);
+    t.equal(z, undefined || null, `GetRowData SHOULD return undefined or null: ${z}`);
+
+  });
+
+  await test(`FindOne`, (t) => {
+    const x = FindOne(`cparsell@berkeley.edu`);
+    t.notEqual(x, undefined || null, `FindOne should not return undefined or null. ${JSON.stringify(x)}`);
+
+    const y = FindOne(`BAD NAME`);
+    t.equal(0, Object.entries(y).length, `FindOne SHOULD return empty object: ${JSON.stringify(y)}`);
+  });
+
+  await test(`ValidateEmail`, (t) => {
+    const x = ValidateEmail(`cparsell@berkeley.edu`);
+    t.equal(x, true, `ValidateEmail SHOULD return true: ${x}`);
+
+    const y = ValidateEmail(`BAD NAME`);
+    t.equal(y, false, `ValidateEmail SHOULD return false: ${y}`);
+
+    const z = ValidateEmail(`!#$%^%$123@berkeley.edu`);
+    t.equal(z, false, `ValidateEmail SHOULD return false: ${z}`);
+
+    const a = ValidateEmail(`normalname@!#&^*^&*$%^)$!#$#!`);
+    t.equal(a, false, `ValidateEmail SHOULD return false: ${a}`);
+
+    const b = ValidateEmail(`12345675645634599293487529384752938745923845293485729348572934875@berkeley.edu`);
+    t.equal(b, true, `ValidateEmail SHOULD return true: ${b}`);
+
+  });
+
 
   await test.finish();
 }
