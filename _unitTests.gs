@@ -185,6 +185,10 @@ const _gasTMainTesting = async () => {
     const y = write.Info(`Info Test ----> Message`);
     const z = write.Error(`ERROR Test ----> Message`);
     const w = write.Debug(`Debugging Test ----> Message`);
+    t.notThrow(() => x, `Warning SHOULD NOT throw error.`);
+    t.notThrow(() => y, `Warning SHOULD NOT throw error.`);
+    t.notThrow(() => z, `Warning SHOULD NOT throw error.`);
+    t.notThrow(() => w, `Warning SHOULD NOT throw error.`);
     t.pass(`Logger is Good`);
     t.fail(`Bad`);
   });

@@ -79,7 +79,8 @@ class CheckPriority
   
 }
 
-
+/** 
+ * @NOTIMPLEMENTED
 const _testPriority = () => {
   let typesOfPriority = {
     goodEgoodS : {
@@ -116,7 +117,7 @@ const _testPriority = () => {
   console.timeEnd(`Priority`);
 
 }
-
+*/
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -128,20 +129,21 @@ const CheckMissingAccessStudents = () => {
   if(results != null) {
     for(const [sheetName, values] of Object.entries(results)) {
       values.forEach( row => {
-        let email = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.email, row);
-        let sid = GetByHeader(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName), HEADERNAMES.sid, row)
+        let thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+        let email = GetByHeader(thisSheet, HEADERNAMES.email, row);
+        let sid = GetByHeader(thisSheet, HEADERNAMES.sid, row)
         const p = new CheckPriority({email : email, sid : sid}).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
         if(p != `STUDENT NOT FOUND!`) {
           list.push(email);
-          SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(row, 3, 1, 1).setValue(p);
+          SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
+          SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
         }
       })
     }
   }
   return list;
 };
-
 
 
 

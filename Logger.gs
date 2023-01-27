@@ -6,50 +6,71 @@
 class WriteLogger
 {
   constructor() { 
-    this.date = new Date().toUTCString();
     this.sheet = OTHERSHEETS.Logger;
-    this.row = OTHERSHEETS.Logger.getLastRow() + 1;
-    this.sheetLength = OTHERSHEETS.Logger.getMaxRows();
   }
-  Error(message) {
-    const text = [this.date, "ERROR!", message, ];
-    this.sheet.appendRow(text);
-    console.error(`${text[0]}, ${text[1]} : ${message}`);
-    this._PopItem();
-    this._CleanupSheet();
-  }
-  Warning(message) {
-    const text = [this.date, "WARNING!", message, ];
-    this.sheet.appendRow(text);
-    console.warn(`${text[0]}, ${text[1]} : ${message}`);
-    this._PopItem();
-    this._CleanupSheet();
-  }
-  Info(message) {
-    const text = [this.date, "INFO!", message, ];
-    this.sheet.appendRow(text);
-    console.info(`${text[0]}, ${text[1]} : ${message}`);
-    this._PopItem();
-    this._CleanupSheet();
-  }
-  Debug(message) {
-    const text = [this.date, "DEBUG", message, ];
-    this.sheet.appendRow(text);
-    console.log(`${text[0]}, ${text[1]} : ${message}`);
-    this._PopItem();
-    this._CleanupSheet();
-  }
-  _PopItem() {
-    if(this.row > 500) {
-      this.sheet.deleteRows(2, 1);
-    } else {
-      this.sheet.insertRowAfter(this.sheetLength - 1);
+  async Error(message) {
+    try{
+      const text = [new Date().toUTCString(), "ERROR!", message, ];
+      await this.sheet.appendRow(text);
+      await console.error(`${text[0]}, ${text[1]} : ${message}`);
+      await this._PopItem();
+      await this._CleanupSheet();
+    } catch(err) {
+      console.error(`Whoops ---> ${err}`);
     }
   }
-  _CleanupSheet() {
-    if(this.row > 2000) {
-      this.sheet.deleteRows(2, 1999);
-    } else return;
+  async Warning(message) {
+    try{
+      const text = [new Date().toUTCString(), "WARNING!", message, ];
+      await this.sheet.appendRow(text);
+      await console.warn(`${text[0]}, ${text[1]} : ${message}`);
+      await this._PopItem();
+      await this._CleanupSheet();
+    } catch(err) {
+      console.error(`Whoops ---> ${err}`);
+    }
+  }
+  async Info(message) {
+    try {
+      const text = [new Date().toUTCString(), "INFO!", message, ];
+      await this.sheet.appendRow(text);
+      await console.info(`${text[0]}, ${text[1]} : ${message}`);
+      await this._PopItem();
+      await this._CleanupSheet();
+    } catch(err) {
+      console.error(`Whoops ---> ${err}`);
+    }
+  }
+  async Debug(message) {
+    try {
+      const text = [new Date().toUTCString(), "DEBUG", message, ];
+      await this.sheet.appendRow(text);
+      await console.log(`${text[0]}, ${text[1]} : ${message}`);
+      await this._PopItem();
+      await this._CleanupSheet();
+    } catch(err) {
+      console.error(`Whoops ---> ${err}`);
+    }
+  }
+  async _PopItem() {
+    try {
+      if(this.sheet.getLastRow() + 1 > 500) {
+        await this.sheet.deleteRows(2, 1);
+      } else {
+        await this.sheet.insertRowAfter(this.sheet.getLastRow() - 1);
+      }
+    } catch(err) {
+      console.error(`Whoops ---> ${err}`);
+    }
+  }
+  async _CleanupSheet() {
+    try {
+      if(this.sheet.getLastRow() + 1 > 2000) {
+        await this.sheet.deleteRows(2, 1999);
+      } else return 1;
+    } catch(err) {
+      console.error(`Whoops ---> ${err}`);
+    }
   }
   
 }
@@ -58,15 +79,16 @@ class WriteLogger
  * -----------------------------------------------------------------------------------------------------------------
  * Testing for Logger Class
  */
-const _testWriteLog = () => {
+const _testWriteLog = async () => {
   console.time(`WriteLogger Time `);
   const write = new WriteLogger();
-  for (let i = 0; i < 5; i++) {
-    write.Warning(`Ooopsies ----> Warning`);
-    write.Info(`Some Info`);
-    write.Error(`ERROR`);
-    write.Debug(`Debugging`);
-    write._CleanupSheet();
-  }
+  await write.Warning(`Ooopsies ----> Warning`);
+  // for (let i = 0; i < 5; i++) {
+  //   await write.Warning(`Ooopsies ----> Warning`);
+  //   await write.Info(`Some Info`);
+  //   await write.Error(`ERROR`);
+  //   await write.Debug(`Debugging`);
+  //   await write._CleanupSheet();
+  // }
   console.timeEnd(`WriteLogger Time `);
 }

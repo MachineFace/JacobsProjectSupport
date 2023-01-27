@@ -127,7 +127,10 @@ const PopupGetSingleStudentPriority = async () => {
   if(response == ui.Button.OK) {
     try {
       const priority = await new CheckPriority({email : email, sid : sid}).Priority;
-      SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+      if(priority != `STUDENT NOT FOUND!`) {
+        SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+        SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.received);
+      }
       ui.alert(
         `JPS : Checked Access`,
         `Access for ${name} set to : "${priority}"`,
