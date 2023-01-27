@@ -375,24 +375,24 @@ const onChange = async (e) => {
         let notes = [];
         switch(thisSheet.getSheetName()) {
           case SHEETS.Laser.getSheetName():
-            material = GetByHeader(SHEETS.Laser, `Rough dimensions of your part`, thisRow);
+            material = GetByHeader(SHEETS.Laser, HEADERNAMES.roughDimensions, thisRow);
             if(!material) mat.push(`Materials: `, `None`);
             else mat.push( `Rough Dimensions:`, material.toString());
 
-            part = GetByHeader(SHEETS.Laser, `Total number of parts needed`, thisRow);
+            part = GetByHeader(SHEETS.Laser, HEADERNAMES.numberOfParts, thisRow);
             if(!part) partcount.push(`Part Count: `, `None`);
             else partcount.push(`Part Count:`, part.toString());
 
-            note = GetByHeader(SHEETS.Laser, `Notes`, thisRow);
+            note = GetByHeader(SHEETS.Laser, HEADERNAMES.staffNotes, thisRow);
             if(!note) notes.push(`Notes: `, `None`);
             else notes.push( `Notes:`, note.toString());
             break;
           case SHEETS.Fablight.getSheetName():
-            material = GetByHeader(SHEETS.Fablight, `Rough dimensions of your part?`, thisRow);
+            material = GetByHeader(SHEETS.Fablight, HEADERNAMES.roughDimensions, thisRow);
             if(!material) mat.push(`Materials: `, `None`);
             else mat.push( `Rough Dimensions:`, material.toString());
 
-            part = GetByHeader(SHEETS.Fablight, `How many parts do you need?`, thisRow);
+            part = GetByHeader(SHEETS.Fablight, HEADERNAMES.numberOfParts, thisRow);
             if(!part) partcount.push(`Part Count: `, `None`);
             else partcount.push( `Part Count:`, part.toString());
 
@@ -401,15 +401,15 @@ const onChange = async (e) => {
             else notes.push( `Notes:`, note.toString());
             break;
           case SHEETS.Waterjet.getSheetName():
-            material = GetByHeader(SHEETS.Waterjet, `Rough dimensions of your part`, thisRow);
+            material = GetByHeader(SHEETS.Waterjet, HEADERNAMES.roughDimensions, thisRow);
             if(!material) mat.push(`Materials: `, `None`);
             else mat.push( `Rough Dimensions: `, material.toString());
 
-            part = GetByHeader(SHEETS.Waterjet, `How many parts do you need?`, thisRow);
+            part = GetByHeader(SHEETS.Waterjet, HEADERNAMES.numberOfParts, thisRow);
             if(!part) partcount.push(`Part Count: `, `None`);
             else partcount.push( `Part Count:`, part.toString());
 
-            note = GetByHeader(SHEETS.Waterjet, `Notes`, thisRow);
+            note = GetByHeader(SHEETS.Waterjet, HEADERNAMES.staffNotes, thisRow);
             if(!note) notes.push(`Notes: `, `None`);
             else notes.push( `Notes: `, note.toString());
             break;
@@ -427,7 +427,7 @@ const onChange = async (e) => {
             else notes.push( `Notes:`, note.toString());
             break;
           case SHEETS.Plotter.getSheetName():
-            material = GetByHeader(SHEETS.Plotter, `Total number of prints needed`, thisRow) ? GetByHeader(SHEETS.Plotter, `Total number of prints needed`, thisRow) : 0;
+            material = GetByHeader(SHEETS.Plotter, HEADERNAMES.numberOfParts, thisRow) ? GetByHeader(SHEETS.Plotter, HEADERNAMES.numberOfParts, thisRow) : 0;
             mat.push(`Materials: `, `Canon Poster Printer: 36" wide (priced per foot)`);
             partcount.push(`Part Count: `, material.toString());
             notes.push(`Notes: `, `None`);
