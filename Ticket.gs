@@ -6,33 +6,33 @@
 class Ticket 
 {
   constructor({
-    jobnumber : jobnumber,
-    designspecialist : designspecialist,
-    submissiontime : submissiontime,
-    name : name,
-    email : email,
-    projectname : projectname,
-    material1Name : material1Name,
-    material1Quantity : material1Quantity,
-    material2Name : material2Name,
-    material2Quantity : material2Quantity,
-    materials : materials,
-    partCount : partcount,
-    notes : notes,
+    jobnumber : jobnumber = 202010010101,
+    designspecialist : designspecialist = `Staff`,
+    submissiontime : submissiontime = new Date(),
+    name : name = `Unknown`,
+    email : email = `Unknown`,
+    projectname : projectname = `Unknown`,
+    material1Name : material1Name = `Unknown`,
+    material1Quantity : material1Quantity = 0,
+    material2Name : material2Name = `Unknown`,
+    material2Quantity : material2Quantity = 0,
+    materials : materials =  [`Materials: `, `None`],
+    partCount : partcount = [`Part Count: `, `None`],
+    notes : notes = [`Notes: `, `None`],
   }){
-    this.jobnumber = jobnumber ? jobnumber : 202010010101;
-    this.designspecialist  = designspecialist ? designspecialist : `Staff`;
-    this.submissiontime = submissiontime ? submissiontime : new Date();
-    this.name = name ? name : `Unknown`;
-    this.email = email ? email : `Unknown`;
-    this.projectname = projectname ? projectname : `Unknown`;
-    this.material1Name = material1Name ? material1Name : `Unknown`;
-    this.material1Quantity = material1Quantity ? material1Quantity : 0;
-    this.material2Name = material2Name ? material2Name : `Unknown`;
-    this.material2Quantity = material2Quantity ? material2Quantity : 0;
-    this.materials = materials ? materials : [`Materials: `, `None`];
-    this.partcount = partcount ? partcount : [`Part Count: `, `None`];
-    this.notes = notes ? notes : [`Notes: `, `None`];
+    this.jobnumber = jobnumber;
+    this.designspecialist  = designspecialist;
+    this.submissiontime = submissiontime;
+    this.name = name;
+    this.email = email;
+    this.projectname = projectname;
+    this.material1Name = material1Name;
+    this.material1Quantity = material1Quantity;
+    this.material2Name = material2Name;
+    this.material2Quantity = material2Quantity;
+    this.materials = materials;
+    this.partcount = partcount;
+    this.notes = notes;
 
     this.doc;
     this.url = ``;
@@ -44,7 +44,7 @@ class Ticket
     console.info(`Barcode ----> ${barcode.url}`);
 
     const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
-    this.doc = DocumentApp.create(`JPS-Ticket-${this.jobnumber}`); // Make Document
+    this.doc = await DocumentApp.create(`JPS-Ticket-${this.jobnumber}`); // Make Document
     this.url = this.doc.getUrl();
     let body = this.doc.getBody();
     let docId = this.doc.getId();
@@ -107,7 +107,7 @@ class Ticket
 
     // Remove File from root and Add that file to a specific folder
     try {
-      const docFile = DriveApp.getFileById(docId);
+      const docFile = await DriveApp.getFileById(docId);
       docFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
       docFile.moveTo(folder)
     } catch (err) {
@@ -171,23 +171,13 @@ const GenerateMissingTickets = () => {
         SetByHeader(sheet, HEADERNAMES.ticket, thisRow, t.getUrl());
       }
     })
-    // console.info(tickets)
   })
+  return 0;
 }
 
 
 
-const _testTicket = () => {
-  const tic = new Ticket({ 
-    jobnumber : 20200807042018, 
-    name : `Stan Duck`,
-    email : `some@thing.com`,
-    projectname : `Some Project`,
-    partCount : [`Part Count: `, `35`],
-  });
-  tic.CreateTicket();
-  console.info(tic);
-}
+
 
 
 

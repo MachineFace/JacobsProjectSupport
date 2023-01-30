@@ -223,11 +223,11 @@ const onChange = async (e) => {
   // ----------------------------------------------------------------------------------------------------------------
   // Add link to DS List on Staff Sheet
   if(thisSheet.getSheetName() == OTHERSHEETS.Staff.getSheetName() && thisRow >= 2) {
-    const sLink = OTHERSHEETS.Staff.getRange(thisRow, 4).getValue();
-    const staffEmail = OTHERSHEETS.Staff.getRange(thisRow, 3).getValue();
+    const sLink = GetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow);
+    const staffEmail = GetByHeader(OTHERSHEETS.Staff, `EMAIL`, thisRow);
     if ( sLink == undefined || sLink == null || (sLink == `` && staffEmail != ``) ) {
       const l = MakeLink(staffEmail);
-      OTHERSHEETS.Staff.getRange(thisRow, 4).setValue(l);
+      SetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow, l);
     }
   }
 

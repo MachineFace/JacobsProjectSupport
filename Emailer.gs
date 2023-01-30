@@ -144,42 +144,7 @@ class Emailer
   }
 }
 
-/**
- * -----------------------------------------------------------------------------------------------------------------
- * Unit Test for Emailer
- */
-const _testEmailer = () => {
-  const name = `Dingus Dongus`; 
-  const email = "codyglen@berkeley.edu";
-  const jobnumber = new JobNumberGenerator({ date : new Date()}).jobnumber;
-  const projectname = `Some Kinda Project`;
-  const message = new CreateMessage({
-    name : name,
-    jobnumber : jobnumber,
-    projectname : projectname,
-  });
-  Object.values(STATUS).forEach(async (status) => {
-    await new Emailer({
-      name : name,
-      status : status,
-      email : email,
-      designspecialistemail : `codyglen@berkeley.edu`,
-      message : message, 
-    })
-  })
-}
 
-/** 
-const __thing__ = () => {
-  const message = new CreateMessage({
-    name : `Cingus`,
-    jobnumber : 192384712938,
-    projectname : `P Funk`,
-  });
-  if(message instanceof CreateMessage) console.warn(`Message is instance of Message Class...`);
-  else console.warn(`message is NOT instance of Message class.`)
-}
-*/
 
 /** 
  * @NOTIMPLEMENTED

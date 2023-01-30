@@ -14,40 +14,6 @@ class BarcodeGenerator {
    * ----------------------------------------------------------------------------------------------------------------
    * Generate Barcode
    */
-  async GenerateBarCode() {
-
-    const root = 'http://bwipjs-api.metafloor.com/';
-    const rootsec = 'https://bwipjs-api.metafloor.com/';
-    const type = '?bcid=code128';
-    const ts = '&text=';
-    const scale = '&scale=0.75'
-    const postfx = '&includetext';
-
-    //let barcodeLoc = 'http://bwipjs-api.metafloor.com/?bcid=code128&text=1234567890&includetext';  //KNOWN WORKING LOCATION
-    const barcodeLoc = root + type + ts + this.jobnumber + scale + postfx;
-
-    const params = {
-      "method" : "GET",
-      "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
-      "contentType" : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true
-    };
-    
-    const html = await UrlFetchApp.fetch(barcodeLoc, params);
-    const responseCode = html.getResponseCode();
-    console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
-    if (responseCode != 200 || responseCode != 201) {
-      console.error('Failed to GET Barcode');
-      return false;
-    }
-    this.blob = Utilities.newBlob(html.getContent()).setName(`Barcode-${this.jobnumber}`) ;
-    this.barcode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(this.blob);
-    this.url = this.barcode.getUrl();
-    console.info(`Barcode ---> ${this.url}`);
-    return this.barcode;
-  }
-
   async GenerateBarCodeForTicketHeader() {
 
     const root = 'http://bwipjs-api.metafloor.com/';
@@ -67,17 +33,17 @@ class BarcodeGenerator {
       muteHttpExceptions : true,
     };
 
-    let barcode;
-    const res = UrlFetchApp.fetch(barcodeLoc, params);
-    const responseCode = res.getResponseCode();
-    // console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
-    if (responseCode != 200 || responseCode != 201) {
-      console.error('Failed to GET Barcode');
+    try {
+      const res = await UrlFetchApp.fetch(barcodeLoc, params);
+      const responseCode = res.getResponseCode();
+      // console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
+      let barcode = await DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      barcode.setTrashed(true);
+      console.info(`BARCODE CREATED ---> ${barcode?.getId()?.toString()}, URL: ${barcode?.getUrl()}`);
+      return barcode;
+    } catch(err) {
+      console.error(`Failed to GET Barcode ---> ${err}`);
     }
-    barcode = DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
-    barcode.setTrashed(true);
-    console.info(`BARCODE CREATED ---> ${barcode?.getId()?.toString()}`);
-    return barcode;
     
   }
   
@@ -91,7 +57,6 @@ class QRCodeGenerator {
   constructor({ url : url, }) {
     this.url = url ? url : `jps.jacobshall.org/`;
     this.GenerateQRCode();
-    this.blob;
   }
 
   /**
@@ -99,7 +64,6 @@ class QRCodeGenerator {
    * Generate QR Code
    */
   async GenerateQRCode(){
-    console.info(`QRCode URL : ${this.url}`);
     const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
     const params = {
       "method" : "GET",
@@ -109,18 +73,17 @@ class QRCodeGenerator {
       muteHttpExceptions : true
     };
 
-    let qrCode;
-    const html = await UrlFetchApp.fetch(loc, params);
-    const responseCode = html.getResponseCode();
-    console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
-    if (responseCode != 200 || responseCode != 201) {
-      console.error('Failed to GET QRCode');
-      return false;
+    try {
+      const html = await UrlFetchApp.fetch(loc, params);
+      // const responseCode = html?.getResponseCode();
+      // console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
+      const blob = await Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
+      let qrCode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
+      console.info(`QR CODE ---> ${qrCode.getUrl()} for ${this.url}`);
+      return qrCode;
+    } catch(err) {
+      console.error(`Failed to generate QRCode ---> ${err}`);
     }
-    this.blob = Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
-    qrCode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
-    console.info(`QR CODE ---> ${qrCode.getUrl()}`);
-    return qrCode;
   }
   
 }
@@ -207,12 +170,6 @@ const MarkAsAbandonedByBarcode = async () => {
   progress.setValue(`Job number not found. Try again.`);
 }
 
-const _testBarcode = async () => {
-  const b = await new BarcodeGenerator({ jobnumber : 123847687 }).GenerateBarCodeForTicketHeader();
-  console.info(b);
-  // const q = new QRCodeGenerator({ url : `https://www.codyglen.com/`, });
-  // console.info(q)
-}
 
 
 

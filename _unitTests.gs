@@ -17,7 +17,7 @@ const _gasTMainTesting = async () => {
   //     let i = 3 + 4
   //     t.equal(i, 7, `Calc : 3 + 4 = 7  : Correct`)
   // })
-
+  
   await test(`Priority Test`, (t) => {
     let types = {
       staff : {
@@ -63,21 +63,19 @@ const _gasTMainTesting = async () => {
     t.pass(`Good : ${x}`);
     t.fail(`Bad`);
   });
-  
-  await test(`Generate Barcode: `, async(t) => {
-    const barcode = await new BarcodeGenerator({ jobnumber : 20230119105523 }).GenerateBarCodeForTicketHeader();
-    console.info(`Barcode ----> ${barcode.url}`);
-    t.pass(`Good : ${barcode.url}`);
-    t.fail(`Bad`);
+
+  await test(`Generate Barcode: `, (t) => {
+    const x = new BarcodeGenerator({ jobnumber : 20230119105523 }).GenerateBarCodeForTicketHeader();
+    t.notEqual(x, undefined || null, `Barcode SHOULD NOT be undefined or null : ${x}`);
+    const y = new BarcodeGenerator({ jobnumber : `alskdfjalsdkfj` }).GenerateBarCodeForTicketHeader();
+    t.notEqual(y, undefined || null, `Barcode SHOULD NOT be undefined or null : ${y}`);
+    const z = new BarcodeGenerator({}).GenerateBarCodeForTicketHeader();
+    t.notEqual(z, undefined || null, `Barcode SHOULD NOT be undefined or null : ${z}`);
   });
 
-  await test(`Generate QRCode: `, async(t) => {
-    t.skip(`#Not implemented`);
-    // const url = `http://www.codyglen.com/`;
-    // const qgen = new QRCodeGenerator({url : url,});
-    // const x = await qgen;
-    // t.pass(`Good : ${x}`);
-    // t.fail(`Bad`);
+  await test(`Generate QRCode: `, t => {
+    const x = new QRCodeGenerator({ url : `http://www.codyglen.com/`, });
+    t.notEqual(x, undefined || null, `Generate QRCode SHOULD NOT be undefined or null : ${x}`);
   });
   
   await test(`Design Specialist Creation`, (t) => {
@@ -103,9 +101,84 @@ const _gasTMainTesting = async () => {
     t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
   });
   
+  await test(`JobNumber`, (t) => {
+    const x = new CreateJobnumber({ date : new Date(1986, 01, 02) }).Jobnumber;
+    t.equal(x, 19860202000000, `Standard Job Number for 01, 02, 1986 should equal 19860202000000.`);
+    const y = new CreateJobnumber({}).Jobnumber;
+    t.notEqual(y, undefined || null, `DEFAULT / EMPTY jobnumber should not return undefined or null, ${y}`);
+
+    const jtypes = {
+      GoodDate : new Date(2015, 10, 3),
+      BadDate : `20220505`,
+      AnotherBad : `5/3/2022 8:29:08`,
+      AnotherBadString : `Thu, 27 Jan 2022 18:34:48 GMT`,
+    }
+
+    const goodDate = new CreateJobnumber({ date : jtypes.GoodDate }).Jobnumber;
+    t.equal(goodDate, 20151103000000, `Job Number for ${jtypes.GoodDate} should return 20151103000000`);
+    const badDate = new CreateJobnumber({ date : jtypes.BadDate }).Jobnumber;
+    t.notEqual(badDate, undefined || null, `Bad date should still return good jobnumber, ${badDate}`);
+    const anotherBad = new CreateJobnumber({ date : jtypes.AnotherBad }).Jobnumber;
+    t.notEqual(anotherBad, undefined || null, `Bad string date should still return good jobnumber, ${anotherBad}`);
+    const anotherBadString = new CreateJobnumber({ date : jtypes.AnotherBadString }).Jobnumber;
+    t.notEqual(anotherBadString, undefined || null, `Bad string date should still return good jobnumber, ${anotherBadString}`);
   
+  });
+  
+  await test(`Sheet Permitted Check`, (t) => {
+    const val = CheckSheetIsForbidden(OTHERSHEETS.Logger);
+    t.equal(true, val, `Logger Should be true-forbidden : ${val}`);
+
+    const val2 = CheckSheetIsForbidden(SHEETS.Fablight);
+    t.equal(false, val2, `Fablight Should be false-not_forbidden: ${val2}`);
+
+    const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
+    t.equal(true, val3, `Store Should be true-forbidden: ${val3}`);
+  });
+  
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
+
+
+
+/**
+ * Test Logger and Message with GasT
+ */
+const _gasTLoggerAndMessagingTesting = async () => {
+  if ((typeof GasTap) === 'undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap();
+
   // ------------------------------------------------------------------------------------------------------------------------------
-  await test(`Create Message`, (t) => {
+  await test(`CreateMessage DEFAULT`, (t) => {
+    const message = new CreateMessage({});
+
+    const a = `DEFAULT ${message.defaultMessage}`;
+    t.notThrow(() => a, `DEFAULT SHOULD NOT throw error.`);
+    const b = `RECEIVED ${message.receivedMessage}`;
+    t.notThrow(() => b, `RECEIVED SHOULD NOT throw error.`);
+    const c = `PENDING ${message.pendingMessage}`;
+    t.notThrow(() => c, `PENDING SHOULD NOT throw error.`);
+    const d = `IN-PROGRESS ${message.inProgressMessage}`;
+    t.notThrow(() => d, `IN-PROGRESS SHOULD NOT throw error.`);
+    const e = `COMPLETED ${message.completedMessage}`;
+    t.notThrow(() => e, `COMPLETED SHOULD NOT throw error.`);
+    const f = `FAILED ${message.failedMessage}`;
+    t.notThrow(() => f, `FAILED SHOULD NOT throw error.`);
+    const g = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
+    t.notThrow(() => g, `REJECTED BY STUDENT SHOULD NOT throw error.`);
+    const h = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
+    t.notThrow(() => h, `REJECTED BY STAFF SHOULD NOT throw error.`);
+    const i = `BILLED ${message.billedMessage}`;
+    t.notThrow(() => i, `BILLED SHOULD NOT throw error.`);
+    const j = `PICKED UP ${message.pickedUpMessage}`;
+    t.notThrow(() => j, `PICKED UP SHOULD NOT throw error.`);
+
+  });
+
+  await test(`CreateMessage`, (t) => {
     const message = new CreateMessage({
       name : 'Cody', 
       projectname : 'Test Project',
@@ -141,6 +214,16 @@ const _gasTMainTesting = async () => {
 
   });
 
+  await test(`Submission DEFAULTS`, (t) => {
+    const message = new CreateSubmissionMessage({});
+    const w = `DS MESSAGE : ${message.dsMessage}`;
+    t.notThrow(() => w, `DS MESSAGE SHOULD NOT throw error.`);
+    const x = `CREAFORM MESSAGE : ${message.creaformMessage}`;
+    t.notThrow(() => x, `CREAFORM MESSAGE SHOULD NOT throw error.`);
+    const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
+    t.notThrow(() => y, `MISSING MESSAGE SHOULD NOT throw error.`);
+  });
+
   await test(`Submission Messages`, (t) => {
     const message = new CreateSubmissionMessage({ 
       name : 'Cody', 
@@ -155,53 +238,16 @@ const _gasTMainTesting = async () => {
     t.notEqual(y, undefined || null, `MISSING ACCESS message should not return undefined or null. \n${y}`);
   });
 
-  await test(`JobNumber`, (t) => {
-    const x = new CreateJobnumber({ date : new Date(1986, 01, 02) }).Jobnumber;
-    t.equal(x, 19860202000000, `Standard Job Number for 01, 02, 1986 should equal 19860202000000.`);
-    const y = new CreateJobnumber({}).Jobnumber;
-    t.notEqual(y, undefined || null, `DEFAULT / EMPTY jobnumber should not return undefined or null, ${y}`);
-
-    const jtypes = {
-      GoodDate : new Date(2015, 10, 3),
-      BadDate : `20220505`,
-      AnotherBad : `5/3/2022 8:29:08`,
-      AnotherBadString : `Thu, 27 Jan 2022 18:34:48 GMT`,
-    }
-
-    const goodDate = new CreateJobnumber({ date : jtypes.GoodDate }).Jobnumber;
-    t.equal(goodDate, 20151103000000, `Job Number for ${jtypes.GoodDate} should return 20151103000000`);
-    const badDate = new CreateJobnumber({ date : jtypes.BadDate }).Jobnumber;
-    t.notEqual(badDate, undefined || null, `Bad date should still return good jobnumber, ${badDate}`);
-    const anotherBad = new CreateJobnumber({ date : jtypes.AnotherBad }).Jobnumber;
-    t.notEqual(anotherBad, undefined || null, `Bad string date should still return good jobnumber, ${anotherBad}`);
-    const anotherBadString = new CreateJobnumber({ date : jtypes.AnotherBadString }).Jobnumber;
-    t.notEqual(anotherBadString, undefined || null, `Bad string date should still return good jobnumber, ${anotherBadString}`);
-  
-  });
-  
-  await test(`Logger Test`, (t) => {
+  await test(`WriteLogger`, (t) => {
     const write = new WriteLogger();
     const x = write.Warning(`Warning Test ----> Message`);
     const y = write.Info(`Info Test ----> Message`);
     const z = write.Error(`ERROR Test ----> Message`);
     const w = write.Debug(`Debugging Test ----> Message`);
     t.notThrow(() => x, `Warning SHOULD NOT throw error.`);
-    t.notThrow(() => y, `Warning SHOULD NOT throw error.`);
-    t.notThrow(() => z, `Warning SHOULD NOT throw error.`);
-    t.notThrow(() => w, `Warning SHOULD NOT throw error.`);
-    t.pass(`Logger is Good`);
-    t.fail(`Bad`);
-  });
-
-  await test(`Sheet Permitted Check`, (t) => {
-    const val = CheckSheetIsForbidden(OTHERSHEETS.Logger);
-    t.equal(true, val, `Logger Should be true-forbidden : ${val}`);
-
-    const val2 = CheckSheetIsForbidden(SHEETS.Fablight);
-    t.equal(false, val2, `Fablight Should be false-not_forbidden: ${val2}`);
-
-    const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
-    t.equal(true, val3, `Store Should be true-forbidden: ${val3}`);
+    t.notThrow(() => y, `Info SHOULD NOT throw error.`);
+    t.notThrow(() => z, `Error SHOULD NOT throw error.`);
+    t.notThrow(() => w, `Debug SHOULD NOT throw error.`);
   });
 
   await test.finish();
@@ -300,6 +346,7 @@ const _gasTMiscTesting = async () => {
   });
 
   await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
 
@@ -383,6 +430,7 @@ const _gasTCalculationTesting = async () => {
   });
 
   await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
 
@@ -425,6 +473,96 @@ const _gasTShopifyTesting = async () => {
   });
 
   await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
+
+
+
+/**
+ * Test Ticket with GasT
+ */
+const _gasTTicketTesting = async () => {
+  if ((typeof GasTap) === 'undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap();
+
+  await test(`Ticket`, t => {
+    const name = `Dingus`; 
+    const email = "codyglen@berkeley.edu";
+    const jobnumber = new CreateJobnumber({ date : new Date()}).Jobnumber;
+    const projectname = `Some Kinda Project`;
+    const partCount = [`Part Count: `, `35`];
+
+    let tick = new Ticket({
+      name : name, 
+      email : email, 
+      jobnumber : jobnumber,
+      projectname : projectname,
+      partCount : partCount, 
+    });
+    const x = tick.CreateTicket();
+    console.info(tick);
+    t.notEqual(tick, undefined || null, `Ticket SHOULD NOT yield null.`);
+    t.notEqual(x, undefined || null, `Generation SHOULD NOT yield null. ${x}`);
+  });
+
+  await test(`GenerateMissingTickets`, t => {
+    const x = GenerateMissingTickets();
+    t.equal(x, 0, `GenerateMissingTickets SHOULD yield "0".`);
+  });
+
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
+
+
+/**
+ * Test Email Service with GasT
+ */
+const _gasTEmailTesting = async () => {
+  if ((typeof GasTap) === 'undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap();
+
+  await test(`Emailer`, async(t) => {
+    const name = `Dingus`; 
+    const email = "codyglen@berkeley.edu";
+    const jobnumber = new JobNumberGenerator({ date : new Date()}).jobnumber;
+    const projectname = `Some Kinda Project`;
+    const message = new CreateMessage({
+      name : name,
+      jobnumber : jobnumber,
+      projectname : projectname,
+    });
+    Object.values(STATUS).forEach(async (status) => {
+      const x = await new Emailer({
+        name : name,
+        status : status,
+        email : email,
+        designspecialistemail : `codyglen@berkeley.edu`,
+        message : message, 
+      })
+      t.notThrow(() => x, `Emailer SHOULD NOT throw error`);
+    })
+  });
+
+  
+
+  /** 
+  const __thing__ = () => {
+    const message = new CreateMessage({
+      name : `Cingus`,
+      jobnumber : 192384712938,
+      projectname : `P Funk`,
+    });
+    if(message instanceof CreateMessage) console.warn(`Message is instance of Message Class...`);
+    else console.warn(`message is NOT instance of Message class.`)
+  }
+  */
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
 
@@ -433,9 +571,12 @@ const _gasTShopifyTesting = async () => {
  */
 const _gasTTestAll = async () => {
   _gasTMainTesting();
+  _gasTLoggerAndMessagingTesting();
   _gasTMiscTesting();
   _gasTCalculationTesting();
   _gasTShopifyTesting();
+  _gasTTicketTesting();
+  _gasTEmailTesting();
 }
 
 // /**
