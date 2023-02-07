@@ -79,45 +79,6 @@ class CheckPriority
   
 }
 
-/** 
- * @NOTIMPLEMENTED
-const _testPriority = () => {
-  let typesOfPriority = {
-    goodEgoodS : {
-      email : `sequin@cs.berkeley.edu`,
-      sid : 3038201402
-    },
-    // goodEbadS : {
-    //   email : `sequin@cs.berkeley.edu`,
-    //   sid : 12938749123,
-    // },
-    badEgoodS : {
-      email : `ding@bat.edu`,
-      sid : 3038201402,
-    },
-    badEbadS : {
-      email : `ding@bat.edu`,
-      sid : 2394872349587,
-    },
-    // other : {
-    //   email : `ggrigoriadis@berkeley.edu`,
-    //   sid : 29384762983472,
-    // },
-  }
-  console.time(`Priority`);
-  Object.entries(typesOfPriority).forEach(type => {
-    console.info(type[1])
-    const p = new CheckPriority({
-      email : type[1].email,
-      sid : type[1].sid,
-    }).Priority;
-    console.info(`Testing produced ---> ${p}`);
-  }) 
-  
-  console.timeEnd(`Priority`);
-
-}
-*/
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -134,9 +95,9 @@ const CheckMissingAccessStudents = () => {
         let sid = GetByHeader(thisSheet, HEADERNAMES.sid, row)
         const p = new CheckPriority({email : email, sid : sid}).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
+        SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
         if(p != `STUDENT NOT FOUND!`) {
           list.push(email);
-          SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
           SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
         }
       })
@@ -146,4 +107,6 @@ const CheckMissingAccessStudents = () => {
 };
 
 
+const _testCheck = () => {
 
+}

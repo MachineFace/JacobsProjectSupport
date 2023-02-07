@@ -98,16 +98,6 @@ class ApprovalFormBuilder
 }
 
 
-const _testApprovalForm = () => {
-  console.time(`FormBuilder Time`);
-  new ApprovalFormBuilder({
-    name : "Dingus",
-    jobnumber : 19238712398,
-    cost : 50.00,
-  });
-  console.timeEnd(`FormBuilder Time`);
-}
-
 
 
 

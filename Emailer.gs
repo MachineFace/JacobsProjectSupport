@@ -145,6 +145,30 @@ class Emailer
 }
 
 
+/**
+ * Send an email
+ */
+const SendEmail = async ({
+  email : email = `jacobsprojectsupport@berkeley.edu`,
+  staffEmail : staffEmail = `jacobsprojectsupport@berkeley.edu`,
+  status : status = `Default`,
+  message : message = new CreateMessage(),
+}) => {
+  try {
+    await GmailApp.sendEmail(email, `${SERVICE_NAME} : ${status}`, ``, {
+      htmlBody: message,
+      from: SUPPORT_ALIAS,
+      cc: staffEmail,
+      bcc: staff.Chris.email,
+      name: SERVICE_NAME,
+    });
+    const writer = new WriteLogger();
+    writer.Warning(`"${status}" Email sent to student and status set to "${status}".`);
+    return 0;
+  } catch (err) {
+    console.error(`Could not email: ${err}`);
+  }
+}
 
 /** 
  * @NOTIMPLEMENTED

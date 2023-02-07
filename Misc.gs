@@ -31,6 +31,7 @@ const Search = (value) => {
  * @returns {[sheet, [values]]} list of sheets with lists of indexes
  */
 const SearchSpecificSheet = (sheet, value) => {
+  if(typeof sheet != `object`) return 1;
   if (value) value.toString().replace(/\s+/g, "");
   const finder = sheet.createTextFinder(value).findNext();
   if (finder != null) {
@@ -69,13 +70,18 @@ const FindByJobNumber = (jobnumber) => {
  * @param {number} row
  */
 const GetByHeader = (sheet, columnName, row) => {
+  if(typeof sheet != `object`) return 1;
   try {
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(columnName);
     if (col != -1) return data[row - 1][col];
-    else throw new Error(`Getting data by header fucking failed...`);
+    else {
+      console.error(`Getting data by header fucking failed...`);
+      return 1;
+    }
   } catch (err) {
     console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
+    return 1;
   }
 };
 
@@ -88,15 +94,20 @@ const GetByHeader = (sheet, columnName, row) => {
  * @param {number} row
  */
 const GetColumnDataByHeader = (sheet, columnName) => {
+  if(typeof sheet != `object`) return 1;
   try {
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName);
     let colData = data.map(d => d[col]);
     colData.splice(0, 1);
     if (col != -1) return colData;
-    else throw new Error(`Getting column data by header fucking failed...`);
+    else {
+      console.error(`Getting column data by header fucking failed...`);
+      return 1;
+    }
   } catch (err) {
     console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
+    return 1;
   }
 }
 
@@ -109,6 +120,7 @@ const GetColumnDataByHeader = (sheet, columnName) => {
  * @returns {dict} {header, value}
  */
 const GetRowData = (sheet, row) => {
+  if(typeof sheet != `object`) return 1;
   let dict = {};
   try {
     let headers = sheet.getRange(1, 1, 1, sheet.getMaxColumns()).getValues()[0];
@@ -127,6 +139,7 @@ const GetRowData = (sheet, row) => {
     return dict;
   } catch (err) {
     console.error(`${err} : GetRowData failed - Sheet: ${sheet} Row: ${row}`);
+    return 1;
   }
 }
 
@@ -142,12 +155,19 @@ const GetRowData = (sheet, row) => {
  * @param {any} val
  */
 const SetByHeader = (sheet, columnName, row, val) => {
+  if(typeof sheet != `object`) return 1;
+  let data;
+  let col;
   try {
-    const data = sheet.getDataRange().getValues();
-    const col = data[0].indexOf(columnName) + 1;
-    sheet.getRange(row, col).setValue(val);
+    data = sheet.getDataRange().getValues();
+    col = data[0].indexOf(columnName) + 1;
+    if(col != -1) {
+      sheet.getRange(row, col).setValue(val);
+      return 0;
+    } else return 1;
   } catch (err) {
     console.error(`${err} : SetByHeader failed - Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
+    return 1;
   }
 };
 

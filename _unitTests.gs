@@ -263,7 +263,7 @@ const _gasTMiscTesting = async () => {
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
   } 
   const test = new GasTap();
-
+  
   // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Search`, (t) => {
     const x = Search(`Cody`);
@@ -285,13 +285,13 @@ const _gasTMiscTesting = async () => {
     t.equal(x, `codyglen@berkeley.edu`, `Should fetch my email from that sheet.`);
 
     const y = GetByHeader(SHEETS.Laser, `BAD COLUMN NAME`, 2);
-    t.equal(y, undefined || null, `GetByHeader SHOULD return undefined or null: ${y}`);
+    t.equal(y, 1, `GetByHeader SHOULD return "1": ${y}`);
 
     const z = GetByHeader(`BAD SHEET`, HEADERNAMES.email, 2);
-    t.equal(y, undefined || null, `GetByHeader SHOULD return undefined or null: ${y}`);
+    t.equal(y, 1, `GetByHeader SHOULD return "1": ${y}`);
 
     const a = GetByHeader(`BAD SHEET`, `BAD COLUMN NAME`, `BAD ROW NUMBER`);
-    t.equal(a, undefined || null, `GetByHeader SHOULD return undefined or null: ${a}`);
+    t.equal(a, 1, `GetByHeader SHOULD return "1": ${a}`);
 
   });
 
@@ -300,10 +300,10 @@ const _gasTMiscTesting = async () => {
     t.notEqual(x, undefined || null, `GetColumnDataByHeader SHOULD NOT return undefined or null: ${x}`);
 
     const y = GetColumnDataByHeader(SHEETS.Laser, `BAD COLUMN NAME`);
-    t.equal(y, undefined || null, `GetByHeader SHOULD return undefined or null: ${y}`);
+    t.equal(y, 1, `GetByHeader SHOULD return "1": ${y}`);
 
     const z = GetColumnDataByHeader(`BAD SHEET`, `BAD COLUMN NAME`);
-    t.equal(z, undefined || null, `GetByHeader SHOULD return undefined or null: ${z}`);
+    t.equal(z, 1, `GetByHeader SHOULD return "1": ${z}`);
 
   });
 
@@ -312,10 +312,10 @@ const _gasTMiscTesting = async () => {
     t.notEqual(x, undefined || null, `GetRowData SHOULD NOT return undefined or null: ${JSON.stringify(x)}`);
 
     const y = GetRowData(SHEETS.Laser, `BAD COLUMN NAME`);
-    t.equal(y, undefined || null, `GetRowData SHOULD return undefined or null: ${y}`);
+    t.equal(y, 1, `GetRowData SHOULD return "1": ${y}`);
 
     const z = GetRowData(`BAD SHEET`, `BAD COLUMN NAME`);
-    t.equal(z, undefined || null, `GetRowData SHOULD return undefined or null: ${z}`);
+    t.equal(z, 1, `GetRowData SHOULD return "1": ${z}`);
 
   });
 
@@ -342,6 +342,24 @@ const _gasTMiscTesting = async () => {
 
     const b = ValidateEmail(`12345675645634599293487529384752938745923845293485729348572934875@berkeley.edu`);
     t.equal(b, true, `ValidateEmail SHOULD return true: ${b}`);
+
+  });
+
+  await test(`SetByHeader`, (t) => {
+    const x = SetByHeader(OTHERSHEETS.Logger, `Date`, OTHERSHEETS.Logger.getLastRow(), `TESTING FUNCTIONALITY....`);
+    t.notThrow(() => x, `SetByHeader SHOULD NOT throw an error. ${x}`);
+    t.equal(x, 0, `SetByHeader SHOULD return "0": Actual: ${x}`);
+
+    const y = SetByHeader(`BAD SHEET`, `Date`, OTHERSHEETS.Logger.getLastRow(), `TESTING FUNCTIONALITY....`);
+    t.equal(y, 1, `SetByHeader SHOULD return "1": Actual: ${y}`);
+
+    const z = SetByHeader(OTHERSHEETS.Logger, `BAD TITLE`, OTHERSHEETS.Logger.getLastRow(), `TESTING FUNCTIONALITY....`);
+    t.throws(z, `SetByHeader SHOULD throw an error on bad column name: ${z}`)
+    t.equal(z, 1, `SetByHeader SHOULD return "1": Actual: ${z}`);
+
+    const a = SetByHeader(OTHERSHEETS.Logger, `Date`, -1, `TESTING FUNCTIONALITY....`);
+    t.throws(a, `SetByHeader SHOULD throw an error on bad row number: ${a}`)
+    t.equal(a, 1, `SetByHeader SHOULD return "1": Actual: ${a}`);
 
   });
 
@@ -382,8 +400,8 @@ const _gasTCalculationTesting = async () => {
     t.notEqual(x, undefined, `Count Each Submission should not return undefined.`);
   });
   
-  await test(`Create Top Ten`, async(t) => {
-    const x = await calc.CreateTopTen();
+  await test(`Create Top Ten`, (t) => {
+    const x = calc.CreateTopTen();
     t.notEqual(x, undefined || null, `Top Ten should not return undefined or null.`);
   });
   
@@ -570,13 +588,19 @@ const _gasTEmailTesting = async () => {
  * Test All with GasT
  */
 const _gasTTestAll = async () => {
-  _gasTMainTesting();
-  _gasTLoggerAndMessagingTesting();
-  _gasTMiscTesting();
-  _gasTCalculationTesting();
-  _gasTShopifyTesting();
-  _gasTTicketTesting();
-  _gasTEmailTesting();
+  Promise.all([
+    await _gasTMainTesting(),
+    await _gasTLoggerAndMessagingTesting(),
+    await _gasTMiscTesting(),
+    await _gasTCalculationTesting(),
+    await _gasTShopifyTesting(),
+    await _gasTTicketTesting(),
+    await _gasTEmailTesting(),
+  ])
+  .then(console.info('Test Success.'))
+  .catch(err => {
+    console.error(`Failure: ${err}`);
+  });
 }
 
 // /**

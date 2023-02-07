@@ -211,7 +211,7 @@ const onChange = async (e) => {
   const staff = new MakeStaff().Staff;
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var thisSheetName = e.range.getSheet().getSheetName();
+  // var thisSheetName = e.range.getSheet().getSheetName();
 
   // Fetch Columns and rows and check validity
   var thisCol = e.range.getColumn();
@@ -273,7 +273,7 @@ const onChange = async (e) => {
   var projectname = rowData.projectName ? rowData.projectName : `Your Project`;
   var cost = rowData.estimate;
 
-  //Materials
+  // Materials
   const material1Quantity = rowData.mat1quantity;
   const material1Name = rowData.mat1;
   const material1URL = ``;

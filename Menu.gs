@@ -102,6 +102,7 @@ const PopupCountUsers = async () => {
 const PopupCheckMissingAccessStudents = async () => {
   const ui = await SpreadsheetApp.getUi();
   const names = await CheckMissingAccessStudents().join(", ");
+  console.info(names);
   ui.alert(
     `JPS Runtime Message`,
     `Checking Missing Access Students on All Sheets : \\n ${names}`,
@@ -119,32 +120,28 @@ const PopupGetSingleStudentPriority = async () => {
   const email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
   const sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
   const name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
-  let response = ui.alert(
-    `JPS : Checking Access`,
-    `Checking Missing Access for ${name}`,
-    ui.ButtonSet.OK_CANCEL
-  );
-  if(response == ui.Button.OK) {
-    try {
-      const priority = await new CheckPriority({email : email, sid : sid}).Priority;
-      if(priority != `STUDENT NOT FOUND!`) {
-        SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-        SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.received);
-      }
-      ui.alert(
-        `JPS : Checked Access`,
-        `Access for ${name} set to : "${priority}"`,
-        ui.ButtonSet.OK
-      );
-    } catch (err) {
-      console.error(`${err} : Whoops, couldn't set priority for ${name}`);
-      ui.alert(
-        `JPS Error`,
-        `Whoops, couldn't set priority for ${name}`,
-        ui.ButtonSet.OK
-      );
+  console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
+  try {
+    const priority = await new CheckPriority({ email : email, sid : sid }).Priority;
+    console.info(`Priority: ${priority}`);
+    SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+    if(priority != `STUDENT NOT FOUND!`) {
+      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.received);
     }
+    ui.alert(
+      `JPS : Checked Access`,
+      `Access for ${name} set to : "${priority}"`,
+      ui.ButtonSet.OK
+    );
+  } catch (err) {
+    console.error(`${err} : Whoops, couldn't set priority for ${name}`);
+    ui.alert(
+      `JPS Error`,
+      `Whoops, couldn't set priority for ${name}`,
+      ui.ButtonSet.OK
+    );
   }
+  
 };
 
 /**
