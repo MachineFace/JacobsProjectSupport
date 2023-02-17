@@ -239,7 +239,45 @@ const InvokeDS = (name, property) => {
 }
 
 
-
+const SetStaffForSheet = (sheet) => {
+  const sheetName = sheet.getSheetName();
+  switch (sheetName) {
+    case SHEETS.Othermill.getName():
+    case SHEETS.Shopbot.getName():
+      designspecialistemail = staff.Adam.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Adam.name);
+      break;
+    case SHEETS.Advancedlab.getName():
+    case SHEETS.Creaform.getName():
+      designspecialistemail = staff.Chris.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
+      break;
+    case SHEETS.Plotter.getName():
+    case SHEETS.Fablight.getName():
+    case SHEETS.Haas.getName():
+    case SHEETS.Vinyl.getName():
+      designspecialistemail = staff.Cody.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
+      break;
+    case SHEETS.Waterjet.getName():
+    case SHEETS.Othertools.getName():
+      designspecialistemail = staff.Gary.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
+      break;
+    case SHEETS.Laser.getName():
+      // Nobody assigned / Everyone assigned.
+      break;
+    case SHEETS.Ultimaker.getName():
+      designspecialistemail = staff.Nicole.email;
+      break;
+    case undefined:
+      designspecialistemail = staff.Staff.email;
+      //sheet.getRange(`B` + lastRow).setValue(`Staff`);
+      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      break;
+  }
+  return 0;
+}
 
 
 /**

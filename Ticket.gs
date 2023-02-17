@@ -12,13 +12,7 @@ class Ticket
     name : name = `Unknown`,
     email : email = `Unknown`,
     projectname : projectname = `Unknown`,
-    material1Name : material1Name = `Unknown`,
-    material1Quantity : material1Quantity = 0,
-    material2Name : material2Name = `Unknown`,
-    material2Quantity : material2Quantity = 0,
-    materials : materials =  [`Materials: `, `None`],
-    partCount : partcount = [`Part Count: `, `None`],
-    notes : notes = [`Notes: `, `None`],
+    rowData : rowData = [],
   }){
     this.jobnumber = jobnumber;
     this.designspecialist  = designspecialist;
@@ -26,28 +20,75 @@ class Ticket
     this.name = name;
     this.email = email;
     this.projectname = projectname;
-    this.material1Name = material1Name;
-    this.material1Quantity = material1Quantity;
-    this.material2Name = material2Name;
-    this.material2Quantity = material2Quantity;
-    this.materials = materials;
-    this.partcount = partcount;
-    this.notes = notes;
+    this.rowData = rowData;
 
     this.doc;
     this.url = ``;
 
   }
 
+
   async CreateTicket() {
     const barcode = await new BarcodeGenerator({ jobnumber : this.jobnumber }).GenerateBarCodeForTicketHeader();
-    console.info(`Barcode ----> ${barcode.url}`);
 
     const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
     this.doc = await DocumentApp.create(`JPS-Ticket-${this.jobnumber}`); // Make Document
     this.url = this.doc.getUrl();
     let body = this.doc.getBody();
     let docId = this.doc.getId();
+
+    // Parse
+    let { status, whichPrinter, numberOfParts, staffNotes,
+      material, materials, fiberReinforcement, fiberPattern, timestamp,
+      mat1quantity, mat1, 
+      mat2quantity, mat2, 
+      mat3quantity, mat3, 
+      mat4quantity, mat4, 
+      mat5quantity, mat5, 
+      otherNotes, layerThickness, density, fortusLayerThickness, densityInfill, finish, roughDimensions, 
+      markforgedDensity, buildParameters, otherJobNotes, dateCompleted, 
+      elapsedTime, estimate, price1, price2, price3, price4, sheet, row 
+    } = this.rowData;
+
+    // Build Table
+    let tb = [];
+
+    this.designspecialist ? tb.push([`Design Specialist`, this.designspecialist.toString()]) : tb.push([`Design Specialist`, `Staff`]);
+    tb.push([`Job Number`, this.jobnumber.toString()]);
+    tb.push([`Student Name`, this.name?.toString()]);
+    tb.push([`Project Name`, this.projectname?.toString()]);
+    status ? tb.push([`Status`, status.toString()]) : tb.push([`Status`, STATUS.received]);
+    timestamp ? tb.push([`Submitted On`, timestamp.toString()]) : tb.push([`Submitted On`, new Date().toDateString()])
+    roughDimensions ? tb.push([`General Dimensions`, roughDimensions.toString()]) : tb.push([`General Dimensions`, `Unknown`]);
+    numberOfParts ? tb.push([`Number of Parts`, numberOfParts.toString()]) : tb.push([`Number of Parts`, `1`]);
+    
+    if (mat1 && mat1quantity) tb.push([mat1.toString(), mat1quantity.toString()]);
+    if (mat2 && mat2quantity) tb.push([mat2.toString(), mat2quantity.toString()]);
+    if (mat3 && mat3quantity) tb.push([mat3.toString(), mat3quantity.toString()]);
+    if (mat4 && mat4quantity) tb.push([mat4.toString(), mat4quantity.toString()]);
+    if (mat5 && mat5quantity) tb.push([mat5.toString(), mat5quantity.toString()]);
+    if (material) tb.push([`Material`, material.toString()]);
+    if (materials) tb.push([`Materials`, materials.toString()]);
+
+    if (whichPrinter) tb.push([`Printer`, whichPrinter.toString()]);
+    if (layerThickness) tb.push([`Layer Thickness`, layerThickness.toString()]);
+    if (density) tb.push([`Density`, density.toString()]);
+    if (fortusLayerThickness) tb.push([`Fortus Layer Thickness`, fortusLayerThickness.toString()]);
+    if (densityInfill) tb.push([`Infill Density`, densityInfill.toString()]);
+    if (finish) tb.push([`Finish`, finish.toString()]);
+    if (markforgedDensity) tb.push([`Density`, markforgedDensity.toString()]);
+    if (fiberReinforcement) tb.push([`Fiber Reinforcement`, fiberReinforcement.toString()]);
+    if (fiberPattern) tb.push([`Fiber Pattern`, fiberPattern.toString()]);
+    if (buildParameters) tb.push([`Parameters`, buildParameters.toString()]);
+    if (dateCompleted) tb.push([`Date Completed`, dateCompleted.toString()]);
+    if (elapsedTime) tb.push([`Elapsed Time`, elapsedTime.toString()]);
+    if (estimate) tb.push([`Estimate`, estimate.toString()]);
+
+    staffNotes ? tb.push([`Notes`, staffNotes.toString()]) : tb.push([`Notes`, `None`]);
+    if (otherNotes) tb.push([`Additional Notes`, otherNotes.toString()]);
+    if (otherJobNotes) tb.push([`Additional Notes`, otherJobNotes.toString()]);
+
+    console.info(tb)
 
     // Append Document with Info
     try {
@@ -87,15 +128,7 @@ class Ticket
         });
 
       // Create a two-dimensional array containing the cell contents.
-      body.appendTable([
-          ["Design Specialist:", this.designspecialist.toString()],
-          ["Job Number:", this.jobnumber.toString()],
-          ["Student Name:", this.name.toString()],
-          ["Project Name:", this.projectname.toString()],
-          [this.materials[0], this.materials[1]],
-          [this.partcount[0], this.partcount[1]],
-          [this.notes[0], this.notes[1]],
-        ])
+      body.appendTable([...tb])
         .setAttributes({
           [DocumentApp.Attribute.FONT_SIZE]: 6,
           [DocumentApp.Attribute.LINE_SPACING]: 1,
@@ -162,13 +195,9 @@ const GenerateMissingTickets = () => {
           name : data.name,
           email : data.email,
           projectname : data.projectName,
-          material1Name : data.material1Name,
-          material1Quantity : data.material1Quantity,
-          material2Name : data.material2Name,
-          material2Quantity : data.material2Quantity,
-        });
-        let t = await ticket.CreateTicket();
-        SetByHeader(sheet, HEADERNAMES.ticket, thisRow, t.getUrl());
+          rowData : data,
+        }).CreateTicket();
+        SetByHeader(sheet, HEADERNAMES.ticket, thisRow, ticket.getUrl());
       }
     })
   })

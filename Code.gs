@@ -95,41 +95,8 @@ const onSubmission = async (e) => {
   // Notify Staff via email and set their assignment
   var designspecialistemail;
 
-  switch (sheetName) {
-    case SHEETS.Othermill.getName():
-    case SHEETS.Shopbot.getName():
-      designspecialistemail = staff.Adam.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Adam.name);
-      break;
-    case SHEETS.Advancedlab.getName():
-    case SHEETS.Creaform.getName():
-      designspecialistemail = staff.Chris.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
-      break;
-    case SHEETS.Plotter.getName():
-    case SHEETS.Fablight.getName():
-    case SHEETS.Haas.getName():
-    case SHEETS.Vinyl.getName():
-      designspecialistemail = staff.Cody.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
-      break;
-    case SHEETS.Waterjet.getName():
-    case SHEETS.Othertools.getName():
-      designspecialistemail = staff.Gary.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
-      break;
-    case SHEETS.Laser.getName():
-      // Nobody assigned / Everyone assigned.
-      break;
-    case SHEETS.Ultimaker.getName():
-      designspecialistemail = staff.Nicole.email;
-      break;
-    case undefined:
-      designspecialistemail = staff.Staff.email;
-      //sheet.getRange(`B` + lastRow).setValue(`Staff`);
-      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
-      break;
-  }
+  // Set the Staff member for the sheet.
+  SetStaffForSheet(sheet);
 
   // Email each DS
   try {
@@ -233,12 +200,7 @@ const onChange = async (e) => {
 
   // ----------------------------------------------------------------------------------------------------------------
   // Ignore Edits on background sheets like Logger and StoreItems 
-  let forbiddenSheets = Object.values(NONITERABLESHEETS);
-  if (forbiddenSheets.includes(thisSheet)) {
-    console.info(`${thisSheet.getSheetName()} is forbidden from editing... Skipping.`);
-    return;
-  }
-
+  if (CheckSheetIsForbidden(thisSheet)) return;
 
   // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
   if (thisCol > 1 && thisCol != 3) return;
@@ -246,67 +208,46 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Parse Data
   let rowData = GetRowData(thisSheet, thisRow);
+  let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
+    mat1quantity, mat1, mat2quantity, mat2, 
+    mat3quantity, mat3, mat4quantity, mat4, 
+    mat5quantity, mat5, afiliation, elapsedTime, estimate, 
+    price1, price2, sheetName, row, } = rowData;
   console.info(rowData)
 
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
-  let status = rowData.status;
-
-  let tempEmail = rowData.email;
-  let tempSID = rowData.sid;
-
-  let tempPriority = await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
-  SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, tempPriority);
-  if (tempPriority == `STUDENT NOT FOUND` || !tempPriority && (status != STATUS.cancelled || status != STATUS.closed)) {
-    SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+  try {
+    priority = priority ? priority : await new CheckPriority({ email : email, sid : sid }).Priority;
+    SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+    if (priority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) {
+      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+    }
+  } catch (err) {
+    console.error(`Whoops: Couldn't double-check priority: ${err}`);
   }
 
-  var designspecialist = rowData.ds ? rowData.ds : `a Design Specialist`;
-  var priority = rowData.priority ? rowData.priority : await new CheckPriority({email : tempEmail, sid : tempSID}).Priority;
-  var jobnumber = rowData.jobNumber ? rowData.jobNumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
-  var ticket = rowData.ticket;
-  var submissiontime = rowData.timestamp;
-  var email = rowData.email;
-  var name = rowData.name;
-  var sid = rowData.sid;
-  var studentType = rowData.afiliation;
-  var projectname = rowData.projectName ? rowData.projectName : `Your Project`;
-  var cost = rowData.estimate;
+
+  var designspecialist = ds ? ds : `a Design Specialist`;
+  var jobnumber = jobNumber ? jobNumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
+  projectName = projectName ? projectName : `Your Project`;
 
   // Materials
-  const material1Quantity = rowData.mat1quantity;
-  const material1Name = rowData.mat1;
-  const material1URL = ``;
+  const material1Name = mat1, material1URL = ``;
+  const material2Name = mat2, material2URL = ``;
+  const material3Name = mat3, material3URL = ``;
+  const material4Name = mat4, material4URL = ``;
+  const material5Name = mat5, material5URL = ``;
 
-  const material2Quantity = rowData.mat2quantity;
-  const material2Name = rowData.mat2;
-  const material2URL = ``;
+  mat1 = material1Name == `` ? false : true;
+  mat2 = material2Name == `` ? false : true;
+  mat3 = material3Name == `` ? false : true;
+  mat4 = material4Name == `` ? false : true;
+  mat5 = material5Name == `` ? false : true;
 
-  const material3Quantity = rowData.mat3quantity;
-  const material3Name = rowData.mat3;
-  const material3URL = ``;
-
-  const material4Quantity = rowData.mat4quantity;
-  const material4Name = rowData.mat4;
-  const material4URL = ``;
-
-  const material5Quantity = rowData.mat5quantity;
-  const material5Name = rowData.mat5;
-  const material5URL = ``;
-
-  if (material1Name != ``) var mat1 = true;
-  else mat1 = false;
-  if (material2Name != ``) var mat2 = true;
-  else mat2 = false;
-  if (material3Name != ``) var mat3 = true;
-  else mat3 = false;
-  if (material4Name != ``) var mat4 = true;
-  else mat4 = false;
-  if (material5Name != ``) var mat5 = true;
-  else mat5 = false;
 
   // Log submission info to sheet
-  writer.Info(`Submission Time = ${submissiontime}, Name = ${name}, Email = ${email}, Project = ${projectname}`);
+  writer.Info(`Submission Time = ${timestamp}, Name = ${name}, Email = ${email}, Project = ${projectName}`);
 
   // Ignore
   if(status == STATUS.closed || status == STATUS.cancelled) return;
@@ -316,7 +257,7 @@ const onChange = async (e) => {
   try {
     writer.Warning(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobnumber = jobnumber ? jobnumber : new CreateJobnumber({ date : submissiontime }).Jobnumber;
+      jobnumber = jobnumber ? jobnumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
       SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
@@ -337,17 +278,13 @@ const onChange = async (e) => {
   try {
     writer.Warning(`Attempting to Calculate turnaround times`);
     const calc = new Calculate();
-    let elapsedCell = thisSheet.getRange(thisRow, 43).getValue();
-    if (elapsedCell) {
+    if (!elapsedTime) {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
-        let time = await calc.CalculateDuration(new Date(submissiontime), endTime);
+        let time = await calc.CalculateDuration(new Date(timestamp), endTime);
 
         // Write to Column - d h:mm:ss  
         SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
-        writer.Info(`Turnaround Time = ${time}`);
-
-        // Write Completed time
         SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
       }
     }
@@ -360,98 +297,19 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Generating a "Ticket"
   if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
-    if (ticket !== null || ticket !== undefined) {
-    writer.Warning("Already seems to have a ticket.");
-    }
-    writer.Warning("current ticket: " + ticket);
+    if (ticket !== null || ticket !== undefined) writer.Warning("Already seems to have a ticket.");
+    writer.Warning(`Current Ticket: ${ticket}`);
     if (ticket == null || ticket == undefined) {
 
-      let ticket;
       try {
-        writer.Warning(`Attempting to create a ticket`);
-        let material, part, note;
-        let mat = [];
-        let partcount = [];
-        let notes = [];
-        switch(thisSheet.getSheetName()) {
-          case SHEETS.Laser.getSheetName():
-            material = GetByHeader(SHEETS.Laser, HEADERNAMES.roughDimensions, thisRow);
-            if(!material) mat.push(`Materials: `, `None`);
-            else mat.push( `Rough Dimensions:`, material.toString());
-
-            part = GetByHeader(SHEETS.Laser, HEADERNAMES.numberOfParts, thisRow);
-            if(!part) partcount.push(`Part Count: `, `None`);
-            else partcount.push(`Part Count:`, part.toString());
-
-            note = GetByHeader(SHEETS.Laser, HEADERNAMES.staffNotes, thisRow);
-            if(!note) notes.push(`Notes: `, `None`);
-            else notes.push( `Notes:`, note.toString());
-            break;
-          case SHEETS.Fablight.getSheetName():
-            material = GetByHeader(SHEETS.Fablight, HEADERNAMES.roughDimensions, thisRow);
-            if(!material) mat.push(`Materials: `, `None`);
-            else mat.push( `Rough Dimensions:`, material.toString());
-
-            part = GetByHeader(SHEETS.Fablight, HEADERNAMES.numberOfParts, thisRow);
-            if(!part) partcount.push(`Part Count: `, `None`);
-            else partcount.push( `Part Count:`, part.toString());
-
-            note = GetByHeader(SHEETS.Fablight, `Notes:`, thisRow);
-            if(!note) notes.push(`Notes: `, `None`);
-            else notes.push( `Notes:`, note.toString());
-            break;
-          case SHEETS.Waterjet.getSheetName():
-            material = GetByHeader(SHEETS.Waterjet, HEADERNAMES.roughDimensions, thisRow);
-            if(!material) mat.push(`Materials: `, `None`);
-            else mat.push( `Rough Dimensions: `, material.toString());
-
-            part = GetByHeader(SHEETS.Waterjet, HEADERNAMES.numberOfParts, thisRow);
-            if(!part) partcount.push(`Part Count: `, `None`);
-            else partcount.push( `Part Count:`, part.toString());
-
-            note = GetByHeader(SHEETS.Waterjet, HEADERNAMES.staffNotes, thisRow);
-            if(!note) notes.push(`Notes: `, `None`);
-            else notes.push( `Notes: `, note.toString());
-            break;
-          case SHEETS.Advancedlab.getSheetName():
-            material = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.whichPrinter, thisRow);
-            if(!material) mat.push(`Materials: `, `None`);
-            else mat.push( `Which Printer: `, material.toString());
-
-            part = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.numberOfParts, thisRow);
-            if(!part) partcount.push(`Part Count: `, `None`);
-            else partcount.push( `Part Count:`, part.toString());
-
-            note = GetByHeader(SHEETS.Advancedlab, HEADERNAMES.otherJobNotes, thisRow);
-            if(!note) notes.push(`Notes: `, `None`);
-            else notes.push( `Notes:`, note.toString());
-            break;
-          case SHEETS.Plotter.getSheetName():
-            material = GetByHeader(SHEETS.Plotter, HEADERNAMES.numberOfParts, thisRow) ? GetByHeader(SHEETS.Plotter, HEADERNAMES.numberOfParts, thisRow) : 0;
-            mat.push(`Materials: `, `Canon Poster Printer: 36" wide (priced per foot)`);
-            partcount.push(`Part Count: `, material.toString());
-            notes.push(`Notes: `, `None`);
-            break;
-          default:
-            mat.push(`Materials: `, `None`);
-            partcount.push(`Part Count: `, `None`);
-            notes.push(`Notes: `, `None`);
-            break;
-        }
         ticket = new Ticket({
           jobnumber : jobnumber,
           designspecialist : designspecialist,
-          submissiontime : submissiontime,
+          submissiontime : timestamp,
           name : name,
           email : email,
-          projectname : projectname,
-          material1Name : material1Name,
-          material1Quantity : material1Quantity,
-          material2Name : material2Name,
-          material2Quantity : material2Quantity,
-          materials : mat,
-          partCount : partcount,
-          notes : notes,
+          projectname : projectName,
+          rowData : rowData,
         });
         ticket.CreateTicket();
       } catch (err) {
@@ -459,7 +317,7 @@ const onChange = async (e) => {
       }
       try {
         SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
-        console.info(`Set Ticket URL - Sheet: ${thisSheet} Row: ${thisRow}, URL: ${ticket.url}`);
+        console.info(`Set Ticket URL: ${ticket.url} - Sheet: ${thisSheet} Row: ${thisRow}`);
       } catch (err) {
         console.error(`${err} : Setting Ticket URL failed - Sheet: ${thisSheet} Row: ${thisRow} URL: ${ticket.url}`);
       }
@@ -473,41 +331,41 @@ const onChange = async (e) => {
   // Create a Message and Return Appropriate Responses.
   var Message = new CreateMessage({
     name : name,
-    projectname : projectname, 
+    projectname : projectName, 
     jobnumber : jobnumber,
     material1URL : material1URL,
-    material1Quantity : material1Quantity,
+    material1Quantity : mat1quantity,
     material1Name : material1Name,
-    material2URL :material2URL,
-    material2Quantity : material2Quantity,
+    material2URL : material2URL,
+    material2Quantity : mat2quantity,
     material2Name : material2Name,
     material3URL : material3URL,
-    material3Quantity : material3Quantity,
+    material3Quantity : mat3quantity,
     material3Name : material3Name,
     material4URL : material4URL,
-    material4Quantity : material4Quantity,
+    material4Quantity : mat4quantity,
     material4Name : material4Name,
     material5URL : material5URL,
-    material5Quantity : material5Quantity,
+    material5Quantity : mat5quantity,
     material5Name : material5Name,
     designspecialist : designspecialist,
     designspecialistemaillink : designspecialistemaillink,
-    cost : cost,
+    cost : estimate,
   });
 
   // Send email with appropriate response and cc Chris and Cody.
   writer.Info(`Sending email....`);
-  const emailer = new Emailer({
+  new Emailer({
     name : name, 
     status : status,
     email : email,    
     designspecialistemail : designspecialistemail,
     message : Message,
-  })
+  });
 
   // Check priority one more time:
   if(priority == `STUDENT NOT FOUND!`){
-    if(status != STATUS.closed && status != STATUS.cancelled ) {
+    if(status != STATUS.closed || status != STATUS.cancelled ) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     }
   } else if (!priority) {

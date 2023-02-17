@@ -47,6 +47,7 @@ const PopUpMarkAsAbandoned = async () => {
     
 }
 
+
 /**
  * Mark a job as abandoned and send an email to that student
  */
@@ -82,7 +83,6 @@ const PopUpMarkAsPickedUp = async () => {
 }
 
 
-
 /** 
  * Creates a pop-up for counting users.
  */
@@ -95,6 +95,7 @@ const PopupCountUsers = async () => {
     ui.ButtonSet.OK
   );
 };
+
 
 /**
  * Create a pop-up to check for ALL missing students
@@ -109,6 +110,7 @@ const PopupCheckMissingAccessStudents = async () => {
     ui.ButtonSet.OK
   );
 };
+
 
 /**
  * Create a pop-up to check for ONE missing students
@@ -144,6 +146,7 @@ const PopupGetSingleStudentPriority = async () => {
   
 };
 
+
 /**
  * Create a pop-up to make a new Jobnumber
  */
@@ -178,118 +181,103 @@ const PopupCreateNewJobNumber = async () => {
  */
 const BillFromSelected = async () => {
   let thisSheet = SpreadsheetApp.getActiveSheet();
-  let sheetname = thisSheet.getName();
   let thisRow = thisSheet.getActiveRange().getRow();
 
   if(CheckSheetIsForbidden(thisSheet) == true) {
-    Browser.msgBox(
+    const b = Browser.msgBox(
       `Incorrect Sheet Active`,
       `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK
     );
-    return;
+    if (b == `ok`) return;
   }
   const rowData = GetRowData(thisSheet, thisRow);
-
-  const status = rowData.status;
-  const jobnumber = rowData.jobNumber;
-  const email = rowData.email;
-  const name = rowData.name;
-  const material1Quantity = rowData.mat1quantity;
-  const material1Name = rowData.mat1;
-  const material2Quantity = rowData.mat2quantity;
-  const material2Name = rowData.mat2;
-  const material3Quantity = rowData.mat3quantity;
-  const material3Name = rowData.mat3;
-  const material4Quantity = rowData.mat4quantity;
-  const material4Name = rowData.mat4;
-  const material5Quantity = rowData.mat5quantity;
-  const material5Name = rowData.mat5;
-  const quantityTotal = material1Quantity + material2Quantity + material3Quantity + material4Quantity + material5Quantity;
+  const { status, jobnumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate } = rowData;
+  const quantityTotal = mat1quantity + mat2quantity + mat3quantity + mat4quantity + mat5quantity;
   console.info(rowData);
+  
+  let response;
+  if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
+    console.warn(`Cannot Bill Student - No Material quantity(s) recorded...`);
+    const b = Browser.msgBox(
+      `Generate Bill to Shopify`,
+      `No quantities entered for selected submission. Maybe add some materials first before billing...`,
+      Browser.Buttons.OK
+    );
+    if (b == `ok`) return;
+  }
+  if (status == STATUS.billed || status == STATUS.closed || status == STATUS.abandoned || status == STATUS.failed) {
+    const b = Browser.msgBox(
+      `Generate Bill to Shopify`,
+      `You have already Generated a bill to this Student. Project is closed.`,
+      Browser.Buttons.OK
+    );
+    if (b == `ok`) return;
+  }
 
   const shopify = await new ShopifyAPI({
     jobnumber : jobnumber, 
     email : email,
-    material1Name : material1Name, material1Quantity : material1Quantity,
-    material2Name : material2Name, material2Quantity : material2Quantity,
-    material3Name : material3Name, material3Quantity : material3Quantity,
-    material4Name : material4Name, material4Quantity : material4Quantity,
-    material5Name : material5Name, material5Quantity : material5Quantity, 
-  });
+    material1Name : mat1, material1Quantity : mat1quantity,
+    material2Name : mat2, material2Quantity : mat2quantity,
+    material3Name : mat3, material3Quantity : mat3quantity,
+    material4Name : mat4, material4Quantity : mat4quantity,
+    material5Name : mat5, material5Quantity : mat5quantity, 
+  }); 
+
+  // Fetch Customer and Products
   const customer = await shopify.GetCustomerByEmail(email);
   console.info(`CUSTOMER : ${JSON.stringify(customer)}`)
-  // const order = await shopify.CreateOrder();
-  // console.info(`ORDER : ${JSON.stringify(order)}`)
-  let response;
-  if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
-    console.warn(`Cannot bill - no quantity recorded`);
-    Browser.msgBox(
-      `Generate Bill to Shopify`,
-      `No quantities entered for selected submission.`,
+  if (customer == undefined || customer == null) {
+    const b = Browser.msgBox(
+      `Shopify Error`,
+      `The Shopify customer was not found... Check with Chris & Cody.`,
       Browser.Buttons.OK
     );
-    return;
-  } else {
-    if (status == STATUS.billed || status == STATUS.closed || status == STATUS.abandoned || status == STATUS.failed) {
+    if (b == `ok`) return;
+  }
+
+  let boxTitle = `Generate Bill to Shopify`;
+  let msg = `Would you like to Generate a Bill to: \\n`;
+  msg += `${customer?.first_name} ${customer?.last_name} \\n`;
+  msg += `Email: ${email} \\n`;
+  msg += `Job Number : ${jobnumber?.toString()} \\n`;
+  msg += `Shopify ID : ${customer?.id?.toString()} \\n`;
+  msg += `For Materials : \\n`; 
+  msg += `----- ${mat1quantity} of ${mat1}\\n`;
+  if(mat2quantity) msg += `----- ${mat2quantity} of ${mat2}\\n`;
+  if(mat3quantity) msg += `----- ${mat3quantity} of ${mat3}\\n`;
+  if(mat4quantity) msg += `----- ${mat4quantity} of ${mat4}\\n`;
+  if(mat5quantity) msg += `----- ${mat5quantity} of ${mat5}\\n`;
+  msg += `Estimated Cost: $${estimate?.toString()} \\n`;
+
+  // Make a nessage box
+  try {
+    response = Browser.msgBox(
+      boxTitle,
+      msg,
+      Browser.Buttons.YES_NO_CANCEL
+    );
+    if (response == "yes") {
+      console.info(`User clicked "Yes".`);
+      
+      const order = await shopify.CreateOrder();
+      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
+      console.info(order.toString());
+      let lastOrder = await shopify.GetLastOrder();
       Browser.msgBox(
-        `Generate Bill to Shopify`,
-        `You have already Generated a bill to this Student`,
+        boxTitle,
+        `Student has been successfully billed on Shopify! \n ${JSON.stringify(lastOrder)}`,
         Browser.Buttons.OK
       );
-      return;
     } else {
-      let response;
-
-      // Fetch Customer and Products
-      if (customer == undefined || customer == null) {
-        Browser.msgBox(
-          `Shopify Error`,
-          `The Shopify customer was not found`,
-          Browser.Buttons.OK
-        );
-      } else {
-        let boxTitle = `Generate Bill to Shopify`;
-        let boxMsg = `Would you like to Generate a Bill to: \\n\\n`;
-        boxMsg += `Customer Name : ${customer.first_name} ${customer.last_name} \\n`;
-        boxMsg += `Job Number : ${jobnumber} \\n`;
-        boxMsg += `Shopify ID : ${customer.id} \\n`;
-        boxMsg += `For Materials : \\n • ${material1Quantity} of ${material1Name}\\n`;
-        if(material2Quantity) boxMsg += ` • ${material2Quantity} of ${material2Name}\\n`;
-        if(material3Quantity) boxMsg += ` • ${material3Quantity} of ${material3Name}\\n`;
-        if(material4Quantity) boxMsg += ` • ${material4Quantity} of ${material4Name}\\n`;
-        if(material5Quantity) boxMsg += ` • ${material5Quantity} of ${material5Name}\\n`;
-
-        //Make a nessage box
-        try {
-          response = Browser.msgBox(
-            boxTitle,
-            boxMsg,
-            Browser.Buttons.YES_NO_CANCEL
-          );
-          if (response == "yes") {
-            console.info(`User clicked "Yes".`);
-            
-            const order = await shopify.CreateOrder();
-            SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
-            console.info(order.toString());
-            let lastOrder = await shopify.GetLastOrder();
-            Browser.msgBox(
-              boxTitle,
-              `Student has been successfully billed on Shopify! \\n ${JSON.stringify(lastOrder)}`,
-              Browser.Buttons.OK
-            );
-          } else {
-            console.warn(`User clicked "No / Cancel".`);
-            console.warn(`Order NOT Created.`);
-          }
-        } catch (err) {
-          console.error(`${err} : Couldn't create an order...`);
-        } finally {
-          thisSheet.getRange(`AZ${thisRow}`).setValue(false);
-        }
-      }
+      console.warn(`User clicked "No / Cancel".`);
+      console.warn(`Order NOT Created.`);
     }
+  } catch (err) {
+    console.error(`${err} : Couldn't create an order...`);
+  } finally {
+    thisSheet.getRange(`AZ${thisRow}`).setValue(false);
   }
 
   console.info(`Completed BillFromSelected`);
@@ -302,37 +290,36 @@ const BillFromSelected = async () => {
 const PopupCreateTicket = async () => {
   let thisSheet = SpreadsheetApp.getActiveSheet();
   let ui = SpreadsheetApp.getUi();
-  if(CheckSheetIsForbidden(thisSheet) == true) {
+  if(CheckSheetIsForbidden(thisSheet)) {
     Browser.msgBox(
       `Incorrect Sheet Active`,
       `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK
     );
     return;
-  } else {
-    let thisRow = thisSheet.getActiveRange().getRow();
-    let jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow);
-    let data = await GetRowData(thisSheet, thisRow);
-    let ticket = await new Ticket({
-      jobnumber : jobnumber,
-      designspecialist : data.ds,
-      submissiontime : data.timestamp,
-      name : data.name,
-      email : data.email,
-      projectname : data.projectName,
-      material1Name : data.material1Name,
-      material1Quantity : data.material1Quantity,
-      material2Name : data.material2Name,
-      material2Quantity : data.material2Quantity,
-    });
-    let t = await ticket.CreateTicket();
-    SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
-    ui.alert(
-      `JPS Ticket Creation`,
-      `Ticket Created for : ${data?.name}, Job Number : ${jobnumber}`,
-      ui.ButtonSet.OK
-    );
   }
+  let thisRow = thisSheet.getActiveRange().getRow();
+  let rowData = await GetRowData(thisSheet, thisRow);
+  const { ds, jobNumber, timestamp, email, name, sid, projectName, sheetName, row } = rowData;
+  let x = await new Ticket({
+    jobnumber : jobNumber,
+    designspecialist : ds,
+    submissiontime : timestamp,
+    name : name,
+    email : email, 
+    projectname : projectName,
+    rowData : rowData,
+  });
+  let t = await x.CreateTicket();
+  console.info(t);
+  
+  SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
+  ui.alert(
+    `JPS Ticket Creation`,
+    `Ticket Created for : ${name}, Job Number : ${jobNumber}`,
+    ui.ButtonSet.OK
+  );
+  
 };
 
 /**
