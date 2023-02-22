@@ -525,10 +525,10 @@ const _gasTTicketTesting = async () => {
     t.notEqual(x, undefined || null, `Generation SHOULD NOT yield null. ${x}`);
   });
 
-  // await test(`GenerateMissingTickets`, t => {
-  //   const x = GenerateMissingTickets();
-  //   t.equal(x, 0, `GenerateMissingTickets SHOULD yield "0".`);
-  // });
+  await test(`GenerateMissingTickets`, t => {
+    const x = GenerateMissingTickets();
+    t.equal(x, 0, `GenerateMissingTickets SHOULD yield "0".`);
+  });
 
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";

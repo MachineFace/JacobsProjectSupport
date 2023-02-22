@@ -49,16 +49,16 @@ const onSubmission = async (e) => {
       }
     }
     SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.received);
-    writer.Info(`Set status to 'Received'.`);
+    console.info(`Set status to 'Received'.`);
   } catch (err) {
-    writer.Error(`${err}: Couldn't set status to 'Received'.`);
+    console.error(`${err}: Couldn't set status to 'Received'.`);
   }
 
   // Parse variables
   var name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : GetByHeader(sheet, HEADERNAMES.name, lastRow);
   var email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
   var sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
-  var studentType = e.namedValues[HEADERNAMES.afiliation][0] ? e.namedValues[HEADERNAMES.afiliation][0] : GetByHeader(sheet, HEADERNAMES.afiliation, lastRow);
+  var studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(sheet, HEADERNAMES.affiliation, lastRow);
   var projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : GetByHeader(sheet, HEADERNAMES.projectName, lastRow);
   var timestamp = e.namedValues[HEADERNAMES.timestamp][0];
 
@@ -175,7 +175,7 @@ const onSubmission = async (e) => {
  */
 const onChange = async (e) => {
   const writer = new WriteLogger();
-  const staff = new MakeStaff().Staff;
+  // const staff = new MakeStaff().Staff;
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   // var thisSheetName = e.range.getSheet().getSheetName();
@@ -211,7 +211,7 @@ const onChange = async (e) => {
   let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
-    mat5quantity, mat5, afiliation, elapsedTime, estimate, 
+    mat5quantity, mat5, affiliation, elapsedTime, estimate, 
     price1, price2, sheetName, row, } = rowData;
   console.info(rowData)
 
@@ -255,14 +255,14 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
-    writer.Warning(`Trying to fix job number : ${jobnumber}`)
+    console.info(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumber ? jobnumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
       SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
-    writer.Error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+    console.error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
   }
   
   //----------------------------------------------------------------------------------------------------------------
@@ -270,13 +270,13 @@ const onChange = async (e) => {
   try {
     if(name) SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
   } catch (err) {
-    writer.Error(`${err} : Couldn't fix their name.....`)
+    console.error(`${err} : Couldn't fix their name.....`)
   }
 
   //----------------------------------------------------------------------------------------------------------------
   // Calculate Turnaround Time only when cell is empty
   try {
-    writer.Warning(`Attempting to Calculate turnaround times`);
+    console.info(`Attempting to Calculate turnaround times`);
     const calc = new Calculate();
     if (!elapsedTime) {
       if (status == STATUS.completed || status == STATUS.billed) {
@@ -289,7 +289,7 @@ const onChange = async (e) => {
       }
     }
   } catch (err) {
-    writer.Error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
+    console.error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
 
@@ -297,8 +297,8 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Generating a "Ticket"
   if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
-    if (ticket !== null || ticket !== undefined) writer.Warning("Already seems to have a ticket.");
-    writer.Warning(`Current Ticket: ${ticket}`);
+    if (ticket !== null || ticket !== undefined) console.info("Already seems to have a ticket.");
+    console.info(`Current Ticket: ${ticket}`);
     if (ticket == null || ticket == undefined) {
 
       try {
@@ -313,7 +313,7 @@ const onChange = async (e) => {
         });
         ticket.CreateTicket();
       } catch (err) {
-        writer.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+        console.error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
       }
       try {
         SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
@@ -329,7 +329,7 @@ const onChange = async (e) => {
   var designspecialistemail = InvokeDS(designspecialist, `email`);
 
   // Create a Message and Return Appropriate Responses.
-  var Message = new CreateMessage({
+  var message = new CreateMessage({
     name : name,
     projectname : projectName, 
     jobnumber : jobnumber,
@@ -360,7 +360,7 @@ const onChange = async (e) => {
     status : status,
     email : email,    
     designspecialistemail : designspecialistemail,
-    message : Message,
+    message : message,
   });
 
   // Check priority one more time:

@@ -246,7 +246,7 @@ class Calculate
 
     let typeList = [];
     Object.values(SHEETS).forEach(sheet => {
-      GetColumnDataByHeader(sheet, HEADERNAMES.afiliation)
+      GetColumnDataByHeader(sheet, HEADERNAMES.affiliation)
         .filter(Boolean)
         .filter(x => x != `Test`)
         .filter(x => x != `FORMULA ROW`)

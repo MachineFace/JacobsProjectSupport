@@ -147,12 +147,13 @@ class Emailer
 
 /**
  * Send an email
+ * @NOTIMPLEMENTED
  */
 const SendEmail = async ({
   email : email = `jacobsprojectsupport@berkeley.edu`,
   staffEmail : staffEmail = `jacobsprojectsupport@berkeley.edu`,
   status : status = `Default`,
-  message : message = new CreateMessage(),
+  message : message = new CreateMessage({}),
 }) => {
   try {
     await GmailApp.sendEmail(email, `${SERVICE_NAME} : ${status}`, ``, {

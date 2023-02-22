@@ -342,7 +342,7 @@ const HEADERNAMES = {
   mat5quantity : `(INTERNAL) Material 5 Quantity`,	
   mat5 : `(INTERNAL) Item 5`,	
   otherNotes : `Other Notes About This Job`,	
-  afiliation : `What is your affiliation to the Jacobs Institute?`,	
+  affiliation : `What is your affiliation to the Jacobs Institute?`,	
   layerThickness : `Layer Thickness`,	
   density : `Density`,	
   fortusLayerThickness : `Fortus Layer Thickness`, 	

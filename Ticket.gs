@@ -2,6 +2,13 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Printable Ticket
  * @required {number} jobnumber
+ * @param {string} designspecialist
+ * @param {date} submissiontime
+ * @param {string} name
+ * @param {string} email
+ * @param {string} projectname
+ * @param {JSON} rowData
+ * @returns {Ticket} ticket
  */
 class Ticket 
 {

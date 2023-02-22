@@ -240,6 +240,7 @@ const InvokeDS = (name, property) => {
 
 
 const SetStaffForSheet = (sheet) => {
+  const staff = new MakeStaff().Staff;
   const sheetName = sheet.getSheetName();
   switch (sheetName) {
     case SHEETS.Othermill.getName():
