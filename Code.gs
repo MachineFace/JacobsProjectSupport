@@ -175,6 +175,7 @@ const onSubmission = async (e) => {
  */
 const onChange = async (e) => {
   const writer = new WriteLogger();
+
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   // var thisSheetName = e.range.getSheet().getSheetName();
@@ -225,17 +226,9 @@ const onChange = async (e) => {
     console.error(`Whoops: Couldn't double-check priority: ${err}`);
   }
 
-
-  var designspecialist = ds ? ds : `a Design Specialist`;
-  var jobnumber = jobNumber ? jobNumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
+  ds = ds ? ds : `a Design Specialist`;
+  jobNumber = jobNumber ? jobNumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
   projectName = projectName ? projectName : `Your Project`;
-
-  // Materials
-  mat1 = material1Name == `` ? false : true;
-  mat2 = material2Name == `` ? false : true;
-  mat3 = material3Name == `` ? false : true;
-  mat4 = material4Name == `` ? false : true;
-  mat5 = material5Name == `` ? false : true;
 
 
   // Log submission info to sheet
@@ -247,10 +240,10 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
-    console.info(`Trying to fix job number : ${jobnumber}`)
+    console.info(`Trying to fix job number : ${jobNumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobnumber = jobnumber ? jobnumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
-      SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber);
+      jobNumber = jobNumber ? jobNumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
+      SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobNumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
@@ -295,8 +288,8 @@ const onChange = async (e) => {
 
       try {
         ticket = new Ticket({
-          jobnumber : jobnumber,
-          designspecialist : designspecialist,
+          jobnumber : jobNumber,
+          designspecialist : ds,
           submissiontime : timestamp,
           name : name,
           email : email,
@@ -317,16 +310,16 @@ const onChange = async (e) => {
   }
   
   // Case switch for different Design Specialists email
-  var designspecialistemaillink = InvokeDS(designspecialist, `emaillink`);
-  var designspecialistemail = InvokeDS(designspecialist, `email`);
+  var designspecialistemaillink = InvokeDS(ds, `emaillink`);
+  var designspecialistemail = InvokeDS(ds, `email`);
 
   // Create a Message and Return Appropriate Responses.
   var message = new CreateMessage({
     name : name,
     projectname : projectName, 
-    jobnumber : jobnumber,
+    jobnumber : jobNumber,
     rowData : rowData,
-    designspecialist : designspecialist,
+    designspecialist : ds,
     designspecialistemaillink : designspecialistemaillink,
     cost : estimate,
   });
