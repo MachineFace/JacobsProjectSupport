@@ -145,7 +145,7 @@ const _gasTMainTesting = async () => {
 /**
  * Test Logger and Message with GasT
  */
-const _gasTLoggerAndMessagingTesting = async () => {
+const _gasTMessagingTesting = async () => {
   if ((typeof GasTap) === 'undefined') { 
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
   } 
@@ -179,16 +179,15 @@ const _gasTLoggerAndMessagingTesting = async () => {
   });
 
   await test(`CreateMessage`, (t) => {
+    const rowData = GetRowData(SHEETS.Fablight, 2);
     const message = new CreateMessage({
       name : 'Cody', 
       projectname : 'Test Project',
       jobnumber : '101293874098', 
-      material1URL : 'material1URL', material1Quantity : 45, material1Name : 'TestPLA',
-      material2URL : 'material2URL', material2Quantity : 15, material2Name : 'TestBreakaway',
-      material3URL : 'mat3URL', material3Quantity : 23, material3Name : 'Steel',
-      material4URL : 'mat4URL', material4Quantity : 24, material4Name : 'Aluminum',
-      material5URL : 'mat5URL', material5Quantity : 75, material5Name : 'Plastic',
-      designspecialist : 'designspecialist', designspecialistemaillink : 'cody@glen.com', cost : 45.50,
+      rowData : rowData,
+      designspecialist : 'designspecialist', 
+      designspecialistemaillink : 'cody@glen.com', 
+      cost : 45.50,
     });
 
     const a = `DEFAULT ${message.defaultMessage}`;
@@ -237,6 +236,20 @@ const _gasTLoggerAndMessagingTesting = async () => {
     const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
     t.notEqual(y, undefined || null, `MISSING ACCESS message should not return undefined or null. \n${y}`);
   });
+
+  
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
+
+/**
+ * Test Logging with GasT
+ */
+const _gasTLoggerTesting = async () => {
+  if ((typeof GasTap) === 'undefined') { 
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } 
+  const test = new GasTap();
 
   await test(`WriteLogger`, (t) => {
     const write = new WriteLogger();
@@ -590,7 +603,8 @@ const _gasTEmailTesting = async () => {
 const _gasTTestAll = async () => {
   Promise.all([
     await _gasTMainTesting(),
-    await _gasTLoggerAndMessagingTesting(),
+    await _gasTMessagingTesting(),
+    await _gasTLoggerTesting(),
     await _gasTMiscTesting(),
     await _gasTCalculationTesting(),
     await _gasTShopifyTesting(),

@@ -135,7 +135,7 @@ const GetRowData = (sheet, row) => {
     });
     dict[`sheetName`] = sheet.getSheetName();
     dict[`row`] = row;
-    // console.info(dict);
+    console.info(dict);
     return dict;
   } catch (err) {
     console.error(`${err} : GetRowData failed - Sheet: ${sheet} Row: ${row}`);

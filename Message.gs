@@ -6,11 +6,9 @@
  * @param {string} projectname
  * @param {number} jobnumber
  * @param {string} mat1
- * @param {string} material1URL
  * @param {number} material1Quantity
  * @param {string} material1Name
  * @param {string} mat2
- * @param {string} material2URL
  * @param {number} material2Quantity
  * @param {string} material2Name
  * @param {string} designspecialist
@@ -22,21 +20,7 @@ class CreateMessage
     name : name, 
     projectname : projectname, 
     jobnumber : jobnumber, 
-    material1URL : material1URL, 
-    material1Quantity : material1Quantity, 
-    material1Name : material1Name,
-    material2URL : material2URL, 
-    material2Quantity : material2Quantity, 
-    material2Name : material2Name,
-    material3URL : material3URL, 
-    material3Quantity : material3Quantity, 
-    material3Name : material3Name,
-    material4URL : material4URL, 
-    material4Quantity : material4Quantity, 
-    material4Name : material4Name,
-    material5URL : material5URL, 
-    material5Quantity : material5Quantity, 
-    material5Name : material5Name,
+    rowData : rowData,
     designspecialist : designspecialist, 
     designspecialistemaillink : designspecialistemaillink, 
     cost : cost,
@@ -45,27 +29,17 @@ class CreateMessage
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
     this.jobnumber = jobnumber ? jobnumber.toString() : new CreateJobnumber({ date : new Date() }).Jobnumber;
 
-    this.material1Name = material1Name ? material1Name.toString() : `Material 1 Name`;
-    this.material2Name = material2Name ? material2Name.toString() : `Material 2 Name`;
-    this.material3Name = material3Name ? material3Name.toString() : `Material 3 Name`;
-    this.material4Name = material4Name ? material4Name.toString() : `Material 4 Name`;
-    this.material5Name = material5Name ? material5Name.toString() : `Material 5 Name`;
+    // let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
+    // mat1quantity, mat1, mat2quantity, mat2, 
+    // mat3quantity, mat3, mat4quantity, mat4, 
+    // mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+    // price1, price2, sheetName, row, } = rowData;
 
-    this.material1Quantity = material1Quantity ? material1Quantity.toString() : 0;
-    this.material2Quantity = material2Quantity ? material2Quantity.toString() : 0;
-    this.material3Quantity = material3Quantity ? material3Quantity.toString() : 0;
-    this.material4Quantity = material4Quantity ? material4Quantity.toString() : 0;
-    this.material5Quantity = material5Quantity ? material5Quantity.toString() : 0;
-
-    this.material1URL = material1URL ? material1URL.toString() : `Unknown URL`;
-    this.material2URL = material2URL ? material2URL.toString() : `Unknown URL`;
-    this.material3URL = material3URL ? material3URL.toString() : `Unknown URL`;
-    this.material4URL = material4URL ? material4URL.toString() : `Unknown URL`;
-    this.material5URL = material5URL ? material5URL.toString() : `Unknown URL`;
+    this.rowData = rowData;
 
     this.designspecialist = designspecialist ? designspecialist.toString() : `Staff`;
-    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>`;
-    this.cost = cost ? cost : 0;
+    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>`;
+    this.cost = cost ? Number(cost).toFixed(2) : 0;
     this.costFormatted = `$ ${this.cost.toString()}`;
   }
 
@@ -106,12 +80,11 @@ class CreateMessage
       message += `Please email ${this.designspecialist} at ${this.designspecialistemaillink} for further details.<br/>`;
       message += `Your Jacobs Store account will be billed for: <br/> `;
       message += `<p><ul>`;
-      if (this.material1Name) message += `<li><a href = "${this.material1URL}">${this.material1Quantity} of ${this.material1Name}</a></li>`;   
-      if (this.material2Name != `Material 2 Name`) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`; 
-      if (this.material3Name != `Material 3 Name`) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
-      if (this.material4Name != `Material 4 Name`) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
-      if (this.material5Name != `Material 5 Name`) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`;  
-      else message += `Your Jacobs Store account will be billed for the materials used. <br/> `;    
+      if (this.rowData?.mat1) message += `<li>${this.rowData?.mat1quantity} of ${this.rowData?.mat1}</li>`;   
+      if (this.rowData?.mat2) message += `<li>${this.rowData?.mat2quantity} of ${this.rowData?.mat2}</li>`; 
+      if (this.rowData?.mat3) message += `<li>${this.rowData?.mat3quantity} of ${this.rowData?.mat3}</li>`; 
+      if (this.rowData?.mat4) message += `<li>${this.rowData?.mat4quantity} of ${this.rowData?.mat4}</li>`; 
+      if (this.rowData?.mat5) message += `<li>${this.rowData?.mat5quantity} of ${this.rowData?.mat5}</li>`;  
       message += `</ul>`;     // dont forget to end the bullet point list (unordered list)
       if (this.cost == "" || this.cost == undefined){
         message += `<p>The cost is not specified. Speak to a Design Specialist about this if you have questions before approving. <br /><p></br>`;
@@ -201,12 +174,11 @@ class CreateMessage
       message += `<p>Thank you for choosing ${SERVICE_NAME}. Your project <b><i>${this.projectname}</b></i> is now <b>CLOSED.</b><br />`;
       message += `Job Number: <i>${this.jobnumber}</i>. Your Jacobs Store account has been billed for: <br/> `;
       message += `<p><ul>`;
-      if (this.material1Name) message += `<li><a href = "${this.material1URL}">${this.material1Quantity} of ${this.material1Name}</a></li>`;  
-      if (this.material2Name != `Material 2 Name`) message += `<li><a href = "${this.material2URL}">${this.material2Quantity} of ${this.material2Name}</a></li>`; 
-      if (this.material3Name != `Material 3 Name`) message += `<li><a href = "${this.material3URL}">${this.material3Quantity} of ${this.material3Name}</a></li>`; 
-      if (this.material4Name != `Material 4 Name`) message += `<li><a href = "${this.material4URL}">${this.material4Quantity} of ${this.material4Name}</a></li>`; 
-      if (this.material5Name != `Material 5 Name`) message += `<li><a href = "${this.material5URL}">${this.material5Quantity} of ${this.material5Name}</a></li>`;  
-      else message += `Materials Used, unless you provided your own material, in which case, you will not be charged.<br/> `; 
+      if (this.rowData?.mat1) message += `<li>${this.rowData?.mat1quantity} of ${this.rowData?.mat1}</li>`;   
+      if (this.rowData?.mat2) message += `<li>${this.rowData?.mat2quantity} of ${this.rowData?.mat2}</li>`; 
+      if (this.rowData?.mat3) message += `<li>${this.rowData?.mat3quantity} of ${this.rowData?.mat3}</li>`; 
+      if (this.rowData?.mat4) message += `<li>${this.rowData?.mat4quantity} of ${this.rowData?.mat4}</li>`; 
+      if (this.rowData?.mat5) message += `<li>${this.rowData?.mat5quantity} of ${this.rowData?.mat5}</li>`;  
       message += `</ul>`;     // dont forget to end the bullet point list (unordered list)
       if (this.cost == "" || this.cost == undefined || this.cost == 0){
         message += `<p>The cost is not specified. Speak to a Design Specialist about this if you have questions before approving. <br /><p></br>`;

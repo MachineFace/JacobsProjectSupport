@@ -76,7 +76,7 @@ const onSubmission = async (e) => {
 
 
   // Create Messages
-  const message = await new CreateSubmissionMessage({name : name, projectname : projectname, jobnumber : jobnumber});
+  const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, jobnumber : jobnumber });
 
   // Get DS-Specific Message
   let dsMessage = message.dsMessage;
@@ -175,7 +175,6 @@ const onSubmission = async (e) => {
  */
 const onChange = async (e) => {
   const writer = new WriteLogger();
-  // const staff = new MakeStaff().Staff;
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   // var thisSheetName = e.range.getSheet().getSheetName();
@@ -213,7 +212,6 @@ const onChange = async (e) => {
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
     price1, price2, sheetName, row, } = rowData;
-  console.info(rowData)
 
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
@@ -233,12 +231,6 @@ const onChange = async (e) => {
   projectName = projectName ? projectName : `Your Project`;
 
   // Materials
-  const material1Name = mat1, material1URL = ``;
-  const material2Name = mat2, material2URL = ``;
-  const material3Name = mat3, material3URL = ``;
-  const material4Name = mat4, material4URL = ``;
-  const material5Name = mat5, material5URL = ``;
-
   mat1 = material1Name == `` ? false : true;
   mat2 = material2Name == `` ? false : true;
   mat3 = material3Name == `` ? false : true;
@@ -333,21 +325,7 @@ const onChange = async (e) => {
     name : name,
     projectname : projectName, 
     jobnumber : jobnumber,
-    material1URL : material1URL,
-    material1Quantity : mat1quantity,
-    material1Name : material1Name,
-    material2URL : material2URL,
-    material2Quantity : mat2quantity,
-    material2Name : material2Name,
-    material3URL : material3URL,
-    material3Quantity : mat3quantity,
-    material3Name : material3Name,
-    material4URL : material4URL,
-    material4Quantity : mat4quantity,
-    material4Name : material4Name,
-    material5URL : material5URL,
-    material5Quantity : mat5quantity,
-    material5Name : material5Name,
+    rowData : rowData,
     designspecialist : designspecialist,
     designspecialistemaillink : designspecialistemaillink,
     cost : estimate,

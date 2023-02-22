@@ -139,28 +139,28 @@ const MarkAsAbandonedByBarcode = async () => {
       SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.abandoned);
       progress.setValue(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       console.info(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+      
+      const rowData = GetRowData(sheet, searchRow);
+      let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
+    mat1quantity, mat1, mat2quantity, mat2, 
+    mat3quantity, mat3, mat4quantity, mat4, 
+    mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+    price1, price2, sheetName, row, } = rowData;
 
-      const email = GetByHeader(sheet, HEADERNAMES.email, searchRow);
-      const name = GetByHeader(sheet, HEADERNAMES.name, searchRow);
-      const projectname = GetByHeader(sheet, HEADERNAMES.filename, searchRow);
-      const material1Quantity = GetByHeader(sheet, HEADERNAMES.materials, searchRow);
-      const material1Name = GetByHeader(sheet, HEADERNAMES.mat1, searchRow);
-      const designspecialist = GetByHeader(sheet, HEADERNAMES.ds, searchRow);
       var message = new CreateMessage({
         name : name,
-        projectname : projectname, 
-        jobnumber : jobnumber,
-        material1Quantity : material1Quantity,
-        material1Name : material1Name,
-        designspecialist : designspecialist,
+        projectname : projectName, 
+        jobnumber : jobNumber,
+        rowData : rowData,
+        designspecialist : ds,
       });
       new Emailer({
         email : email,
         name : name, 
         status : STATUS.abandoned,
-        projectname : projectname,
-        jobnumber : jobnumber,
-        material1Quantity : material1Quantity,
+        projectname : projectName,
+        jobnumber : jobNumber,
+        material1Quantity : mat1quantity,
         message : message,
       });
       console.warn(`Student: ${name} emailed ABANDONED message.`)
