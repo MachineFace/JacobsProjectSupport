@@ -120,7 +120,7 @@ class ShopifyAPI
         delete pack[key];
       } else values.id = this._LookupStoreProductDetails(values.name);
     }
-    // this.writer.info(`PACK --> ${JSON.stringify(pack)}`);
+    // console.info(`PACK --> ${JSON.stringify(pack)}`);
 
     // Fetch Shopify Info
     let sum = 0.0;

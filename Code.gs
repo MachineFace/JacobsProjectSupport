@@ -112,7 +112,7 @@ const onSubmission = async (e) => {
   }
 
   // Fix `Received` Status Issue
-  let stat = sheet.getRange(`A` + lastRow).getValue();
+  let stat = GetByHeader(sheet, HEADERNAMES.status, lastRow);
   stat = stat ? stat : SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
   writer.Warning(`Status refixed to 'Received'.`);
 
@@ -172,8 +172,10 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  jobnumber = jobnumber !== null && jobnumber !== undefined ? jobnumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
-  SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
+  if(!jobnumber) {
+    jobnumber = new CreateJobnumber({ date : timestamp }).Jobnumber
+    SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
+  }
 
   // Fix wrapping issues
   let driveloc = sheet.getRange(`D` + lastRow);

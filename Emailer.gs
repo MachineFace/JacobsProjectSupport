@@ -163,8 +163,7 @@ const SendEmail = async ({
       bcc: staff.Chris.email,
       name: SERVICE_NAME,
     });
-    const writer = new WriteLogger();
-    writer.Warning(`"${status}" Email sent to student and status set to "${status}".`);
+    console.warn(`"${status}" Email sent to student and status set to "${status}".`);
     return 0;
   } catch (err) {
     console.error(`Could not email: ${err}`);
