@@ -232,7 +232,7 @@ const onChange = async (e) => {
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
-    price1, price2, sheetName, row, } = rowData;
+    price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
 
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
@@ -306,10 +306,10 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Generating a "Ticket"
   if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
-    if (ticket !== null || ticket !== undefined) console.info("Already seems to have a ticket.");
-    console.info(`Current Ticket: ${ticket}`);
-    if (ticket == null || ticket == undefined) {
-
+    if (ticket !== null || ticket !== undefined) {
+      console.info("Already seems to have a ticket.");
+      console.info(`Current Ticket: ${ticket}`);
+    } else {
       try {
         ticket = new Ticket({
           jobnumber : jobNumber,

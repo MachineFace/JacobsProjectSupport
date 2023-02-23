@@ -399,7 +399,7 @@ class Calculate
     })
     let sum = subtotals.reduce((a, b) => a + b, 0);
     // console.info(`Subtotals ---> ${subtotals}`);
-    // console.info(`Funding = $${sum.toFixed(2)}`);
+    console.info(`Funding = $${sum.toFixed(2)}`);
     return sum.toFixed(2);
   }
   PrintFundingSum () {
@@ -444,7 +444,7 @@ const _testDist = () => {
   // let end = new Date(3,10,2020,10,32,42);
   // c.CalculateDuration(start, end);
   // c.CountActiveUsers();
-  c.PrintTypesCount();
+  c.CountFunding();
 
 }
 

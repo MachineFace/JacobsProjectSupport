@@ -46,16 +46,19 @@ class Ticket
 
     // Parse
     let { status, whichPrinter, numberOfParts, staffNotes,
-      material, materials, fiberReinforcement, fiberPattern, timestamp,
+      material, materials, fablightMaterial, fiberReinforcement, fiberPattern, timestamp,
       mat1quantity, mat1, 
       mat2quantity, mat2, 
       mat3quantity, mat3, 
       mat4quantity, mat4, 
-      mat5quantity, mat5, 
+      mat5quantity, mat5,
+      thickness, fablightThickness, roughDimsFablight, partCountFablight,
+      printColor, printSize, printCount, 
       otherNotes, layerThickness, density, fortusLayerThickness, densityInfill, finish, roughDimensions, 
       markforgedDensity, buildParameters, otherJobNotes, dateCompleted, 
       elapsedTime, estimate, price1, price2, price3, price4, sheet, row 
     } = this.rowData;
+
 
     // Build Table
     let tb = [];
@@ -66,9 +69,12 @@ class Ticket
     tb.push([`Project Name`, this.projectname?.toString()]);
     status ? tb.push([`Status`, status.toString()]) : tb.push([`Status`, STATUS.received]);
     timestamp ? tb.push([`Submitted On`, timestamp.toString()]) : tb.push([`Submitted On`, new Date().toDateString()])
-    roughDimensions ? tb.push([`General Dimensions`, roughDimensions.toString()]) : tb.push([`General Dimensions`, `Unknown`]);
-    numberOfParts ? tb.push([`Number of Parts`, numberOfParts.toString()]) : tb.push([`Number of Parts`, `1`]);
-    
+
+    if (numberOfParts) tb.push([`Number of Parts`, numberOfParts.toString()]);
+    if (partCountFablight) tb.push([`Number of Parts`, partCountFablight.toString()]);
+
+    if (roughDimensions) tb.push([`General Dimensions`, roughDimensions.toString()]);
+    if (roughDimsFablight) tb.push([`General Dimensions`, roughDimsFablight.toString()]);
     if (mat1 && mat1quantity) tb.push([mat1.toString(), mat1quantity.toString()]);
     if (mat2 && mat2quantity) tb.push([mat2.toString(), mat2quantity.toString()]);
     if (mat3 && mat3quantity) tb.push([mat3.toString(), mat3quantity.toString()]);
@@ -76,6 +82,14 @@ class Ticket
     if (mat5 && mat5quantity) tb.push([mat5.toString(), mat5quantity.toString()]);
     if (material) tb.push([`Material`, material.toString()]);
     if (materials) tb.push([`Materials`, materials.toString()]);
+    if (fablightMaterial) tb.push([`Material`, fablightMaterial.toString()]);
+
+    if (thickness) tb.push([`Thickness`, thickness.toString()]);
+    if (fablightThickness) tb.push([`Thickness`, fablightThickness.toString()]);
+
+    if (printColor) tb.push([`Color or B/W`, printColor.toString()]);	
+    if (printSize) tb.push([`Print Dimensions`, printSize.toString()]);		
+    if (printCount) tb.push([`Number of Prints`, printCount.toString()]);	
 
     if (whichPrinter) tb.push([`Printer`, whichPrinter.toString()]);
     if (layerThickness) tb.push([`Layer Thickness`, layerThickness.toString()]);
