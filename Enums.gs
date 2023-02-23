@@ -224,6 +224,7 @@ const SHEETS = {
   Creaform : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
   Othertools : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Other Tools`), // Other Sheet
   Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Canon Plotter`), // Plotter Sheet
+  GSI_Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`GSI - Cannon Plotter`), // GSI Submission Form
 };
 
 /**
@@ -279,6 +280,7 @@ const FORMS = {
   creaform: `1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc`,
   othertools: `1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38`,
   plotter: `1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34`,
+  gsi_plotter: `1F_lEMi0HoV6Ej4RPxn8FuWqsPWJdfjmwyJs7v2SkoCg`,
 };
 
 

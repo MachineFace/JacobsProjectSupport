@@ -242,6 +242,7 @@ const InvokeDS = (name, property) => {
 const SetStaffForSheet = (sheet) => {
   const staff = new MakeStaff().Staff;
   const sheetName = sheet.getSheetName();
+  const lastRow = sheet.getLastRow();
   switch (sheetName) {
     case SHEETS.Othermill.getName():
     case SHEETS.Shopbot.getName():
@@ -257,6 +258,7 @@ const SetStaffForSheet = (sheet) => {
     case SHEETS.Fablight.getName():
     case SHEETS.Haas.getName():
     case SHEETS.Vinyl.getName():
+    case SHEETS.GSI_Plotter.getName():
       designspecialistemail = staff.Cody.email;
       SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
       break;
@@ -273,7 +275,10 @@ const SetStaffForSheet = (sheet) => {
       break;
     case undefined:
       designspecialistemail = staff.Staff.email;
-      //sheet.getRange(`B` + lastRow).setValue(`Staff`);
+      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      break;
+    default:
+      designspecialistemail = staff.Staff.email;
       SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
   }

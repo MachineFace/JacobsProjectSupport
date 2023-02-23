@@ -255,6 +255,22 @@ class CreateSubmissionMessage
       message += `<p>Best,<br />Jacobs Hall Staff</p>`;
     return message;
   }
+  get gsiPlotterMessage() {
+    let message = `<p>Hi ${this.name},</p>`;
+      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
+      message += `Large-format paper plotting has been requested for your course. Job Number: <i>${this.jobnumber}</i><br />`;
+      message += `<br/>`;
+      message += `A staff member will begin plotting your courses prints as soon as possible. <br/><br/>`;
+      message += `<b>Pick-up Location:<br/>`;
+      message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>`; 
+      message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
+      message += `<b>Pick-up Hours:<br/>`;
+      message += `${PickupHours}</b><br/><br/>`
+      message += `Please email ${InvokeDS("Cody", "fullname")} at ${InvokeDS("Cody", "emaillink")} for further details.<br/>`;
+      message += `If you have any further questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
+      message += `<p>Best,<br />Jacobs Hall Staff</p>`;
+    return message;
+  }
   get missingAccessMessage() {
     let message = `<p>Hi ${this.name},</p>`;
       message += `<p>Thank you for choosing ${SERVICE_NAME}. Your project: <b><i>${this.projectname}</i></b> has been prevented from advancing until we have received confirmation of your approval. `;

@@ -5,7 +5,6 @@
 class Calculate
 {
   constructor() {
-    this.writer = new WriteLogger();
   }
 
   CalculateAverageTurnaround (sheet) {
@@ -68,7 +67,7 @@ class Calculate
       })
     }
     catch (err) {
-      this.writer.Error(`${err} : Printing the turnaround times has failed for some reason.`);
+      console.error(`${err} : Printing the turnaround times has failed for some reason.`);
     }
   }
 
@@ -117,7 +116,7 @@ class Calculate
     // console.info(persons)
     let unique = new Set(persons);
     let count = unique.size;
-    this.writer.Info(`Active JPS Users : ${count}`);
+    console.info(`Active JPS Users : ${count}`);
     return count;
   }
   PrintActiveUsers () {

@@ -32,6 +32,7 @@
  * @param {Event} e
  */
 const onSubmission = async (e) => {
+
   const writer = new WriteLogger();
   const staff = new MakeStaff().Staff;
   // Set status to RECEIVED on new submission
@@ -55,7 +56,7 @@ const onSubmission = async (e) => {
   }
 
   // Parse variables
-  var name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : GetByHeader(sheet, HEADERNAMES.name, lastRow);
+  var name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : undefined;
   var email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
   var sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
   var studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(sheet, HEADERNAMES.affiliation, lastRow);
@@ -63,7 +64,7 @@ const onSubmission = async (e) => {
   var timestamp = e.namedValues[HEADERNAMES.timestamp][0];
 
   var values = e.namedValues;
-
+  console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
   writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
@@ -73,7 +74,6 @@ const onSubmission = async (e) => {
   // Check Priority
   let priority = await new CheckPriority({email : email, sid : sid}).Priority;
   SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority);
-
 
   // Create Messages
   const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, jobnumber : jobnumber });
@@ -116,6 +116,7 @@ const onSubmission = async (e) => {
   stat = stat ? stat : SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
   writer.Warning(`Status refixed to 'Received'.`);
 
+  // Creaform
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.Creaform.getSheetName()) {
       //Email
@@ -129,6 +130,23 @@ const onSubmission = async (e) => {
     }
   } catch (err) {
     writer.Error(`${err} : Couldn't send Creaform email for some reason.`);
+  }
+
+  // GSI Plotter
+  try {
+    if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
+      SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.priority, lastRow, 1);
+      SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.status, lastRow, STATUS.received );
+      GmailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
+        htmlBody: message.gsiPlotterMessage,
+        from: SUPPORT_ALIAS,
+        bcc: staff.Chris.email,
+        name: SERVICE_NAME,
+      });
+      writer.Info(`GSI Plotter instruction email sent.`);
+    }
+  } catch (err) {
+    console.error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
   }
 
   try {
@@ -217,10 +235,14 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Check Priority
   try {
-    priority = priority ? priority : await new CheckPriority({ email : email, sid : sid }).Priority;
-    SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    if (priority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) {
+    if(!priority) {
+      priority = await new CheckPriority({ email : email, sid : sid }).Priority;
+      SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+    } else if (priority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+    } else if(sheet.getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
+      priority = 1;
+      SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
   } catch (err) {
     console.error(`Whoops: Couldn't double-check priority: ${err}`);
