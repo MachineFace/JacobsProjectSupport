@@ -241,8 +241,8 @@ const BillFromSelected = async () => {
   let msg = `Would you like to Generate a Bill to: \\n`;
   msg += `${customer?.first_name} ${customer?.last_name} \\n`;
   msg += `Email: ${email} \\n`;
-  msg += `Job Number : ${jobnumber?.toString()} \\n`;
-  msg += `Shopify ID : ${customer?.id?.toString()} \\n`;
+  msg += `Job Number : ${jobnumber.toString()} \\n`;
+  msg += `Shopify ID : ${customer.id?.toString()} \\n`;
   msg += `For Materials : \\n`; 
   msg += `----- ${mat1quantity} of ${mat1}\\n`;
   if(mat2quantity) msg += `----- ${mat2quantity} of ${mat2}\\n`;
