@@ -33,24 +33,14 @@ const onSubmission = async (e) => {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var sheetName = e.range.getSheet().getName();
 
-  // Loop through to get last row and set status to received
-  try {
-    var searchRange = sheet.getRange(2, 8, sheet.getLastRow()).getValues(); //search timestamp rows for last row
-    var lastRow;
-    for (var i = 0; i < searchRange.length; i++) {
-      if (searchRange[i][0].toString() == ``) {
-        lastRow = i + 1;
-        break;
-      }
-    }
-    SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.received);
-    console.info(`Set status to 'Received'.`);
-  } catch (err) {
-    console.error(`${err}: Couldn't set status to 'Received'.`);
-  }
+  // Get last row and set status to received
+  let timestamps = [...GetColumnDataByHeader(sheet, HEADERNAMES.timestamp)].filter(Boolean);
+  let lastRow = timestamps.length + 1;
+  console.info(`This Row: ${lastRow}`);
 
   // Parse variables
   var name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : undefined;
+  SetByHeader(sheet, HEADERNAMES.name, lastRow, name);
   var email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
   var sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
   var studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(sheet, HEADERNAMES.affiliation, lastRow);
@@ -87,7 +77,7 @@ const onSubmission = async (e) => {
   dsMessage += `<div>`;
 
   // Notify Staff via email and set their assignment
-  let designspecialistemail;
+  var designspecialistemail;
 
   // Set the Staff member for the sheet.
   switch (sheetName) {
@@ -146,8 +136,11 @@ const onSubmission = async (e) => {
 
   // Fix `Received` Status Issue
   let stat = GetByHeader(sheet, HEADERNAMES.status, lastRow);
-  stat = stat ? stat : SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
-  writer.Warning(`Status refixed to 'Received'.`);
+  if (stat != STATUS.received) {
+    stat = STATUS.received;
+    SetByHeader(sheet, HEADERNAMES.status,  lastRow, stat); 
+    writer.Warning(`Status refixed to 'Received'.`);
+  }
 
   // Creaform
   try {

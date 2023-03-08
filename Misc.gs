@@ -156,7 +156,7 @@ const _tt = () => GetRowData(SHEETS.Fablight, 2);
  * @param {any} val
  */
 const SetByHeader = (sheet, columnName, row, val) => {
-  if(typeof sheet != `object`) return 1;
+  // if(typeof sheet != `object`) return 1;
   let data;
   let col;
   try {
