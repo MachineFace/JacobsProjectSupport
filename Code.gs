@@ -91,11 +91,7 @@ const onSubmission = async (e) => {
 
   // Set the Staff member for the sheet.
   switch (sheetName) {
-    case SHEETS.Othermill.getName():
-    case SHEETS.Shopbot.getName():
-      designspecialistemail = staff.Adam.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Adam.name);
-      break;
+
     case SHEETS.Advancedlab.getName():
     case SHEETS.Creaform.getName():
       designspecialistemail = staff.Chris.email;
@@ -119,6 +115,11 @@ const onSubmission = async (e) => {
       break;
     case SHEETS.Ultimaker.getName():
       designspecialistemail = staff.Nicole.email;
+      break;
+    case SHEETS.Othermill.getName():
+    case SHEETS.Shopbot.getName():
+      designspecialistemail = staff.Staff.email;
+      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
     case undefined:
       designspecialistemail = staff.Staff.email;

@@ -38,7 +38,7 @@ class DesignSpecialist
 
   SetAreas () {
     switch (this.name) {
-      case "Adam":
+      case "Staff":
         this.areas = [SHEETS.Othermill.getSheetName(), SHEETS.Shopbot.getSheetName(),];
         break;
       case "Chris":
