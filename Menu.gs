@@ -192,7 +192,7 @@ const BillFromSelected = async () => {
     if (b == `ok`) return;
   }
   const rowData = GetRowData(thisSheet, thisRow);
-  const { status, jobnumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate } = rowData;
+  const { status, jobNumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate } = rowData;
   const quantityTotal = mat1quantity + mat2quantity + mat3quantity + mat4quantity + mat5quantity;
   console.info(rowData);
   
@@ -216,7 +216,7 @@ const BillFromSelected = async () => {
   }
 
   const shopify = await new ShopifyAPI({
-    jobnumber : jobnumber, 
+    jobnumber : jobNumber, 
     email : email,
     material1Name : mat1, material1Quantity : mat1quantity,
     material2Name : mat2, material2Quantity : mat2quantity,
@@ -241,7 +241,7 @@ const BillFromSelected = async () => {
   let msg = `Would you like to Generate a Bill to: \\n`;
   msg += `${customer?.first_name} ${customer?.last_name} \\n`;
   msg += `Email: ${email} \\n`;
-  msg += `Job Number : ${jobnumber.toString()} \\n`;
+  msg += `Job Number : ${jobNumber?.toString()} \\n`;
   msg += `Shopify ID : ${customer.id?.toString()} \\n`;
   msg += `For Materials : \\n`; 
   msg += `----- ${mat1quantity} of ${mat1}\\n`;
