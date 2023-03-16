@@ -81,7 +81,6 @@ const onSubmission = async (e) => {
 
   // Set the Staff member for the sheet.
   switch (sheetName) {
-
     case SHEETS.Advancedlab.getName():
     case SHEETS.Creaform.getName():
       designspecialistemail = staff.Chris.email;
@@ -102,9 +101,6 @@ const onSubmission = async (e) => {
       break;
     case SHEETS.Laser.getName():
       // Nobody assigned / Everyone assigned.
-      break;
-    case SHEETS.Ultimaker.getName():
-      designspecialistemail = staff.Nicole.email;
       break;
     case SHEETS.Othermill.getName():
     case SHEETS.Shopbot.getName():
