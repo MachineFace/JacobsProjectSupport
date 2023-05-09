@@ -92,13 +92,16 @@ const CheckMissingAccessStudents = () => {
       values.forEach( row => {
         let thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
         let email = GetByHeader(thisSheet, HEADERNAMES.email, row);
-        let sid = GetByHeader(thisSheet, HEADERNAMES.sid, row)
+        let sid = GetByHeader(thisSheet, HEADERNAMES.sid, row);
+        let status = GetByHeader(thisSheet, HEADERNAMES.status, row);
         const p = new CheckPriority({email : email, sid : sid}).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
         SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
         if(p != `STUDENT NOT FOUND!`) {
-          list.push(email);
-          SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
+          if (status == STATUS.missingAccess) {
+            list.push(email);
+            SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
+          }
         }
       })
     }
@@ -107,6 +110,8 @@ const CheckMissingAccessStudents = () => {
 };
 
 
-const _testCheck = () => {
 
+
+const _testCheck = () => {
+  CheckMissingAccessStudents();
 }

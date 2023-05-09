@@ -144,7 +144,52 @@ const GetRowData = (sheet, row) => {
 }
 
 
-const _tt = () => GetRowData(SHEETS.Fablight, 2);
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Return the values of a row by the number
+ * @param {sheet} sheet
+ * @param {number} row
+ * @param {JSON} data
+ * @returns {dict} {header, value}
+ */
+const SetRowData = (sheet, data) => {
+  if(typeof sheet != `object`) return 1;
+  let dict = {};
+  try {
+    let sheetHeaderNames = Object.values(GetRowData(sheet, 1));
+    let values = [];
+    Object.entries(data).forEach(pair => {
+      let headername = HEADERNAMES[pair[0]];
+      let index = sheetHeaderNames.indexOf(headername);
+      values[index] = pair[1];
+    });
+    console.info(values);
+    sheet.appendRow(values);
+
+  } catch (err) {
+    console.error(`${err} : SetRowData failed - Sheet: ${sheet}`);
+    return 1;
+  }
+}
+
+const testSetRow = () => {
+  const rowdata = { 
+    status: STATUS.received,
+    ds: 'Cody',
+    priority: 1,
+    jobNumber: new CreateJobnumber({}).Jobnumber,
+    timestamp: new Date().toDateString(),
+    email: 'dingus@berkeley.edu',
+    name: 'Testy Fiesty',
+    sid: 3035180162,
+    projectName: 'Testy',
+    affiliation: 'DES INV Student',
+    Color: 'Red',
+    roughDimensions: '3x5',
+    numberOfParts: 25 ,
+  }
+  SetRowData(SHEETS.Vinyl, rowdata);
+}
 
 
 /**

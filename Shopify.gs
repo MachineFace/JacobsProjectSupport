@@ -19,9 +19,9 @@ class ShopifyAPI
     material5Name : material5Name,
     material5Quantity : material5Quantity,
   }){
-    this.root = 'https://jacobs-student-store.myshopify.com/admin/api/2021-10/';
-    this.api_key = '1e70652225e070b078def8bf6e154e98';
-    this.api_pass = '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';
+    this.root = PropertiesService.getScriptProperties().getProperty(`shopify_root`);
+    this.api_key = PropertiesService.getScriptProperties().getProperty(`shopify_api_key`);
+    this.api_pass = PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`);
     this.writer = new WriteLogger();
 
     this.jobnumber = jobnumber ? jobnumber : 202010011925;

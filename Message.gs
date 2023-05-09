@@ -196,6 +196,7 @@ class CreateMessage
     let message = `<p>Hi ${this.name},</p>`;
       message += `<p>Thank you for choosing ${SERVICE_NAME}. `;
       message += `Your project: <b><i>${this.projectname}</i></b> has been prevented from advancing until we have received confirmation of your approval. <br/><br/>`;
+      message += `You may be receiving this message because you haven't registered for this service yet. `;
       message += `DES INV and affiliated courses students are approved automatically upon registration submission. `; 
       message += `Researchers are added when we receive IOC payment approval from their PI. `; 
       message += `Researchers are urged to contact their PI to ensure they have appropriate approval.<br/>`;
