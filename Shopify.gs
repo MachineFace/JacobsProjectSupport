@@ -22,6 +22,7 @@ class ShopifyAPI
     this.root = PropertiesService.getScriptProperties().getProperty(`shopify_root`);
     this.api_key = PropertiesService.getScriptProperties().getProperty(`shopify_api_key`);
     this.api_pass = PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`);
+    console.info(`${this.root}, API: ${this.api_key}, Pass: ${this.api_pass}`);
     this.writer = new WriteLogger();
 
     this.jobnumber = jobnumber ? jobnumber : 202010011925;
@@ -328,7 +329,7 @@ class ShopifyAPI
     // Fetch Products
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       var parsed = JSON.parse(html.getContentText())['orders'][0];
       this.writer.Info(`ORDER PLACED ----> TIME : ${parsed.created_at}\\n ORDER NUMBER : ${parsed.name}\\n TO : ${parsed.email}\\n FOR : $${parsed.total_price}`);
