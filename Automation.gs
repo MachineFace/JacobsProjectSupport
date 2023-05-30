@@ -3,8 +3,7 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Updating Prices from Shopify and Updating ID's from StorePage.
  */
-class HackyStoreAutomation
-{
+class HackyStoreAutomation {
   constructor() {
     // this.UpdateProductID();
     this.UpdatePriceUsingShopifyAPI();
@@ -167,8 +166,7 @@ const RunHackySheetUpdater = () => new HackyStoreAutomation();
 
 
 
-class MaterialLookup
-{
+class MaterialLookup {
   constructor({
     materialName : matertialName = `Canon Poster Printer: 36" wide (priced per foot)`,
   }){
@@ -199,8 +197,7 @@ const _testURL = () => {
 }
 
 
-class HackySemesterDateLookup
-{
+class HackySemesterDateLookup {
   constructor() {
     this.url = `https://jacobsinstitute.berkeley.edu/making-at-jacobs/`;
     this.startDate = ``;

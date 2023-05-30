@@ -4,8 +4,7 @@
  * @param {time} date
  * @return {number} job number
  */
-class CreateJobnumber
-{
+class CreateJobnumber {
   constructor({
     date : date = new Date(),
   }){
@@ -32,14 +31,17 @@ class CreateJobnumber
     return jobnumber.toString();
   };
 
+  /** @private */
   _FormatDate() {
     return new Date(this.date.getYear(), this.date.getMonth(), this.date.getDate() -1);
   }
 
+  /** @private */
   _FormatDateAsJobnumber (date) {
     return +Utilities.formatDate(date, `PST`, `yyyyMMddHHmmss`)
   }
 
+  /** @private */
   _IsValidDate() {
     if (Object.prototype.toString.call(this.date) !== "[object Date]") return false;
     else return !isNaN(this.date.getTime());

@@ -4,8 +4,7 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Design Specialist Employee
  */
-class DesignSpecialist
-{
+class DesignSpecialist {
   constructor({
     name : name, 
     fullname : fullname, 
@@ -36,6 +35,7 @@ class DesignSpecialist
     }
   }
 
+  /** @private */
   SetAreas () {
     switch (this.name) {
       case "Staff":
@@ -66,8 +66,7 @@ class DesignSpecialist
  * SS Class - child of DS Class
  * Note: In derived classes, super() must be called before you can use 'this'. Leaving this out will cause a reference error.
  */
-class StudentSupervisor extends DesignSpecialist
-{
+class StudentSupervisor extends DesignSpecialist {
   constructor({
     name : name, 
     fullname : fullname, 
@@ -106,8 +105,7 @@ class StudentSupervisor extends DesignSpecialist
  * ----------------------------------------------------------------------------------------------------------------
  * Manager Class - child of DS Class
  */
-class Manager extends DesignSpecialist 
-{ 
+class Manager extends DesignSpecialist { 
   constructor({
     name : name, 
     fullname : fullname, 
@@ -145,8 +143,7 @@ class Manager extends DesignSpecialist
 /**
  * @NOTIMPLEMENTED
  */
-class MakeStaff
-{
+class MakeStaff {
   constructor() {
     
   }

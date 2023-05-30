@@ -4,8 +4,7 @@
  * @param {string} email
  * @param {string} sid
  */
-class CheckPriority
-{
+class CheckPriority {
   constructor({
     email : email = `jacobsprojectsupport@berkeley.edu`,
     sid : sid = 1293487129348,
@@ -27,6 +26,7 @@ class CheckPriority
     }
   }
 
+  /** @private */
   _CheckForStaff () {
     try {
       console.warn(`Checking if ${this.email} is staff....`);
@@ -41,6 +41,7 @@ class CheckPriority
     } 
   }
 
+  /** @private */
   _CheckViaEmail () {
     try {
       console.warn(`Checking priority via email for ${this.email}....`);
@@ -58,6 +59,7 @@ class CheckPriority
     }
   }
 
+  /** @private */
   _CheckViaSID () {
     try {
       console.warn(`Checking priority via SID for ${this.email}....`);

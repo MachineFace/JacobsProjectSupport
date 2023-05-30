@@ -2,8 +2,7 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Calculating Metrics
  */
-class Calculate
-{
+class Calculate {
   constructor() {
   }
 
@@ -219,8 +218,10 @@ class Calculate
     console.warn(items);
     return items;  
   }
+  
   /**
    * Defunct
+   * @private
    */
   PrintDistributionNumbers () {
     let userList = [];

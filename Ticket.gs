@@ -10,8 +10,7 @@
  * @param {JSON} rowData
  * @returns {Ticket} ticket
  */
-class Ticket 
-{
+class Ticket {
   constructor({
     jobnumber : jobnumber = 202010010101,
     designspecialist : designspecialist = `Staff`,
@@ -34,7 +33,7 @@ class Ticket
 
   }
 
-
+  
   async CreateTicket() {
     const barcode = await new BarcodeGenerator({ jobnumber : this.jobnumber }).GenerateBarCodeForTicketHeader();
 
@@ -176,6 +175,7 @@ class Ticket
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Replace table entries with an Image blob
+   * @private
    * @param {DocumentApp.create(`doc`).getbody()} body
    * @param {string} text
    * @param {blob} image

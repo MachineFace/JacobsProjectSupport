@@ -4,8 +4,7 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Summary Email
  */
-class SummaryBuilder
-{
+class SummaryBuilder {
   constructor() {
     this.CreateSummaryEmail();
   }
@@ -13,10 +12,11 @@ class SummaryBuilder
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Get html template
+   * @private
    * @param {dataRange} dataRange
    * @returns {html} htmlBody
    */
-  _GetEmailHtml (dataRange) {
+  _GetEmailHtml(dataRange) {
     let htmlTemplate = HtmlService.createTemplateFromFile("TableTemplate.html");
     htmlTemplate.items = dataRange;
     const htmlBody = htmlTemplate.evaluate().getContent();
@@ -28,10 +28,11 @@ class SummaryBuilder
    * ----------------------------------------------------------------------------------------------------------------
    * Get data and put into internal lists
    * This function is used in 'CreateSummaryEmail()' with 'tabletemplate.html'
+   * @private
    * @param {any} values
    * @returns {[any]} list
    */
-  _GetData (values) {
+  _GetData(values) {
     values.shift(); // remove headers
     let items = [];
     values.forEach( (value) => {
@@ -68,10 +69,11 @@ class SummaryBuilder
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Get Google Doc as html string data : returns string
+   * @private
    * @param {string} docId
    * @return {string} text 
    */
-  async _DocToHtml (docId) {
+  async _DocToHtml(docId) {
     let url = 'https://docs.google.com/feeds/download/documents/export/Export?id=' + docId + '&exportFormat=html';
     let param = {
       method: 'GET',
@@ -85,8 +87,9 @@ class SummaryBuilder
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Summary Text
+   * @private
    */
-  _SummaryText () {
+  _SummaryText() {
     let text = `<p>Hello!</p> `;
       text += `<p>Here is a summary of all the recent submissions.<br />`;
       text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>. </p>`;

@@ -7,8 +7,7 @@
  * @param {string} jobnumber
  * @param {float} cost
  */
-class ApprovalFormBuilder
-{
+class ApprovalFormBuilder {
   constructor({
     name : name = `Some Name`,
     jobnumber : jobnumber = 1239487123,

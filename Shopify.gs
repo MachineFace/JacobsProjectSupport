@@ -3,8 +3,7 @@
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Interfacing with Shopify API
  */
-class ShopifyAPI 
-{
+class ShopifyAPI {
   constructor({
     jobnumber : jobnumber,
     email : email,
@@ -22,7 +21,6 @@ class ShopifyAPI
     this.root = PropertiesService.getScriptProperties().getProperty(`shopify_root`);
     this.api_key = PropertiesService.getScriptProperties().getProperty(`shopify_api_key`);
     this.api_pass = PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`);
-    console.info(`${this.root}, API: ${this.api_key}, Pass: ${this.api_pass}`);
     this.writer = new WriteLogger();
 
     this.jobnumber = jobnumber ? jobnumber : 202010011925;
@@ -46,6 +44,7 @@ class ShopifyAPI
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Get Info from sheet by looking up Jobnumber
+   * @private
    */
   _SetInfo() {
     for(const [key, sheet] of Object.entries(SHEETS)) {
@@ -75,6 +74,7 @@ class ShopifyAPI
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Better Lookup
+   * @private
    * @param {string} material name
    * @returns {[string, string]} productID, link, price
    */
@@ -103,6 +103,7 @@ class ShopifyAPI
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Packages Materials in a way that can be used in MakeLineItems
+   * @private
    * @returns {[{string}]} materials
    */
   async _PackageMaterials() {
@@ -155,9 +156,6 @@ class ShopifyAPI
     return shopifyPack;
   }
 
-
-
-
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Create Shopify Order
@@ -202,9 +200,6 @@ class ShopifyAPI
     }
       
   }
-
-
-
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
@@ -251,8 +246,6 @@ class ShopifyAPI
       
     }
   }
-
-
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
@@ -301,9 +294,6 @@ class ShopifyAPI
       }
   }
 
-
-
-
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Look up the last order
@@ -338,7 +328,6 @@ class ShopifyAPI
     else return null;
   }
 
-
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Look up a specific order
@@ -365,8 +354,6 @@ class ShopifyAPI
     }
     else return false;
   }
-
-
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
@@ -415,8 +402,6 @@ class ShopifyAPI
     else return false;
   }
 
-
-
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Retrieve list of open orders
@@ -459,8 +444,6 @@ class ShopifyAPI
     return orders;
 
   }
-
-
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
@@ -511,11 +494,6 @@ class ShopifyAPI
     }
   }
 
-
-
-
-
-
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Create sales reports
@@ -523,21 +501,19 @@ class ShopifyAPI
    */
   async CreateSalesReport() {
 
-    const ql = {
-      "report": {
-        "name": "Last 6 months of Sales",
-        "shopify_ql": "SHOW total_sales BY order_id FROM sales SINCE -6m UNTIL -1d ORDER BY total_sales",
-      }
-    }
-
     let params = {
       "method" : "POST",
       "headers" : { "Authorization" : "Basic " + Utilities.base64Encode(`${this.api_key} : ${this.api_pass}`) },
       "contentType" : "application/json",
-      "payload" : ql,
-      followRedirects : true,
-      muteHttpExceptions : true,
-    }
+      "followRedirects" : true,
+      "muteHttpExceptions" : true,
+      "payload" : {
+        "report": {
+          "name": "Last 6 months of Sales",
+          "shopify_ql": "SHOW total_sales BY order_id FROM sales SINCE -6m UNTIL -1d ORDER BY total_sales",
+        },
+      },
+    };
     
     // Fetch Reports
     let html = await UrlFetchApp.fetch(this.root, params);
@@ -553,8 +529,6 @@ class ShopifyAPI
     else return false;
   }
 
-
-
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * GET sales reports
@@ -566,8 +540,8 @@ class ShopifyAPI
       "method" : "GET",
       "headers" : { "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
       "contentType" : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true,
+      "followRedirects" : true,
+      "muteHttpExceptions" : true,
     };
     
     // Fetch Reports

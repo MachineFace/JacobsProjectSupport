@@ -14,8 +14,7 @@
  * @param {string} designspecialist
  * @param {string} designspecialistemaillink
  */
-class CreateMessage
-{
+class CreateMessage {
   constructor({
     name : name, 
     projectname : projectname, 
@@ -218,8 +217,7 @@ class CreateMessage
  * @param {string} projectname
  * @param {string} jobnumber
  */
-class CreateSubmissionMessage
-{
+class CreateSubmissionMessage {
   constructor({
     name : name, 
     projectname : projectname, 

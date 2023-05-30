@@ -4,8 +4,7 @@
  * @required {string} Student Email
  * @required {string} Status
  */
-class Emailer
-{
+class Emailer {
   constructor({ 
     name : name = `Unknown Name`, 
     status : status = STATUS.received,
