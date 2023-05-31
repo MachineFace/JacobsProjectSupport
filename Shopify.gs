@@ -26,36 +26,6 @@ class ShopifyAPI {
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
-   * Get Info from sheet by looking up Jobnumber
-   * @private
-   */
-  _SetInfo() {
-    for(const [key, sheet] of Object.entries(SHEETS)) {
-      const finder = sheet.createTextFinder(this.jobnumber).findNext();
-      if (finder != null) {
-        this.row = finder.getRow();
-        this.sheet = sheet;
-        this.sheetName = sheet.getName();
-      }
-    }
-    this.designspecialist = GetByHeader(this.sheet, HEADERNAMES.ds, this.row);
-    this.email = GetByHeader(this.sheet, HEADERNAMES.email, this.row);
-    this.name = GetByHeader(this.sheet, HEADERNAMES.name, this.row);
-    this.projectname = GetByHeader(this.sheet, HEADERNAMES.projectName, this.row);
-    this.material1Name = GetByHeader(this.sheet, HEADERNAMES.mat1, this.row);
-    this.material1Quantity = GetByHeader(this.sheet, HEADERNAMES.mat1quantity, this.row);
-    this.material2Name = GetByHeader(this.sheet, HEADERNAMES.mat2, this.row);
-    this.material2Quantity = GetByHeader(this.sheet, HEADERNAMES.mat2quantity, this.row);
-    this.material3Name = GetByHeader(this.sheet, HEADERNAMES.mat3, this.row);
-    this.material3Quantity = GetByHeader(this.sheet, HEADERNAMES.mat3quantity, this.row);
-    this.material4Name = GetByHeader(this.sheet, HEADERNAMES.mat4, this.row);
-    this.material4Quantity = GetByHeader(this.sheet, HEADERNAMES.mat4quantity, this.row);
-    this.material5Name = GetByHeader(this.sheet, HEADERNAMES.mat5, this.row);
-    this.material5Quantity = GetByHeader(this.sheet, HEADERNAMES.mat5quantity, this.row);
-  }
-
-  /**
-   * ----------------------------------------------------------------------------------------------------------------
    * Better Lookup
    * @private
    * @param {string} material name
