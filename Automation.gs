@@ -14,6 +14,7 @@ class HackyStoreAutomation {
    * ----------------------------------------------------------------------------------------------------------------
    * DEFUNCT : Write the price to sheet
    * Used in "UpdatePriced()" function
+   * @private
    */
   _WritePrice (sheet) {
     let links = GetColumnDataByHeader(sheet, "Link");
@@ -30,35 +31,34 @@ class HackyStoreAutomation {
    * ----------------------------------------------------------------------------------------------------------------
    * DEFUNCT : Get Price From Shopify Store URL (NOT USING SHOPIFY API)
    * Used in "WritePrice()" function
+   * @private
    * @param {string} url
    * @return {float} price
    */
-  async _GetPriceFromStore (url) {
+  async _GetPriceFromStore(url) {
     let price;
     try
     {
       // let meta = '<meta property="og:price:amount" content="0.17">';
       const urlFixed = `${url.toString()}&exportFormat=html`;
       const param = {
-        method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
-        muteHttpExceptions: true,
+        "method" : "GET",
+        "headers" : { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+        "muteHttpExceptions" : true,
       };
 
-      const html = await UrlFetchApp.fetch(url, param);
+      const response = await UrlFetchApp.fetch(url, param);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      const content = response.getContentText();
 
-      const responseCode = html.getResponseCode();
-      // console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-      if(responseCode == 200 || responseCode == 201) {
-        const content = html.getContentText();
-        const searchstring = 'og:price:amount';
-        const index = content.search(searchstring);
-        if (index >= 0) {
-          const pos = index + searchstring.length
-          const rate = content.substring(pos + 10, pos + 16);
-          const stripped = +Number(rate.replace(/^"(.*)"$/, '$1'));
-          price = +Number.parseFloat(stripped).toFixed(2);
-        }
+      const searchstring = 'og:price:amount';
+      const index = content.search(searchstring);
+      if (index >= 0) {
+        const pos = index + searchstring.length
+        const rate = content.substring(pos + 10, pos + 16);
+        const stripped = +Number(rate.replace(/^"(.*)"$/, '$1'));
+        price = +Number.parseFloat(stripped).toFixed(2);
       }
     }
     catch(err){
@@ -91,11 +91,12 @@ class HackyStoreAutomation {
    */
   UpdatePricePerSheet (sheet) {
     const shopify = new ShopifyAPI({jobnumber : 0});
-    const data = GetColumnDataByHeader(sheet, "Product ID (Shopify)");
-    const ids = data.filter(Boolean);
+    const ids = GetColumnDataByHeader(sheet, "Product ID (Shopify)")
+      .filter(Boolean);
     console.info(ids.toString())
     ids.forEach( async (id, index) => {
       let info = await shopify.GetProductByID(id);
+      console.info(info)
       let price = info?.variants[0]?.price;
       console.info(`Price : $${price}`);
       SetByHeader(sheet, "Price", index + 2, price);
@@ -165,7 +166,10 @@ class HackyStoreAutomation {
 const RunHackySheetUpdater = () => new HackyStoreAutomation();
 
 
-
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Class for Looking up a material's URL
+ */
 class MaterialLookup {
   constructor({
     materialName : matertialName = `Canon Poster Printer: 36" wide (priced per foot)`,
@@ -174,9 +178,9 @@ class MaterialLookup {
   }
 
   get URL(){
+    console.warn(`Getting URL for ${this.materialName}....`);
     let url = ``;
     try {
-      console.warn(`Getting URL for ${this.materialName}....`);
       Object.values(STORESHEETS).forEach(sheet => {
         let finder = sheet.createTextFinder(this.materialName).findNext();
         if(finder) {
@@ -197,6 +201,10 @@ const _testURL = () => {
 }
 
 
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Class for Updating the Semester Start and End Dates
+ */
 class HackySemesterDateLookup {
   constructor() {
     this.url = `https://jacobsinstitute.berkeley.edu/making-at-jacobs/`;
@@ -209,6 +217,7 @@ class HackySemesterDateLookup {
    * ----------------------------------------------------------------------------------------------------------------
    * DEFUNCT : Get Price From Shopify Store URL (NOT USING SHOPIFY API)
    * Used in "WritePrice()" function
+   * @private
    * @param {string} url
    * @return {float} price
    */
@@ -221,41 +230,39 @@ class HackySemesterDateLookup {
 
     try
     {
-      const html = await UrlFetchApp.fetch(this.url, param);
+      const response = await UrlFetchApp.fetch(this.url, param);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode }---> ${RESPONSECODES[responseCode]}`);
 
-      const responseCode = html.getResponseCode();
-      console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-      if(responseCode == 200 || responseCode == 201) {
-        const content = html.getContentText();
-        const index = content.search(`Key Dates`);
+      const content = response.getContentText();
+      const index = content.search(`Key Dates`);
+      if(index <= 0) throw new Error(`No content`);
 
-        if (index >= 0) {
-          let chunk = content
-            .substring(index, index + 1200)
-            .replace(/<\/?[^>]+(>|$)/g, "");
-          // console.info(chunk);
+      let chunk = content
+        .substring(index, index + 1200)
+        .replace(/<\/?[^>]+(>|$)/g, "");
 
-          // Start Date
-          let serviceStartIdx = chunk.search(`JPS Service`);
-          if (serviceStartIdx >= 0) {
-            this.startDate = chunk
-              .substring(serviceStartIdx + 20, serviceStartIdx + 26) + `, ` + new Date().getFullYear();
-            console.info(this.startDate);
-          }
-
-          // End Date
-          let serviceEndIdx = chunk.search(`Last day to submit`);
-          if (serviceEndIdx >= 0) {
-            this.endDate = chunk
-              .substring(serviceEndIdx + 28, serviceEndIdx + 33) + `, ` + new Date().getFullYear();
-            console.info(this.endDate);
-          }
-
-          // Next
-          let end = new Date(this.endDate);
-          this.nextDate = new Date(end.getFullYear(), end.getMonth() + 3, end.getDay() + 20 ). toDateString();
-        }
+      // Start Date
+      let serviceStartIdx = chunk.search(`JPS Service`);
+      if (serviceStartIdx >= 0) {
+        this.startDate = chunk
+          .substring(serviceStartIdx + 20, serviceStartIdx + 26) + `, ` + new Date().getFullYear();
+        console.info(this.startDate);
       }
+
+      // End Date
+      let serviceEndIdx = chunk.search(`Last day to submit`);
+      if (serviceEndIdx >= 0) {
+        this.endDate = chunk
+          .substring(serviceEndIdx + 28, serviceEndIdx + 33) + `, ` + new Date().getFullYear();
+        console.info(this.endDate);
+      }
+
+      // Next
+      let end = new Date(this.endDate);
+      this.nextDate = new Date(end.getFullYear(), end.getMonth() + 3, end.getDay() + 20 ). toDateString();
+      
+      
     }
     catch(err){
       console.error(`${err} : Couldn't fetch info.`);

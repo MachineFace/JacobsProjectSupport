@@ -400,10 +400,11 @@ const BarMenu = () => {
     .addSubMenu(
       SpreadsheetApp
         .getUi()
-        .createMenu('Chris & Cody ONLY')
+        .createMenu(`Chris & Cody ONLY`)
         .addItem(`DO NOT USE THESE FUNCTIONS UNLESS YOU ARE CHRIS OR CODY!`, `_testStaff`)
-        .addItem('ENABLE JPS', 'EnableJPS')
-        .addItem('DISABLE JPS', 'DisableJPS')
+        .addItem(`ENABLE JPS`, `EnableJPS`)
+        .addItem(`DISABLE JPS`, `DisableJPS`)
+        .addItem(`Update Start and End Dates`, `PrintServiceDates`)
     )
     .addSeparator()
     .addItem(`Help`, `PopupHelp`)

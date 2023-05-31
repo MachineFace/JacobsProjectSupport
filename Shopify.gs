@@ -5,40 +5,84 @@
  */
 class ShopifyAPI {
   constructor({
-    jobnumber : jobnumber,
-    email : email,
-    material1Name : material1Name,
-    material1Quantity : material1Quantity,
-    material2Name : material2Name,
-    material2Quantity : material2Quantity,
-    material3Name : material3Name,
-    material3Quantity : material3Quantity,
-    material4Name : material4Name,
-    material4Quantity : material4Quantity,
-    material5Name : material5Name,
-    material5Quantity : material5Quantity,
+    jobnumber : jobnumber = 202010011925,
+    email : email = `jacobsinstitutestore@gmail.com`,
+    material1Name : material1Name = `None`,
+    material1Quantity : material1Quantity = 0,
+    material2Name : material2Name = `None`,
+    material2Quantity : material2Quantity = 0,
+    material3Name : material3Name = `None`,
+    material3Quantity : material3Quantity = 0,
+    material4Name : material4Name = `None`,
+    material4Quantity : material4Quantity = 0,
+    material5Name : material5Name = `None`,
+    material5Quantity : material5Quantity = 0,
   }){
-    this.root = PropertiesService.getScriptProperties().getProperty(`shopify_root`);
+    /** @private */
+    this.root = `https://jacobs-student-store.myshopify.com/admin/api/2023-04/`;
+    /** @private */
     this.api_key = PropertiesService.getScriptProperties().getProperty(`shopify_api_key`);
+    /** @private */
     this.api_pass = PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`);
-    this.writer = new WriteLogger();
 
-    this.jobnumber = jobnumber ? jobnumber : 202010011925;
-    this.email = email ? email : `jacobsinstitutestore@gmail.com`;
-    this.material1Name = material1Name ? material1Name : `None`;
-    this.material1Quantity = material1Quantity ? material1Quantity : 0;
-    this.material2Name = material2Name ? material2Name : `None`;
-    this.material2Quantity = material2Quantity ? material2Quantity : 0;
-    this.material3Name = material3Name ? material3Name : `None`;
-    this.material3Quantity = material3Quantity ? material3Quantity : 0;
-    this.material4Name = material4Name ? material4Name : `None`;
-    this.material4Quantity = material4Quantity ? material4Quantity : 0;
-    this.material5Name = material5Name ? material5Name : `None`;
-    this.material5Quantity = material5Quantity ? material5Quantity : 0;
+    this.jobnumber = jobnumber;
+    this.email = email;
+    this.material1Name = material1Name;
+    this.material1Quantity = material1Quantity;
+    this.material2Name = material2Name;
+    this.material2Quantity = material2Quantity;
+    this.material3Name = material3Name;
+    this.material3Quantity = material3Quantity;
+    this.material4Name = material4Name;
+    this.material4Quantity = material4Quantity;
+    this.material5Name = material5Name;
+    this.material5Quantity = material5Quantity;
     this.customer;
     this.customerID;
     this.pack = this._PackageMaterials();
     this.totalprice;
+  }
+
+  /**
+   * Configure the service
+   * @private
+   */
+  _CreateService() {
+    const service = OAuth2.createService(`Shopify`)
+      .setAuthorizationBaseUrl(`${this.root}oauth/authorize`)
+      .setTokenUrl(`${this.root}oauth/access_token`)
+      .setClientId(this.api_key)
+      .setClientSecret(this.api_pass)
+      .setCallbackFunction((request) => {
+        const service = this._CreateService();
+        const isAuthorized = service.handleCallback(request);
+        if (!isAuthorized) {
+          return HtmlService
+            .createTemplateFromFile("auth_error")
+            .evaluate(); 
+        } 
+        return HtmlService
+          .createTemplateFromFile("auth_success")
+          .evaluate();
+      })
+      .setPropertyStore(PropertiesService.getUserProperties())
+      .setCache(CacheService.getUserCache())
+      .setLock(LockService.getUserLock())
+      // .setScope(`read_analytics, write_assigned_fulfillment_orders, read_customers, write_draft_orders, write_fulfillments, read_inventory, write_order_edits, write_orders, read_products, write_reports, write_script_tags, read_gdpr_data_request, read_assigned_fulfillment_orders, read_draft_orders, read_fulfillments, read_order_edits, read_orders, read_reports, read_script_tags`);
+    if (!service.hasAccess()) {
+      throw new Error('"CreateService()" failed : Missing Shopify authorization.');
+    }
+    console.info(`Service Access: ${service.hasAccess()}`);
+    return service;
+  }
+
+  /**
+   * Check if Service is Active
+   * @private
+   */
+  _isServiceActive() {
+    if(!this.service.hasAccess()) return false;
+    return true;
   }
 
   /**
@@ -176,15 +220,15 @@ class ShopifyAPI {
         "note": "Job Number : " + this.jobnumber,
       }
     };
-    this.writer.Info(`ORDER SUMMARY ----> ${JSON.stringify(order)}`);
+    console.info(`ORDER SUMMARY ----> ${JSON.stringify(order)}`);
 
     let params = {
       "method" : "POST",
       "headers" : { "Authorization": "Basic " + Utilities.base64EncodeWebSafe(this.api_key + ":" + this.api_pass) },
       "contentType" : "application/json",
       "payload" : JSON.stringify(order),
-      followRedirects : true,
-      muteHttpExceptions : true
+      "followRedirects" : true,
+      "muteHttpExceptions" : true
     };
 
     let html = await UrlFetchApp.fetch(this.root + repo, params);
@@ -256,42 +300,44 @@ class ShopifyAPI {
    * Access individual properties by invoking GetShopifyProductByID(productID).productTitle or GetShopifyProductByID(productID).id or GetShopifyProductByID(productID).price
    */
   async GetProductByID(productID) {
-      // productID = 7751141320; //Test ID
-      let status = '&status=active';
-      let fields = '&fields=id,title,price,variants';
+    // productID = 7751141320; //Test ID
+    let status = '&status=active';
+    let fields = '&fields=id,title,price,variants';
 
-      const repo = 'products/' + productID + '.json?' + status + fields;
+    const repo = 'products/' + productID + '.json?' + status + fields;
 
-      let params = {
-        "method" : "GET",
-        "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-        "contentType" : "application/json",
-        followRedirects : true,
-        muteHttpExceptions : true
-      };
+    let params = {
+      method : "GET",
+      headers : { Authorization : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      contentType : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : false,
+    };
+
+    // Fetch Products
+    try {
+      let response = await UrlFetchApp.fetch(this.root + repo, params);
+      let responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      let parsed = JSON.parse(response.getContentText())['product'];
+
+      if(!parsed) throw new Error(`Couldn't find Product!`);
+
+      this.productTitle = parsed.title;
+      if(parsed.title == undefined || parsed.title == null) this.productTitle = parsed.variants[0].title;
+      this.id = productID;
+      if(parsed.id == undefined || parsed.id == null) this.id = parsed.variants[0].id;
+      this.price = parsed.price;
+      if(parsed.price == undefined) this.price = parsed.variants[0].price;
+
+      // console.info(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
+      return parsed; 
+    } catch(err) {
+      console.error(`"GetProductByID()" failed: ${err}`);
+    }
       
-      // Fetch Products
-      let html = await UrlFetchApp.fetch(this.root + repo, params);
-      let responseCode = html.getResponseCode();
-      // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-      if (responseCode == 200 || responseCode == 201) {
-        let parsed = JSON.parse(html.getContentText())['product'];
-
-        if(!parsed) {
-          this.writer.Error(`Couldn't find Product!`);
-          return false;
-        } else {
-          this.productTitle = parsed.title;
-          if(parsed.title == undefined || parsed.title == null) this.productTitle = parsed.variants[0].title;
-          this.id = productID;
-          if(parsed.id == undefined || parsed.id == null) this.id = parsed.variants[0].id;
-          this.price = parsed.price;
-          if(parsed.price == undefined) this.price = parsed.variants[0].price;
-
-          // this.writer.Info(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
-          return parsed; 
-        }
-      }
+      
+      
   }
 
   /**
@@ -596,5 +642,17 @@ const _testAPI = async () => {
 
   const order = await shopify.GetLastOrder();
   console.info(JSON.stringify(order))
+}
+
+const _testSh = () => {
+  const s = new ShopifyAPI({});
+  // s._CreateService();
+  s.GetProductByID(4344136269920);
+}
+
+const GetRedirectUri = () => {
+  const redirectURI = new ShopifyAPI({})._CreateService().getRedirectUri();
+  console.log(redirectURI);
+  return redirectURI;
 }
 
