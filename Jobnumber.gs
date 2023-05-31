@@ -8,6 +8,7 @@ class CreateJobnumber {
   constructor({
     date : date = new Date(),
   }){
+    /** @private */
     this.date = date;
   }
 
@@ -26,6 +27,7 @@ class CreateJobnumber {
       }
     } catch (err) {
       console.error(`${err} : Couldn't fix jobnumber.`);
+      return 1;
     }
     console.info(`Returned Job Number : ${jobnumber}`);
     return jobnumber.toString();
@@ -37,7 +39,7 @@ class CreateJobnumber {
   }
 
   /** @private */
-  _FormatDateAsJobnumber (date) {
+  _FormatDateAsJobnumber(date) {
     return +Utilities.formatDate(date, `PST`, `yyyyMMddHHmmss`)
   }
 

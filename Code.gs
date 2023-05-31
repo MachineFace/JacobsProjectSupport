@@ -127,7 +127,7 @@ const onSubmission = async (e) => {
     });
     writer.Info(`Design Specialist has been emailed.`);
   } catch (err) {
-    writer.Error(`${err} : Couldn't email DS. Something went wrong.`);
+    console.error(`${err} : Couldn't email DS...`);
   }
 
   // Fix `Received` Status Issue
@@ -151,7 +151,7 @@ const onSubmission = async (e) => {
       writer.Info(`Creaform instruction email sent.`);
     }
   } catch (err) {
-    writer.Error(`${err} : Couldn't send Creaform email for some reason.`);
+    console.error(`${err} : Couldn't send Creaform email for some reason.`);
   }
 
   // GSI Plotter
@@ -165,7 +165,7 @@ const onSubmission = async (e) => {
         bcc: staff.Chris.email,
         name: SERVICE_NAME,
       });
-      writer.Info(`GSI Plotter instruction email sent.`);
+      console.info(`GSI Plotter instruction email sent.`);
     }
   } catch (err) {
     console.error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
@@ -186,7 +186,7 @@ const onSubmission = async (e) => {
       writer.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
-    writer.Error(`${err} : Couldn't find student access boolean value`);
+    console.error(`${err} : Couldn't determine student access`);
   } finally {
     if (priority == `STUDENT NOT FOUND!` || priority == false) {
       SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
@@ -310,8 +310,6 @@ const onChange = async (e) => {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
         let time = await calc.CalculateDuration(new Date(timestamp), endTime);
-
-        // Write to Column - d h:mm:ss  
         SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
         SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
       }
@@ -319,7 +317,6 @@ const onChange = async (e) => {
   } catch (err) {
     console.error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
-
 
 
   //----------------------------------------------------------------------------------------------------------------

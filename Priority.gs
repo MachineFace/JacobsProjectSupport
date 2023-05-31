@@ -35,9 +35,9 @@ class CheckPriority {
         console.warn(`${this.email} is not staff.`)
         return false;
       }
-      return 1;
     } catch (err) {
       console.error(`${err} : Whoops, couldn't check if this person is staff`);
+      return 1;
     } 
   }
 
@@ -56,6 +56,7 @@ class CheckPriority {
       return priority;
     } catch(err) {
       console.error(`${err} : Whoops, checking via email failed....`);
+      return 1;
     }
   }
 
@@ -74,6 +75,7 @@ class CheckPriority {
       return priority;
     } catch(err) {
       console.error(`${err}: Whoops, couldn't check via SID`);
+      return 1;
     } 
 
   }
