@@ -43,47 +43,6 @@ class ShopifyAPI {
     this.totalprice;
   }
 
-  /**
-   * Configure the service
-   * @private
-   */
-  _CreateService() {
-    const service = OAuth2.createService(`Shopify`)
-      .setAuthorizationBaseUrl(`${this.root}oauth/authorize`)
-      .setTokenUrl(`${this.root}oauth/access_token`)
-      .setClientId(this.api_key)
-      .setClientSecret(this.api_pass)
-      .setCallbackFunction((request) => {
-        const service = this._CreateService();
-        const isAuthorized = service.handleCallback(request);
-        if (!isAuthorized) {
-          return HtmlService
-            .createTemplateFromFile("auth_error")
-            .evaluate(); 
-        } 
-        return HtmlService
-          .createTemplateFromFile("auth_success")
-          .evaluate();
-      })
-      .setPropertyStore(PropertiesService.getUserProperties())
-      .setCache(CacheService.getUserCache())
-      .setLock(LockService.getUserLock())
-      // .setScope(`read_analytics, write_assigned_fulfillment_orders, read_customers, write_draft_orders, write_fulfillments, read_inventory, write_order_edits, write_orders, read_products, write_reports, write_script_tags, read_gdpr_data_request, read_assigned_fulfillment_orders, read_draft_orders, read_fulfillments, read_order_edits, read_orders, read_reports, read_script_tags`);
-    if (!service.hasAccess()) {
-      throw new Error('"CreateService()" failed : Missing Shopify authorization.');
-    }
-    console.info(`Service Access: ${service.hasAccess()}`);
-    return service;
-  }
-
-  /**
-   * Check if Service is Active
-   * @private
-   */
-  _isServiceActive() {
-    if(!this.service.hasAccess()) return false;
-    return true;
-  }
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
@@ -123,24 +82,21 @@ class ShopifyAPI {
    * @returns {[string, string]} productID, link, price
    */
   _LookupStoreProductDetails(material) {
-    // material = 'Fortus Red ABS-M30'; // Test Material
-    if(!material) return;
-    else {
-      let productID;
+    material = material ? material : `Fortus Red ABS-M30`;
+    let productID;
+    try {
       Object.values(STORESHEETS).forEach(sheet => {
         const find = SearchSpecificSheet(sheet, material);
         if(find !== false) {
           let index = find;
-          // let sheetName = sheet.getName();
-          // let link = sheet.getRange(index, 2, 1, 1).getValue();
-          // let price = sheet.getRange(index, 6, 1, 1).getValue();
+          let link = sheet.getRange(index, 2, 1, 1).getValue();
+          let price = sheet.getRange(index, 6, 1, 1).getValue();
           productID = sheet.getRange(index, 4, 1, 1).getValue();
-          // out["productID"] = productID;
-          // out["link"] = link;
-          // out["price"] = price;
         }
       })
       return productID.toString();
+    } catch(err) {
+      console.error(`"_LookupStoreProductDetails()" failed : ${err}`);
     }
   }
 
@@ -151,8 +107,6 @@ class ShopifyAPI {
    * @returns {[{string}]} materials
    */
   async _PackageMaterials() {
-
-    // Pack
     let pack = {};
     pack["material1"] = { name : this.material1Name, ammount : this.material1Quantity, id : "" };
     pack["material2"] = { name : this.material2Name, ammount : this.material2Quantity, id : "" };
@@ -204,7 +158,7 @@ class ShopifyAPI {
    * ----------------------------------------------------------------------------------------------------------------
    * Create Shopify Order
    */
-  async CreateOrder () {
+  async CreateOrder() {
     this.customer = await this.GetCustomerByEmail(this.email);
     if(!this.customer) this.customer = await this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
     let repo = 'orders.json/';
@@ -233,10 +187,10 @@ class ShopifyAPI {
 
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (responseCode == 200 || responseCode == 201) {
       let content = JSON.parse(html.getContentText());
-      this.writer.Info(`Posted Order! : ${content}`);
+      console.info(`Posted Order! : ${content}`);
       return content;
     } else {
       this.writer.Error('Failed to POST to Shopify');
@@ -270,7 +224,7 @@ class ShopifyAPI {
     //Fetch Customer
     let html = await UrlFetchApp.fetch(this.root + repo, params);
     let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+    // console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
     if (html.getResponseCode() == 200) {
       let user = JSON.parse(html.getContentText())['customers'][0];
       if(!user) {
@@ -279,7 +233,7 @@ class ShopifyAPI {
         return this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
         
       } else {
-        this.writer.Info(`ID : ${user['id']}, Name : ${user['first_name']} ${user['last_name']}, Total Spent : ${user['total_spent']}`);
+        console.info(`ID : ${user['id']}, Name : ${user['first_name']} ${user['last_name']}, Total Spent : ${user['total_spent']}`);
         this.customerID = user['id'];
         return user;
       }
@@ -334,6 +288,7 @@ class ShopifyAPI {
       return parsed; 
     } catch(err) {
       console.error(`"GetProductByID()" failed: ${err}`);
+      return 1;
     }
       
       
@@ -353,25 +308,33 @@ class ShopifyAPI {
     // Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
     const repo = 'orders.json?' + status + limit + fields;
 
-    // Stuff into Params
     const params = {
-      "method" : "GET",
-      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      "contentType" : "application/json",
+      method : "GET",
+      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      contentType : "application/json",
       followRedirects : true,
-      muteHttpExceptions : true
+      muteHttpExceptions : true,
     };
-    
-    // Fetch Products
-    let html = await UrlFetchApp.fetch(this.root + repo, params);
-    let responseCode = html.getResponseCode();
-    this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      var parsed = JSON.parse(html.getContentText())['orders'][0];
-      this.writer.Info(`ORDER PLACED ----> TIME : ${parsed.created_at}\\n ORDER NUMBER : ${parsed.name}\\n TO : ${parsed.email}\\n FOR : $${parsed.total_price}`);
-      return parsed;  
+
+    try {
+      // Fetch Products
+      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const responseCode = response.getResponseCode();
+      if (responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      const parsed = JSON.parse(response.getContentText());
+      if(!parsed) throw new Error(`No orders...`);
+      const createdAt = parsed ? parsed['orders'][0]?.created_at : [];
+      const name = parsed ? parsed['orders'][0]?.name : [];
+      const email = parsed ? parsed['orders'][0]?.email : [];
+      const total_price = parsed ? parsed['orders'][0]?.total_price : [];
+      console.info(`ORDER PLACED ----> TIME : ${createdAt}\\n ORDER NUMBER : ${name}\\n TO : ${email}\\n FOR : $${total_price}`);
+      return parsed['orders'][0];  
+    } catch(err) {
+      console.error(`"GetLastOrder()" failed: ${err}`);
+      return 1;
     }
-    else return null;
+    
   }
 
   /**
@@ -383,22 +346,25 @@ class ShopifyAPI {
     const repo = `orders/${order}.json?`;
 
     const params = {
-      "method" : "GET",
-      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      "contentType" : "application/json",
+      method : "GET",
+      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      contentType : "application/json",
       followRedirects : true,
-      muteHttpExceptions : true
+      muteHttpExceptions : true,
     };
     
-    // Fetch Products
-    let html = await UrlFetchApp.fetch(this.root + repo, params);
-    let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      let content = JSON.parse(html.getContentText())["order"];
+    try {
+      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      const content = JSON.parse(response.getContentText())["order"];
       return content;  
+    } catch(err) {
+      console.error(`"GetSpecificOrder(${order})" failed: ${err}`);
+      return 1;
     }
-    else return false;
+    
   }
 
   /**
@@ -408,8 +374,6 @@ class ShopifyAPI {
    * @return {string} order data
    */
   async GetOrdersList() {
-    let total = 0;
-
     const status = 'status=any';
     const limit = '&limit=250'
     const fields = '&fields=name,total_price';
@@ -417,35 +381,37 @@ class ShopifyAPI {
     const repo = 'orders.json?' + status + limit + fields;
 
     const params = {
-      "method" : "GET",
-      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      "contentType" : "application/json",
+      method : "GET",
+      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      contentType : "application/json",
       followRedirects : true,
-      muteHttpExceptions : true
+      muteHttpExceptions : true,
     };
-    
-    // Fetch Products
-    let html = await UrlFetchApp.fetch(this.root + repo, params);
-    let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      var parsed = JSON.parse(html.getContentText())['orders'];
+    try {
+      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      const parsed = JSON.parse(response.getContentText())['orders'];
 
       let orderNums = [];
       let spent = [];
-
       parsed.forEach(item => {
         orderNums.push(item.name);
         spent.push(parseFloat(item.total_price));
       });
-      let storeSpent = spent.reduce((a, b) => a + b, 0);
-      this.total = storeSpent;
-      this.writer.Info(orderNums);
-      this.writer.Info(storeSpent);
 
+      const storeSpent = spent.reduce((a, b) => a + b, 0);
+      this.total = storeSpent;
+      console.info(`${orderNums} : ${storeSpent}`);
       return orderNums;  
+    } catch(err) {
+      console.error(`"GetOrdersList()" failed: ${err}`);
+      return 1;
     }
-    else return false;
+
+
+
   }
 
   /**
@@ -465,29 +431,31 @@ class ShopifyAPI {
     const repo = 'orders.json?' + status + limit + additionalFields + fulfillment + fields;
 
     const params = {
-      "method" : "GET",
-      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      "contentType" : "application/json",
+      method : "GET",
+      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      contentType : "application/json",
       followRedirects : true,
-      muteHttpExceptions : true
+      muteHttpExceptions : true,
     };
-    
-    let html = await UrlFetchApp.fetch(this.root + repo, params);
-    let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      let parsed = JSON.parse(html.getContentText())['orders'];
+    try {
+      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      let responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      let parsed = JSON.parse(response.getContentText())['orders'];
 
       parsed.forEach(item => {
         if(item.fulfillment_status == `fulfilled`) {
           orders.push(item);
           // let id = Number.parseFloat(item.id);
-          // this.writer.Info(`${id} : ${JSON.stringify(item)}`);  
+          // console.info(`${id} : ${JSON.stringify(item)}`);  
         }
       }); 
+      return orders;
+    } catch(err) {
+      console.error(`"GetUnfulfilledOrders()" failed: ${err}`);
+      return 1;
     }
-
-    return orders;
 
   }
 
@@ -498,15 +466,10 @@ class ShopifyAPI {
    * @return {string} order data
    */
   async CloseUnfulfilledOrders() {
+    console.info(`Putting to this Repo -----> ${this.root + repo}`);
     let order = 4244891041958;
 
     const repo = `orders/${order}.json?`;
-    this.writer.Info(`Putting to this Repo -----> ${this.root + repo}`);
-
-    // let payload = await this.GetSpecificOrder(order);
-    // payload.financial_status = "paid";
-    // payload.fulfillment_status = "fulfilled";
-    // this.writer.Info(payload)
 
     const payload = {  
       "order" : {
@@ -527,82 +490,20 @@ class ShopifyAPI {
       muteHttpExceptions : true
     };
 
-    this.writer.Info(`Params -----> ${JSON.stringify(params)}`);
-    
-    let html = await UrlFetchApp.fetch(this.root + repo, params);
-    let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    this.writer.Info(`Content -----> ${html.getContentText()}`);
-    if (responseCode == 200 || responseCode == 201) {
-      let content = html.getContentText();
-      this.writer.Info(content);
+    try {
+      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      const content = response.getContentText();
+      console.info(`Content -----> ${content}`);
       return content;
+    } catch(err) {
+      console.error(`"CloseUnfulfilledOrders()" failed: ${err}`);
+      return 1;
     }
   }
 
-  /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Create sales reports
-   * @return {string} reports
-   */
-  async CreateSalesReport() {
-
-    let params = {
-      "method" : "POST",
-      "headers" : { "Authorization" : "Basic " + Utilities.base64Encode(`${this.api_key} : ${this.api_pass}`) },
-      "contentType" : "application/json",
-      "followRedirects" : true,
-      "muteHttpExceptions" : true,
-      "payload" : {
-        "report": {
-          "name": "Last 6 months of Sales",
-          "shopify_ql": "SHOW total_sales BY order_id FROM sales SINCE -6m UNTIL -1d ORDER BY total_sales",
-        },
-      },
-    };
-    
-    // Fetch Reports
-    let html = await UrlFetchApp.fetch(this.root, params);
-    let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
-
-    if (responseCode == 200 || responseCode == 201) {
-      let content = html.getContentText()
-      this.writer.Info(`Report -----> ${content}`)
-
-      return content 
-    }
-    else return false;
-  }
-
-  /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * GET sales reports
-   * @return {string} reports
-   */
-  async GetSalesReport() {
-   
-    let params = {
-      "method" : "GET",
-      "headers" : { "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      "contentType" : "application/json",
-      "followRedirects" : true,
-      "muteHttpExceptions" : true,
-    };
-    
-    // Fetch Reports
-    let html = await UrlFetchApp.fetch(this.root, params);
-    let responseCode = html.getResponseCode();
-    // this.writer.Info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-
-    if (responseCode == 200 || responseCode == 201) {
-      let content = html.getContentText();
-      this.writer.Info(`Reports : ${content.toString()}`)
-
-      return content;  
-    }
-    else return false;
-  }
 }
 
 
@@ -634,25 +535,13 @@ const _testAPI = async () => {
   // let lookup = shopify.LookupShopifyProductFromSheet2();
   // let customer = shopify.SetCustomer("jacobsinstitutestore@gmail.com");
 
-
-
-  
   // const order = await shopify.CreateOrder();
-  // this.writer.Info(JSON.stringify(order))
+  // console.info(JSON.stringify(order))
 
   const order = await shopify.GetLastOrder();
   console.info(JSON.stringify(order))
 }
 
-const _testSh = () => {
-  const s = new ShopifyAPI({});
-  // s._CreateService();
-  s.GetProductByID(4344136269920);
-}
 
-const GetRedirectUri = () => {
-  const redirectURI = new ShopifyAPI({})._CreateService().getRedirectUri();
-  console.log(redirectURI);
-  return redirectURI;
-}
+
 

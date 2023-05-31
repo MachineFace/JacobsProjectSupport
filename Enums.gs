@@ -11,7 +11,7 @@ const DaysRetentionNumber = 15; //How many days to hold a file
 const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
 const PickupHours = `Monday - Friday: 11am - 1pm.`  //`Monday - Friday: 11am - 1pm & 4pm - 6pm.`
 
-const COLORS = {
+const COLORS = Object.freeze({
   green_light : `#d9ead3`,
   green : `74d975`, 
   green_dark : `#93c47d`, 
@@ -38,9 +38,9 @@ const COLORS = {
   grey : `#cccccc`, 
   grey_dark : `#999999`,
   black : `#000000`,
-}
+});
 
-const ALLCOLORS = {
+const ALLCOLORS = Object.freeze({
   black : `#000000`,
   dark_gray_4 : `#434343`,
   dark_gray_3 : `#666666`,
@@ -121,9 +121,9 @@ const ALLCOLORS = {
   dark_blue_3 : `#073763`,
   dark_purple_3 : `#20124d`,
   dark_magenta_3 : `#4c1130`,
-}
+});
 
-const RESPONSECODES = {
+const RESPONSECODES = Object.freeze({
 	200 : `OK`,
 	201 : `Created`,
 	202 : `Accepted`,
@@ -190,9 +190,9 @@ const RESPONSECODES = {
 	511 : `Network Authentication Required`,
 	598 : `Network read timeout error`,
 	599 : `Network connect timeout error`,
-}
+});
 
-const STATUS = {
+const STATUS = Object.freeze({
   received : `Received`,
   inProgress : `In-Progress`,
   completed : `Completed`,
@@ -204,14 +204,14 @@ const STATUS = {
   missingAccess : `Missing Access`,
   closed : `CLOSED`,
   abandoned : `Abandoned`,
-}
+});
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheets : Dictionary of key / value pair.
  * Example: Calling 'SHEETS.laser' returns value sheet.
  */
-const SHEETS = {
+const SHEETS = Object.freeze({
   Laser : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Laser Cutter`), // Laser Sheet
   Fablight : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Fablight`), // Fablight Sheet
   Waterjet : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Waterjet`), // Waterjet Sheet
@@ -224,13 +224,13 @@ const SHEETS = {
   Othertools : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Other Tools`), // Other Sheet
   Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Canon Plotter`), // Plotter Sheet
   GSI_Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`GSI - Cannon Plotter`), // GSI Submission Form
-};
+});
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
-const OTHERSHEETS = {
+const OTHERSHEETS = Object.freeze({
   Summary : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
   Pickup : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Pickup`),
   Approved : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
@@ -239,14 +239,14 @@ const OTHERSHEETS = {
   Data : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
   Backgrounddata : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Background Data Mgmt`),
   Master : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Master Intake Form Responses`),
-}
+});
 
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
-const STORESHEETS = {
+const STORESHEETS = Object.freeze({
   AdvLabStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('AdvLabStoreItems'),
   UltimakerStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UltimakerStoreItems'),
   FablightStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FablightStoreItems'),
@@ -256,9 +256,9 @@ const STORESHEETS = {
   VinylCutterStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('VinylCutterStoreItems'),
   LaserStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('LaserStoreItems'),
   OthermillStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OthermillStoreItems'),
-};
+});
 
-const NONITERABLESHEETS = {...OTHERSHEETS, ...STORESHEETS};
+const NONITERABLESHEETS = Object.freeze({...OTHERSHEETS, ...STORESHEETS});
 
 
 /**
@@ -266,7 +266,7 @@ const NONITERABLESHEETS = {...OTHERSHEETS, ...STORESHEETS};
  * Collection of Forms : Dictionary of key / value pair.
  * Example: Calling 'formDict.laser' returns value string.
  */
-const FORMS = {
+const FORMS = Object.freeze({
   // ultimaker: `1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8`,
   laser: `1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w`,
   fablight: `1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA`,
@@ -280,17 +280,17 @@ const FORMS = {
   othertools: `1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38`,
   plotter: `1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34`,
   gsi_plotter: `1F_lEMi0HoV6Ej4RPxn8FuWqsPWJdfjmwyJs7v2SkoCg`,
-};
+});
 
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Drive Folder Locations
  */
-const DRIVEFOLDERS = {
+const DRIVEFOLDERS = Object.freeze({
   tickets : `1xpjeqTju9ELRrQJ3GzFdv-nHYjoCfUjl`,
   jobforms : `1G31sd5TZiAWCus4Gi_JSpFTSY1xVOV2o`,
-}
+});
 
 
 /**
@@ -312,7 +312,7 @@ const TYPES = [
   `General Students`,
 ];
 
-const HEADERNAMES = {
+const HEADERNAMES = Object.freeze({
   status : `(INTERNAL) Status`,	
   ds : `(INTERNAL): DS Assigned`,	
   staffNotes : `(INTERNAL) Staff Notes`,
@@ -367,11 +367,11 @@ const HEADERNAMES = {
   price2 : `Price 2`,	
   price3 : `Price 3`,	
   price4 : `Price 4`,
-};
+});
 
 
 
-const PAGESIZES = {
+const PAGESIZES = Object.freeze({
   letter: { width: 612.283, height: 790.866 },
   tabloid: { width: 790.866, height: 1224.57 },
   legal: { width: 612.283, height: 1009.13 },
@@ -384,7 +384,7 @@ const PAGESIZES = {
   b4: { width: 708.661, height: 1000.63 },
   b5: { width: 498.898, height: 708.661 },
   custom: { width: 204.000, height: 566.000 }
-}
+});
 
 
 
