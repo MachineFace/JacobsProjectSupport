@@ -4,42 +4,22 @@
  * Class for Interfacing with Shopify API
  */
 class ShopifyAPI {
-  constructor({
-    jobnumber : jobnumber = 202010011925,
-    email : email = `jacobsinstitutestore@gmail.com`,
-    material1Name : material1Name = `None`,
-    material1Quantity : material1Quantity = 0,
-    material2Name : material2Name = `None`,
-    material2Quantity : material2Quantity = 0,
-    material3Name : material3Name = `None`,
-    material3Quantity : material3Quantity = 0,
-    material4Name : material4Name = `None`,
-    material4Quantity : material4Quantity = 0,
-    material5Name : material5Name = `None`,
-    material5Quantity : material5Quantity = 0,
-  }){
+  constructor(){
     /** @private */
     this.root = `https://jacobs-student-store.myshopify.com/admin/api/2023-04/`;
     /** @private */
     this.api_key = PropertiesService.getScriptProperties().getProperty(`shopify_api_key`);
     /** @private */
     this.api_pass = PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`);
-
-    this.jobnumber = jobnumber;
-    this.email = email;
-    this.material1Name = material1Name;
-    this.material1Quantity = material1Quantity;
-    this.material2Name = material2Name;
-    this.material2Quantity = material2Quantity;
-    this.material3Name = material3Name;
-    this.material3Quantity = material3Quantity;
-    this.material4Name = material4Name;
-    this.material4Quantity = material4Quantity;
-    this.material5Name = material5Name;
-    this.material5Quantity = material5Quantity;
+    /** @private */
+    this.jobnumber;
+    /** @private */
+    this.email;
+    /** @private */
     this.customer;
+    /** @private */
     this.customerID;
-    this.pack = this._PackageMaterials();
+    /** @private */
     this.totalprice;
   }
 
@@ -82,21 +62,21 @@ class ShopifyAPI {
    * @returns {[string, string]} productID, link, price
    */
   _LookupStoreProductDetails(material) {
-    material = material ? material : `Fortus Red ABS-M30`;
+    if(!material) throw new Error(`No material supplied`);
     let productID;
     try {
       Object.values(STORESHEETS).forEach(sheet => {
-        const find = SearchSpecificSheet(sheet, material);
-        if(find !== false) {
-          let index = find;
-          let link = sheet.getRange(index, 2, 1, 1).getValue();
-          let price = sheet.getRange(index, 6, 1, 1).getValue();
-          productID = sheet.getRange(index, 4, 1, 1).getValue();
+        const idx = SearchSpecificSheet(sheet, material);
+        if(idx) {
+          // let link = sheet.getRange(idx, 2, 1, 1).getValue();
+          // let price = sheet.getRange(idx, 6, 1, 1).getValue();
+          productID = sheet.getRange(idx, 4, 1, 1).getValue().toString();
         }
-      })
-      return productID.toString();
+      });
+      return productID;
     } catch(err) {
       console.error(`"_LookupStoreProductDetails()" failed : ${err}`);
+      return 1;
     }
   }
 
@@ -104,99 +84,154 @@ class ShopifyAPI {
    * ----------------------------------------------------------------------------------------------------------------
    * Packages Materials in a way that can be used in MakeLineItems
    * @private
+   * @param {object} list of material names and quantities
    * @returns {[{string}]} materials
    */
-  async _PackageMaterials() {
-    let pack = {};
-    pack["material1"] = { name : this.material1Name, ammount : this.material1Quantity, id : "" };
-    pack["material2"] = { name : this.material2Name, ammount : this.material2Quantity, id : "" };
-    pack["material3"] = { name : this.material3Name, ammount : this.material3Quantity, id : "" };
-    pack["material4"] = { name : this.material4Name, ammount : this.material4Quantity, id : "" };
-    pack["material5"] = { name : this.material5Name, ammount : this.material5Quantity, id : "" };
+  async _PackageMaterials({
+      material1Name, material1Quantity,
+      material2Name, material2Quantity,
+      material3Name, material3Quantity,
+      material4Name, material4Quantity,
+      material5Name, material5Quantity,
+  }) {
+    let pack = {
+      material1 : { 
+        name : material1Name, 
+        ammount : material1Quantity, 
+        id : 0, 
+      },
+      material2 : { 
+        name : material2Name, 
+        ammount : material2Quantity, 
+        id : 0,
+      },
+      material3 : { 
+        name : material3Name, 
+        ammount : material3Quantity, 
+        id : 0,
+      },
+      material4 : { 
+        name : material4Name, 
+        ammount : material4Quantity, 
+        id : 0,
+      },
+      material5 : { 
+        name : material5Name, 
+        ammount : material5Quantity, 
+        id : 0,
+      },
+    };
 
-    // Remove when Those are empty / null / undefined
     for(const [key, values] of Object.entries(pack)) {
       if(!values.name || !values.ammount) {
         delete pack[key];
       } else values.id = this._LookupStoreProductDetails(values.name);
     }
-    // console.info(`PACK --> ${JSON.stringify(pack)}`);
+    for(const [key, values] of Object.entries(pack)) {
+      if(!values.id) delete pack[key];
+    }
 
-    // Fetch Shopify Info
     let sum = 0.0;
     let shopifyPack = [];
     for(const [key, values] of Object.entries(pack)) {
       console.info(values.id);
       let info = await this.GetProductByID(values.id);
-      console.info(info)
       let price = info?.variants[0]?.price * pack[key].ammount ? info?.variants[0]?.price * pack[key].ammount : info?.price * pack[key].ammount;
       let subtotal = +Number.parseFloat(price).toFixed(2);
       sum += subtotal;
       shopifyPack.push({ 
         name : key,
         title : info?.title,
-        id : info?.id,
+        id : +Number(info?.id),
         price : info?.variants[0]?.price,
         quantity : pack[key].ammount,
         subtotal : subtotal,
-        discount_allocations : [{
-          amount: "0.00",
-          discount_application_index : 0,
-          amount_set : { shop_money : { amount : 0.00, currency_code : "USD" }, }
-        }],  
+        // discount_allocations : [{
+        //   amount: "0.00",
+        //   discount_application_index : 0,
+        //   amount_set : { 
+        //     shop_money : { 
+        //       amount : 0.00, 
+        //       currency_code : "USD" 
+        //     },
+        //   },
+        // }], 
       });
     }
     const total = +Number.parseFloat(sum).toFixed(2);
     this.totalprice = total;
 
     // console.info(`Total Price = ${total}`);
-    // console.info(`PACKED ----> ${JSON.stringify(shopifyPack)}`);
+    // console.info(`PACKED ----> ${JSON.stringify(shopifyPack, null, 4)}`);
     return shopifyPack;
   }
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Create Shopify Order
+   * @param {object} inputs
+   * @returns {object} order
    */
-  async CreateOrder() {
-    this.customer = await this.GetCustomerByEmail(this.email);
-    if(!this.customer) this.customer = await this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
-    let repo = 'orders.json/';
+  async CreateOrder({
+    jobnumber : jobnumber = 202010011925,
+    email : email = `jacobsinstitutestore@gmail.com`,
+    material1Name : material1Name = `None`,
+    material1Quantity : material1Quantity = 0,
+    material2Name : material2Name = `None`,
+    material2Quantity : material2Quantity = 0,
+    material3Name : material3Name = `None`,
+    material3Quantity : material3Quantity = 0,
+    material4Name : material4Name = `None`,
+    material4Quantity : material4Quantity = 0,
+    material5Name : material5Name = `None`,
+    material5Quantity : material5Quantity = 0,
+  }) {
+    const repo = 'orders.json/';
+    const customer = await this.GetCustomerByEmail(email);
+    if(!customer) customer = await this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
+    this.customerID = customer.id;
+    const pack = await this._PackageMaterials({
+      material1Name, material1Quantity,
+      material2Name, material2Quantity,
+      material3Name, material3Quantity,
+      material4Name, material4Quantity,
+      material5Name, material5Quantity,
+    });
 
-    let order = {
+    const order = {
       "order": {
-        "line_items": await this.pack,
-        "customer": { "id": await this.customerID },
-        "total_price": await this.totalprice,
+        "line_items": pack,
+        "customer": { "id": customer.id },
+        "total_price": this.totalprice,
         "financial_status": "paid",
         "fulfillment_status": "fulfilled",
         "inventory_behaviour" : "decrement_ignoring_policy",
-        "note": "Job Number : " + this.jobnumber,
+        "note": "Job Number : " + jobnumber,
       }
     };
-    console.info(`ORDER SUMMARY ----> ${JSON.stringify(order)}`);
+    console.info(`ORDER SUMMARY ----> ${JSON.stringify(order, null, 4)}`);
 
-    let params = {
+    const params = {
       "method" : "POST",
       "headers" : { "Authorization": "Basic " + Utilities.base64EncodeWebSafe(this.api_key + ":" + this.api_pass) },
       "contentType" : "application/json",
       "payload" : JSON.stringify(order),
       "followRedirects" : true,
-      "muteHttpExceptions" : true
+      "muteHttpExceptions" : true,
     };
 
-    let html = await UrlFetchApp.fetch(this.root + repo, params);
-    let responseCode = html.getResponseCode();
-    // console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    if (responseCode == 200 || responseCode == 201) {
-      let content = JSON.parse(html.getContentText());
-      console.info(`Posted Order! : ${content}`);
+    try {
+      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      const content = JSON.parse(response.getContentText());
+      // console.info(`Posted Order! : ${JSON.stringify(content, null, 4)}`);
       return content;
-    } else {
-      this.writer.Error('Failed to POST to Shopify');
-      return false;
+    } catch(err) {
+      console.error(`"CreateOrder()" failed: ${err}`);
+      return 1;
     }
-      
   }
 
   /**
@@ -208,41 +243,38 @@ class ShopifyAPI {
    */
   async GetCustomerByEmail(email) {
 
-    let fields = `&fields=id,first_name,last_name,total_spent`;
-    let scope = `customers/search.json?query=email:${email}`;
-    let repo = scope + fields;
+    const fields = `&fields=id,first_name,last_name,total_spent`;
+    const scope = `customers/search.json?query=email:${email}`;
+    const repo = scope + fields;
 
-    //Stuff into Params
-    let params = {
-      "method" : "GET",
-      "headers" : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      "contentType" : "application/json",
+    const params = {
+      method : "GET",
+      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      contentType : "application/json",
       followRedirects : true,
-      muteHttpExceptions : true
+      muteHttpExceptions : true,
     };
 
-    //Fetch Customer
-    let html = await UrlFetchApp.fetch(this.root + repo, params);
-    let responseCode = html.getResponseCode();
-    // console.info(`Response Code : ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-    if (html.getResponseCode() == 200) {
-      let user = JSON.parse(html.getContentText())['customers'][0];
+    try {
+      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      const user = JSON.parse(response.getContentText())['customers'][0];
       if(!user) {
-        this.writer.Error('User Shopify Account Does Not Exist. Please make a User Account on Shopify.');
-        this.writer.Error(`Trying as internal sale.....`)
-        return this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
-        
-      } else {
-        console.info(`ID : ${user['id']}, Name : ${user['first_name']} ${user['last_name']}, Total Spent : ${user['total_spent']}`);
-        this.customerID = user['id'];
-        return user;
+        console.warn('User Shopify Account Does Not Exist.\nTrying as internal sale.....');
+        return await this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
       }
 
-      // this.first_name = user['first_name'];
-      // this.last_name = user['last_name'];
-      // this.total_spent = user['total_spent'];
+      this.customerID = user.id;
+      // console.info(`USER ---> ${JSON.stringify(user, null, 4)}`);
+      return user;
+    } catch(err) {
+      console.error(`"GetCustomerByEmail()" failed: ${err}`);
+      return 1;
+    } 
       
-    }
+  
   }
 
   /**
@@ -254,7 +286,6 @@ class ShopifyAPI {
    * Access individual properties by invoking GetShopifyProductByID(productID).productTitle or GetShopifyProductByID(productID).id or GetShopifyProductByID(productID).price
    */
   async GetProductByID(productID) {
-    // productID = 7751141320; //Test ID
     let status = '&status=active';
     let fields = '&fields=id,title,price,variants';
 
@@ -270,21 +301,19 @@ class ShopifyAPI {
 
     // Fetch Products
     try {
+      if(!productID) throw new Error(`No product ID supplied....`);
+
       let response = await UrlFetchApp.fetch(this.root + repo, params);
       let responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
       let parsed = JSON.parse(response.getContentText())['product'];
 
       if(!parsed) throw new Error(`Couldn't find Product!`);
+      if(parsed.title == undefined) parsed.title = parsed.variants[0].title;
+      if(parsed.id == undefined) parsed.id = parsed.variants[0].id;
+      if(parsed.price == undefined) parsed.price = parsed.variants[0].price;
 
-      this.productTitle = parsed.title;
-      if(parsed.title == undefined || parsed.title == null) this.productTitle = parsed.variants[0].title;
-      this.id = productID;
-      if(parsed.id == undefined || parsed.id == null) this.id = parsed.variants[0].id;
-      this.price = parsed.price;
-      if(parsed.price == undefined) this.price = parsed.variants[0].price;
-
-      // console.info(`Title : ${this.productTitle}, ID : ${this.id}, Price : ${this.price}`);
+      // console.info(`Title : ${parsed.title}, ID : ${parsed.id}, Price : ${price}`);
       return parsed; 
     } catch(err) {
       console.error(`"GetProductByID()" failed: ${err}`);
@@ -510,20 +539,7 @@ class ShopifyAPI {
 const _testAPI = async () => {
   const jobnumber = new CreateJobnumber({ date : new Date() }).Jobnumber;
   // const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
-  const shopify = new ShopifyAPI({
-    jobnumber : jobnumber,
-    email : `pico@pico.com`,
-    material1Name : 'Fortus Red ABS-M30',
-    material1Quantity : 5,
-    material2Name : 'Objet Polyjet VeroMagenta RGD851',
-    material2Quantity : 10,
-    material3Name : null,
-    material3Quantity : 123234,
-    material4Name : 'Stratasys Dimension Soluble Support Material P400SR',
-    material4Quantity : 15,
-    material5Name : null,
-    material5Quantity : 20,
-  });
+  const shopify = new ShopifyAPI();
   // let product = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
   // let lastOrder = await shopify.GetLastOrder();
   // let orders = await shopify.GetOrdersList();
@@ -535,11 +551,24 @@ const _testAPI = async () => {
   // let lookup = shopify.LookupShopifyProductFromSheet2();
   // let customer = shopify.SetCustomer("jacobsinstitutestore@gmail.com");
 
-  // const order = await shopify.CreateOrder();
-  // console.info(JSON.stringify(order))
+  const order = await shopify.CreateOrder({
+    jobnumber : jobnumber,
+    email : `pico@pico.com`,
+    material1Name : 'Fortus Red ABS-M30',
+    material1Quantity : 5,
+    material2Name : 'Objet Polyjet VeroMagenta RGD851',
+    material2Quantity : 10,
+    material3Name : null,
+    material3Quantity : 123234,
+    material4Name : 'Stainless Steel - 0.125" - priced per square inch',
+    material4Quantity : 15,
+    material5Name : null,
+    material5Quantity : 20,
+  });
+  console.info(JSON.stringify(order, null, 4));
 
-  const order = await shopify.GetLastOrder();
-  console.info(JSON.stringify(order))
+  // const order = await shopify.GetLastOrder();
+  // console.info(JSON.stringify(order))
 }
 
 

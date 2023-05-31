@@ -127,20 +127,18 @@ const PopupGetSingleStudentPriority = async () => {
     const priority = await new CheckPriority({ email : email, sid : sid }).Priority;
     console.info(`Priority: ${priority}`);
     SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    if(priority != `STUDENT NOT FOUND!`) {
-      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.received);
-    }
+    if(priority != `STUDENT NOT FOUND!`) SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.received);
     ui.alert(
-      `JPS : Checked Access`,
+      `${SERVICE_NAME} : Checked Access`,
       `Access for ${name} set to : "${priority}"`,
-      ui.ButtonSet.OK
+      ui.ButtonSet.OK,
     );
   } catch (err) {
     console.error(`${err} : Whoops, couldn't set priority for ${name}`);
     ui.alert(
       `JPS Error`,
       `Whoops, couldn't set priority for ${name}`,
-      ui.ButtonSet.OK
+      ui.ButtonSet.OK,
     );
   }
   
@@ -157,22 +155,22 @@ const PopupCreateNewJobNumber = async () => {
 
   // If It is on a valid sheet
   if(CheckSheetIsForbidden(thisSheet) == true) {
-    Browser.msgBox(
-      `Incorrect Sheet Active`,
-      `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
-      Browser.Buttons.OK
-    );
-    return;
-  } else {
-    const timestamp = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
-    const jobnumber = new CreateJobnumber({ date : timestamp}).Jobnumber;
-    SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber.toString());
     ui.alert(
-      `JPS Job Number Created`,
-      `Created a New Jobnumber : ${jobnumber}`,
-      ui.ButtonSet.OK
+      `${SERVICE_NAME}: Incorrect Sheet Active`,
+      `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+      Browser.Buttons.OK,
     );
-  }
+    if(ui.ButtonSet.OK) return;
+  } 
+  const timestamp = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
+  const jobnumber = new CreateJobnumber({ date : timestamp}).Jobnumber;
+  SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber.toString());
+  ui.alert(
+    `JPS Job Number Created`,
+    `Created a New Jobnumber : ${jobnumber}`,
+    ui.ButtonSet.OK
+  );
+  
 };
 
 
@@ -180,107 +178,109 @@ const PopupCreateNewJobNumber = async () => {
  * Bill from a selected line
  */
 const BillFromSelected = async () => {
+  const ui = await SpreadsheetApp.getUi();
+  const shopify = await new ShopifyAPI(); 
   let thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
 
   if(CheckSheetIsForbidden(thisSheet) == true) {
-    const b = Browser.msgBox(
-      `Incorrect Sheet Active`,
-      `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+    const a = ui.alert(
+      `${SERVICE_NAME}: Error!`,
+      `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight).\nSelect one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK
     );
-    if (b == `ok`) return;
+    if (a === ui.Button.OK) return;
   }
   const rowData = GetRowData(thisSheet, thisRow);
-  const { status, jobNumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate } = rowData;
-  const quantityTotal = mat1quantity + mat2quantity + mat3quantity + mat4quantity + mat5quantity;
-  console.info(rowData);
+  let { status, jobNumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate, } = rowData;
+
+  // TODO: Fix this messy shit.
+  if(thisSheet == SHEETS.Plotter || thisSheet == SHEETS.GSI_Plotter) {
+    mat1 = rowData.material;
+    mat1quantity = rowData.printSize;
+  }
+
+  let quantityTotal = mat1quantity + mat2quantity + mat3quantity + mat4quantity + mat5quantity;
   
-  let response;
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
     console.warn(`Cannot Bill Student - No Material quantity(s) recorded...`);
-    const b = Browser.msgBox(
-      `Generate Bill to Shopify`,
+    const b = ui.alert(
+      `${SERVICE_NAME}: Error!`,
       `No quantities entered for selected submission. Maybe add some materials first before billing...`,
       Browser.Buttons.OK
     );
-    if (b == `ok`) return;
+    if (b === ui.Button.OK) return;
   }
   if (status == STATUS.billed || status == STATUS.closed || status == STATUS.abandoned || status == STATUS.failed) {
     const b = Browser.msgBox(
-      `Generate Bill to Shopify`,
+      `${SERVICE_NAME}: Error!`,
       `You have already Generated a bill to this Student. Project is closed.`,
       Browser.Buttons.OK
     );
-    if (b == `ok`) return;
+    if (b === ui.Button.OK) return;
   }
 
-  const shopify = await new ShopifyAPI({
-    jobnumber : jobNumber, 
-    email : email,
-    material1Name : mat1, material1Quantity : mat1quantity,
-    material2Name : mat2, material2Quantity : mat2quantity,
-    material3Name : mat3, material3Quantity : mat3quantity,
-    material4Name : mat4, material4Quantity : mat4quantity,
-    material5Name : mat5, material5Quantity : mat5quantity, 
-  }); 
 
   // Fetch Customer and Products
   const customer = await shopify.GetCustomerByEmail(email);
   console.info(`CUSTOMER : ${JSON.stringify(customer)}`)
   if (customer == undefined || customer == null) {
-    const b = Browser.msgBox(
-      `Shopify Error`,
+    const b = ui.alert(
+      `${SERVICE_NAME}: Error!`,
       `The Shopify customer was not found... Check with Chris & Cody.`,
       Browser.Buttons.OK
     );
-    if (b == `ok`) return;
+    if (b === ui.Button.OK) return;
   }
 
-  let boxTitle = `Generate Bill to Shopify`;
-  let msg = `Would you like to Generate a Bill to: \\n`;
-  msg += `${customer?.first_name} ${customer?.last_name} \\n`;
-  msg += `Email: ${email} \\n`;
-  msg += `Job Number : ${jobNumber?.toString()} \\n`;
-  msg += `Shopify ID : ${customer.id?.toString()} \\n`;
-  msg += `For Materials : \\n`; 
-  msg += `----- ${mat1quantity} of ${mat1}\\n`;
-  if(mat2quantity) msg += `----- ${mat2quantity} of ${mat2}\\n`;
-  if(mat3quantity) msg += `----- ${mat3quantity} of ${mat3}\\n`;
-  if(mat4quantity) msg += `----- ${mat4quantity} of ${mat4}\\n`;
-  if(mat5quantity) msg += `----- ${mat5quantity} of ${mat5}\\n`;
-  msg += `Estimated Cost: $${estimate?.toString()} \\n`;
+  const boxTitle = `${SERVICE_NAME} : Generate Bill to Shopify`;
+  let msg = `Would you like to Generate a Bill to:\n`
+  + `${customer?.first_name} ${customer?.last_name}\n`
+  + `Email: ${email}\n`
+  + `Job Number : ${jobNumber?.toString()}\n`
+  + `Shopify ID : ${customer.id?.toString()}\n`
+  + `For Materials : \n`
+  + `----- ${mat1quantity} of ${mat1}\n`
+  if(mat2quantity) msg += `----- ${mat2quantity} of ${mat2}\n`;
+  if(mat3quantity) msg += `----- ${mat3quantity} of ${mat3}\n`;
+  if(mat4quantity) msg += `----- ${mat4quantity} of ${mat4}\n`;
+  if(mat5quantity) msg += `----- ${mat5quantity} of ${mat5}\n`;
+  msg += `Estimated Cost: $${estimate?.toString()} \n`;
 
-  // Make a nessage box
+  let response;
   try {
-    response = Browser.msgBox(
+    response = ui.alert(
       boxTitle,
       msg,
       Browser.Buttons.YES_NO_CANCEL
     );
-    if (response == "yes") {
-      console.info(`User clicked "Yes".`);
-      
-      const order = await shopify.CreateOrder();
+    if (response == ui.Button.YES) {      
+      const order = await shopify.CreateOrder({
+        jobnumber : jobNumber, 
+        email : email,
+        material1Name : mat1, material1Quantity : mat1quantity,
+        material2Name : mat2, material2Quantity : mat2quantity,
+        material3Name : mat3, material3Quantity : mat3quantity,
+        material4Name : mat4, material4Quantity : mat4quantity,
+        material5Name : mat5, material5Quantity : mat5quantity, 
+      });
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
-      console.info(order.toString());
-      let lastOrder = await shopify.GetLastOrder();
-      Browser.msgBox(
+      let lastOrder =  JSON.stringify(order, null, 4);
+      console.info(lastOrder);
+      ui.alert(
         boxTitle,
-        `Student has been successfully billed on Shopify! \n ${JSON.stringify(lastOrder)}`,
-        Browser.Buttons.OK
+        `Student has been successfully billed on Shopify! \n ${lastOrder}`,
+        Browser.Buttons.OK,
       );
-    } else {
+    } 
+    else if(response === ui.Button.NO || response === ui.Button.CANCEL) {
       console.warn(`User clicked "No / Cancel".`);
       console.warn(`Order NOT Created.`);
     }
   } catch (err) {
     console.error(`${err} : Couldn't create an order...`);
-  } finally {
-    thisSheet.getRange(`AZ${thisRow}`).setValue(false);
-  }
-
-  console.info(`Completed BillFromSelected`);
+    return 1;
+  } 
 };
 
 
@@ -288,20 +288,20 @@ const BillFromSelected = async () => {
  * Create a pop-up to Create a new Ticket if one is missing.
  */
 const PopupCreateTicket = async () => {
-  let thisSheet = SpreadsheetApp.getActiveSheet();
-  let ui = SpreadsheetApp.getUi();
+  const thisSheet = SpreadsheetApp.getActiveSheet();
+  const ui = SpreadsheetApp.getUi();
   if(CheckSheetIsForbidden(thisSheet)) {
-    Browser.msgBox(
-      `Incorrect Sheet Active`,
-      `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+    ui.alert(
+      `${SERVICE_NAME} : Error!`,
+      `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight). \nSelect one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK
     );
     return;
   }
-  let thisRow = thisSheet.getActiveRange().getRow();
-  let rowData = await GetRowData(thisSheet, thisRow);
+  const thisRow = thisSheet.getActiveRange().getRow();
+  const rowData = await GetRowData(thisSheet, thisRow);
   const { ds, jobNumber, timestamp, email, name, sid, projectName, sheetName, row } = rowData;
-  let x = await new Ticket({
+  const x = await new Ticket({
     jobnumber : jobNumber,
     designspecialist : ds,
     submissiontime : timestamp,
@@ -310,12 +310,12 @@ const PopupCreateTicket = async () => {
     projectname : projectName,
     rowData : rowData,
   });
-  let t = await x.CreateTicket();
+  const t = await x.CreateTicket();
   console.info(t);
   
   SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
   ui.alert(
-    `JPS Ticket Creation`,
+    `${SERVICE_NAME} : Ticket Created!`,
     `Ticket Created for : ${name}, Job Number : ${jobNumber}`,
     ui.ButtonSet.OK
   );
@@ -343,11 +343,11 @@ const BuildHTMLHELP = () => {
     `If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. `,
     `See Cody or Chris for additional help + protips.`,
   ];
-  let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`;
-  html += `<h3 style="font-family:Roboto">How to Use JPS : </h3>`;
-  html += `<hr>`;
-  html += `<p>${items[0]}</p>`;
-  html += `<ol style="font-family:Roboto font-size:10">`;
+  let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`
+  + `<h3 style="font-family:Roboto">How to Use JPS : </h3>`
+  + `<hr>`
+  + `<p>${items[0]}</p>`
+  + `<ol style="font-family:Roboto font-size:10">`
   items.forEach((item, index) => {
     if (index > 0 && index < items.length - 1) html += `<li>${item}</li>`;
   });
@@ -366,7 +366,7 @@ const PopupHelp = async () => {
   let htmlOutput = HtmlService.createHtmlOutput(await BuildHTMLHELP())
     .setWidth(640)
     .setHeight(480);
-  ui.showModalDialog(htmlOutput, `JPS HELP!!`);
+  ui.showModalDialog(htmlOutput, `${SERVICE_NAME} HELP!!`);
 };
 
 /**

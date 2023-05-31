@@ -32,7 +32,7 @@ const Search = (value) => {
  */
 const SearchSpecificSheet = (sheet, value) => {
   if(typeof sheet != `object`) return 1;
-  if (value) value.toString().replace(/\s+/g, "");
+  if (value && value != undefined) value.toString().replace(/\s+/g, "");
   const finder = sheet.createTextFinder(value).findNext();
   if (finder != null) {
     return finder.getRow();
