@@ -7,11 +7,10 @@ class BarcodeGenerator {
   constructor({
     jobnumber : jobnumber,
   }) {
-    this.jobnumber = jobnumber ? jobnumber : `10000001`;
+    this.jobnumber = jobnumber ? jobnumber : new JobnumberService().jobnumber;
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
    * Generate Barcode
    */
   async GenerateBarCodeForTicketHeader() {
@@ -26,23 +25,25 @@ class BarcodeGenerator {
     const barcodeLoc = root + type + ts + this.jobnumber + scaleX + scaleY + postfx;
 
     const params = {
-      "method" : "GET",
-      "headers" : { "Authorization": "Basic ", "Content-Type" : "image/png" },
-      "contentType" : "application/json",
+      method : "GET",
+      headers : { "Authorization": "Basic ", "Content-Type" : "image/png" },
+      contentType : "application/json",
       followRedirects : true,
       muteHttpExceptions : true,
     };
 
     try {
-      const res = await UrlFetchApp.fetch(barcodeLoc, params);
-      const responseCode = res.getResponseCode();
-      // console.info(`Response Code : ${responseCode}, ${RESPONSECODES[responseCode]}`);
-      let barcode = await DriveApp.createFile( Utilities.newBlob(res.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      const response = await UrlFetchApp.fetch(barcodeLoc, params);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+
+      let barcode = await DriveApp.createFile( Utilities.newBlob(response.getContent()).setName(`Barcode : ${this.jobnumber}`) );
       barcode.setTrashed(true);
       console.info(`BARCODE CREATED ---> ${barcode?.getId()?.toString()}, URL: ${barcode?.getUrl()}`);
       return barcode;
     } catch(err) {
       console.error(`Failed to GET Barcode ---> ${err}`);
+      return 1;
     }
     
   }
@@ -60,24 +61,23 @@ class QRCodeGenerator {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
    * Generate QR Code
    */
   async GenerateQRCode(){
     const loc = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${this.url}`;  //API call
     const params = {
-      "method" : "GET",
-      "headers" : { "Authorization" : "Basic" },
-      "contentType" : "application/json",
+      method : "GET",
+      headers : { "Authorization" : "Basic" },
+      contentType : "application/json",
       followRedirects : true,
-      muteHttpExceptions : true
+      muteHttpExceptions : true,
     };
 
     try {
-      const html = await UrlFetchApp.fetch(loc, params);
-      // const responseCode = html?.getResponseCode();
-      // console.info(`Response Code : ${responseCode} ----> ${RESPONSECODES[responseCode]}`);
-      const blob = await Utilities.newBlob(html.getContent()).setName(`QRCode-${this.jobnumber}` );
+      const response = await UrlFetchApp.fetch(loc, params);
+      const responseCode = response.getResponseCode();
+      if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      const blob = await Utilities.newBlob(response.getContent()).setName(`QRCode-${this.jobnumber}` );
       let qrCode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
       console.info(`QR CODE ---> ${qrCode.getUrl()} for ${this.url}`);
       return qrCode;
@@ -93,6 +93,7 @@ class QRCodeGenerator {
  * ----------------------------------------------------------------------------------------------------------------
  * For use with barcode scanner.
  * Searches for job number found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
+ * @DEFUNCT
  */
 const PickupByBarcode = () => {
   const jobnumber = OTHERSHEETS.Pickup.getRange(3,2).getValue();
@@ -121,6 +122,7 @@ const PickupByBarcode = () => {
 
 /**
  * Mark a job as abandoned and email student.
+ * @DEFUNCT
  */
 const MarkAsAbandonedByBarcode = async () => {
   const jobnumber = OTHERSHEETS.Pickup.getRange(3,2).getValue();

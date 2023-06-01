@@ -12,7 +12,7 @@
  */
 class Ticket {
   constructor({
-    jobnumber : jobnumber = 202010010101,
+    jobnumber : jobnumber = new JobnumberService().jobnumber,
     designspecialist : designspecialist = `Staff`,
     submissiontime : submissiontime = new Date(),
     name : name = `Unknown`,

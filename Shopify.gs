@@ -143,7 +143,7 @@ class ShopifyAPI {
    * @returns {object} order
    */
   async CreateOrder({
-    jobnumber : jobnumber = 202010011925,
+    jobnumber : jobnumber = new JobnumberService().jobnumber,
     email : email = `jacobsinstitutestore@gmail.com`,
     material1Name : material1Name = `None`,
     material1Quantity : material1Quantity = 0,
@@ -507,7 +507,7 @@ class ShopifyAPI {
 
 
 const _testAPI = async () => {
-  const jobnumber = new CreateJobnumber({ date : new Date() }).Jobnumber;
+  const jobnumber = new JobnumberService().jobnumber;
   // const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
   const shopify = new ShopifyAPI();
   // let product = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);

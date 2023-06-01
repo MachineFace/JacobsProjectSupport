@@ -163,7 +163,7 @@ const PopupCreateNewJobNumber = async () => {
     if(ui.ButtonSet.OK) return;
   } 
   const timestamp = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
-  const jobnumber = new CreateJobnumber({ date : timestamp}).Jobnumber;
+  const jobnumber = new JobnumberService().jobnumber;
   SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber.toString());
   ui.alert(
     `JPS Job Number Created`,

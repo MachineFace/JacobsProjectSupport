@@ -11,6 +11,7 @@ class DesignSpecialist {
     email : email,
     areas : areas,
   }) {
+    this.id = Utilities.getUuid();
     this.name = name ? name : `DS`;
     this.fullname = fullname ? fullname : `Design Specialist`;
     this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
@@ -24,6 +25,7 @@ class DesignSpecialist {
   
   get() {
     return {
+      id : this.id,
       name : this.name,
       fullname : this.fullname,
       email : this.email,
@@ -75,6 +77,7 @@ class StudentSupervisor extends DesignSpecialist {
   }) {
     // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
     super(name, fullname, email, areas);
+    this.id = Utilities.getUuid();
     this.name = name ? name : `SS`;
     this.fullname = fullname ? fullname : `Student Supervisor`;
     this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
@@ -87,6 +90,7 @@ class StudentSupervisor extends DesignSpecialist {
 
   get() {
     return {
+      id : this.id,
       name : this.name,
       fullname : this.fullname,
       email : this.email,
@@ -114,6 +118,7 @@ class Manager extends DesignSpecialist {
   }) 
   {
     super(name, fullname, email, areas);
+    this.id = Utilities.getUuid();
     this.name = name ? name : `MA`;
     this.fullname = fullname ? fullname : `Manager`;
     this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
@@ -126,6 +131,7 @@ class Manager extends DesignSpecialist {
 
   get() {
     return {
+      id : this.id,
       name : this.name,
       fullname : this.fullname,
       email : this.email,
@@ -200,9 +206,9 @@ class MakeStaff {
  * @USED in Daily Email Summary
  */
 const StaffEmailAsString = () => {
-  let emaillist = GetColumnDataByHeader(OTHERSHEETS.Staff, `EMAIL`);
-  let culled = emaillist.filter(Boolean);
-  let f = [...new Set(culled)].toString();
+  let emaillist = GetColumnDataByHeader(OTHERSHEETS.Staff, `EMAIL`)
+    .filter(Boolean);
+  let f = [...new Set(emaillist)].toString();
   return f;
 }
 

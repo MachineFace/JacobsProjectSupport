@@ -10,12 +10,12 @@
 class ApprovalFormBuilder {
   constructor({
     name : name = `Some Name`,
-    jobnumber : jobnumber = 1239487123,
+    jobnumber : jobnumber = new JobnumberService().jobnumber,
     cost : cost = 2.50,
   }) {
-    this.name = name ? name : `Some Name`;
-    this.jobnumber = jobnumber ? jobnumber : 129384712398;
-    this.cost = cost ? cost : 2.50;
+    this.name = name;
+    this.jobnumber = jobnumber;
+    this.cost = cost;
     this.destination = DriveApp.getFoldersByName(`Job Forms`);
     this.form = FormApp.create(`Approval Form`);
     this.CreateApprovalForm();

@@ -45,8 +45,6 @@ const SearchSpecificSheet = (sheet, value) => {
  * @returns {[sheet, row]} list of sheets with a row
  */
 const FindByJobNumber = (jobnumber) => {
-  // jobnumber = 20211025144607;  // test good jnum
-  if (jobnumber) jobnumber.toString().replace(/\s+/g, "");
   let res = {};
   Object.values(SHEETS).forEach(sheet => {
     const finder = sheet.createTextFinder(jobnumber).findNext();
@@ -177,7 +175,7 @@ const testSetRow = () => {
     status: STATUS.received,
     ds: 'Cody',
     priority: 1,
-    jobNumber: new CreateJobnumber({}).Jobnumber,
+    jobNumber: new JobnumberService().jobnumber,
     timestamp: new Date().toDateString(),
     email: 'dingus@berkeley.edu',
     name: 'Testy Fiesty',

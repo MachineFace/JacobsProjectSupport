@@ -39,20 +39,21 @@ const onSubmission = async (e) => {
   console.info(`This Row: ${lastRow}`);
 
   // Parse variables
-  var name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : undefined;
+  let name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : undefined;
   SetByHeader(sheet, HEADERNAMES.name, lastRow, name);
-  var email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
-  var sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
-  var studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(sheet, HEADERNAMES.affiliation, lastRow);
-  var projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : GetByHeader(sheet, HEADERNAMES.projectName, lastRow);
-  var timestamp = e.namedValues[HEADERNAMES.timestamp][0];
+  let email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
+  let sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
+  let studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(sheet, HEADERNAMES.affiliation, lastRow);
+  let projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : GetByHeader(sheet, HEADERNAMES.projectName, lastRow);
+  let timestamp = e.namedValues[HEADERNAMES.timestamp][0];
 
-  var values = e.namedValues;
+  let values = e.namedValues;
   console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
   writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let jobnumber = await new CreateJobnumber({ date : timestamp }).Jobnumber;
+  const jobnumberService = new JobnumberService();
+  let jobnumber = jobnumberService.jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
 
   // Check Priority
@@ -66,18 +67,17 @@ const onSubmission = async (e) => {
   let dsMessage = message.dsMessage;
 
   // Create array summary of student's entry and append it to the message
-  var values = e.namedValues;
   dsMessage += `<ul>`;
-  for (Key in values) {
-    let label = Key;
-    let data = values[Key];
+  for (let key in values) {
+    let label = key;
+    let data = values[key];
     dsMessage += `<li>` + label + `: ` + data + `</li>`;
   }
   dsMessage += `</ul>`;
   dsMessage += `<div>`;
 
   // Notify Staff via email and set their assignment
-  var designspecialistemail;
+  let designspecialistemail;
 
   // Set the Staff member for the sheet.
   switch (sheetName) {
@@ -135,7 +135,7 @@ const onSubmission = async (e) => {
   if (stat != STATUS.received) {
     stat = STATUS.received;
     SetByHeader(sheet, HEADERNAMES.status,  lastRow, stat); 
-    writer.Warning(`Status refixed to 'Received'.`);
+    console.warn(`Status refixed to 'Received'.`);
   }
 
   // Creaform
@@ -194,8 +194,8 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  if(!jobnumber) {
-    jobnumber = new CreateJobnumber({ date : timestamp }).Jobnumber
+  if(!jobnumberService.IsValid(jobnumber)) {
+    jobnumber = jobnumberService.jobnumber
     SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
   }
 
@@ -270,7 +270,8 @@ const onChange = async (e) => {
   }
 
   ds = ds ? ds : `a Design Specialist`;
-  jobNumber = jobNumber ? jobNumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
+  const jobnumberService = new JobnumberService();
+  jobNumber = jobNumber ? jobNumber : jobnumberService.jobnumber;
   projectName = projectName ? projectName : `Your Project`;
 
 
@@ -285,7 +286,7 @@ const onChange = async (e) => {
   try {
     console.info(`Trying to fix job number : ${jobNumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobNumber = jobNumber ? jobNumber : new CreateJobnumber({ date : timestamp }).Jobnumber;
+      jobNumber = jobNumber ? jobNumber : jobnumberService.jobnumber;
       SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobNumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }

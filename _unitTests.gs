@@ -102,26 +102,13 @@ const _gasTMainTesting = async () => {
   });
   
   await test(`JobNumber`, (t) => {
-    const x = new CreateJobnumber({ date : new Date(1986, 01, 02) }).Jobnumber;
-    t.equal(x, 19860202000000, `Standard Job Number for 01, 02, 1986 should equal 19860202000000.`);
-    const y = new CreateJobnumber({}).Jobnumber;
+    const jobnumberService = new JobnumberService()
+    const x = jobnumberService.jobnumber;
+    t.equal(jobnumberService.IsValid(x), true, `Standard Job Number should be valid : Acutal : ${jobnumberService.IsValid(x)}.`);
+    const y = jobnumberService.jobnumber;
     t.notEqual(y, undefined || null, `DEFAULT / EMPTY jobnumber should not return undefined or null, ${y}`);
-
-    const jtypes = {
-      GoodDate : new Date(2015, 10, 3),
-      BadDate : `20220505`,
-      AnotherBad : `5/3/2022 8:29:08`,
-      AnotherBadString : `Thu, 27 Jan 2022 18:34:48 GMT`,
-    }
-
-    const goodDate = new CreateJobnumber({ date : jtypes.GoodDate }).Jobnumber;
-    t.equal(goodDate, 20151103000000, `Job Number for ${jtypes.GoodDate} should return 20151103000000`);
-    const badDate = new CreateJobnumber({ date : jtypes.BadDate }).Jobnumber;
-    t.notEqual(badDate, undefined || null, `Bad date should still return good jobnumber, ${badDate}`);
-    const anotherBad = new CreateJobnumber({ date : jtypes.AnotherBad }).Jobnumber;
-    t.notEqual(anotherBad, undefined || null, `Bad string date should still return good jobnumber, ${anotherBad}`);
-    const anotherBadString = new CreateJobnumber({ date : jtypes.AnotherBadString }).Jobnumber;
-    t.notEqual(anotherBadString, undefined || null, `Bad string date should still return good jobnumber, ${anotherBadString}`);
+    const z = `20220505`;
+    t.equal(jobnumberService.IsValid(z), false, `Test Job Number should be invalid : Acutal : ${jobnumberService.IsValid(z)}.`);
   
   });
   
@@ -473,7 +460,7 @@ const _gasTShopifyTesting = async () => {
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
   } 
   const test = new GasTap();
-  const shopify = new ShopifyAPI({jobnumber : 1129384729384});
+  const shopify = new ShopifyAPI();
 
 
   // ------------------------------------------------------------------------------------------------------------------------------
@@ -560,7 +547,7 @@ const _gasTEmailTesting = async () => {
   await test(`Emailer`, async(t) => {
     const name = `Dingus`; 
     const email = "codyglen@berkeley.edu";
-    const jobnumber = new JobNumberGenerator({ date : new Date()}).jobnumber;
+    const jobnumber = new CreateJobnumber({ date : new Date()}).Jobnumber;
     const projectname = `Some Kinda Project`;
     const message = new CreateMessage({
       name : name,
@@ -579,19 +566,6 @@ const _gasTEmailTesting = async () => {
     })
   });
 
-  
-
-  /** 
-  const __thing__ = () => {
-    const message = new CreateMessage({
-      name : `Cingus`,
-      jobnumber : 192384712938,
-      projectname : `P Funk`,
-    });
-    if(message instanceof CreateMessage) console.warn(`Message is instance of Message Class...`);
-    else console.warn(`message is NOT instance of Message class.`)
-  }
-  */
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }

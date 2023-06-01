@@ -26,7 +26,7 @@ class CreateMessage {
   }) {
     this.name = name ? name.toString() : `Unknown Name`;
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
-    this.jobnumber = jobnumber ? jobnumber.toString() : new CreateJobnumber({ date : new Date() }).Jobnumber;
+    this.jobnumber = jobnumber ? jobnumber.toString() : new JobnumberService().jobnumber;
 
     // let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
     // mat1quantity, mat1, mat2quantity, mat2, 
@@ -225,7 +225,7 @@ class CreateSubmissionMessage {
   }) {
     this.name = name ? name : `Unknown Name`;
     this.projectname = projectname ? projectname : `Unknown Project Name`;
-    this.jobnumber = jobnumber ? jobnumber : new CreateJobnumber({ date : new Date() }).Jobnumber;
+    this.jobnumber = jobnumber ? jobnumber : new JobnumberService().jobnumber;
   }
   get dsMessage() {
     let message = `<p>Hello!</p> `;

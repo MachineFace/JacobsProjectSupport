@@ -90,7 +90,7 @@ class HackyStoreAutomation {
    * @return {bool} true
    */
   UpdatePricePerSheet (sheet) {
-    const shopify = new ShopifyAPI({jobnumber : 0});
+    const shopify = new ShopifyAPI();
     const ids = GetColumnDataByHeader(sheet, "Product ID (Shopify)")
       .filter(Boolean);
     console.info(ids.toString())
