@@ -54,7 +54,7 @@ const PopUpMarkAsAbandoned = async () => {
 const PopUpMarkAsPickedUp = async () => {
   let ui = SpreadsheetApp.getUi(); 
   let response = ui.prompt(
-    `${SERVICE_NAME} : Mark Print as Picked Up`, 
+    `${SERVICE_NAME}:\n Mark Print as Picked Up`, 
     `Scan a ticket with this cell selected and press "OK".`, 
     ui.ButtonSet.OK_CANCEL
   );
@@ -88,9 +88,10 @@ const PopUpMarkAsPickedUp = async () => {
  */
 const PopupCountUsers = async () => {
   const ui = await SpreadsheetApp.getUi();
-  const count = await CountActiveUsers();
+  const c = new Calculate();
+  const count = c.CountActiveUsers();
   ui.alert(
-    `${SERVICE_NAME} : User Count`,
+    `${SERVICE_NAME}`,
     `Students Currently Using JPS : ${count}`,
     ui.ButtonSet.OK
   );
@@ -105,7 +106,7 @@ const PopupCheckMissingAccessStudents = async () => {
   const names = await CheckMissingAccessStudents().join(",\n");
   console.info(names);
   ui.alert(
-    `${SERVICE_NAME} : ALERT!`,
+    `${SERVICE_NAME}: ALERT!`,
     `Checked Missing Access Students on All Sheets :\n ${names}`,
     ui.ButtonSet.OK
   );
@@ -129,7 +130,7 @@ const PopupGetSingleStudentPriority = async () => {
     SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     if(priority != `STUDENT NOT FOUND!`) SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.received);
     ui.alert(
-      `${SERVICE_NAME} : Checked Access`,
+      `${SERVICE_NAME}: Checked Access`,
       `Access for ${name} set to : "${priority}"`,
       ui.ButtonSet.OK,
     );
@@ -156,7 +157,7 @@ const PopupCreateNewJobNumber = async () => {
 
   if(CheckSheetIsForbidden(thisSheet) == true) {
     const a = ui.alert(
-      `${SERVICE_NAME} : Incorrect Sheet!`,
+      `${SERVICE_NAME}: Incorrect Sheet!`,
       `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK,
     );
@@ -165,7 +166,7 @@ const PopupCreateNewJobNumber = async () => {
   const { name, jobnumber } = GetRowData(thisSheet, thisRow);
   if(jobnumberService.IsValid(jobnumber)) {
     const a = ui.alert(
-      `${SERVICE_NAME}\nJob Number Exists!`,
+      `${SERVICE_NAME}: Error!`,
       `Jobnumber for ${name} exists already!\n${jobnumber}`,
       ui.ButtonSet.OK
     );
@@ -277,16 +278,15 @@ const BillFromSelected = async () => {
       console.info(lastOrder);
       ui.alert(
         boxTitle,
-        `Student has been successfully billed on Shopify! \n ${lastOrder}`,
+        `Student has been successfully billed on Shopify for $${estimate?.toString()}`,
         Browser.Buttons.OK,
       );
     } 
     else if(response === ui.Button.NO || response === ui.Button.CANCEL) {
-      console.warn(`User clicked "No / Cancel".`);
-      console.warn(`Order NOT Created.`);
+      console.warn(`User clicked "No / Cancel"....\nOrder NOT Created.`);
     }
   } catch (err) {
-    console.error(`${err} : Couldn't create an order...`);
+    console.error(`"BillFromSelected()" failed : ${err}`);
     return 1;
   } 
 };
@@ -299,12 +299,12 @@ const PopupCreateTicket = async () => {
   const thisSheet = SpreadsheetApp.getActiveSheet();
   const ui = SpreadsheetApp.getUi();
   if(CheckSheetIsForbidden(thisSheet)) {
-    ui.alert(
+    const a = ui.alert(
       `${SERVICE_NAME} : Error!`,
       `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight). \nSelect one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK
     );
-    return;
+    if(a === ui.Button.OK) return;
   }
   const thisRow = thisSheet.getActiveRange().getRow();
   const rowData = await GetRowData(thisSheet, thisRow);
@@ -322,12 +322,12 @@ const PopupCreateTicket = async () => {
   console.info(t);
   
   SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
-  ui.alert(
+  const a = ui.alert(
     `${SERVICE_NAME} : Ticket Created!`,
     `Ticket Created for : ${name}, Job Number : ${jobnumber}`,
     ui.ButtonSet.OK
   );
-  
+  if(a === ui.Button.OK) return;
 };
 
 /**
@@ -346,7 +346,6 @@ const BuildHTMLHELP = () => {
     `If you don't need to bill the student, choose 'CLOSED' status.`,
     `If you need to cancel the job, choose 'Cancelled'. `,
     `If the project can't be fabricated at all, choose 'FAILED', and email the student why it failed.`,
-    `If you need student approval before proceeding, choose 'Pending Approval'. `,
     `'Missing Access' will be set automatically, and you should not choose this as an option.`,
     `If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. `,
     `See Cody or Chris for additional help + protips.`,
@@ -355,7 +354,7 @@ const BuildHTMLHELP = () => {
   + `<h3 style="font-family:Roboto">How to Use JPS : </h3>`
   + `<hr>`
   + `<p>${items[0]}</p>`
-  + `<ol style="font-family:Roboto font-size:10">`
+  + `<ol style="font-family:Roboto font-size:10">`;
   items.forEach((item, index) => {
     if (index > 0 && index < items.length - 1) html += `<li>${item}</li>`;
   });
@@ -383,40 +382,40 @@ const PopupHelp = async () => {
 const BarMenu = () => {
   SpreadsheetApp.getUi()
     .createMenu(`JPS Menu`)
-    .addItem(`Generate Bill to Selected Student`, `BillFromSelected`)
-    .addItem(`Generate a New JobNumber`, `PopupCreateNewJobNumber`)
-    .addSeparator()
-    .addItem(`Mark as Abandoned`, `PopUpMarkAsAbandoned`)
-    .addItem(`Mark as Picked Up`, `PopUpMarkAsPickedUp`)
-    .addSeparator()
-    .addItem(`Barcode Scanning Tool`, `OpenBarcodeTab`)
-    .addSeparator()
-    .addItem(`Check All Missing Access Students`, `PopupCheckMissingAccessStudents`)
-    .addItem(`Check Specific Student's Access`, `PopupGetSingleStudentPriority`)
-    .addSeparator()
-    .addItem(`Count Active Users`, `PopupCountUsers`)
-    .addItem(`Create a Ticket for a User`, `PopupCreateTicket`)
-    .addSubMenu(
-      SpreadsheetApp.getUi()
-        .createMenu(`Calculate`)
-        .addItem(`Count Total Emails Sent`, `CountTotalEmailsSent`)
-        .addItem(`Generate Metrics`, `Metrics`)
-        .addItem(`Generate Top Ten`, `RunTopTen`)
-        .addItem(`Generate Standard Deviation`, `RunStandardDeviation`)
-    )
-    .addSeparator()
-    .addSubMenu(
-      SpreadsheetApp
-        .getUi()
-        .createMenu(`Chris & Cody ONLY`)
-        .addItem(`DO NOT USE THESE FUNCTIONS UNLESS YOU ARE CHRIS OR CODY!`, `_testStaff`)
-        .addItem(`ENABLE JPS`, `EnableJPS`)
-        .addItem(`DISABLE JPS`, `DisableJPS`)
-        .addItem(`Update Start and End Dates`, `PrintServiceDates`)
-    )
-    .addSeparator()
-    .addItem(`Help`, `PopupHelp`)
-    .addToUi();
+      .addItem(`Generate Bill to Selected Student`, `BillFromSelected`)
+      .addItem(`Generate a New Jobnumber`, `PopupCreateNewJobNumber`)
+      .addSeparator()
+      .addItem(`Mark as Abandoned`, `PopUpMarkAsAbandoned`)
+      .addItem(`Mark as Picked Up`, `PopUpMarkAsPickedUp`)
+      .addSeparator()
+      .addItem(`Barcode Scanning Tool`, `OpenBarcodeTab`)
+      .addSeparator()
+      .addItem(`Check All Missing Access Students`, `PopupCheckMissingAccessStudents`)
+      .addItem(`Check Specific Student's Access`, `PopupGetSingleStudentPriority`)
+      .addSeparator()
+      .addItem(`Count Active Users`, `PopupCountUsers`)
+      .addItem(`Create a Ticket for a User`, `PopupCreateTicket`)
+      .addSubMenu(
+        SpreadsheetApp.getUi()
+          .createMenu(`Calculate`)
+          .addItem(`Count Total Emails Sent`, `CountTotalEmailsSent`)
+          .addItem(`Generate Metrics`, `Metrics`)
+          .addItem(`Generate Top Ten`, `RunTopTen`)
+          .addItem(`Generate Standard Deviation`, `RunStandardDeviation`)
+      )
+      .addSeparator()
+      .addSubMenu(
+        SpreadsheetApp
+          .getUi()
+          .createMenu(`Chris & Cody ONLY`)
+          .addItem(`DO NOT USE THESE FUNCTIONS UNLESS YOU ARE CHRIS OR CODY!`, `_testStaff`)
+          .addItem(`ENABLE JPS`, `EnableJPS`)
+          .addItem(`DISABLE JPS`, `DisableJPS`)
+          .addItem(`Update Start and End Dates`, `PrintServiceDates`)
+      )
+      .addSeparator()
+      .addItem(`Help`, `PopupHelp`)
+      .addToUi();
 };
 
 const RunStandardDeviation = () => new Calculate().CalculateStandardDeviation();
