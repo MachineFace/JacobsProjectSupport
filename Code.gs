@@ -54,7 +54,7 @@ const onSubmission = async (e) => {
   // Generate new Job number
   const jobnumberService = new JobnumberService();
   let jobnumber = jobnumberService.jobnumber;
-  SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
+  SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobnumber);
 
   // Check Priority
   let priority = await new CheckPriority({email : email, sid : sid}).Priority;
@@ -196,7 +196,7 @@ const onSubmission = async (e) => {
   // Check again
   if(!jobnumberService.IsValid(jobnumber)) {
     jobnumber = jobnumberService.jobnumber
-    SetByHeader(sheet, HEADERNAMES.jobNumber, lastRow, jobnumber);
+    SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobnumber);
   }
 
   // Fix wrapping issues
@@ -247,7 +247,7 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Parse Data
   let rowData = GetRowData(thisSheet, thisRow);
-  let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
+  let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
@@ -271,7 +271,7 @@ const onChange = async (e) => {
 
   ds = ds ? ds : `a Design Specialist`;
   const jobnumberService = new JobnumberService();
-  jobNumber = jobNumber ? jobNumber : jobnumberService.jobnumber;
+  jobnumber = jobnumberService.IsValid(jobnumber) ? jobnumber : jobnumberService.jobnumber;
   projectName = projectName ? projectName : `Your Project`;
 
 
@@ -284,10 +284,10 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
-    console.info(`Trying to fix job number : ${jobNumber}`)
+    console.info(`Trying to fix job number : ${jobnumber}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobNumber = jobNumber ? jobNumber : jobnumberService.jobnumber;
-      SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobNumber);
+      jobnumber = jobnumberService.IsValid(jobnumber) ? jobnumber : jobnumberService.jobnumber;
+      SetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow, jobnumber);
       writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
@@ -329,7 +329,7 @@ const onChange = async (e) => {
     } else {
       try {
         ticket = new Ticket({
-          jobnumber : jobNumber,
+          jobnumber : jobnumber,
           designspecialist : ds,
           submissiontime : timestamp,
           name : name,
@@ -358,7 +358,7 @@ const onChange = async (e) => {
   var message = new CreateMessage({
     name : name,
     projectname : projectName, 
-    jobnumber : jobNumber,
+    jobnumber : jobnumber,
     rowData : rowData,
     designspecialist : ds,
     designspecialistemaillink : designspecialistemaillink,

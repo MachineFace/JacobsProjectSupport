@@ -175,7 +175,7 @@ const testSetRow = () => {
     status: STATUS.received,
     ds: 'Cody',
     priority: 1,
-    jobNumber: new JobnumberService().jobnumber,
+    jobnumber: new JobnumberService().jobnumber,
     timestamp: new Date().toDateString(),
     email: 'dingus@berkeley.edu',
     name: 'Testy Fiesty',

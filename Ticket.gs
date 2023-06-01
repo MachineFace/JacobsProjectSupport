@@ -201,7 +201,7 @@ class Ticket {
  */
 const GenerateMissingTickets = () => {
   Object.values(SHEETS).forEach(sheet => {
-    let jobnumbers = GetColumnDataByHeader(sheet, HEADERNAMES.jobNumber);
+    let jobnumbers = GetColumnDataByHeader(sheet, HEADERNAMES.jobnumber);
     let tickets = GetColumnDataByHeader(sheet, HEADERNAMES.ticket);
     console.info(`Sheet --> ${sheet.getSheetName()}`)
     jobnumbers.forEach( async(jobnumber, index) => {

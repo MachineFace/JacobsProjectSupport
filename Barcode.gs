@@ -143,7 +143,7 @@ const MarkAsAbandonedByBarcode = async () => {
       console.info(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       
       const rowData = GetRowData(sheet, searchRow);
-      let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
+      let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
@@ -152,7 +152,7 @@ const MarkAsAbandonedByBarcode = async () => {
       var message = new CreateMessage({
         name : name,
         projectname : projectName, 
-        jobnumber : jobNumber,
+        jobnumber : jobnumber,
         rowData : rowData,
         designspecialist : ds,
       });
@@ -161,7 +161,7 @@ const MarkAsAbandonedByBarcode = async () => {
         name : name, 
         status : STATUS.abandoned,
         projectname : projectName,
-        jobnumber : jobNumber,
+        jobnumber : jobnumber,
         material1Quantity : mat1quantity,
         message : message,
       });

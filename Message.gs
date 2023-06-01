@@ -28,7 +28,7 @@ class CreateMessage {
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
     this.jobnumber = jobnumber ? jobnumber.toString() : new JobnumberService().jobnumber;
 
-    // let { status, ds, priority, ticket, jobNumber, timestamp, email, name, sid, projectName, 
+    // let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
     // mat1quantity, mat1, mat2quantity, mat2, 
     // mat3quantity, mat3, mat4quantity, mat4, 
     // mat5quantity, mat5, affiliation, elapsedTime, estimate, 

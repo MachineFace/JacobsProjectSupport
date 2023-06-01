@@ -5,7 +5,7 @@
 const PopUpMarkAsAbandoned = async () => {
   let ui = SpreadsheetApp.getUi(); 
   let response = ui.prompt(
-    `Mark Job as Abandoned`, 
+    `${SERVICE_NAME} : Mark Job as Abandoned`, 
     `Scan a ticket with this cell selected and press "OK".`, 
     ui.ButtonSet.OK_CANCEL
   );
@@ -54,7 +54,7 @@ const PopUpMarkAsAbandoned = async () => {
 const PopUpMarkAsPickedUp = async () => {
   let ui = SpreadsheetApp.getUi(); 
   let response = ui.prompt(
-    `Mark Print as Picked Up`, 
+    `${SERVICE_NAME} : Mark Print as Picked Up`, 
     `Scan a ticket with this cell selected and press "OK".`, 
     ui.ButtonSet.OK_CANCEL
   );
@@ -90,7 +90,7 @@ const PopupCountUsers = async () => {
   const ui = await SpreadsheetApp.getUi();
   const count = await CountActiveUsers();
   ui.alert(
-    `JPS User Count`,
+    `${SERVICE_NAME} : User Count`,
     `Students Currently Using JPS : ${count}`,
     ui.ButtonSet.OK
   );
@@ -102,11 +102,11 @@ const PopupCountUsers = async () => {
  */
 const PopupCheckMissingAccessStudents = async () => {
   const ui = await SpreadsheetApp.getUi();
-  const names = await CheckMissingAccessStudents().join(", ");
+  const names = await CheckMissingAccessStudents().join(",\n");
   console.info(names);
   ui.alert(
-    `JPS Runtime Message`,
-    `Checking Missing Access Students on All Sheets : \\n ${names}`,
+    `${SERVICE_NAME} : ALERT!`,
+    `Checked Missing Access Students on All Sheets :\n ${names}`,
     ui.ButtonSet.OK
   );
 };
@@ -136,7 +136,7 @@ const PopupGetSingleStudentPriority = async () => {
   } catch (err) {
     console.error(`${err} : Whoops, couldn't set priority for ${name}`);
     ui.alert(
-      `JPS Error`,
+      `${SERVICE_NAME} : Error!`,
       `Whoops, couldn't set priority for ${name}`,
       ui.ButtonSet.OK,
     );
@@ -152,25 +152,33 @@ const PopupCreateNewJobNumber = async () => {
   const ui = await SpreadsheetApp.getUi();
   const thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
+  const jobnumberService = new JobnumberService();
 
-  // If It is on a valid sheet
   if(CheckSheetIsForbidden(thisSheet) == true) {
-    ui.alert(
-      `${SERVICE_NAME}: Incorrect Sheet Active`,
+    const a = ui.alert(
+      `${SERVICE_NAME} : Incorrect Sheet!`,
       `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK,
     );
-    if(ui.ButtonSet.OK) return;
+    if(a === ui.Button.OK) return;
   } 
-  const timestamp = GetByHeader(thisSheet, HEADERNAMES.timestamp, thisRow);
-  const jobnumber = new JobnumberService().jobnumber;
-  SetByHeader(thisSheet, HEADERNAMES.jobNumber, thisRow, jobnumber.toString());
-  ui.alert(
-    `JPS Job Number Created`,
-    `Created a New Jobnumber : ${jobnumber}`,
+  const { name, jobnumber } = GetRowData(thisSheet, thisRow);
+  if(jobnumberService.IsValid(jobnumber)) {
+    const a = ui.alert(
+      `${SERVICE_NAME}\nJob Number Exists!`,
+      `Jobnumber for ${name} exists already!\n${jobnumber}`,
+      ui.ButtonSet.OK
+    );
+    if(a === ui.Button.OK) return;
+  }
+  const newJobnumber = jobnumberService.jobnumber;
+  SetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow, newJobnumber);
+  const a = ui.alert(
+    `${SERVICE_NAME}:\n Job Number Created!`,
+    `Created a New Jobnumber for ${name}:\n${newJobnumber}`,
     ui.ButtonSet.OK
   );
-  
+  if(a === ui.Button.OK) return;
 };
 
 
@@ -192,7 +200,7 @@ const BillFromSelected = async () => {
     if (a === ui.Button.OK) return;
   }
   const rowData = GetRowData(thisSheet, thisRow);
-  let { status, jobNumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate, } = rowData;
+  let { status, jobnumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate, } = rowData;
 
   // TODO: Fix this messy shit.
   if(thisSheet == SHEETS.Plotter || thisSheet == SHEETS.GSI_Plotter) {
@@ -237,7 +245,7 @@ const BillFromSelected = async () => {
   let msg = `Would you like to Generate a Bill to:\n`
   + `${customer?.first_name} ${customer?.last_name}\n`
   + `Email: ${email}\n`
-  + `Job Number : ${jobNumber?.toString()}\n`
+  + `Job Number : ${jobnumber?.toString()}\n`
   + `Shopify ID : ${customer.id?.toString()}\n`
   + `For Materials : \n`
   + `----- ${mat1quantity} of ${mat1}\n`
@@ -256,7 +264,7 @@ const BillFromSelected = async () => {
     );
     if (response == ui.Button.YES) {      
       const order = await shopify.CreateOrder({
-        jobnumber : jobNumber, 
+        jobnumber : jobnumber, 
         email : email,
         material1Name : mat1, material1Quantity : mat1quantity,
         material2Name : mat2, material2Quantity : mat2quantity,
@@ -300,9 +308,9 @@ const PopupCreateTicket = async () => {
   }
   const thisRow = thisSheet.getActiveRange().getRow();
   const rowData = await GetRowData(thisSheet, thisRow);
-  const { ds, jobNumber, timestamp, email, name, sid, projectName, sheetName, row } = rowData;
+  const { ds, jobnumber, timestamp, email, name, sid, projectName, sheetName, row } = rowData;
   const x = await new Ticket({
-    jobnumber : jobNumber,
+    jobnumber : jobnumber,
     designspecialist : ds,
     submissiontime : timestamp,
     name : name,
@@ -316,7 +324,7 @@ const PopupCreateTicket = async () => {
   SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
   ui.alert(
     `${SERVICE_NAME} : Ticket Created!`,
-    `Ticket Created for : ${name}, Job Number : ${jobNumber}`,
+    `Ticket Created for : ${name}, Job Number : ${jobnumber}`,
     ui.ButtonSet.OK
   );
   
