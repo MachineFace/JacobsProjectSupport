@@ -12,7 +12,7 @@ class Calculate {
    * @param {sheet} sheet
    * @returns {string} formatted average time
    */
-  CalculateAverageTurnaround(sheet) {
+  static CalculateAverageTurnaround(sheet) {
     try {
       if(typeof(sheet) != typeof(SHEETS.Advancedlab)) throw new Error(`Bad sheet supplied...`)
       let totals = [];
@@ -63,7 +63,7 @@ class Calculate {
   /**
    * Print Turnaround Times
    */
-  PrintTurnaroundTimes() {
+  static PrintTurnaroundTimes() {
     try {
       let data = [];
       Object.values(SHEETS).forEach(sheet => {
@@ -86,7 +86,7 @@ class Calculate {
    * @param {Date} end
    * @returns {string} formatted duration
    */ 
-  CalculateDuration(start, end) {
+  static CalculateDuration(start, end) {
     try {
       end = end instanceof Date ? new Date(end) : new Date();  // if supplied with nothing, set end time to now
       start = start instanceof Date ? new Date(start) : new Date(end - 87000000);  // if supplied with nothing, set start time to now minus 24 hours.
@@ -120,7 +120,7 @@ class Calculate {
    * Count Active Users
    * @returns {number} unique users
    */
-  CountActiveUsers() {
+  static CountActiveUsers() {
     let persons = [];
     try {
       Object.values(SHEETS).forEach(sheet => {
@@ -146,7 +146,7 @@ class Calculate {
   /**
    * Print Active Users
    */
-  PrintActiveUsers() {
+  static PrintActiveUsers() {
     const count = this.CountActiveUsers();
     OTHERSHEETS.Data.getRange(`B4`).setValue(`TOTAL STUDENTS CURRENTLY USING JPS`);
     OTHERSHEETS.Data.getRange(`C4`).setValue(count);
@@ -156,7 +156,7 @@ class Calculate {
    * Count Each Submission
    * @returns {object} counts per sheet
    */
-  CountEachSubmission() {
+  static CountEachSubmission() {
     let data = [];
     try {
       Object.values(SHEETS).forEach(sheet => {
@@ -176,7 +176,7 @@ class Calculate {
   /**
    * Print Submissions
    */
-  PrintSubmissionData() {
+  static PrintSubmissionData() {
     let data = this.CountEachSubmission();
     data.forEach( (entry, index) => {
       OTHERSHEETS.Data.getRange(13 + index , 2, 1, 1).setValue(entry[0]);
@@ -187,7 +187,7 @@ class Calculate {
   /**
    * Print All Submissions
    */
-  PrintTotalSubmissions() {
+  static PrintTotalSubmissions() {
     let projects = [];
     Object.values(SHEETS).forEach(sheet => {
       const projectnames = GetColumnDataByHeader(sheet, HEADERNAMES.projectName)
@@ -203,9 +203,28 @@ class Calculate {
   }
 
   /**
+   * Find Email
+   * @private
+   * @param {string} name
+   * @returns {string} email
+   */
+  static _FindEmail(name) {
+    if (name) name.toString().replace(/\s+/g, "");
+    let email = ``;
+    Object.values(SHEETS).forEach(sheet => {
+      const finder = sheet.createTextFinder(name).findNext();
+      if (finder != null) {
+        let row = finder.getRow();
+        email = GetByHeader(sheet, HEADERNAMES.email, row);
+      }
+    })
+    return email;
+  }
+
+  /**
    * Create Top Ten List of Users
    */
-  CreateTopTen() {
+  static CreateTopTen() {
     try {
       return this.CalculateDistribution()
         .slice(0, 11)
@@ -224,30 +243,13 @@ class Calculate {
     }
   }
 
-  /**
-   * Find Email
-   * @private
-   * @param {string} name
-   * @returns {string} email
-   */
-  _FindEmail(name) {
-    if (name) name.toString().replace(/\s+/g, "");
-    let email = ``;
-    Object.values(SHEETS).forEach(sheet => {
-      const finder = sheet.createTextFinder(name).findNext();
-      if (finder != null) {
-        let row = finder.getRow();
-        email = GetByHeader(sheet, HEADERNAMES.email, row);
-      }
-    })
-    return email;
-  }
+  
 
   /**
    * Calculate Distribution
    * @returns {[string, number]} sorted list of users
    */
-  CalculateDistribution() {
+  static CalculateDistribution() {
     let userList = [];
     let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
     Object.values(SHEETS).forEach(sheet => {
@@ -256,6 +258,7 @@ class Calculate {
         .filter(x => x != `FORMULA ROW`)
         .filter(x => x != `Formula Row`)
         .filter(x => x != `Test`)
+        .filter(x => x != `test`)
         .filter(x => !staff.includes(x))
         .forEach(user => userList.push(user));
     });
@@ -280,7 +283,7 @@ class Calculate {
    * Defunct
    * @private
    */
-  PrintDistributionNumbers() {
+  static PrintDistributionNumbers() {
     let userList = [];
     let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
     Object.values(SHEETS).forEach(sheet => {
@@ -302,7 +305,7 @@ class Calculate {
    * Count User Types
    * @returns {[]} types, count
    */
-  CountTypes() {
+  static CountTypes() {
     let typeTuple = new Map(Object.keys(TYPES).map(key => [TYPES[key], 0]));
 
     let typeList = [];
@@ -336,7 +339,7 @@ class Calculate {
   /**
    * Print User Types
    */
-  PrintTypesCount() {
+  static PrintTypesCount() {
     let types = this.CountTypes();
     OTHERSHEETS.Data.getRange(44, 2, 1, 1).setValue(`Student Type`);
     OTHERSHEETS.Data.getRange(44, 3, 1, 1).setValue(`Count`);
@@ -351,7 +354,7 @@ class Calculate {
    * Calculate Standard Deviation
    * @returns {number} Standard Deviation
    */
-  CalculateStandardDeviation() {
+  static CalculateStandardDeviation() {
     const distribution = this.CalculateDistribution();
     let n = distribution.length;
     // console.info(`n = ${n}`);
@@ -372,7 +375,7 @@ class Calculate {
    * Calculate Arithmetic Mean
    * @returns {number} arithmetic mean
    */
-  CalculateArithmeticMean() {
+  static CalculateArithmeticMean() {
     const distribution = this.CalculateDistribution();
     let n = distribution.length;
     // console.info(`n = ${n}`);
@@ -389,7 +392,7 @@ class Calculate {
   /**
    * Print Statistics
    */
-  PrintStatistics() {
+  static PrintStatistics() {
     const mean = this.CalculateArithmeticMean();
     OTHERSHEETS.Data.getRange(102, 2, 1, 1).setValue(`Arithmetic Mean for Number of Project Submissions : `)
     OTHERSHEETS.Data.getRange(102, 3, 1, 1).setValue(mean);
@@ -402,7 +405,7 @@ class Calculate {
    * Count User Tiers
    * @returns {[]} tiers
    */
-  CountTiers() {
+  static CountTiers() {
     let tiers = GetColumnDataByHeader(OTHERSHEETS.Approved, `Tier`)
       .filter(Boolean);
     tiers = [].concat(...tiers);
@@ -424,7 +427,7 @@ class Calculate {
   /**
    * Print User Tiers
    */
-  PrintTiers () {
+  static PrintTiers () {
     const tiers = this.CountTiers();
     tiers.forEach( (tier, index) => {
       OTHERSHEETS.Data.getRange(39 + index, 2, 1, 1).setValue(`Tier ${tier[0]} Applicants`);
@@ -438,7 +441,7 @@ class Calculate {
    * Count Project Statuses
    * @returns {[]} statuses
    */
-  CountStatuses () {
+  static CountStatuses () {
     let statuses = [];
     Object.values(SHEETS).forEach(sheet => {
       GetColumnDataByHeader(sheet, HEADERNAMES.status)
@@ -456,7 +459,7 @@ class Calculate {
   /**
    * Print Statuses
    */
-  PrintStatusCounts () {
+  static PrintStatusCounts () {
     let data = this.CountStatuses();
     for(const [status, count] of Object.entries(data)) {
       if(status == STATUS.completed || status == STATUS.billed || status == STATUS.closed || status == STATUS.pickedUp || status == STATUS.abandoned) {
@@ -482,7 +485,7 @@ class Calculate {
    * Count Funding
    * @returns {number} funding
    */
-  CountFunding () {
+  static CountFunding () {
     let subtotals = [];
     Object.values(SHEETS).forEach(sheet => {
       let estimates = GetColumnDataByHeader(sheet, HEADERNAMES.estimate);
@@ -499,7 +502,7 @@ class Calculate {
   /**
    * Print Funding
    */
-  PrintFundingSum () {
+  static PrintFundingSum () {
     let sum = this.CountFunding();
     OTHERSHEETS.Data.getRange(99, 2, 1, 1).setValue(`Total Funds`);
     OTHERSHEETS.Data.getRange(99, 3, 1, 1).setValue(`$${sum}`);
@@ -515,19 +518,18 @@ class Calculate {
  */
 const Metrics = () => {
   console.time(`Metrics Timer `)
-  const calc = new Calculate();
   try {
     console.info(`Calculating Metrics .....`);
-    calc.PrintActiveUsers();
-    calc.PrintTotalSubmissions();
-    calc.PrintTiers();
-    calc.PrintStatusCounts();
-    calc.PrintStatistics();
-    calc.PrintTypesCount();
-    calc.PrintSubmissionData();
-    calc.PrintTurnaroundTimes();
-    calc.PrintFundingSum();
-    calc.CreateTopTen();
+    Calculate.PrintActiveUsers();
+    Calculate.PrintTotalSubmissions();
+    Calculate.PrintTiers();
+    Calculate.PrintStatusCounts();
+    Calculate.PrintStatistics();
+    Calculate.PrintTypesCount();
+    Calculate.PrintSubmissionData();
+    Calculate.PrintTurnaroundTimes();
+    Calculate.PrintFundingSum();
+    Calculate.CreateTopTen();
     console.info(`Recalculated Metrics`);
   } catch (err) {
     console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
@@ -536,11 +538,10 @@ const Metrics = () => {
 }
 
 const _testDist = () => {
-  const c = new Calculate();
   // c.CalculateAverageTurnaround(SHEETS.Advancedlab);
   // c.CalculateDuration();
   // c.CountActiveUsers();
-  c.CountEachSubmission();
+  Calculate.CreateTopTen();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);

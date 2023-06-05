@@ -306,11 +306,10 @@ const onChange = async (e) => {
   // Calculate Turnaround Time only when cell is empty
   try {
     console.info(`Attempting to Calculate turnaround times`);
-    const calc = new Calculate();
     if (!elapsedTime) {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
-        let time = await calc.CalculateDuration(new Date(timestamp), endTime);
+        let time = await Calculate.CalculateDuration(new Date(timestamp), endTime);
         SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
         SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
       }
