@@ -31,12 +31,15 @@ const Search = (value) => {
  * @returns {[sheet, [values]]} list of sheets with lists of indexes
  */
 const SearchSpecificSheet = (sheet, value) => {
-  if(typeof sheet != `object`) return 1;
-  if (value && value != undefined) value.toString().replace(/\s+/g, "");
-  const finder = sheet.createTextFinder(value).findNext();
-  if (finder != null) {
+  try {
+    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
+    if (value && value != undefined) value.toString().replace(/\s+/g, "");
+    const finder = sheet.createTextFinder(value).findNext();
+    if (!finder) return false;
     return finder.getRow();
-  } else return false;
+  } catch(err) {
+    console.error(`"SearchSpecificSheet()" failed : ${err}`);
+  }
 }
 
 /**
@@ -68,17 +71,14 @@ const FindByJobNumber = (jobnumber) => {
  * @param {number} row
  */
 const GetByHeader = (sheet, columnName, row) => {
-  if(typeof sheet != `object`) return 1;
   try {
+    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(columnName);
-    if (col != -1) return data[row - 1][col];
-    else {
-      console.error(`Getting data by header fucking failed...`);
-      return 1;
-    }
+    if (col == -1) return false;
+    return data[row - 1][col];
   } catch (err) {
-    console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
+    console.error(`"GetByHeader()" failed : ${err}, Sheet: ${sheet}, Col: ${columnName}, Row: ${row}`);
     return 1;
   }
 };
@@ -92,19 +92,16 @@ const GetByHeader = (sheet, columnName, row) => {
  * @param {number} row
  */
 const GetColumnDataByHeader = (sheet, columnName) => {
-  if(typeof sheet != `object`) return 1;
   try {
+    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName);
-    let colData = data.map(d => d[col]);
-    colData.splice(0, 1);
-    if (col != -1) return colData;
-    else {
-      console.error(`Getting column data by header fucking failed...`);
-      return 1;
-    }
+    if (col == -1) return false;
+    return colData = data
+      .map(d => d[col])
+      .splice(0, 1);
   } catch (err) {
-    console.error(`${err} : GetByHeader failed - Sheet: ${sheet} Col Name specified: ${columnName}`);
+    console.error(`"GetColumnDataByHeader()" failed : ${err}, Sheet: ${sheet}, Col: ${columnName}`);
     return 1;
   }
 }
@@ -118,9 +115,9 @@ const GetColumnDataByHeader = (sheet, columnName) => {
  * @returns {dict} {header, value}
  */
 const GetRowData = (sheet, row) => {
-  if(typeof sheet != `object`) return 1;
   let dict = {};
   try {
+    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     let headers = sheet.getRange(1, 1, 1, sheet.getMaxColumns()).getValues()[0];
     headers.forEach( (name, index) => {
       let linkedKey = Object.keys(HEADERNAMES).find(key => HEADERNAMES[key] === name);
@@ -136,7 +133,7 @@ const GetRowData = (sheet, row) => {
     console.info(dict);
     return dict;
   } catch (err) {
-    console.error(`${err} : GetRowData failed - Sheet: ${sheet} Row: ${row}`);
+    console.error(`"GetRowData()" failed : ${err}, Sheet: ${sheet}, Row: ${row}`);
     return 1;
   }
 }
@@ -151,9 +148,9 @@ const GetRowData = (sheet, row) => {
  * @returns {dict} {header, value}
  */
 const SetRowData = (sheet, data) => {
-  if(typeof sheet != `object`) return 1;
   let dict = {};
   try {
+    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     let sheetHeaderNames = Object.values(GetRowData(sheet, 1));
     let values = [];
     Object.entries(data).forEach(pair => {
@@ -163,9 +160,9 @@ const SetRowData = (sheet, data) => {
     });
     console.info(values);
     sheet.appendRow(values);
-
+    return 0;
   } catch (err) {
-    console.error(`${err} : SetRowData failed - Sheet: ${sheet}`);
+    console.error(`"SetRowData()" failed : ${err}, Sheet: ${sheet}`);
     return 1;
   }
 }
@@ -199,18 +196,15 @@ const testSetRow = () => {
  * @param {any} val
  */
 const SetByHeader = (sheet, columnName, row, val) => {
-  // if(typeof sheet != `object`) return 1;
-  let data;
-  let col;
   try {
-    data = sheet.getDataRange().getValues();
-    col = data[0].indexOf(columnName) + 1;
-    if(col != -1) {
-      sheet.getRange(row, col).setValue(val);
-      return 0;
-    } else return 1;
+    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied....`);
+    const data = sheet.getDataRange().getValues();
+    const col = data[0].indexOf(columnName) + 1;
+    if(col == -1) return false;
+    sheet.getRange(row, col).setValue(val);
+    return 0;
   } catch (err) {
-    console.error(`${err} : SetByHeader failed - Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
+    console.error(`"SetByHeader()" failed : ${err}, Sheet: ${sheet}, Col: ${columnName}, Row: ${row}, Value: ${val}`);
     return 1;
   }
 };
@@ -233,20 +227,6 @@ const FindOne = (value) => {
   }
   return res;
 }
-
-
-
-
-
-/**
- * Materials Class function
- */
-const materials = (index, quantity, name, url) => {
-  this.index = index;
-  this.quantity = quantity;
-  this.name = name;
-  this.url = url;
-};
 
 
 
@@ -354,10 +334,7 @@ const ParseStringToDate = (dateString) => {
   console.info(`${new Date(year, month, day)}`);
   return new Date(year, month, day);
 }
-const _testParseDate = () => {
-  const cell = OTHERSHEETS.Summary.getRange(1, 6).getValue();
-  ParseStringToDate(cell);
-}
+
 
 /**
  * Check if this sheet is forbidden
@@ -372,14 +349,19 @@ const CheckSheetIsForbidden = (someSheet) => {
   if(index == -1 || index == undefined) {
     console.info(`Sheet is NOT FORBIDDEN : ${someSheet.getName()}`)
     return false;
-  } else {
-    console.error(`SHEET FORBIDDEN : ${forbiddenNames[index]}`);
-    return true;
-  }
+  } 
+  console.error(`SHEET FORBIDDEN : ${forbiddenNames[index]}`);
+  return true;
+  
 }
 
 
-
+/**
+ * Find Missing Elements in Array
+ * @param {[]} array 1
+ * @param {[]} array 2
+ * @return {[]} array of indexes
+ */
 const FindMissingElementsInArrays = (array1, array2) => {
   let indexes = [];
   array1.forEach( item => {
@@ -436,17 +418,6 @@ const TitleCase = (str) => {
 }
 
 
-const _t = () => {
-  let testg = OTHERSHEETS.Data;
-  let testa = SHEETS.Fablight;
-
-  let d = Object.values(NONITERABLESHEETS)
-  console.info(d.includes(testg))
-  // for(let i = 0; i < Object.entries(NONITERABLESHEETS).length; i++) {
-  //   console.info(`Checking if ${thisSheet.getSheetName()} is ${Object.values(NONITERABLESHEETS)[i].getSheetName()}`);
-  //   if(thisSheet === Object.values(NONITERABLESHEETS)[i]) return;
-  // }
-}
 
 
 

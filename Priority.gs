@@ -22,7 +22,7 @@ class CheckPriority {
       if(priority == false) priority = `STUDENT NOT FOUND!`;
       return priority;      
     } catch (err) {
-      console.error(`Whoops ---> ${err}`);
+      console.error(`"Priority()" failed : ${err}`);
     }
   }
 
@@ -37,7 +37,7 @@ class CheckPriority {
       }
       return 1;
     } catch (err) {
-      console.error(`${err} : Whoops, couldn't check if this person is staff`);
+      console.error(`"_CheckForStaff()" failed : ${err}`);
     } 
   }
 
@@ -55,7 +55,7 @@ class CheckPriority {
       console.info(`${this.email} is registered. Priority: ${priority}`);
       return priority;
     } catch(err) {
-      console.error(`${err} : Whoops, checking via email failed....`);
+      console.error(`"_CheckViaEmail()" failed : ${err}`);
     }
   }
 
@@ -88,24 +88,22 @@ class CheckPriority {
  */
 const CheckMissingAccessStudents = () => {
   let list = [];
-  let results = Search("STUDENT NOT FOUND!");
+  const results = Search("STUDENT NOT FOUND!");
   if(results != null) {
     for(const [sheetName, values] of Object.entries(results)) {
       values.forEach( row => {
-        let thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-        let email = GetByHeader(thisSheet, HEADERNAMES.email, row);
-        let sid = GetByHeader(thisSheet, HEADERNAMES.sid, row);
-        let status = GetByHeader(thisSheet, HEADERNAMES.status, row);
+        const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+        const email = GetByHeader(thisSheet, HEADERNAMES.email, row);
+        const sid = GetByHeader(thisSheet, HEADERNAMES.sid, row);
+        const status = GetByHeader(thisSheet, HEADERNAMES.status, row);
         const p = new CheckPriority({email : email, sid : sid}).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
         SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
-        if(p != `STUDENT NOT FOUND!`) {
-          if (status == STATUS.missingAccess) {
-            list.push(email);
-            SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
-          }
+        if(p != `STUDENT NOT FOUND!` && status == STATUS.missingAccess) {
+          list.push(email);
+          SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
         }
-      })
+      });
     }
   }
   return list;

@@ -14,25 +14,26 @@ class BarcodeGenerator {
    * Generate Barcode
    */
   async GenerateBarCodeForTicketHeader() {
-
-    const root = 'http://bwipjs-api.metafloor.com/';
-    const type = '?bcid=code128';
-    const ts = '&text=';
-    const scaleX = `&scaleX=6`
-    const scaleY = '&scaleY=6';
-    const postfx = '&includetext';
-
-    const barcodeLoc = root + type + ts + this.jobnumber + scaleX + scaleY + postfx;
-
-    const params = {
-      method : "GET",
-      headers : { "Authorization": "Basic ", "Content-Type" : "image/png" },
-      contentType : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true,
-    };
-
     try {
+      const root = 'http://bwipjs-api.metafloor.com/';
+      const type = '?bcid=code128';
+      const ts = '&text=';
+      const scaleX = `&scaleX=6`
+      const scaleY = '&scaleY=6';
+
+      if(!JobnumberService.isValid(this.jobnumber)) throw new Error(`Invalid UUID jobnumber...`);
+      const text = JobnumberService.toDecimal(this.jobnumber);
+
+      const barcodeLoc = root + type + ts + text + scaleX + scaleY + `&includetext` + `&parsefnc&alttext=` + this.jobnumber;
+
+      const params = {
+        method : "GET",
+        headers : { "Authorization" : "Basic ", "Content-Type" : "image/png" },
+        contentType : "application/json",
+        followRedirects : true,
+        muteHttpExceptions : true,
+      };
+      console.info(barcodeLoc, params);
       const response = await UrlFetchApp.fetch(barcodeLoc, params);
       const responseCode = response.getResponseCode();
       if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
@@ -48,6 +49,11 @@ class BarcodeGenerator {
     
   }
   
+}
+
+const _testBarcode = () => {
+  const jobnumber = new JobnumberService().jobnumber;
+  const b = new BarcodeGenerator({ jobnumber : jobnumber }).GenerateBarCodeForTicketHeader();
 }
 
 /**
@@ -96,7 +102,8 @@ class QRCodeGenerator {
  * @DEFUNCT
  */
 const PickupByBarcode = () => {
-  const jobnumber = OTHERSHEETS.Pickup.getRange(3,2).getValue();
+  const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
+  const jobnumber = JobnumberService.decimalToUUID(text);
   let progress = OTHERSHEETS.Pickup.getRange(4,2);
 
   progress.setValue(`Searching for job number...`);
@@ -125,7 +132,8 @@ const PickupByBarcode = () => {
  * @DEFUNCT
  */
 const MarkAsAbandonedByBarcode = async () => {
-  const jobnumber = OTHERSHEETS.Pickup.getRange(3,2).getValue();
+  const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
+  const jobnumber = JobnumberService.decimalToUUID(text);
   let progress = OTHERSHEETS.Pickup.getRange(4,2);
 
   progress.setValue(`Searching for job number...`);

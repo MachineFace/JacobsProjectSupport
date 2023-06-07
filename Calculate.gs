@@ -225,7 +225,10 @@ class Calculate {
    */
   static CreateTopTen() {
     try {
-      return this.CalculateDistribution()
+      const distribution = this.CalculateDistribution();
+      if(distribution == 0) throw new Error(`Distribution is empty: ${distribution}`);
+
+      return distribution
         .slice(0, 11)
         .forEach((pair, index) => {
           let email = this._FindEmail(pair[0]);
@@ -254,6 +257,7 @@ class Calculate {
     Object.values(SHEETS).forEach(sheet => {
       GetColumnDataByHeader(sheet, HEADERNAMES.name)
         .filter(Boolean)
+        .filter(x => !x.includes(HEADERNAMES.name))
         .filter(x => x != `FORMULA ROW`)
         .filter(x => x != `Formula Row`)
         .filter(x => x != `Test`)
@@ -354,20 +358,25 @@ class Calculate {
    * @returns {number} Standard Deviation
    */
   static CalculateStandardDeviation() {
-    const distribution = this.CalculateDistribution();
-    let n = distribution.length;
-    // console.info(`n = ${n}`);
+    try {
+      const distribution = this.CalculateDistribution();
+      const n = distribution.length;
+      if(n == 0) throw new Error(`Distribution is empty: ${n}`);
 
-    let values = [];
-    distribution.forEach(x => values.push(x[1]))
-    // console.info(values)
-    let mean = values.reduce((a, b) => a + b) / n;
-    console.warn(`Mean = ${mean}`);
+      let values = [];
+      distribution.forEach(x => values.push(x[1]))
 
-    let s = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-    let standardDeviation = s - mean;
-    console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
-    return Number(standardDeviation).toFixed(2);
+      const mean = values.reduce((a, b) => a + b) / n;
+      console.warn(`Mean = ${mean}`);
+
+      const s = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+      const standardDeviation = s - mean;
+      console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
+      return Number(standardDeviation).toFixed(2);
+    } catch(err) {
+      console.error(`"CalculateStandardDeviation()" failed : ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -375,17 +384,20 @@ class Calculate {
    * @returns {number} arithmetic mean
    */
   static CalculateArithmeticMean() {
-    const distribution = this.CalculateDistribution();
-    let n = distribution.length;
-    // console.info(`n = ${n}`);
+    try {
+      const distribution = this.CalculateDistribution();
+      const n = distribution.length;
+      if(n == 0) throw new Error(`Distribution is empty: ${n}`);
 
-    let values = [];
-    distribution.forEach(person => values.push(person[1]))
-    // console.info(values)
-    let mean = values.reduce((a, b) => a + b) / n;
-    console.warn(`Mean = ${mean}`);
-
-    return mean.toFixed(3);
+      let values = [];
+      distribution.forEach(person => values.push(person[1]))
+      const mean = values.reduce((a, b) => a + b) / n;
+      console.warn(`Mean = ${mean}`);
+      return mean.toFixed(3);
+    } catch(err) {
+      console.error(`"CalculateArithmeticMean()" failed : ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -484,18 +496,25 @@ class Calculate {
    * Count Funding
    * @returns {number} funding
    */
-  static CountFunding () {
-    let subtotals = [];
-    Object.values(SHEETS).forEach(sheet => {
-      let estimates = GetColumnDataByHeader(sheet, HEADERNAMES.estimate);
-      let culled = estimates.filter(Boolean);
-      let reduced = culled.reduce((a, b) => a + b, 0);
-      subtotals.push(reduced);
-    })
-    let sum = subtotals.reduce((a, b) => a + b, 0);
-    // console.info(`Subtotals ---> ${subtotals}`);
-    console.info(`Funding = $${sum.toFixed(2)}`);
-    return sum.toFixed(2);
+  static CountFunding() {
+    try {
+      let subtotals = [];
+      Object.values(SHEETS).forEach(sheet => {
+        let estimates = GetColumnDataByHeader(sheet, HEADERNAMES.estimate)
+          .filter(x => !x.includes(`Estimate`))
+          .filter(Boolean)
+          .reduce((a, b) => a + b, 0);
+        subtotals.push(estimates);
+      })
+      const sum = subtotals.reduce((a, b) => a + b, 0);
+      const fixed = Number(sum).toFixed(2);
+      console.info(`Subtotals ---> ${subtotals}`);
+      console.info(`Funding = $${fixed}`);
+      return fixed;
+    } catch(err) {
+      console.error(`"CountFunding()" failed : ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -540,7 +559,8 @@ const _testDist = () => {
   // c.CalculateAverageTurnaround(SHEETS.Advancedlab);
   // c.CalculateDuration();
   // c.CountActiveUsers();
-  Calculate.CreateTopTen();
+  // Calculate.CalculateDistribution();
+  Calculate.CountFunding();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);

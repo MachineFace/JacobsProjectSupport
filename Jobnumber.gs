@@ -45,9 +45,50 @@ class JobnumberService {
       console.error(`"FindByJobnumber()" failed: ${err}`);
     }
   }
+
+  /**
+   * Convert a UUID to decimal
+   * @param {string} uuid
+   * @return {number} decimals
+   */
+  static toDecimal(uuid) {
+    const hex = uuid.replace(/-/g, '');
+    const decimal = BigInt(`0x${hex}`).toString();  // Convert hexadecimal to decimal
+    const paddedDecimal = decimal.padStart(40, '0');  // Pad decimal with leading zeros to ensure 40 digits
+    return paddedDecimal;
+  }
+
+  /**
+   * Convert a Decimal Value to UUID
+   * @param {number} decimal
+   * @return {string} uuid
+   */
+  static decimalToUUID(decimal) {
+    const paddedDecimal = decimal.toString().padStart(40, '0');  // Pad decimal with leading zeros to ensure 40 digits
+    const hex = BigInt(paddedDecimal).toString(16);   // Convert decimal to hexadecimal
+
+    // Insert dashes to create the UUID format
+    const uuid = [
+      hex.slice(0, 8),
+      hex.slice(8, 12),
+      hex.slice(12, 16),
+      hex.slice(16, 20),
+      hex.slice(20),
+    ].join('-');
+
+    return uuid;
+  }
 }
 
-const _testJ = () => console.info(new JobnumberService().IsValid(`b819a295-66b7-4b82-8f91-81cf227c5216`));
+const _testJ = () => {
+  const testUUID = `b819a295-66b7-4b82-8f91-81cf227c5216`;
+  const dec = JobnumberService.toDecimal(testUUID);
+  console.info(`TEST: ${testUUID} ---> ${dec}`);
+  const back = JobnumberService.decimalToUUID(dec);
+  console.info(`BACK: ${dec} ----> ${back}`);
+  const val = JobnumberService.isValid(back);
+  console.info(`Valid? : ${val}`);
+}
 
 
 

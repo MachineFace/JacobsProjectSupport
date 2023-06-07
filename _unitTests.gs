@@ -288,13 +288,13 @@ const _gasTMiscTesting = async () => {
     t.equal(x, `codyglen@berkeley.edu`, `Should fetch my email from that sheet.`);
 
     const y = GetByHeader(SHEETS.Laser, `BAD COLUMN NAME`, 2);
-    t.equal(y, 1, `GetByHeader SHOULD return "1": ${y}`);
+    t.equal(y, false, `GetByHeader SHOULD return "false": ${y}`);
 
     const z = GetByHeader(`BAD SHEET`, HEADERNAMES.email, 2);
-    t.equal(y, 1, `GetByHeader SHOULD return "1": ${y}`);
+    t.throws(z, `GetByHeader SHOULD throw an error on bad sheet name: ${z}`);
 
     const a = GetByHeader(`BAD SHEET`, `BAD COLUMN NAME`, `BAD ROW NUMBER`);
-    t.equal(a, 1, `GetByHeader SHOULD return "1": ${a}`);
+    t.throws(a, `GetByHeader SHOULD throw an error on bad sheet name: ${a}`);
 
   });
 
@@ -303,10 +303,10 @@ const _gasTMiscTesting = async () => {
     t.notEqual(x, undefined || null, `GetColumnDataByHeader SHOULD NOT return undefined or null: ${x}`);
 
     const y = GetColumnDataByHeader(SHEETS.Laser, `BAD COLUMN NAME`);
-    t.equal(y, 1, `GetByHeader SHOULD return "1": ${y}`);
+    t.equal(y, false, `GetByHeader SHOULD return "false": ${y}`);
 
     const z = GetColumnDataByHeader(`BAD SHEET`, `BAD COLUMN NAME`);
-    t.equal(z, 1, `GetByHeader SHOULD return "1": ${z}`);
+    t.throws(z, `GetColumnDataByHeader SHOULD throw an error on bad sheet name: ${z}`);
 
   });
 
@@ -402,13 +402,14 @@ const _gasTCalculationTesting = async () => {
     t.notEqual(x, undefined, `Count Each Submission should not return undefined.`);
   });
   
+  
   await test(`Create Top Ten`, (t) => {
     const x = Calculate.CreateTopTen();
-    t.notEqual(x, undefined || null, `Top Ten should not return undefined or null.`);
+    t.notThrow(() => x, `CreateTopTen SHOULD NOT throw error`);
   });
-  
+
   await test(`Find an Email.`, (t) => {
-    const x = Calculate.FindEmail(`Cody`);
+    const x = Calculate._FindEmail(`Cody`);
     t.equal(x, `codyglen@berkeley.edu`, `Function should find my email: ${x}.`);
     t.notEqual(x, undefined || null, `Find an Email should not return undefined or null.`);
   });
@@ -510,7 +511,7 @@ const _gasTTicketTesting = async () => {
   await test(`Ticket`, t => {
     const name = `Dingus`; 
     const email = "codyglen@berkeley.edu";
-    const jobnumber = new CreateJobnumber({ date : new Date()}).Jobnumber;
+    const jobnumber = new JobnumberService().jobnumber;
     const projectname = `Some Kinda Project`;
     const rowData = GetRowData(SHEETS.Fablight, 2);
 
