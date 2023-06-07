@@ -27,7 +27,6 @@
  */
 const onSubmission = async (e) => {
 
-  const writer = new WriteLogger();
   const staff = new MakeStaff().Staff;
   // Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -49,7 +48,7 @@ const onSubmission = async (e) => {
 
   let values = e.namedValues;
   console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
-  writer.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
+  Log.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
   const jobnumberService = new JobnumberService();
@@ -125,7 +124,7 @@ const onSubmission = async (e) => {
       bcc: staff.Chris.email,
       name: SERVICE_NAME,
     });
-    writer.Info(`Design Specialist has been emailed.`);
+    Log.Info(`Design Specialist has been emailed.`);
   } catch (err) {
     console.error(`${err} : Couldn't email DS...`);
   }
@@ -148,7 +147,7 @@ const onSubmission = async (e) => {
         bcc: staff.Chris.email,
         name: SERVICE_NAME,
       });
-      writer.Info(`Creaform instruction email sent.`);
+      Log.Info(`Creaform instruction email sent.`);
     }
   } catch (err) {
     console.error(`${err} : Couldn't send Creaform email for some reason.`);
@@ -183,7 +182,7 @@ const onSubmission = async (e) => {
         bcc: staff.Chris.email,
         name: SERVICE_NAME,
       });
-      writer.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
+      Log.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
   } catch (err) {
     console.error(`${err} : Couldn't determine student access`);
@@ -213,7 +212,6 @@ const onSubmission = async (e) => {
  * @param {Event} e
  */
 const onChange = async (e) => {
-  const writer = new WriteLogger();
 
   // Fetch Data from Sheets
   var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -276,7 +274,7 @@ const onChange = async (e) => {
 
 
   // Log submission info to sheet
-  writer.Info(`Submission Time = ${timestamp}, Name = ${name}, Email = ${email}, Project = ${projectName}`);
+  Log.Info(`Submission Time = ${timestamp}, Name = ${name}, Email = ${email}, Project = ${projectName}`);
 
   // Ignore
   if(status == STATUS.closed) return;
@@ -288,7 +286,7 @@ const onChange = async (e) => {
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumberService.IsValid(jobnumber) ? jobnumber : jobnumberService.jobnumber;
       SetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow, jobnumber);
-      writer.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
+      Log.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
     console.error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
@@ -365,7 +363,7 @@ const onChange = async (e) => {
   });
 
   // Send email with appropriate response and cc Chris and Cody.
-  writer.Info(`Sending email....`);
+  Log.Info(`Sending email....`);
   new Emailer({
     name : name, 
     status : status,

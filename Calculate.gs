@@ -104,7 +104,6 @@ class Calculate {
       timeDiff = Math.floor(timeDiff / 24); //Difference hrs to days
       let days = timeDiff.toString();
 
-      // Write
       let formatted = `days : ${days.toString()}, hrs : ${hrs.toString()}, mins : ${minutesAsString}, secs : ${secondsAsString}`;
       let out = `${days} ${hrs}:${minutesAsString}:${secondsAsString}`;
       console.info(`Duration = ${out}`);
