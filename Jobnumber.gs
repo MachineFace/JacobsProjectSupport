@@ -8,8 +8,15 @@ class JobnumberService {
   constructor() {
 
   }
+
+  /**
+   * Get a New Jobnumber
+   * @return {string} uuid
+   */
   get jobnumber(){
-    return Utilities.getUuid();
+    const id = Utilities.getUuid();
+    console.info(`Id Created: ${id}`);
+    return id;
   }
 
   /**
@@ -81,13 +88,15 @@ class JobnumberService {
 }
 
 const _testJ = () => {
-  const testUUID = `b819a295-66b7-4b82-8f91-81cf227c5216`;
-  const dec = JobnumberService.toDecimal(testUUID);
-  console.info(`TEST: ${testUUID} ---> ${dec}`);
-  const back = JobnumberService.decimalToUUID(dec);
-  console.info(`BACK: ${dec} ----> ${back}`);
-  const val = JobnumberService.isValid(back);
-  console.info(`Valid? : ${val}`);
+  const j = new JobnumberService().jobnumber;
+  console.info(j)
+  // const testUUID = `b819a295-66b7-4b82-8f91-81cf227c5216`;
+  // const dec = JobnumberService.toDecimal(testUUID);
+  // console.info(`TEST: ${testUUID} ---> ${dec}`);
+  // const back = JobnumberService.decimalToUUID(dec);
+  // console.info(`BACK: ${dec} ----> ${back}`);
+  // const val = JobnumberService.isValid(back);
+  // console.info(`Valid? : ${val}`);
 }
 
 

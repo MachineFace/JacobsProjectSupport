@@ -13,19 +13,6 @@ class CheckPriority {
     this.sid = sid ? sid.toString().replace(/\s+/g, "") : 19238471239847;
   }
 
-  get Priority () {
-    // Try email first
-    try {
-      let priority = this._CheckViaEmail();
-      if(priority == false) priority = this._CheckViaSID();
-      if(priority == false) priority = this._CheckForStaff();
-      if(priority == false) priority = `STUDENT NOT FOUND!`;
-      return priority;      
-    } catch (err) {
-      console.error(`"Priority()" failed : ${err}`);
-    }
-  }
-
   /** @private */
   _CheckForStaff () {
     try {
@@ -38,6 +25,7 @@ class CheckPriority {
       return 1;
     } catch (err) {
       console.error(`"_CheckForStaff()" failed : ${err}`);
+      return `STUDENT NOT FOUND!`;
     } 
   }
 
@@ -56,6 +44,7 @@ class CheckPriority {
       return priority;
     } catch(err) {
       console.error(`"_CheckViaEmail()" failed : ${err}`);
+      return `STUDENT NOT FOUND!`;
     }
   }
 
@@ -74,8 +63,24 @@ class CheckPriority {
       return priority;
     } catch(err) {
       console.error(`${err}: Whoops, couldn't check via SID`);
+      return `STUDENT NOT FOUND!`;
     } 
 
+  }
+
+  get Priority () {
+    // Try email first
+    try {
+      let priority = false;
+      if(priority == false) priority = this._CheckViaEmail();
+      if(priority == false) priority = this._CheckViaSID();
+      if(priority == false) priority = this._CheckForStaff();
+      if(priority == false) priority = `STUDENT NOT FOUND!`;
+      return priority;      
+    } catch (err) {
+      console.error(`"Priority()" failed : ${err}`);
+      return `STUDENT NOT FOUND!`;
+    }
   }
 
   

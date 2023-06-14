@@ -19,6 +19,7 @@
 
 
 
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Trigger 1 - On Submission
@@ -33,8 +34,9 @@ const onSubmission = async (e) => {
   var sheetName = e.range.getSheet().getName();
 
   // Get last row and set status to received
-  let timestamps = [...GetColumnDataByHeader(sheet, HEADERNAMES.timestamp)].filter(Boolean);
-  let lastRow = timestamps.length + 1;
+  let lastRow = GetColumnDataByHeader(sheet, HEADERNAMES.timestamp)
+    .filter(Boolean)
+    .length + 1;
   console.info(`This Row: ${lastRow}`);
 
   // Parse variables
@@ -51,12 +53,14 @@ const onSubmission = async (e) => {
   Log.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  const jobnumberService = new JobnumberService();
-  let jobnumber = jobnumberService.jobnumber;
+  let jobnumber = new JobnumberService().jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobnumber);
 
+  // Set Status to Received
+  SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
+
   // Check Priority
-  let priority = await new CheckPriority({email : email, sid : sid}).Priority;
+  let priority = new CheckPriority({ email : email, sid : sid }).Priority;
   SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority);
 
   // Create Messages
@@ -68,17 +72,12 @@ const onSubmission = async (e) => {
   // Create array summary of student's entry and append it to the message
   dsMessage += `<ul>`;
   for (let key in values) {
-    let label = key;
-    let data = values[key];
-    dsMessage += `<li>` + label + `: ` + data + `</li>`;
+    dsMessage += `<li>${key}: ${values[key]}</li>`;
   }
-  dsMessage += `</ul>`;
-  dsMessage += `<div>`;
-
-  // Notify Staff via email and set their assignment
-  let designspecialistemail;
+  dsMessage += `</ul><div>`;
 
   // Set the Staff member for the sheet.
+  let designspecialistemail;
   switch (sheetName) {
     case SHEETS.Advancedlab.getName():
     case SHEETS.Creaform.getName():
@@ -127,14 +126,6 @@ const onSubmission = async (e) => {
     Log.Info(`Design Specialist has been emailed.`);
   } catch (err) {
     console.error(`${err} : Couldn't email DS...`);
-  }
-
-  // Fix `Received` Status Issue
-  let stat = GetByHeader(sheet, HEADERNAMES.status, lastRow);
-  if (stat != STATUS.received) {
-    stat = STATUS.received;
-    SetByHeader(sheet, HEADERNAMES.status,  lastRow, stat); 
-    console.warn(`Status refixed to 'Received'.`);
   }
 
   // Creaform
@@ -193,9 +184,8 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  if(!jobnumberService.IsValid(jobnumber)) {
-    jobnumber = jobnumberService.jobnumber
-    SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobnumber);
+  if(new JobnumberService().IsValid(jobnumber) == false) {
+    SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, new JobnumberService().jobnumber);
   }
 
   // Fix wrapping issues

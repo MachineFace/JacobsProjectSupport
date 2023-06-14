@@ -32,13 +32,13 @@ const Search = (value) => {
  */
 const SearchSpecificSheet = (sheet, value) => {
   try {
-    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     if (value && value != undefined) value.toString().replace(/\s+/g, "");
     const finder = sheet.createTextFinder(value).findNext();
     if (!finder) return false;
     return finder.getRow();
   } catch(err) {
     console.error(`"SearchSpecificSheet()" failed : ${err}`);
+    return 1;
   }
 }
 
@@ -72,7 +72,6 @@ const FindByJobNumber = (jobnumber) => {
  */
 const GetByHeader = (sheet, columnName, row) => {
   try {
-    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(columnName);
     if (col == -1) return false;
@@ -93,13 +92,12 @@ const GetByHeader = (sheet, columnName, row) => {
  */
 const GetColumnDataByHeader = (sheet, columnName) => {
   try {
-    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName);
     if (col == -1) return false;
-    return colData = data
-      .map(d => d[col])
-      .splice(0, 1);
+    let colData = data.map(d => d[col]);
+    colData.splice(0, 1);
+    return colData;
   } catch (err) {
     console.error(`"GetColumnDataByHeader()" failed : ${err}, Sheet: ${sheet}, Col: ${columnName}`);
     return 1;
@@ -117,7 +115,6 @@ const GetColumnDataByHeader = (sheet, columnName) => {
 const GetRowData = (sheet, row) => {
   let dict = {};
   try {
-    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     let headers = sheet.getRange(1, 1, 1, sheet.getMaxColumns()).getValues()[0];
     headers.forEach( (name, index) => {
       let linkedKey = Object.keys(HEADERNAMES).find(key => HEADERNAMES[key] === name);
@@ -150,7 +147,6 @@ const GetRowData = (sheet, row) => {
 const SetRowData = (sheet, data) => {
   let dict = {};
   try {
-    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied...`);
     let sheetHeaderNames = Object.values(GetRowData(sheet, 1));
     let values = [];
     Object.entries(data).forEach(pair => {
@@ -197,7 +193,6 @@ const testSetRow = () => {
  */
 const SetByHeader = (sheet, columnName, row, val) => {
   try {
-    if(typeof sheet != `object`) throw new Error(`Bad sheet supplied....`);
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName) + 1;
     if(col == -1) return false;

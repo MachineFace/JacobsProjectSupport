@@ -411,6 +411,7 @@ const BarMenu = () => {
           .addItem(`ENABLE JPS`, `EnableJPS`)
           .addItem(`DISABLE JPS`, `DisableJPS`)
           .addItem(`Update Start and End Dates`, `PrintServiceDates`)
+          .addItem(`Reset Conditional Formatting`, `SetConditionalFormatting`)
       )
       .addSeparator()
       .addItem(`Help`, `PopupHelp`)
