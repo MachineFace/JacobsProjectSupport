@@ -32,6 +32,7 @@ const Search = (value) => {
  */
 const SearchSpecificSheet = (sheet, value) => {
   try {
+    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Value: ${val}`);
     if (value && value != undefined) value.toString().replace(/\s+/g, "");
     const finder = sheet.createTextFinder(value).findNext();
     if (!finder) return false;
@@ -59,10 +60,6 @@ const FindByJobNumber = (jobnumber) => {
   return res;
 }
 
-
-
-
-
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Return the value of a cell by column name and row number
@@ -72,12 +69,13 @@ const FindByJobNumber = (jobnumber) => {
  */
 const GetByHeader = (sheet, columnName, row) => {
   try {
+    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Col: ${columnName} Row: ${row}`);
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(columnName);
     if (col == -1) return false;
     return data[row - 1][col];
   } catch (err) {
-    console.error(`"GetByHeader()" failed : ${err}, Sheet: ${sheet}, Col: ${columnName}, Row: ${row}`);
+    console.error(`"GetByHeader()" failed : ${err}`);
     return 1;
   }
 };
@@ -92,6 +90,7 @@ const GetByHeader = (sheet, columnName, row) => {
  */
 const GetColumnDataByHeader = (sheet, columnName) => {
   try {
+    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Col: ${columnName}`);
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName);
     if (col == -1) return false;
@@ -99,11 +98,10 @@ const GetColumnDataByHeader = (sheet, columnName) => {
     colData.splice(0, 1);
     return colData;
   } catch (err) {
-    console.error(`"GetColumnDataByHeader()" failed : ${err}, Sheet: ${sheet}, Col: ${columnName}`);
+    console.error(`"GetColumnDataByHeader()" failed : ${err}`);
     return 1;
   }
 }
-
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -115,6 +113,7 @@ const GetColumnDataByHeader = (sheet, columnName) => {
 const GetRowData = (sheet, row) => {
   let dict = {};
   try {
+    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Row: ${row}`);
     let headers = sheet.getRange(1, 1, 1, sheet.getMaxColumns()).getValues()[0];
     headers.forEach( (name, index) => {
       let linkedKey = Object.keys(HEADERNAMES).find(key => HEADERNAMES[key] === name);
@@ -130,7 +129,7 @@ const GetRowData = (sheet, row) => {
     console.info(dict);
     return dict;
   } catch (err) {
-    console.error(`"GetRowData()" failed : ${err}, Sheet: ${sheet}, Row: ${row}`);
+    console.error(`"GetRowData()" failed : ${err}`);
     return 1;
   }
 }
@@ -147,6 +146,7 @@ const GetRowData = (sheet, row) => {
 const SetRowData = (sheet, data) => {
   let dict = {};
   try {
+    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}`);
     let sheetHeaderNames = Object.values(GetRowData(sheet, 1));
     let values = [];
     Object.entries(data).forEach(pair => {
@@ -158,7 +158,7 @@ const SetRowData = (sheet, data) => {
     sheet.appendRow(values);
     return 0;
   } catch (err) {
-    console.error(`"SetRowData()" failed : ${err}, Sheet: ${sheet}`);
+    console.error(`"SetRowData()" failed : ${err}`);
     return 1;
   }
 }
@@ -193,13 +193,14 @@ const testSetRow = () => {
  */
 const SetByHeader = (sheet, columnName, row, val) => {
   try {
+    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Col: ${columnName}, Row: ${row}, Value: ${val}`);
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName) + 1;
     if(col == -1) return false;
     sheet.getRange(row, col).setValue(val);
     return 0;
   } catch (err) {
-    console.error(`"SetByHeader()" failed : ${err}, Sheet: ${sheet}, Col: ${columnName}, Row: ${row}, Value: ${val}`);
+    console.error(`"SetByHeader()" failed : ${err}`);
     return 1;
   }
 };
