@@ -30,7 +30,7 @@ const Search = (value) => {
  * @required {string} value
  * @returns {[sheet, [values]]} list of sheets with lists of indexes
  */
-const SearchSpecificSheet = (sheet, value) => {
+const SearchSpecificSheet = (sheet, value) => { 
   try {
     if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Value: ${val}`);
     if (value && value != undefined) value.toString().replace(/\s+/g, "");

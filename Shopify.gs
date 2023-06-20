@@ -542,5 +542,40 @@ const _testAPI = async () => {
 }
 
 
+// /**
+//  * Configure the service
+//  * @private
+//  */
+// const CreateService = () => {
+//   const service = OAuth2.createService(`Shopify`)
+//     .setAuthorizationBaseUrl(`https://jacobs-student-store.myshopify.com/admin/api/2023-04/`)
+//     .setTokenUrl(`https://jacobs-student-store.myshopify.com/admin/api/2023-04/token`)
+//     .setClientId(PropertiesService.getScriptProperties().getProperty(`shopify_api_key`))
+//     .setClientSecret(PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`))
+//     .setCallbackFunction((request) => {
+//       const service = CreateService();
+//       const isAuthorized = service.handleCallback(request);
+//       if (isAuthorized) { 
+//         return HtmlService
+//           .createTemplateFromFile("auth_success")
+//           .evaluate();
+//       } else {
+//         return HtmlService
+//           .createTemplateFromFile("auth_error")
+//           .evaluate();
+//       }
+//     })
+//     .setPropertyStore(PropertiesService.getUserProperties())
+//     .setCache(CacheService.getUserCache())
+//     .setLock(LockService.getUserLock())
+//     // .setScope('user-library-read playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private');
+//   // if (!service.hasAccess()) {
+//   //   throw new Error('Error: Missing Shopify authorization.');
+//   // }
+//   console.info(`Service Access: ${service.hasAccess()}`);
+//   console.info(service)
+//   return service;
+// }
+
 
 

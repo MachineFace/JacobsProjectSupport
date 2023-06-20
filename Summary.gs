@@ -36,29 +36,29 @@ class SummaryBuilder {
     values.shift(); // remove headers
     let items = [];
     values.forEach( (value) => {
-      let item = {};
-      item.status = value[0];
-      item.ds = value[1];
-      item.approved = value[2];
-      item.files = value[3];
-      item.ticket = value[4];
-      item.jobnum = value[5];
-      item.studentApproved = value[6];
-      item.timestamp = value[7];
-      item.email = value[8];
-      item.name = value[9];
-      item.sid = value[10];
-      item.project = value[11];
-      item.mat1num = value[12];
-      item.mat1type = value[13];
-      item.mat1url = value[14];
-      item.mat2num = value[15];
-      item.mat2type = value[16];
-      item.mat2url = value[17];
-      item.affiliation = value[18];
-      item.partcount = value[19];
-      item.quality = value[20];
-
+      const item = {
+        status : value[0],
+        ds : value[1],
+        approved : value[2],
+        files : value[3],
+        ticket : value[4],
+        jobnum : value[5],
+        studentApproved : value[6],
+        timestamp : value[7],
+        email : value[8],
+        name : value[9],
+        sid : value[10],
+        project : value[11],
+        mat1num : value[12],
+        mat1type : value[13],
+        mat1url : value[14],
+        mat2num : value[15],
+        mat2type : value[16],
+        mat2url : value[17],
+        affiliation : value[18],
+        partcount : value[19],
+        quality : value[20],
+      };
       items.push(item);
     })
     return items;

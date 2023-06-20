@@ -86,21 +86,13 @@ const RemoveTimedTriggers = () => {
       .everyMinutes(10)
       .create();
     console.info(`Removed Triggers for Summary Emails`);
+    return 0;
   } catch (err) {
-    console.error(`${err} : Couldnt remove triggers for whatever reason.`);
+    console.error(`"RemoveTimedTriggers()" failed : ${err}`);
+    return 1;
   }
 };
 
-const DisableByDate = () => {
-  const cell = OTHERSHEETS.Summary.getRange(1, 6).getValue();
-  let array = cell.toString().split(" ");
-  console.info(array);
-  
-  //let date = ParseStringToDate(date);
-  const today = new Date();
-  const target = new Date(2022, 12, 9);
-  // if(today >= target) DisableJPS();
-}
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -108,20 +100,19 @@ const DisableByDate = () => {
  * Used in conjunction with 'EnableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
 const DisableJPS = () => {
-  //Disable Forms
   try {
     for (let name in FORMS) {
       FormApp.openById(FORMS[name]).setAcceptingResponses(false);
       console.warn(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
     }
+    RemoveTimedTriggers();
     console.warn(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
+    return 0;
   } catch (err) {
-    console.error(`${err} : Couldnt disable Accepting Responses on Forms`);
+    console.error(`"DisableJPS()" failed : ${err}`);
+    return 1;
   }
-
-  //Delete Timebased Triggers for Daily Emails
-  RemoveTimedTriggers();
-};
+}
 
 
 /**
@@ -136,18 +127,14 @@ const EnableJPS = () => {
       console.warn(`${name} : ${FORMS[name]} IS NOW ENABLED.`);
     }
     console.warn(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
-  } catch (err) {
-    console.error(err + " : Couldnt enable Accepting Responses on Forms");
-  }
-
-  //Create Triggers
-  try {
     CreateTimeDrivenTrigger();
-    console.warn("Created Daily Summary Email Triggers.");
-  } catch (err) {
-    console.error(`${err} : Couldnt install triggers for whatever reason.`);
+    console.warn(`Created Daily Summary Email Triggers.`);
+    return 0;
+  } catch(err) {
+    console.error(`"EnableJPS()" failed : ${err}`);
+    return 1;
   }
-};
+}
 
 
 
@@ -299,10 +286,11 @@ const DeleteOldFiles = () => {
  */
 const FormatCell = (cell) => {
   try {
-    const strategy = SpreadsheetApp.WrapStrategy.CLIP;
-    cell.setWrapStrategy(strategy);
+    cell.setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+    return 0;
   } catch (err) {
-    console.error(`${err} : Cell failed to be clipped.`);
+    console.error(`"FormatCell()" failed : ${err}`);
+    return 1;
   }
-};
+}
 
