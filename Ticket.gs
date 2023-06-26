@@ -33,7 +33,9 @@ class Ticket {
 
   }
 
-  
+  /**
+   * Create Ticket
+   */
   async CreateTicket() {
     const barcode = await new BarcodeGenerator({ jobnumber : this.jobnumber }).GenerateBarCodeForTicketHeader();
 
@@ -180,7 +182,7 @@ class Ticket {
    * @param {string} text
    * @param {blob} image
    */
-  _ReplaceTextToImage (body, searchText, imagefile) {
+  _ReplaceTextToImage(body, searchText, imagefile) {
     try {
       const imageBlob = imagefile.getBlob();
       let next = body.findText(searchText);
@@ -190,7 +192,8 @@ class Ticket {
       r.getParent().asParagraph().insertInlineImage(0,imageBlob);
       return next;
     } catch (err) {
-      console.error(`${err} : Couldn't swap out text for images....`);
+      console.error(`"_ReplaceTextToImage()" failed : ${err}`);
+      return 1;
     }
   };
   

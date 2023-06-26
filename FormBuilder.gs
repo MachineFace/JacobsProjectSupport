@@ -13,20 +13,29 @@ class ApprovalFormBuilder {
     jobnumber : jobnumber = new JobnumberService().jobnumber,
     cost : cost = 2.50,
   }) {
+    /** @private */
     this.name = name;
+    /** @private */
     this.jobnumber = jobnumber;
+    /** @private */
     this.cost = cost;
+    /** @private */
     this.destination = DriveApp.getFoldersByName(`Job Forms`);
+    /** @private */
     this.form = FormApp.create(`Approval Form`);
+    /** @private */
     this.CreateApprovalForm();
     this.url;
   }
 
+  /**
+   * Create Approval Form
+   */
   CreateApprovalForm () {
     const sendloc = "16oCqmnW9zCUhpQLo3TXsaUSxDcSv7aareEVSE9zYtVQ";
     try {
       this.form
-        .setDestination( FormApp.DestinationType.SPREADSHEET, sendloc )
+        .setDestination(FormApp.DestinationType.SPREADSHEET, sendloc )
         .setTitle(`Approval Form`)
         .setDescription(`Referrence Number: ${this.jobnumber}`)
         .setConfirmationMessage(`Thanks for responding!`)
@@ -93,7 +102,7 @@ class ApprovalFormBuilder {
       console.error(`${err} : Couldn't delete the form in that spot. Probably still has the form linked.` );
     }
     return this.url;
-  };
+  }
 }
 
 

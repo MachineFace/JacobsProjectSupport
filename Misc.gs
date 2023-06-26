@@ -207,6 +207,26 @@ const SetByHeader = (sheet, columnName, row, val) => {
 
 
 /**
+ * Check if this sheet is forbidden
+ * @param {sheet} sheet to check
+ * @returns {bool} false if sheet is allowed
+ * @returns {bool} true if forbidden
+ */
+const IsValidSheet = (someSheet) => {
+  try {
+    if (typeof(someSheet) !== `object`) throw new Error(`A non-sheet argument was passed to a function that requires a sheet.`);
+    
+    let forbiddenNames = [];
+    Object.values(NONITERABLESHEETS).forEach(sheet => forbiddenNames.push(sheet.getSheetName()));
+    return !forbiddenNames.includes(someSheet.getName());
+  } catch(err) {
+    console.error(`"IsValidSheet()" failed : ${err}`);
+    return 1;
+  }
+}
+
+
+/**
  * Search all Sheets for one specific value
  * @required {string} value
  * @returns {[sheet, [number]]} [sheetname, row]

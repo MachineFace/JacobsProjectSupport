@@ -166,6 +166,7 @@ const SendEmail = async ({
     return 0;
   } catch (err) {
     console.error(`Could not email: ${err}`);
+    return 1;
   }
 }
 
