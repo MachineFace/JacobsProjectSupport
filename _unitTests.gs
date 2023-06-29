@@ -25,11 +25,11 @@ const _gasTMainTesting = async () => {
         sid : 91283741923,
       },
       goodEgoodS : {
-        email : `codyglen@berkeley.edu`,
+        email : `cassidypowers@berkeley.edu`,
         sid : 3034682275
       },
       goodEbadS : {
-        email : `codyglen@berkeley.edu`,
+        email : `cassidypowers@berkeley.edu`,
         sid : 12938749123,
       },
       badEgoodS : {
@@ -41,15 +41,15 @@ const _gasTMainTesting = async () => {
         sid : 2394872349587,
       },
     }
-    const st = new CheckPriority({ email : types.staff.email, sid : types.staff.sid }).Priority;
+    const st = new CheckPriority({email : types.staff.email, sid : types.staff.sid }).Priority;
     t.equal(st, 1, `DEFAULT priority for staff : Expected 1, Actual ${st}`);
-    const gg = new CheckPriority({ email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
+    const gg = new CheckPriority({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
     t.equal(gg, 3, `Expected 3, Actual ${gg}`);
-    const gb = new CheckPriority({ email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
+    const gb = new CheckPriority({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
     t.equal(gb, 3, `Expected 3, Actual ${gb}`);
-    const bg = new CheckPriority({ email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
+    const bg = new CheckPriority({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
     t.equal(bg, 3, `Expected 3, Actual ${bg}`);
-    const bb = new CheckPriority({ email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
+    const bb = new CheckPriority({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
     t.equal(bb, `STUDENT NOT FOUND!`, `Expected "STUDENT NOT FOUND!", Actual ${bb}`);
 
   });

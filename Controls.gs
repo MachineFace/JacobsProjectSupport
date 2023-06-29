@@ -36,29 +36,32 @@ const CreateTimeDrivenTrigger = () => {
       .onWeekDay(ScriptApp.WeekDay.FRIDAY)
       .atHour(timetoEmail)
       .create();
-  } catch (err) {
-    console.error(`${err} : Could not create triggers`);
-  }
-  try {
     ScriptApp.newTrigger(`SetRowHeight`)
-      .timeBased()
-      .everyMinutes(5)
-      .create();
-    ScriptApp.newTrigger(`Metrics`)
       .timeBased()
       .everyMinutes(10)
       .create();
+    ScriptApp.newTrigger(`Metrics`)
+      .timeBased()
+      .everyMinutes(30)
+      .create();
     ScriptApp.newTrigger(`GenerateMissingTickets`)
       .timeBased()
-      .everyMinutes(5)
+      .everyMinutes(30)
       .create();
     ScriptApp.newTrigger(`SetConditionalFormatting`)
       .timeBased()
-      .onMonthDay(1)
-      .atHour(2)
+      .everyHours(1)
+      .create();
+    ScriptApp.newTrigger(`SetStatusDropdowns`)
+      .timeBased()
+      .everyHours(1)
+      .create();
+    ScriptApp.newTrigger(`SetSummaryPageRowHeight`)
+      .timeBased()
+      .everyDays(1)
       .create();
   } catch (err) {
-    console.error(`${err} : Could not create triggers`);
+    console.error(`"CreateTimeDrivenTrigger()" failed : ${err}`);
   }
 };
 
@@ -144,7 +147,9 @@ const EnableJPS = () => {
  */
 const SetStatusDropdowns = () => {
   Object.values(SHEETS).forEach(sheet => {
-    const rule = SpreadsheetApp.newDataValidation().requireValueInList(Object.values(STATUS));
+    const rule = SpreadsheetApp
+      .newDataValidation()
+      .requireValueInList(Object.values(STATUS));
     sheet.getRange(2, 1, sheet.getLastRow(), 1).setDataValidation(rule);
   })
 }

@@ -212,7 +212,7 @@ const STATUS = Object.freeze({
  * Example: Calling 'SHEETS.laser' returns value sheet.
  */
 const SHEETS = Object.freeze({
-  // Laser : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Laser Cutter`), // Laser Sheet
+  Laser : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Laser Cutter`), // Laser Sheet
   Fablight : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Fablight`), // Fablight Sheet
   Waterjet : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Waterjet`), // Waterjet Sheet
   Advancedlab : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Advanced Lab`), // Advanced Lab Sheet
@@ -387,7 +387,4 @@ const PAGESIZES = Object.freeze({
 });
 
 
-const _tht = () => {
-  console.info(SHEETS)
-}
 

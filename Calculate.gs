@@ -533,8 +533,8 @@ class Calculate {
  * ----------------------------------------------------------------------------------------------------------------
  * Metrics - DO NOT DELETE
  * Used to Calculate Average Turnaround times and write to 'Data/Metrics' sheet
- *
-const CalculateMetrics = () => {
+ */
+const Metrics = () => {
   console.time(`Metrics Timer `)
   try {
     console.info(`Calculating Metrics .....`);
@@ -554,7 +554,7 @@ const CalculateMetrics = () => {
   }
   console.timeEnd(`Metrics Timer `)
 }
-*/
+
 
 const _testDist = () => {
   // c.CalculateAverageTurnaround(SHEETS.Advancedlab);
