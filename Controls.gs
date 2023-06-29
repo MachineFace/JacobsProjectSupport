@@ -83,7 +83,7 @@ const RemoveTimedTriggers = () => {
     })
     ScriptApp.newTrigger(`Metrics`)
       .timeBased()
-      .everyMinutes(10)
+      .everyMinutes(30)
       .create();
     console.info(`Removed Triggers for Summary Emails`);
     return 0;
@@ -250,7 +250,7 @@ const SetConditionalFormatting = () => {
  * Resize the Summary page Rows back to Default
  * @TRIGGERED
  */
-const SetRowHeight = () => {
+const SetSummaryPageRowHeight = () => {
   OTHERSHEETS.Summary.setRowHeightsForced(3, OTHERSHEETS.Summary.getMaxRows() - 3, 21);
   OTHERSHEETS.Summary.getRange(3, 1, OTHERSHEETS.Summary.getMaxRows() -1, OTHERSHEETS.Summary.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
   console.info(`Set Row Height.`)

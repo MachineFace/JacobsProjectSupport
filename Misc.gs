@@ -32,7 +32,6 @@ const Search = (value) => {
  */
 const SearchSpecificSheet = (sheet, value) => { 
   try {
-    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Value: ${val}`);
     if (value && value != undefined) value.toString().replace(/\s+/g, "");
     const finder = sheet.createTextFinder(value).findNext();
     if (!finder) return false;
@@ -69,7 +68,6 @@ const FindByJobNumber = (jobnumber) => {
  */
 const GetByHeader = (sheet, columnName, row) => {
   try {
-    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Col: ${columnName} Row: ${row}`);
     let data = sheet.getDataRange().getValues();
     let col = data[0].indexOf(columnName);
     if (col == -1) return false;
@@ -90,7 +88,6 @@ const GetByHeader = (sheet, columnName, row) => {
  */
 const GetColumnDataByHeader = (sheet, columnName) => {
   try {
-    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Col: ${columnName}`);
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName);
     if (col == -1) return false;
@@ -113,7 +110,6 @@ const GetColumnDataByHeader = (sheet, columnName) => {
 const GetRowData = (sheet, row) => {
   let dict = {};
   try {
-    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Row: ${row}`);
     let headers = sheet.getRange(1, 1, 1, sheet.getMaxColumns()).getValues()[0];
     headers.forEach( (name, index) => {
       let linkedKey = Object.keys(HEADERNAMES).find(key => HEADERNAMES[key] === name);
@@ -146,7 +142,6 @@ const GetRowData = (sheet, row) => {
 const SetRowData = (sheet, data) => {
   let dict = {};
   try {
-    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}`);
     let sheetHeaderNames = Object.values(GetRowData(sheet, 1));
     let values = [];
     Object.entries(data).forEach(pair => {
@@ -193,7 +188,6 @@ const testSetRow = () => {
  */
 const SetByHeader = (sheet, columnName, row, val) => {
   try {
-    if(typeof(sheet) !== typeof(SHEETS.Laser)) throw new Error(`Bad sheet supplied: Sheet: ${sheet}, Col: ${columnName}, Row: ${row}, Value: ${val}`);
     const data = sheet.getDataRange().getValues();
     const col = data[0].indexOf(columnName) + 1;
     if(col == -1) return false;
@@ -215,7 +209,6 @@ const SetByHeader = (sheet, columnName, row, val) => {
 const IsValidSheet = (someSheet) => {
   try {
     if (typeof(someSheet) !== `object`) throw new Error(`A non-sheet argument was passed to a function that requires a sheet.`);
-    
     let forbiddenNames = [];
     Object.values(NONITERABLESHEETS).forEach(sheet => forbiddenNames.push(sheet.getSheetName()));
     return !forbiddenNames.includes(someSheet.getName());
@@ -405,7 +398,7 @@ const ValidateEmail = (email) => {
 const GetAllProjectNames = () => {
   let names = {}
   Object.values(SHEETS).forEach(sheet => {
-    let titles = GetColumnDataByHeader(sheet, HEADERNAMES.projectName)
+    let titles = [...GetColumnDataByHeader(sheet, HEADERNAMES.projectName)]
       .filter(Boolean)
       .filter(x => x != `FORMULA ROW`);
     names[sheet.getName()] = [...new Set(titles)];

@@ -8,9 +8,9 @@ class ShopifyAPI {
     /** @private */
     this.root = `https://jacobs-student-store.myshopify.com/admin/api/2023-04/`;
     /** @private */
-    this.api_key = PropertiesService.getScriptProperties().getProperty(`shopify_api_key`);
+    this.api_key = PropertiesService.getScriptProperties().getProperty(`SHOPIFY_KEY`);
     /** @private */
-    this.api_pass = PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`);
+    this.api_pass = PropertiesService.getScriptProperties().getProperty(`SHOPIFY_PASS`);
     /** @private */
     this.jobnumber;
     /** @private */
