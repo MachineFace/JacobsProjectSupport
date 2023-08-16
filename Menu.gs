@@ -116,14 +116,16 @@ const PopupCheckMissingAccessStudents = async () => {
  * Create a pop-up to check for ONE missing students
  */
 const PopupGetSingleStudentPriority = async () => {
-  const ui = await SpreadsheetApp.getUi();
-  const thisSheet = SpreadsheetApp.getActiveSheet();
-  let thisRow = thisSheet.getActiveRange().getRow();
-  const email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
-  const sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
-  const name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
-  console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
   try {
+    const ui = await SpreadsheetApp.getUi();
+    const thisSheet = SpreadsheetApp.getActiveSheet();
+    let thisRow = thisSheet.getActiveRange().getRow();
+
+    const email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
+    const sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
+    const name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
+    
+    console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
     const priority = await new CheckPriority({ email : email, sid : sid }).Priority;
     console.info(`Priority: ${priority}`);
     SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
@@ -133,8 +135,8 @@ const PopupGetSingleStudentPriority = async () => {
       `Access for ${name} set to : "${priority}"`,
       ui.ButtonSet.OK,
     );
-  } catch (err) {
-    console.error(`${err} : Whoops, couldn't set priority for ${name}`);
+  } catch(err) {
+    Log.Error(`"PopupGetSingleStudentPriority()" failed : ${err} : Couldn't set priority for ${name}`);
     ui.alert(
       `${SERVICE_NAME} : Error!`,
       `Whoops, couldn't set priority for ${name}`,
@@ -285,7 +287,7 @@ const BillFromSelected = async () => {
       console.warn(`User clicked "No / Cancel"....\nOrder NOT Created.`);
     }
   } catch (err) {
-    console.error(`"BillFromSelected()" failed : ${err}`);
+    Log.Error(`"BillFromSelected()" failed : ${err}`);
     return 1;
   } 
 };

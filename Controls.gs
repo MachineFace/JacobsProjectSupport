@@ -36,7 +36,7 @@ const CreateTimeDrivenTrigger = () => {
       .onWeekDay(ScriptApp.WeekDay.FRIDAY)
       .atHour(timetoEmail)
       .create();
-    ScriptApp.newTrigger(`SetRowHeight`)
+    ScriptApp.newTrigger(`SetSummaryPageRowHeight`)
       .timeBased()
       .everyMinutes(10)
       .create();
@@ -259,6 +259,23 @@ const SetSummaryPageRowHeight = () => {
   OTHERSHEETS.Summary.setRowHeightsForced(3, OTHERSHEETS.Summary.getMaxRows() - 3, 21);
   OTHERSHEETS.Summary.getRange(3, 1, OTHERSHEETS.Summary.getMaxRows() -1, OTHERSHEETS.Summary.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
   console.info(`Set Row Height.`)
+}
+
+
+/**
+ * Set Row Height
+ */
+const SetRowHeight = () => {
+  Object.values(SHEETS).forEach(sheet => {
+    const lastRow = sheet.getMaxRows();
+    const lastColumn = sheet.getMaxColumns();
+    sheet
+      .setRowHeightsForced(2, lastRow, 21);
+    sheet
+      .getRange(2, 1, lastRow, lastColumn)
+      .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+    console.info(`Set Row Height for ${sheet.getSheetName()}`);
+  })
 }
 
 

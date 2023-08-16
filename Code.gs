@@ -124,8 +124,8 @@ const onSubmission = async (e) => {
       name: SERVICE_NAME,
     });
     Log.Info(`Design Specialist has been emailed.`);
-  } catch (err) {
-    console.error(`${err} : Couldn't email DS...`);
+  } catch(err) {
+    Log.Error(`${err} : Couldn't email DS...`);
   }
 
   // Creaform
@@ -141,7 +141,7 @@ const onSubmission = async (e) => {
       Log.Info(`Creaform instruction email sent.`);
     }
   } catch (err) {
-    console.error(`${err} : Couldn't send Creaform email for some reason.`);
+    Log.Error(`${err} : Couldn't send Creaform email for some reason.`);
   }
 
   // GSI Plotter
@@ -158,7 +158,7 @@ const onSubmission = async (e) => {
       console.info(`GSI Plotter instruction email sent.`);
     }
   } catch (err) {
-    console.error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
+    Log.Error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
   }
 
   try {
@@ -175,8 +175,8 @@ const onSubmission = async (e) => {
       });
       Log.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     }
-  } catch (err) {
-    console.error(`${err} : Couldn't determine student access`);
+  } catch(err) {
+    Log.Error(`${err} : Couldn't determine student access`);
   } finally {
     if (priority == `STUDENT NOT FOUND!` || priority == false) {
       SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
@@ -254,7 +254,7 @@ const onChange = async (e) => {
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
   } catch (err) {
-    console.error(`Whoops: Couldn't double-check priority: ${err}`);
+    Log.Error(`Whoops: Couldn't double-check priority: ${err}`);
   }
 
   ds = ds ? ds : `a Design Specialist`;
@@ -279,7 +279,7 @@ const onChange = async (e) => {
       Log.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
-    console.error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+    Log.Error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
   }
   
   //----------------------------------------------------------------------------------------------------------------
@@ -287,7 +287,7 @@ const onChange = async (e) => {
   try {
     if(name) SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
   } catch (err) {
-    console.error(`${err} : Couldn't fix their name.....`)
+    Log.Error(`${err} : Couldn't fix their name.....`)
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -303,7 +303,7 @@ const onChange = async (e) => {
       }
     }
   } catch (err) {
-    console.error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
+    Log.Error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
 
@@ -326,13 +326,13 @@ const onChange = async (e) => {
         });
         ticket.CreateTicket();
       } catch (err) {
-        console.error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+        Log.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
       }
       try {
         SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
         console.info(`Set Ticket URL: ${ticket.url} - Sheet: ${thisSheet} Row: ${thisRow}`);
       } catch (err) {
-        console.error(`${err} : Setting Ticket URL failed - Sheet: ${thisSheet} Row: ${thisRow} URL: ${ticket.url}`);
+        Log.Error(`${err} : Setting Ticket URL failed - Sheet: ${thisSheet} Row: ${thisRow} URL: ${ticket.url}`);
       }
     }
   }

@@ -6,7 +6,7 @@
  */
 class SummaryBuilder {
   constructor() {
-    this.CreateSummaryEmail();
+    this.SendEmail();
   }
 
   /**
@@ -103,24 +103,30 @@ class SummaryBuilder {
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
-   * Create Summary Email
+   * Send Summary Email
    * This generates a summary email to all the Design Specialists (triggered daily at 6am)
    */
-  async CreateSummaryEmail () {
-    let dataRange = OTHERSHEETS.Summary.getRange(1, 1, OTHERSHEETS.Summary.getLastRow(), 22).getValues();
+  async SendEmail () {
+    try {
+      console.warn(`Building Email...`)
+      let dataRange = OTHERSHEETS.Summary.getRange(1, 1, OTHERSHEETS.Summary.getLastRow(), 22).getValues();
 
-    let items = await this._GetData(dataRange);
-    let htmlBodyText = await this._GetEmailHtml(items);
+      let items = await this._GetData(dataRange);
+      let htmlBodyText = await this._GetEmailHtml(items);
 
-    // Email DS
-    await GmailApp.sendEmail('codyglen@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
-      htmlBody: this._SummaryText() + htmlBodyText,
-      'from': 'jacobsprojectsupport@berkeley.edu',
-      'cc': StaffEmailAsString(),
-      'bcc': 'cparsell@berkeley.edu',
-      'name': 'JPS DAILY SUMMARY'
-    });
-    console.warn('DS Team Emailed with Summary for the day.');
+      // Email DS
+      await GmailApp.sendEmail('codyglen@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
+        htmlBody: this._SummaryText() + htmlBodyText,
+        'from': 'jacobsprojectsupport@berkeley.edu',
+        'cc' : `codyglen@berkeley.edu`,
+        // 'cc': StaffEmailAsString(),
+        'bcc': 'cparsell@berkeley.edu',
+        'name': 'JPS DAILY SUMMARY'
+      });
+      console.warn('DS Team Emailed with Summary for the day.');
+    } catch(err) {
+      console.error(`"SendEmail()" failed : ${err}`);
+    }
   }
 }
 

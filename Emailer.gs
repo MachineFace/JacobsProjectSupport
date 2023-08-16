@@ -172,6 +172,7 @@ const SendEmail = async ({
 
 /** 
  * @NOTIMPLEMENTED
+ */
 const __CountTotalEmailsSent__ = async () => {
   let count = 0;
   try {
@@ -195,7 +196,7 @@ const __CountTotalEmailsSent__ = async () => {
   console.warn(`Total Emails Sent : ${count}`);
   return count;
 }
-*/
+
 
 /**
  * Lists, for each thread in the user's Inbox, a

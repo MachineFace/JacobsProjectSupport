@@ -22,6 +22,14 @@
         "serviceId": "sheets",
         "version": "v4"
       }
+    ],
+    "libraries": [
+      {
+        "userSymbol": "Log",
+        "version": "0",
+        "libraryId": "1Z1YXYpuN2j2owNQIYk4NeDEgzW9450Sts-y77VMFnnbw7gTMP96b3awX",
+        "developmentMode": true
+      }
     ]
   },
   "exceptionLogging": "STACKDRIVER",
