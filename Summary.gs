@@ -118,8 +118,8 @@ class SummaryBuilder {
       await GmailApp.sendEmail('codyglen@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
         htmlBody: this._SummaryText() + htmlBodyText,
         'from': 'jacobsprojectsupport@berkeley.edu',
-        'cc' : `codyglen@berkeley.edu`,
-        // 'cc': StaffEmailAsString(),
+        // 'cc' : `codyglen@berkeley.edu`,
+        'cc': StaffEmailAsString(),
         'bcc': 'cparsell@berkeley.edu',
         'name': 'JPS DAILY SUMMARY'
       });

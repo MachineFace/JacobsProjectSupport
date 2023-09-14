@@ -6,7 +6,7 @@
 class ShopifyAPI {
   constructor(){
     /** @private */
-    this.root = `https://jacobs-student-store.myshopify.com/admin/api/2023-04/`;
+    this.root = `https://jacobs-student-store.myshopify.com/admin/api/2023-07/`;
     /** @private */
     this.api_key = PropertiesService.getScriptProperties().getProperty(`SHOPIFY_KEY`);
     /** @private */
@@ -319,7 +319,8 @@ class ShopifyAPI {
       // Fetch Products
       const response = await UrlFetchApp.fetch(this.root + repo, params);
       const responseCode = response.getResponseCode();
-      if (responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      console.info(response.getContentText());
+      if (responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
       const parsed = JSON.parse(response.getContentText());
       if(!parsed) throw new Error(`No orders...`);
@@ -511,7 +512,7 @@ const _testAPI = async () => {
   // const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
   const shopify = new ShopifyAPI();
   // let product = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-  // let lastOrder = await shopify.GetLastOrder();
+  let lastOrder = await shopify.GetLastOrder();
   // let orders = await shopify.GetOrdersList();
   // let product = await shopify.GetProductByID(7751141320);
   // let customer = await shopify.GetCustomerByEmail('jacobsinstitutestore@gmail.com');
@@ -521,21 +522,21 @@ const _testAPI = async () => {
   // let lookup = shopify.LookupShopifyProductFromSheet2();
   // let customer = shopify.SetCustomer("jacobsinstitutestore@gmail.com");
 
-  const order = await shopify.CreateOrder({
-    jobnumber : jobnumber,
-    email : `pico@pico.com`,
-    material1Name : 'Fortus Red ABS-M30',
-    material1Quantity : 5,
-    material2Name : 'Objet Polyjet VeroMagenta RGD851',
-    material2Quantity : 10,
-    material3Name : null,
-    material3Quantity : 123234,
-    material4Name : 'Stainless Steel - 0.125" - priced per square inch',
-    material4Quantity : 15,
-    material5Name : null,
-    material5Quantity : 20,
-  });
-  console.info(JSON.stringify(order, null, 4));
+  // const order = await shopify.CreateOrder({
+  //   jobnumber : jobnumber,
+  //   email : `pico@pico.com`,
+  //   material1Name : 'Fortus Red ABS-M30',
+  //   material1Quantity : 5,
+  //   material2Name : 'Objet Polyjet VeroMagenta RGD851',
+  //   material2Quantity : 10,
+  //   material3Name : null,
+  //   material3Quantity : 123234,
+  //   material4Name : 'Stainless Steel - 0.125" - priced per square inch',
+  //   material4Quantity : 15,
+  //   material5Name : null,
+  //   material5Quantity : 20,
+  // });
+  // console.info(JSON.stringify(order, null, 4));
 
   // const order = await shopify.GetLastOrder();
   // console.info(JSON.stringify(order))
