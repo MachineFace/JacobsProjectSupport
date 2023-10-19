@@ -22,6 +22,7 @@ class CheckPriority {
         console.warn(`${this.email} is not staff.`)
         return false;
       }
+      console.info(`Priority set to: 1`);
       return 1;
     } catch (err) {
       console.error(`"_CheckForStaff()" failed : ${err}`);

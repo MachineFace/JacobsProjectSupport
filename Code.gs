@@ -56,12 +56,30 @@ const onSubmission = async (e) => {
   let jobnumber = new JobnumberService().jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobnumber);
 
-  // Set Status to Received
-  SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
-
-  // Check Priority
+  // Priority
   let priority = new CheckPriority({ email : email, sid : sid }).Priority;
   SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority);
+
+  try {
+    if (priority == `STUDENT NOT FOUND!`) {
+      // Set access to Missing Access
+      SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
+
+      // Email
+      GmailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
+        htmlBody: message.missingAccessMessage,
+        from: SUPPORT_ALIAS,
+        bcc: staff.Chris.email,
+        name: SERVICE_NAME,
+      });
+      Log.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
+    } else {
+      // Set Status to Received
+      SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
+    }
+  } catch(err) {
+    Log.Error(`${err} : Couldn't determine student access`);
+  }
 
   // Create Messages
   const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, jobnumber : jobnumber });
@@ -123,7 +141,7 @@ const onSubmission = async (e) => {
       bcc: staff.Chris.email,
       name: SERVICE_NAME,
     });
-    Log.Info(`Design Specialist has been emailed.`);
+    console.info(`Design Specialist has been emailed.`);
   } catch(err) {
     Log.Error(`${err} : Couldn't email DS...`);
   }
@@ -159,28 +177,6 @@ const onSubmission = async (e) => {
     }
   } catch (err) {
     Log.Error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
-  }
-
-  try {
-    if (priority == `STUDENT NOT FOUND!` || priority == false) {
-      // Set access to Missing Access
-      SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
-
-      //Email
-      GmailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
-        htmlBody: message.missingAccessMessage,
-        from: SUPPORT_ALIAS,
-        bcc: staff.Chris.email,
-        name: SERVICE_NAME,
-      });
-      Log.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
-    }
-  } catch(err) {
-    Log.Error(`${err} : Couldn't determine student access`);
-  } finally {
-    if (priority == `STUDENT NOT FOUND!` || priority == false) {
-      SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
-    }
   }
 
   // Check again

@@ -124,12 +124,29 @@ const PopupGetSingleStudentPriority = async () => {
     const email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
     const sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
     const name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
+    const projectName = GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow);
+    const jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow);
+    const rowData = GetRowData(thisSheet, thisRow);
     
     console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
     const priority = await new CheckPriority({ email : email, sid : sid }).Priority;
     console.info(`Priority: ${priority}`);
     SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    if(priority != `STUDENT NOT FOUND!`) SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.received);
+    if(priority != `STUDENT NOT FOUND!`) {
+      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+      new Emailer({ 
+        name : name, 
+        status : STATUS.missingAccess,
+        email : email,    
+        message :  new CreateMessage({
+          name : name,
+          projectname : projectName, 
+          jobnumber : jobnumber,
+          rowData : rowData,
+          designspecialist : rowData.ds,
+        }),
+      });
+    }
     ui.alert(
       `${SERVICE_NAME}: Checked Access`,
       `Access for ${name} set to : "${priority}"`,

@@ -206,6 +206,14 @@ const STATUS = Object.freeze({
   abandoned : `Abandoned`,
 });
 
+const PRIORITY = Object.freeze({
+  0 : `STUDENT NOT FOUND!`,
+  1 : 1,
+  2 : 2,
+  3 : 3,
+  4 : 4,
+});
+
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheets : Dictionary of key / value pair.
