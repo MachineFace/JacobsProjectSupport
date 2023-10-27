@@ -162,7 +162,7 @@ const testSetRow = () => {
   const rowdata = { 
     status: STATUS.received,
     ds: 'Cody',
-    priority: 1,
+    priority: PRIORITY.Tier1,
     jobnumber: new JobnumberService().jobnumber,
     timestamp: new Date().toDateString(),
     email: 'dingus@berkeley.edu',
@@ -428,7 +428,9 @@ const TitleCase = (str) => {
 
 
 
-
+const _testGet = () => {
+  GetRowData(SHEETS.Advancedlab, 10);
+}
 
 
 

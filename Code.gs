@@ -243,10 +243,10 @@ const onChange = async (e) => {
     if(!priority) {
       priority = await new CheckPriority({ email : email, sid : sid }).Priority;
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    } else if (priority == `STUDENT NOT FOUND` && (status != STATUS.cancelled || status != STATUS.closed)) {
+    } else if (priority == PRIORITY.None && (status != STATUS.cancelled || status != STATUS.closed)) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     } else if(sheet.getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
-      priority = 1;
+      priority = PRIORITY.Tier1;
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
   } catch (err) {
@@ -359,7 +359,7 @@ const onChange = async (e) => {
   });
 
   // Check priority one more time:
-  if(priority == `STUDENT NOT FOUND!`){
+  if(priority == PRIORITY.None){
     if(status != STATUS.closed || status != STATUS.cancelled ) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     }

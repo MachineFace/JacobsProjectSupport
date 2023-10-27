@@ -207,11 +207,11 @@ const STATUS = Object.freeze({
 });
 
 const PRIORITY = Object.freeze({
-  0 : `STUDENT NOT FOUND!`,
-  1 : 1,
-  2 : 2,
-  3 : 3,
-  4 : 4,
+  None : `STUDENT NOT FOUND!`,
+  Tier1 : 1,
+  Tier2 : 2,
+  Tier3 : 3,
+  Tier4 : 4,
 });
 
 /**

@@ -23,10 +23,10 @@ class CheckPriority {
         return false;
       }
       console.info(`Priority set to: 1`);
-      return 1;
+      return PRIORITY.Tier1;
     } catch (err) {
       console.error(`"_CheckForStaff()" failed : ${err}`);
-      return `STUDENT NOT FOUND!`;
+      return PRIORITY.None;
     } 
   }
 
@@ -45,7 +45,7 @@ class CheckPriority {
       return priority;
     } catch(err) {
       console.error(`"_CheckViaEmail()" failed : ${err}`);
-      return `STUDENT NOT FOUND!`;
+      return PRIORITY.None;
     }
   }
 
@@ -64,7 +64,7 @@ class CheckPriority {
       return priority;
     } catch(err) {
       console.error(`${err}: Whoops, couldn't check via SID`);
-      return `STUDENT NOT FOUND!`;
+      return PRIORITY.None;
     } 
 
   }
@@ -76,11 +76,11 @@ class CheckPriority {
       if(priority == false) priority = this._CheckViaEmail();
       if(priority == false) priority = this._CheckViaSID();
       if(priority == false) priority = this._CheckForStaff();
-      if(priority == false) priority = `STUDENT NOT FOUND!`;
+      if(priority == false) priority = PRIORITY.None;
       return priority;      
     } catch (err) {
       console.error(`"Priority()" failed : ${err}`);
-      return `STUDENT NOT FOUND!`;
+      return PRIORITY.None;
     }
   }
 
@@ -94,18 +94,18 @@ class CheckPriority {
  */
 const CheckMissingAccessStudents = () => {
   let list = [];
-  const results = Search("STUDENT NOT FOUND!");
+  const results = Search(PRIORITY.None);
   if(results != null) {
     for(const [sheetName, values] of Object.entries(results)) {
       values.forEach( row => {
         const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-        const email = GetByHeader(thisSheet, HEADERNAMES.email, row);
-        const sid = GetByHeader(thisSheet, HEADERNAMES.sid, row);
-        const status = GetByHeader(thisSheet, HEADERNAMES.status, row);
-        const p = new CheckPriority({email : email, sid : sid}).Priority;
+
+        let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, } = GetRowData(thisSheet, row);
+        priority = new CheckPriority({ email : email, sid : sid }).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
+
         SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
-        if(p != `STUDENT NOT FOUND!` && status == STATUS.missingAccess) {
+        if(p != PRIORITY.None && status == STATUS.missingAccess) {
           list.push(email);
           SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
         }
@@ -119,5 +119,6 @@ const CheckMissingAccessStudents = () => {
 
 
 const _testCheck = () => {
-  CheckMissingAccessStudents();
+  // CheckMissingAccessStudents();
+  console.info(Object.keys(PRIORITY))
 }

@@ -121,18 +121,15 @@ const PopupGetSingleStudentPriority = async () => {
     const thisSheet = SpreadsheetApp.getActiveSheet();
     let thisRow = thisSheet.getActiveRange().getRow();
 
-    const email = GetByHeader(thisSheet, HEADERNAMES.email, thisRow);
-    const sid = GetByHeader(thisSheet, HEADERNAMES.sid, thisRow);
-    const name = GetByHeader(thisSheet, HEADERNAMES.name, thisRow);
-    const projectName = GetByHeader(thisSheet, HEADERNAMES.projectName, thisRow);
-    const jobnumber = GetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow);
     const rowData = GetRowData(thisSheet, thisRow);
-    
+    let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, sheetName, row, } = rowData;
     console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
-    const priority = await new CheckPriority({ email : email, sid : sid }).Priority;
+
+    
+    priority = await new CheckPriority({ email : email, sid : sid }).Priority;
     console.info(`Priority: ${priority}`);
     SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    if(priority != `STUDENT NOT FOUND!`) {
+    if(priority == PRIORITY.None) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
       new Emailer({ 
         name : name, 
@@ -210,6 +207,13 @@ const BillFromSelected = async () => {
   let thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
 
+  const rowData = GetRowData(thisSheet, thisRow);
+  let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
+    mat1quantity, mat1, mat2quantity, mat2, 
+    mat3quantity, mat3, mat4quantity, mat4, 
+    mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+    price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
+
   if(CheckSheetIsForbidden(thisSheet) == true) {
     const a = ui.alert(
       `${SERVICE_NAME}: Error!`,
@@ -218,8 +222,6 @@ const BillFromSelected = async () => {
     );
     if (a === ui.Button.OK) return;
   }
-  const rowData = GetRowData(thisSheet, thisRow);
-  let { status, jobnumber, email, mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5, estimate, } = rowData;
 
   // TODO: Fix this messy shit.
   if(thisSheet == SHEETS.Plotter || thisSheet == SHEETS.GSI_Plotter) {

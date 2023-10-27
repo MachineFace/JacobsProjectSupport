@@ -152,10 +152,10 @@ const MarkAsAbandonedByBarcode = async () => {
       
       const rowData = GetRowData(sheet, searchRow);
       let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
-    mat1quantity, mat1, mat2quantity, mat2, 
-    mat3quantity, mat3, mat4quantity, mat4, 
-    mat5quantity, mat5, affiliation, elapsedTime, estimate, 
-    price1, price2, sheetName, row, } = rowData;
+        mat1quantity, mat1, mat2quantity, mat2, 
+        mat3quantity, mat3, mat4quantity, mat4, 
+        mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+        price1, price2, sheetName, row, } = rowData;
 
       var message = new CreateMessage({
         name : name,
