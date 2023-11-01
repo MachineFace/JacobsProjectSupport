@@ -408,7 +408,47 @@ const GetAllProjectNames = () => {
 }
 
 
+const BuildEstimate = (sheet, row) => {
+  try {
+    if(row < 2) throw new Error(`Row ${row}, not allowed...`);
+    if(CheckSheetIsForbidden(sheet)) throw new Error(`Forbidden Sheet....`);
 
+    const rowData = GetRowData(sheet, row);
+    let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
+      mat1quantity, mat1, mat2quantity, mat2, 
+      mat3quantity, mat3, mat4quantity, mat4, 
+      mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+      price1, price2, printColor, printSize, printCount, sheetName, } = rowData;
+
+    let productPrices = [];
+    const materials = [ mat1, mat2, mat3, mat4, mat5 ];
+    const quantities = [ mat1quantity, mat2quantity, mat3quantity, mat4quantity, mat5quantity ];
+    materials.forEach( (material, index) => {
+      if(material) {
+        Object.values(STORESHEETS).forEach(materialSheet => {
+          const idx = SearchSpecificSheet(materialSheet, material);
+          if(idx) {
+            const price = materialSheet.getRange(idx, 6, 1, 1).getValue();
+            let subtotal = price * quantities[index];
+            productPrices.push(subtotal);
+          }
+        });
+      }
+    });
+    console.info(`Sheet Info: ${productPrices}`);
+    estimate = productPrices ? productPrices.reduce((a,b) => a + b) : 0.0;
+    console.info(`Final Estimate = $${estimate}`);
+    SetByHeader(sheet, HEADERNAMES.estimate, row, estimate);
+    return estimate;
+  } catch(err) {
+    console.error(`BuildEstimate() failed: ${err}`);
+    return 1;
+  }
+}
+
+const _testEstimate = () => {
+  BuildEstimate(SHEETS.Advancedlab, 10);
+}
 
 
 /**

@@ -362,6 +362,12 @@ const onChange = async (e) => {
   } else if (!priority) {
     if(status == STATUS.closed) return;
   }
+
+  //----------------------------------------------------------------------------------------------------------------
+  // Generate an estimate
+  if(mat1 && mat1quantity) BuildEstimate(thisSheet, thisRow);
+
+
 };
 
 
