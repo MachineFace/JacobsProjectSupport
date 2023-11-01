@@ -206,6 +206,7 @@ const BillFromSelected = async () => {
   const shopify = await new ShopifyAPI(); 
   let thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
+  let response;
 
   const rowData = GetRowData(thisSheet, thisRow);
   let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
@@ -215,12 +216,12 @@ const BillFromSelected = async () => {
     price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
 
   if(CheckSheetIsForbidden(thisSheet) == true) {
-    const a = ui.alert(
+    response = ui.alert(
       `${SERVICE_NAME}: Error!`,
       `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight).\nSelect one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK
     );
-    if (a === ui.Button.OK) return;
+    if (response === ui.Button.OK) return;
   }
 
   // TODO: Fix this messy shit.
@@ -233,20 +234,20 @@ const BillFromSelected = async () => {
   
   if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
     console.warn(`Cannot Bill Student - No Material quantity(s) recorded...`);
-    const b = ui.alert(
+    response = ui.alert(
       `${SERVICE_NAME}: Error!`,
       `No quantities entered for selected submission. Maybe add some materials first before billing...`,
       Browser.Buttons.OK
     );
-    if (b === ui.Button.OK) return;
+    if (response === ui.Button.OK) return;
   }
   if (status == STATUS.billed || status == STATUS.closed || status == STATUS.abandoned || status == STATUS.failed) {
-    const b = Browser.msgBox(
+    response = Browser.msgBox(
       `${SERVICE_NAME}: Error!`,
       `You have already Generated a bill to this Student. Project is closed.`,
       Browser.Buttons.OK
     );
-    if (b === ui.Button.OK) return;
+    if (response === ui.Button.OK) return;
   }
 
 
@@ -254,12 +255,12 @@ const BillFromSelected = async () => {
   const customer = await shopify.GetCustomerByEmail(email);
   console.info(`CUSTOMER : ${JSON.stringify(customer)}`)
   if (customer == undefined || customer == null) {
-    const b = ui.alert(
+    response = ui.alert(
       `${SERVICE_NAME}: Error!`,
       `The Shopify customer was not found... Check with Chris & Cody.`,
       Browser.Buttons.OK
     );
-    if (b === ui.Button.OK) return;
+    if (response === ui.Button.OK) return;
   }
 
   const boxTitle = `${SERVICE_NAME} : Generate Bill to Shopify`;
@@ -276,7 +277,6 @@ const BillFromSelected = async () => {
   if(mat5quantity) msg += `----- ${mat5quantity} of ${mat5}\n`;
   msg += `Estimated Cost: $${estimate?.toString()} \n`;
 
-  let response;
   try {
     response = ui.alert(
       boxTitle,
@@ -318,13 +318,16 @@ const BillFromSelected = async () => {
 const PopupCreateTicket = async () => {
   const thisSheet = SpreadsheetApp.getActiveSheet();
   const ui = SpreadsheetApp.getUi();
+
+  let response;
+
   if(CheckSheetIsForbidden(thisSheet)) {
-    const a = ui.alert(
+    response = ui.alert(
       `${SERVICE_NAME} : Error!`,
       `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight). \nSelect one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK
     );
-    if(a === ui.Button.OK) return;
+    if(response === ui.Button.OK) return;
   }
   const thisRow = thisSheet.getActiveRange().getRow();
   const rowData = await GetRowData(thisSheet, thisRow);
@@ -342,12 +345,12 @@ const PopupCreateTicket = async () => {
   console.info(t);
   
   SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
-  const a = ui.alert(
+  response = ui.alert(
     `${SERVICE_NAME} : Ticket Created!`,
     `Ticket Created for : ${name}, Job Number : ${jobnumber}`,
     ui.ButtonSet.OK
   );
-  if(a === ui.Button.OK) return;
+  if(response === ui.Button.OK) return;
 };
 
 /**

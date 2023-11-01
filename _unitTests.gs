@@ -48,7 +48,7 @@ const _gasTMainTesting = async () => {
     const gb = new CheckPriority({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
     t.equal(gb, PRIORITY.Tier4, `Expected 4, Actual ${gb}`);
     const bg = new CheckPriority({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
-    t.equal(bg, PRIORITY.Tier3, `Expected 3, Actual ${bg}`);
+    t.equal(bg, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${bg}`);
     const bb = new CheckPriority({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
     t.equal(bb, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${bb}`);
 

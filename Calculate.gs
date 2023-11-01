@@ -501,14 +501,14 @@ class Calculate {
       let subtotals = [];
       Object.values(SHEETS).forEach(sheet => {
         let estimates = GetColumnDataByHeader(sheet, HEADERNAMES.estimate)
-          .filter(x => !x.includes(`Estimate`))
           .filter(Boolean)
           .reduce((a, b) => a + b, 0);
         subtotals.push(estimates);
       })
       const sum = subtotals.reduce((a, b) => a + b, 0);
-      const fixed = Number(sum).toFixed(2);
       console.info(`Subtotals ---> ${subtotals}`);
+      
+      const fixed = Number(sum).toFixed(2);
       console.info(`Funding = $${fixed}`);
       return fixed;
     } catch(err) {

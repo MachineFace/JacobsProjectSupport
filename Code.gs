@@ -321,14 +321,10 @@ const onChange = async (e) => {
           rowData : rowData,
         });
         ticket.CreateTicket();
-      } catch (err) {
-        Log.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
-      }
-      try {
         SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
         console.info(`Set Ticket URL: ${ticket.url} - Sheet: ${thisSheet} Row: ${thisRow}`);
       } catch (err) {
-        Log.Error(`${err} : Setting Ticket URL failed - Sheet: ${thisSheet} Row: ${thisRow} URL: ${ticket.url}`);
+        Log.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
       }
     }
   }
