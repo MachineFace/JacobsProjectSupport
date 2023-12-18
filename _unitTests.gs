@@ -206,8 +206,6 @@ const _gasTMessagingTesting = async () => {
     const message = new CreateSubmissionMessage({});
     const w = `DS MESSAGE : ${message.dsMessage}`;
     t.notThrow(() => w, `DS MESSAGE SHOULD NOT throw error.`);
-    const x = `CREAFORM MESSAGE : ${message.creaformMessage}`;
-    t.notThrow(() => x, `CREAFORM MESSAGE SHOULD NOT throw error.`);
     const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
     t.notThrow(() => y, `MISSING MESSAGE SHOULD NOT throw error.`);
   });
@@ -220,8 +218,6 @@ const _gasTMessagingTesting = async () => {
     } );
     const w = `DS MESSAGE : ${message.dsMessage}`;
     t.notEqual(w, undefined || null, `DS MESSAGE message should not return undefined or null. \n${w}`);
-    const x = `CREAFORM MESSAGE : ${message.creaformMessage}`;
-    t.notEqual(x, undefined || null, `CREAFORM MESSAGE message should not return undefined or null. \n${x}`);
     const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
     t.notEqual(y, undefined || null, `MISSING ACCESS message should not return undefined or null. \n${y}`);
   });

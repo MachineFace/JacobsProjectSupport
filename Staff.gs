@@ -44,10 +44,10 @@ class DesignSpecialist {
         this.areas = [SHEETS.Othermill.getSheetName(), SHEETS.Shopbot.getSheetName(),];
         break;
       case "Chris":
-        this.areas = [SHEETS.Advancedlab.getSheetName(), SHEETS.Creaform.getSheetName(),];
+        this.areas = [SHEETS.Advancedlab.getSheetName(),];
         break;
       case "Cody":
-        this.areas = [SHEETS.Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Haas.getSheetName(), SHEETS.Vinyl.getSheetName()];
+        this.areas = [SHEETS.Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Vinyl.getSheetName()];
         break;
       case "Gary":
         this.areas = [SHEETS.Waterjet.getSheetName(), SHEETS.Othertools.getSheetName(),];
