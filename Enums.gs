@@ -225,13 +225,10 @@ const SHEETS = Object.freeze({
   Waterjet : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Waterjet`), // Waterjet Sheet
   Advancedlab : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Advanced Lab`), // Advanced Lab Sheet
   Shopbot : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Shopbot`), // Shopbot Sheet
-  Haas : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Haas & Tormach`), // Haas Sheet
   Vinyl : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Vinyl Cutter`), // Vinyl Sheet
-  Othermill : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Othermill`), // Othermill Sheet
-  Creaform : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
   Othertools : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Other Tools`), // Other Sheet
   Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Canon Plotter`), // Plotter Sheet
-  GSI_Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`GSI - Cannon Plotter`), // GSI Submission Form
+  GSI_Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`GSI - Canon Plotter`), // GSI Submission Form
 });
 
 /**
@@ -258,7 +255,6 @@ const STORESHEETS = Object.freeze({
   AdvLabStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('AdvLabStoreItems'),
   UltimakerStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UltimakerStoreItems'),
   FablightStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FablightStoreItems'),
-  HaasTormachStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('HaasTormachStoreItems'),
   ShopbotStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ShopbotStoreItems'),
   WaterjetStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('WaterjetStoreItems'),
   VinylCutterStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('VinylCutterStoreItems'),
@@ -266,7 +262,18 @@ const STORESHEETS = Object.freeze({
   OthermillStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OthermillStoreItems'),
 });
 
-const NONITERABLESHEETS = Object.freeze({...OTHERSHEETS, ...STORESHEETS});
+const DEFUNCT = Object.freeze({
+  Ultimaker : `1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8`, // Ultimaker Form
+  Haas : `1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk`,  // Haas Form
+  Othermill : `1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI`, // Othermill Form
+  Creaform : `1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc`,  // Creaform Form
+  Haas : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Haas & Tormach`), // Haas Sheet
+  Othermill : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Othermill`), // Othermill Sheet
+  Creaform : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
+  HaasTormachStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('HaasTormachStoreItems'),
+});
+
+const NONITERABLESHEETS = Object.freeze({...OTHERSHEETS, ...STORESHEETS, ...DEFUNCT, });
 
 
 /**
@@ -275,20 +282,18 @@ const NONITERABLESHEETS = Object.freeze({...OTHERSHEETS, ...STORESHEETS});
  * Example: Calling 'formDict.laser' returns value string.
  */
 const FORMS = Object.freeze({
-  // ultimaker: `1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8`,
   laser: `1xKiHg8_5U3iQH8EoD2-WbWXaRntP3QxzUNGU7QLfW0w`,
   fablight: `1SAQRSMGKyFDrcVf8HGdpRoZ7DrWVVfl6cBAw0ZSyNHA`,
   waterjet: `1dNLAlC8Wg0DLLkBboRMgztPqP-fMmUqyGt5xqtg8TKk`,
   advancedlab: `1okWAdclqrleQ5ktyXbSIRoY6hrL_v2OYYAhaeb0f1jQ`,
   shopbot: `1RFuhGCtQrcA9gbpEStaksK5eYeIAo0dzn5NIcxVngH4`,
-  haas: `1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk`,
   vinyl: `1WTh9nDQ4C_3HyQvCNMIxRFbJk1FH4dZeYeAkiXkItKw`,
-  othermill: `1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI`,
-  creaform: `1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc`,
   othertools: `1cVeRW9WtGa43xNmnwaegZcPK6-V01PIZFpvNcmrpM38`,
   plotter: `1au_NsjuGNuucHeZIh-bgzEwkQN1w17igU9ha6i34Y34`,
   gsi_plotter: `1F_lEMi0HoV6Ej4RPxn8FuWqsPWJdfjmwyJs7v2SkoCg`,
 });
+
+
 
 
 /**

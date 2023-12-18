@@ -98,13 +98,8 @@ const onSubmission = async (e) => {
   let designspecialistemail;
   switch (sheetName) {
     case SHEETS.Advancedlab.getName():
-    case SHEETS.Creaform.getName():
-      designspecialistemail = staff.Chris.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
-      break;
     case SHEETS.Plotter.getName():
     case SHEETS.Fablight.getName():
-    case SHEETS.Haas.getName():
     case SHEETS.Vinyl.getName():
     case SHEETS.GSI_Plotter.getName():
       designspecialistemail = staff.Cody.email;
@@ -118,7 +113,6 @@ const onSubmission = async (e) => {
     case SHEETS.Laser.getName():
       // Nobody assigned / Everyone assigned.
       break;
-    case SHEETS.Othermill.getName():
     case SHEETS.Shopbot.getName():
       designspecialistemail = staff.Staff.email;
       SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
@@ -144,22 +138,6 @@ const onSubmission = async (e) => {
     console.info(`Design Specialist has been emailed.`);
   } catch(err) {
     Log.Error(`${err} : Couldn't email DS...`);
-  }
-
-  // Creaform
-  try {
-    if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.Creaform.getSheetName()) {
-      //Email
-      GmailApp.sendEmail(email, `${SERVICE_NAME} : Creaform Part Drop-off Instructions`, ``, {
-        htmlBody: message.creaformMessage,
-        from: SUPPORT_ALIAS,
-        bcc: staff.Chris.email,
-        name: SERVICE_NAME,
-      });
-      Log.Info(`Creaform instruction email sent.`);
-    }
-  } catch (err) {
-    Log.Error(`${err} : Couldn't send Creaform email for some reason.`);
   }
 
   // GSI Plotter
@@ -243,7 +221,7 @@ const onChange = async (e) => {
     if(!priority) {
       priority = await new CheckPriority({ email : email, sid : sid }).Priority;
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    } else if (priority == PRIORITY.None && (status != STATUS.cancelled || status != STATUS.closed)) {
+    } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     } else if(sheet.getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
       priority = PRIORITY.Tier1;

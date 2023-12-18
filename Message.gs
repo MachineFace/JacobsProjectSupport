@@ -238,22 +238,6 @@ class CreateSubmissionMessage {
       message += `<br/>`;
     return message;
   }
-  get creaformMessage() {
-    let message = `<p>Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
-      message += `Part scanning has been requested for your project. Job Number: <i>${this.jobnumber}</i><br />`;
-      message += `<br/>`;
-      message += `Parts can be dropped off in-person safely at our touchless dropoff window. <br/><br/>`;
-      message += `<b>Drop-off Location:<br/>`;
-      message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>`; 
-      message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
-      message += `<b>Drop-off Hours:<br/>`;
-      message += `${PickupHours}</b><br/><br/>`
-      message += `Please email ${InvokeDS("Chris", "fullname")} at ${InvokeDS("Chris", "emaillink")} for further details.<br/>`;
-      message += `If you have any further questions or need assistance please email ${InvokeDS("Staff", "emaillink")}. <br/>`;
-      message += `<p>Best,<br />Jacobs Hall Staff</p>`;
-    return message;
-  }
   get gsiPlotterMessage() {
     let message = `<p>Hi ${this.name},</p>`;
       message += `<p>Thank you for choosing ${SERVICE_NAME}.<br />`;
