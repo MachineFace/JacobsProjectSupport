@@ -41,13 +41,16 @@ class DesignSpecialist {
   SetAreas () {
     switch (this.name) {
       case "Staff":
-        this.areas = [SHEETS.Othermill.getSheetName(), SHEETS.Shopbot.getSheetName(),];
+        this.areas = [SHEETS.Laser.getSheetName(),];
         break;
       case "Chris":
         this.areas = [SHEETS.Advancedlab.getSheetName(),];
         break;
+      case "ChrisMyers":
+        this.areas = [SHEETS.Shopbot.getSheetName(), ];
+        break;
       case "Cody":
-        this.areas = [SHEETS.Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Vinyl.getSheetName()];
+        this.areas = [SHEETS.Plotter.getSheetName(), SHEETS.GSI_Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Vinyl.getSheetName()];
         break;
       case "Gary":
         this.areas = [SHEETS.Waterjet.getSheetName(), SHEETS.Othertools.getSheetName(),];
