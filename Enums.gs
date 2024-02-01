@@ -237,12 +237,10 @@ const SHEETS = Object.freeze({
  */
 const OTHERSHEETS = Object.freeze({
   Summary : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
-  Pickup : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Pickup`),
   Approved : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
   Staff : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Staff List`),
   Logger : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Logger`),
   Data : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
-  Backgrounddata : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Background Data Mgmt`),
   Master : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Master Intake Form Responses`),
 });
 
@@ -263,17 +261,17 @@ const STORESHEETS = Object.freeze({
 });
 
 const DEFUNCT = Object.freeze({
-  // Ultimaker : `1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8`, // Ultimaker Form
-  // Haas : `1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk`,  // Haas Form
-  // Othermill : `1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI`, // Othermill Form
-  // Creaform : `1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc`,  // Creaform Form
+  Ultimaker : `1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8`, // Ultimaker Form
+  Haas : `1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk`,  // Haas Form
+  Othermill : `1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI`, // Othermill Form
+  Creaform : `1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc`,  // Creaform Form
   Haas : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Haas & Tormach`), // Haas Sheet
   Othermill : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Othermill`), // Othermill Sheet
   Creaform : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
   HaasTormachStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('HaasTormachStoreItems'),
 });
 
-const NONITERABLESHEETS = Object.freeze({...OTHERSHEETS, ...STORESHEETS, ...DEFUNCT, });
+const NONITERABLESHEETS = Object.freeze({...OTHERSHEETS, ...STORESHEETS, });
 
 
 /**

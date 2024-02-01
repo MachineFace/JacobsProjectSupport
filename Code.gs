@@ -98,6 +98,9 @@ const onSubmission = async (e) => {
   let designspecialistemail;
   switch (sheetName) {
     case SHEETS.Advancedlab.getName():
+      designspecialistemail = staff.Chris.email;
+      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
+      break;
     case SHEETS.Plotter.getName():
     case SHEETS.Fablight.getName():
     case SHEETS.Vinyl.getName():
@@ -111,8 +114,6 @@ const onSubmission = async (e) => {
       SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
       break;
     case SHEETS.Laser.getName():
-      // Nobody assigned / Everyone assigned.
-      break;
     case SHEETS.Shopbot.getName():
       designspecialistemail = staff.Staff.email;
       SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
