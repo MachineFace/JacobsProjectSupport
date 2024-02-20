@@ -244,6 +244,13 @@ const OTHERSHEETS = Object.freeze({
   Master : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Master Intake Form Responses`),
 });
 
+const shd = () => {
+  // const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  // const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Laser Cutter`);
+  const sheets = SpreadsheetApp.getActiveSpreadsheet();
+  console.info(sheets);
+}
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
