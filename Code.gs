@@ -28,6 +28,7 @@
  */
 const onSubmission = async (e) => {
 
+  const jobNumberService = new JobnumberService();
   const staff = new MakeStaff().Staff;
   // Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -53,7 +54,7 @@ const onSubmission = async (e) => {
   Log.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let jobnumber = new JobnumberService().jobnumber;
+  let jobnumber = jobNumberService.jobnumber;
   SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobnumber);
 
   // Priority
@@ -159,14 +160,14 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  if(new JobnumberService().IsValid(jobnumber) == false) {
-    SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, new JobnumberService().jobnumber);
+  if(jobNumberService.IsValid(jobnumber) == false) {
+    SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobNumberService.jobnumber);
   }
 
   // Fix wrapping issues
   let driveloc = sheet.getRange(`D` + lastRow);
   FormatCell(driveloc);
-};
+}
 
 
 
@@ -189,7 +190,6 @@ const onChange = async (e) => {
   // Skip the first 2 rows of data.
   if (thisRow <= 1) return;
 
-  // ----------------------------------------------------------------------------------------------------------------
   // Add link to DS List on Staff Sheet
   if(thisSheet.getSheetName() == OTHERSHEETS.Staff.getSheetName() && thisRow >= 2) {
     const sLink = GetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow);
@@ -200,14 +200,12 @@ const onChange = async (e) => {
     }
   }
 
-  // ----------------------------------------------------------------------------------------------------------------
   // Ignore Edits on background sheets like Logger and StoreItems 
   if (CheckSheetIsForbidden(thisSheet)) return;
 
   // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
   if (thisCol > 1 && thisCol != 3) return;
 
-  //----------------------------------------------------------------------------------------------------------------
   // Parse Data
   let rowData = GetRowData(thisSheet, thisRow);
   let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
@@ -272,7 +270,7 @@ const onChange = async (e) => {
     if (!elapsedTime) {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
-        let time = await Calculate.CalculateDuration(new Date(timestamp), endTime);
+        let time = await Calculate.GetDuration(new Date(timestamp), endTime);
         SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
         SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
       }
@@ -347,7 +345,7 @@ const onChange = async (e) => {
   if(mat1 && mat1quantity) BuildEstimate(thisSheet, thisRow);
 
 
-};
+}
 
 
 

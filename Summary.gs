@@ -91,7 +91,8 @@ class SummaryBuilder {
    */
   _SummaryText() {
     let text = `<p>Hello!</p> `;
-      text += `<p>Here is a summary of all the recent submissions.<br />`;
+      text += `<p>Here is a summary of all the recent submissions.<br/><br/>`;
+      text += `<a href="https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ"><b> ** GO TO SHEET NOW ** </b></a><br/><br/>`;
       text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>. </p>`;
       text += `<p>Best,<br />${SERVICE_NAME}</p>`;
       text += `<br/>`;

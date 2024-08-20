@@ -64,12 +64,12 @@ class Ticket {
     // Build Table
     let tb = [];
 
-    this.designspecialist ? tb.push([`Design Specialist`, this.designspecialist.toString()]) : tb.push([`Design Specialist`, `Staff`]);
+    tb.push([`Design Specialist`, this.designspecialist ? this.designspecialist.toString() : `Staff`]);
     tb.push([`Job Number`, this.jobnumber.toString()]);
     tb.push([`Student Name`, this.name?.toString()]);
     tb.push([`Project Name`, this.projectname?.toString()]);
-    status ? tb.push([`Status`, status.toString()]) : tb.push([`Status`, STATUS.received]);
-    timestamp ? tb.push([`Submitted On`, timestamp.toString()]) : tb.push([`Submitted On`, new Date().toDateString()])
+    tb.push([`Status`, status ? status.toString() : STATUS.received]);
+    tb.push([`Submitted On`, timestamp ? timestamp.toString() : new Date().toDateString()]);
 
     if (numberOfParts) tb.push([`Number of Parts`, numberOfParts.toString()]);
     if (partCountFablight) tb.push([`Number of Parts`, partCountFablight.toString()]);
@@ -106,7 +106,7 @@ class Ticket {
     if (elapsedTime) tb.push([`Elapsed Time`, elapsedTime.toString()]);
     if (estimate) tb.push([`Estimate`, estimate.toString()]);
 
-    staffNotes ? tb.push([`Notes`, staffNotes.toString()]) : tb.push([`Notes`, `None`]);
+    tb.push([`Notes`, staffNotes ? staffNotes.toString() : `None`]);
     if (otherNotes) tb.push([`Additional Notes`, otherNotes.toString()]);
     if (otherJobNotes) tb.push([`Additional Notes`, otherJobNotes.toString()]);
 

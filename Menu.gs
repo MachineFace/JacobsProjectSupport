@@ -1,7 +1,8 @@
 
 /**
  * Mark a job as abandoned and send an email to that student
- */
+ * DEFUNCT
+ *
 const PopUpMarkAsAbandoned = async () => {
   let ui = SpreadsheetApp.getUi(); 
   let response = ui.prompt(
@@ -46,11 +47,11 @@ const PopUpMarkAsAbandoned = async () => {
   }
     
 }
-
+*/
 
 /**
  * Mark a job as abandoned and send an email to that student
- */
+ * DEFUNCT
 const PopUpMarkAsPickedUp = async () => {
   let ui = SpreadsheetApp.getUi(); 
   let response = ui.prompt(
@@ -81,6 +82,7 @@ const PopUpMarkAsPickedUp = async () => {
   }
     
 }
+*/
 
 
 /** 
@@ -405,22 +407,17 @@ const PopupHelp = async () => {
 const BarMenu = () => {
   SpreadsheetApp.getUi()
     .createMenu(`JPS Menu`)
-      .addItem(`Generate Bill to Selected Student`, `BillFromSelected`)
-      .addItem(`Generate a New Jobnumber`, `PopupCreateNewJobNumber`)
-      .addSeparator()
-      .addItem(`Mark as Abandoned`, `PopUpMarkAsAbandoned`)
-      .addItem(`Mark as Picked Up`, `PopUpMarkAsPickedUp`)
-      .addSeparator()
-      .addItem(`Barcode Scanning Tool`, `OpenBarcodeTab`)
+      .addItem(`Bill Selected Student`, `BillFromSelected`)
+      .addItem(`Create a New Jobnumber for Selected Student`, `PopupCreateNewJobNumber`)
+      .addItem(`Create a Ticket for Selected Student`, `PopupCreateTicket`)
+      .addItem(`Check Access for Selected Student`, `PopupGetSingleStudentPriority`)
       .addSeparator()
       .addItem(`Check All Missing Access Students`, `PopupCheckMissingAccessStudents`)
-      .addItem(`Check Specific Student's Access`, `PopupGetSingleStudentPriority`)
       .addSeparator()
-      .addItem(`Count Active Users`, `PopupCountUsers`)
-      .addItem(`Create a Ticket for a User`, `PopupCreateTicket`)
       .addSubMenu(
         SpreadsheetApp.getUi()
           .createMenu(`Calculate`)
+          .addItem(`Count Active Users`, `PopupCountUsers`)
           .addItem(`Count Total Emails Sent`, `CountTotalEmailsSent`)
           .addItem(`Generate Metrics`, `Metrics`)
           .addItem(`Generate Top Ten`, `RunTopTen`)
@@ -442,7 +439,7 @@ const BarMenu = () => {
       .addToUi();
 };
 
-const RunStandardDeviation = () => Calculate.CalculateStandardDeviation();
+const RunStandardDeviation = () => Calculate.GetStandardDeviation();
 const RunTopTen = () => Calculate.CreateTopTen();
 
 
@@ -450,12 +447,14 @@ const RunTopTen = () => Calculate.CreateTopTen();
 
 /**
  * Open the Barcode Tab
- */
+ * @DEFUNCT
+ *
 const OpenBarcodeTab = async () => SpreadsheetApp
   .getActiveSpreadsheet()
   .setActiveSheet(OTHERSHEETS.Pickup)
   .getRange(`B3`)
   .activate();
+*/
 
 
 

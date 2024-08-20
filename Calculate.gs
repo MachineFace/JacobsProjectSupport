@@ -12,7 +12,7 @@ class Calculate {
    * @param {sheet} sheet
    * @returns {string} formatted average time
    */
-  static CalculateAverageTurnaround(sheet) {
+  static GetAverageTurnaround(sheet) {
     try {
       if(typeof(sheet) != typeof(SHEETS.Advancedlab)) throw new Error(`Bad sheet supplied...`)
       let totals = [];
@@ -55,7 +55,7 @@ class Calculate {
       return formatted;
     }
     catch (err) {
-      console.error(`"CalculateAverageTurnaround()" failed : ${err}`);
+      console.error(`"GetAverageTurnaround()" failed : ${err}`);
       return 1;
     }
   }
@@ -67,7 +67,7 @@ class Calculate {
     try {
       let data = [];
       Object.values(SHEETS).forEach(sheet => {
-        data.push([`${sheet.getName()} Turnaround`, this.CalculateAverageTurnaround(sheet)]);
+        data.push([`${sheet.getName()} Turnaround`, this.GetAverageTurnaround(sheet)]);
       })
       data.forEach( (entry, index) => {
         OTHERSHEETS.Data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
@@ -86,7 +86,7 @@ class Calculate {
    * @param {Date} end
    * @returns {string} formatted duration
    */ 
-  static CalculateDuration(start, end) {
+  static GetDuration(start, end) {
     try {
       end = end instanceof Date ? new Date(end) : new Date();  // if supplied with nothing, set end time to now
       start = start instanceof Date ? new Date(start) : new Date(end - 87000000);  // if supplied with nothing, set start time to now minus 24 hours.
@@ -110,7 +110,7 @@ class Calculate {
       return out;  // Return Completed time
     }
     catch (err) {
-      console.error(`"CalculateDuration()" failed : ${err}`);
+      console.error(`"GetDuration()" failed : ${err}`);
       return 1;
     }
   }
@@ -147,8 +147,8 @@ class Calculate {
    */
   static PrintActiveUsers() {
     const count = this.CountActiveUsers();
-    OTHERSHEETS.Data.getRange(`B4`).setValue(`TOTAL STUDENTS CURRENTLY USING JPS`);
-    OTHERSHEETS.Data.getRange(`C4`).setValue(count);
+    const values = [ [ `TOTAL STUDENTS CURRENTLY USING JPS`, count ], ];
+    OTHERSHEETS.Data.getRange(3, 2, 1, 2).setValues(values);
   }
 
   /**
@@ -177,10 +177,7 @@ class Calculate {
    */
   static PrintSubmissionData() {
     let data = this.CountEachSubmission();
-    data.forEach( (entry, index) => {
-      OTHERSHEETS.Data.getRange(13 + index , 2, 1, 1).setValue(entry[0]);
-      OTHERSHEETS.Data.getRange(13 + index , 3, 1, 1).setValue(entry[1]);
-    })
+    OTHERSHEETS.Data.getRange(13, 2, data.length, 2).setValues(data);
   }
 
   /**
@@ -197,8 +194,8 @@ class Calculate {
     const projectSet = new Set(projects);
     const size = projectSet.size;
     console.info(`Size of Set --> ${size}`);
-    OTHERSHEETS.Data.getRange(6, 2, 1, 1).setValue(`TOTAL PROJECTS SUBMISSION:`);
-    OTHERSHEETS.Data.getRange(6, 3, 1, 1).setValue(size);
+    const values = [ [`TOTAL PROJECTS SUBMISSION:`, size ], ];
+    OTHERSHEETS.Data.getRange(6, 2, 1, 2).setValues(values);
   }
 
   /**
@@ -223,9 +220,9 @@ class Calculate {
   /**
    * Create Top Ten List of Users
    */
-  static CreateTopTen() {
+  static CreateTopTen() {s
     try {
-      const distribution = this.CalculateDistribution();
+      const distribution = this.GetDistribution();
       if(distribution == 0) throw new Error(`Distribution is empty: ${distribution}`);
 
       return distribution
@@ -245,13 +242,12 @@ class Calculate {
     }
   }
 
-  
 
   /**
    * Calculate Distribution
    * @returns {[string, number]} sorted list of users
    */
-  static CalculateDistribution() {
+  static GetDistribution() {
     let userList = [];
     let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
     Object.values(SHEETS).forEach(sheet => {
@@ -344,22 +340,17 @@ class Calculate {
    */
   static PrintTypesCount() {
     let types = this.CountTypes();
-    OTHERSHEETS.Data.getRange(44, 2, 1, 1).setValue(`Student Type`);
-    OTHERSHEETS.Data.getRange(44, 3, 1, 1).setValue(`Count`);
-    types.forEach( (item, index) => {
-      OTHERSHEETS.Data.getRange(45 + index, 2, 1, 1).setValue(item[0]);
-      OTHERSHEETS.Data.getRange(45 + index, 3, 1, 1).setValue(item[1]);
-    })
-    return types;
+    OTHERSHEETS.Data.getRange(44, 2, 1, 2).setValues([ [`Student Type`, `Count`], ]);
+    OTHERSHEETS.Data.getRange(45, 2, types.length, 2).setValues(types);
   }
 
   /**
    * Calculate Standard Deviation
    * @returns {number} Standard Deviation
    */
-  static CalculateStandardDeviation() {
+  static GetStandardDeviation() {
     try {
-      const distribution = this.CalculateDistribution();
+      const distribution = this.GetDistribution();
       const n = distribution.length;
       if(n == 0) throw new Error(`Distribution is empty: ${n}`);
 
@@ -374,7 +365,7 @@ class Calculate {
       console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
       return Number(standardDeviation).toFixed(2);
     } catch(err) {
-      console.error(`"CalculateStandardDeviation()" failed : ${err}`);
+      console.error(`"GetStandardDeviation()" failed : ${err}`);
       return 1;
     }
   }
@@ -383,9 +374,9 @@ class Calculate {
    * Calculate Arithmetic Mean
    * @returns {number} arithmetic mean
    */
-  static CalculateArithmeticMean() {
+  static GetArithmeticMean() {
     try {
-      const distribution = this.CalculateDistribution();
+      const distribution = this.GetDistribution();
       const n = distribution.length;
       if(n == 0) throw new Error(`Distribution is empty: ${n}`);
 
@@ -395,7 +386,7 @@ class Calculate {
       console.warn(`Mean = ${mean}`);
       return mean.toFixed(3);
     } catch(err) {
-      console.error(`"CalculateArithmeticMean()" failed : ${err}`);
+      console.error(`"GetArithmeticMean()" failed : ${err}`);
       return 1;
     }
   }
@@ -404,12 +395,13 @@ class Calculate {
    * Print Statistics
    */
   static PrintStatistics() {
-    const mean = this.CalculateArithmeticMean();
-    OTHERSHEETS.Data.getRange(102, 2, 1, 1).setValue(`Arithmetic Mean for Number of Project Submissions : `)
-    OTHERSHEETS.Data.getRange(102, 3, 1, 1).setValue(mean);
-    const stand = this.CalculateStandardDeviation();
-    OTHERSHEETS.Data.getRange(103, 2, 1, 1).setValue(`Standard Deviation for Number of Project Submissions : `);
-    OTHERSHEETS.Data.getRange(103, 3, 1, 1).setValue(`+/- ${stand}`);
+    const mean = this.GetArithmeticMean();
+    const stand = this.GetStandardDeviation();
+    const values = [
+      [`Arithmetic Mean for Number of Project Submissions : `, mean],
+      [`Standard Deviation for Number of Project Submissions : `, `+/- ${stand}`],
+    ];
+    OTHERSHEETS.Data.getRange(102, 2, 2, 2).setValues(values);
   }
 
   /**
@@ -477,19 +469,18 @@ class Calculate {
         data.completed += count;
       }
     }
-    delete data[`billed`]; delete data[`closed`]; delete data[`pickedUp`]; delete data[`abandoned`];
+    delete data[`billed`];
+    delete data[`closed`];
+    delete data[`pickedUp`];
+    delete data[`abandoned`];
     console.warn(data);
-    OTHERSHEETS.Data.getRange(7, 2, 1, 1).setValue(`COMPLETED JOBS`);
-    OTHERSHEETS.Data.getRange(7, 3, 1, 1).setValue(data.completed);
-
-    OTHERSHEETS.Data.getRange(8, 2, 1, 1).setValue(`CANCELLED JOBS`);
-    OTHERSHEETS.Data.getRange(8, 3, 1, 1).setValue(data.cancelled);
-
-    OTHERSHEETS.Data.getRange(9, 2, 1, 1).setValue(`IN-PROGRESS JOBS`)
-    OTHERSHEETS.Data.getRange(9, 3, 1, 1).setValue(data.inProgress);
-
-    OTHERSHEETS.Data.getRange(10, 2, 1, 1).setValue(`FAILED JOBS`);
-    OTHERSHEETS.Data.getRange(10, 3, 1, 1).setValue(data.failed);
+    const values = [
+      [`COMPLETED JOBS`, data.completed],
+      [`CANCELLED JOBS`, data.cancelled],
+      [`IN-PROGRESS JOBS`, data.inProgress],
+      [`FAILED JOBS`, data.failed],
+    ];
+    OTHERSHEETS.Data.getRange(7, 2, 4, 2).setValues(values);
   }
 
   /**
@@ -501,12 +492,15 @@ class Calculate {
       let subtotals = [];
       Object.values(SHEETS).forEach(sheet => {
         let estimates = GetColumnDataByHeader(sheet, HEADERNAMES.estimate)
+          .filter(x => x !== '#REF!')        
           .filter(Boolean)
+          .filter(a => !a.isNaN)
           .reduce((a, b) => a + b, 0);
         subtotals.push(estimates);
       })
       const sum = subtotals.reduce((a, b) => a + b, 0);
-      console.info(`Subtotals ---> ${subtotals}`);
+      console.info(`Subtotals ---> `);
+      subtotals.forEach(sub => console.info(sub));
       
       const fixed = Number(sum).toFixed(2);
       console.info(`Funding = $${fixed}`);
@@ -522,8 +516,7 @@ class Calculate {
    */
   static PrintFundingSum () {
     let sum = this.CountFunding();
-    OTHERSHEETS.Data.getRange(99, 2, 1, 1).setValue(`Total Funds`);
-    OTHERSHEETS.Data.getRange(99, 3, 1, 1).setValue(`$${sum}`);
+    OTHERSHEETS.Data.getRange(99, 2, 1, 2).setValues([[`Total Funds`, `$${sum}`],]);
   }
 
 }
@@ -557,11 +550,12 @@ const Metrics = () => {
 
 
 const _testDist = () => {
-  // c.CalculateAverageTurnaround(SHEETS.Advancedlab);
-  // c.CalculateDuration();
+  // c.GetAverageTurnaround(SHEETS.Advancedlab);
+  // c.GetDuration();
   // c.CountActiveUsers();
-  // Calculate.CalculateDistribution();
-  Calculate.CountFunding();
+  // Calculate.GetDistribution();
+  // Calculate.CountFunding();
+  Calculate.PrintSubmissionData();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
