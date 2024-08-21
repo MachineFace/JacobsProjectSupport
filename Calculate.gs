@@ -157,12 +157,14 @@ class Calculate {
    */
   static CountEachSubmission() {
     let data = [];
+    const total = Object.values(this.CountStatuses()).reduce((a, b) => a + b);
     try {
       Object.values(SHEETS).forEach(sheet => {
         let range = GetColumnDataByHeader(sheet, HEADERNAMES.timestamp).filter(Boolean);
         let count = range ? range.length - 2 : 0;
         if(count < 0) count = 0;
-        data.push([sheet.getSheetName(), count]);
+        const percentage = `${Number((count / total) * 100).toFixed(2)}%`;
+        data.push([sheet.getSheetName(), count, percentage]);
       })
       console.warn(data);
       return data;
@@ -177,7 +179,7 @@ class Calculate {
    */
   static PrintSubmissionData() {
     let data = this.CountEachSubmission();
-    OTHERSHEETS.Data.getRange(13, 2, data.length, 2).setValues(data);
+    OTHERSHEETS.Data.getRange(13, 2, data.length, 3).setValues(data);
   }
 
   /**
@@ -220,7 +222,7 @@ class Calculate {
   /**
    * Create Top Ten List of Users
    */
-  static CreateTopTen() {s
+  static CreateTopTen() {
     try {
       const distribution = this.GetDistribution();
       if(distribution == 0) throw new Error(`Distribution is empty: ${distribution}`);
@@ -228,13 +230,11 @@ class Calculate {
       return distribution
         .slice(0, 11)
         .forEach((pair, index) => {
-          let email = this._FindEmail(pair[0]);
-          // console.warn(email);
-          // console.warn(`${pair[0]} -----> ${pair[1]}`);
-          OTHERSHEETS.Data.getRange(106 + index, 1, 1, 1).setValue(index + 1)
-          OTHERSHEETS.Data.getRange(106 + index, 2, 1, 1).setValue(pair[0])
-          OTHERSHEETS.Data.getRange(106 + index, 3, 1, 1).setValue(pair[1])
-          OTHERSHEETS.Data.getRange(106 + index, 5, 1, 1).setValue(email ? email : `Email not found`);
+          let email = this._FindEmail(pair[0]) ? this._FindEmail(pair[0]) : `Email not found`;
+          const values = [
+            [ index + 1, pair[0], pair[1], ``, email ],
+          ];
+          OTHERSHEETS.Data.getRange(106 + index, 1, 1, 5).setValues(values);
         });
     } catch(err) {
       console.error(`"CreateTopTen()" failed : ${err}`);
@@ -469,18 +469,27 @@ class Calculate {
         data.completed += count;
       }
     }
-    delete data[`billed`];
-    delete data[`closed`];
-    delete data[`pickedUp`];
-    delete data[`abandoned`];
-    console.warn(data);
+    const total = Object.values(data).reduce((a, b) => a + b);
+
+    const completed = data.completed ? data.completed : 0;
+    const completedRatio = `${Number((completed / total) * 100).toFixed(2)}%`;
+
+    const cancelled = data.cancelled ? data.cancelled : 0;
+    const cancelledRatio = `${Number((cancelled / total) * 100).toFixed(2)}%`;
+
+    const inProgress = data.inProgress ? data.inProgress : 0;
+    const inProgressRatio = `${Number((inProgress / total) * 100).toFixed(2)}%`;
+
+    const failed = data.failed ? data.failed : 0;
+    const failedRatio = `${Number((failed / total) * 100).toFixed(2)}%`;
+
     const values = [
-      [`COMPLETED JOBS`, data.completed],
-      [`CANCELLED JOBS`, data.cancelled],
-      [`IN-PROGRESS JOBS`, data.inProgress],
-      [`FAILED JOBS`, data.failed],
+      [ `COMPLETED JOBS`, completed, completedRatio ],
+      [ `CANCELLED JOBS`, cancelled, cancelledRatio ],
+      [ `IN-PROGRESS JOBS`, inProgress, inProgressRatio ],
+      [ `FAILED JOBS`, failed, failedRatio ],
     ];
-    OTHERSHEETS.Data.getRange(7, 2, 4, 2).setValues(values);
+    OTHERSHEETS.Data.getRange(7, 2, 4, 3).setValues(values);
   }
 
   /**
