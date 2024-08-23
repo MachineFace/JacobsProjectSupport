@@ -237,10 +237,11 @@ const _gasTLoggerTesting = async () => {
   const test = new GasTap();
 
   await test(`Log`, (t) => {
-    const x = Log.Warning(`Warning Test ----> Message`);
-    const y = Log.Info(`Info Test ----> Message`);
-    const z = Log.Error(`ERROR Test ----> Message`);
-    const w = Log.Debug(`Debugging Test ----> Message`);
+    const logger = new Log();
+    const x = logger.Warning(`Warning Test ----> Message`);
+    const y = logger.Info(`Info Test ----> Message`);
+    const z = logger.Error(`ERROR Test ----> Message`);
+    const w = logger.Debug(`Debugging Test ----> Message`);
     t.notThrow(() => x, `Warning SHOULD NOT throw error.`);
     t.equal(x, 0, `Warning returns 0 : ${x}`);
     t.notThrow(() => y, `Info SHOULD NOT throw error.`);
@@ -548,13 +549,14 @@ const _gasTEmailTesting = async () => {
   await test(`Emailer`, async(t) => {
     const name = `Dingus`; 
     const email = "codyglen@berkeley.edu";
-    const jobnumber = new CreateJobnumber({ date : new Date()}).Jobnumber;
+    const jobnumber = new JobnumberService().jobnumber;
     const projectname = `Some Kinda Project`;
     const message = new CreateMessage({
       name : name,
       jobnumber : jobnumber,
       projectname : projectname,
     });
+    console.warn(`Email to ${email} from ${SUPPORT_ALIAS}, ${name}, ${jobnumber}`);
     Object.values(STATUS).forEach(async (status) => {
       const x = await new Emailer({
         name : name,
@@ -568,7 +570,7 @@ const _gasTEmailTesting = async () => {
   });
 
   await test.finish();
-  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+  if (test?.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
 

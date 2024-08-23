@@ -93,8 +93,8 @@ class SummaryBuilder {
     let text = `<p>Hello!</p> `;
       text += `<p>Here is a summary of all the recent submissions.<br/><br/>`;
       text += `<a href="https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ"><b> ** GO TO SHEET NOW ** </b></a><br/><br/>`;
-      text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobsprojectsupport@berkeley.edu">jacobsprojectsupport@berkeley.edu</a>. </p>`;
-      text += `<p>Best,<br />${SERVICE_NAME}</p>`;
+      text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobs-project-support@berkeley.edu">jacobs-project-support@berkeley.edu</a>. </p>`;
+      text += `<p>Best,<br/>${SERVICE_NAME}</p>`;
       text += `<br/>`;
       text += `SUMMARY:`;
       text += `<br/>`;
@@ -118,7 +118,7 @@ class SummaryBuilder {
       // Email DS
       await GmailApp.sendEmail('codyglen@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
         htmlBody: this._SummaryText() + htmlBodyText,
-        'from': 'jacobsprojectsupport@berkeley.edu',
+        'from': 'jacobs-project-support@berkeley.edu',
         // 'cc' : `codyglen@berkeley.edu`,
         'cc': StaffEmailAsString(),
         'bcc': 'cparsell@berkeley.edu',

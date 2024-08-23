@@ -51,7 +51,7 @@ const onSubmission = async (e) => {
 
   let values = e.namedValues;
   console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
-  Log.Info(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
+  console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
   let jobnumber = jobNumberService.jobnumber;
@@ -73,13 +73,13 @@ const onSubmission = async (e) => {
         bcc: staff.Chris.email,
         name: SERVICE_NAME,
       });
-      Log.Warning(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
+      console.warn(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     } else {
       // Set Status to Received
       SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
     }
   } catch(err) {
-    Log.Error(`${err} : Couldn't determine student access`);
+    console.error(`${err} : Couldn't determine student access`);
   }
 
   // Create Messages
@@ -139,7 +139,7 @@ const onSubmission = async (e) => {
     });
     console.info(`Design Specialist has been emailed.`);
   } catch(err) {
-    Log.Error(`${err} : Couldn't email DS...`);
+    console.error(`${err} : Couldn't email DS...`);
   }
 
   // GSI Plotter
@@ -156,7 +156,7 @@ const onSubmission = async (e) => {
       console.info(`GSI Plotter instruction email sent.`);
     }
   } catch (err) {
-    Log.Error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
+    console.error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
   }
 
   // Check again
@@ -227,7 +227,7 @@ const onChange = async (e) => {
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
   } catch (err) {
-    Log.Error(`Whoops: Couldn't double-check priority: ${err}`);
+    console.error(`Whoops: Couldn't double-check priority: ${err}`);
   }
 
   ds = ds ? ds : `a Design Specialist`;
@@ -237,7 +237,7 @@ const onChange = async (e) => {
 
 
   // Log submission info to sheet
-  Log.Info(`Submission Time = ${timestamp}, Name = ${name}, Email = ${email}, Project = ${projectName}`);
+  console.info(`Submission Time = ${timestamp}, Name = ${name}, Email = ${email}, Project = ${projectName}`);
 
   // Ignore
   if(status == STATUS.closed) return;
@@ -249,10 +249,10 @@ const onChange = async (e) => {
     if (status == STATUS.received || status == STATUS.inProgress) {
       jobnumber = jobnumberService.IsValid(jobnumber) ? jobnumber : jobnumberService.jobnumber;
       SetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow, jobnumber);
-      Log.Warning(`Job Number was missing, so the script fixed it. Submission by ${email}`);
+      console.warn(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
-    Log.Error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+    console.error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
   }
   
   //----------------------------------------------------------------------------------------------------------------
@@ -260,7 +260,7 @@ const onChange = async (e) => {
   try {
     if(name) SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
   } catch (err) {
-    Log.Error(`${err} : Couldn't fix their name.....`)
+    console.error(`${err} : Couldn't fix their name.....`)
   }
 
   //----------------------------------------------------------------------------------------------------------------
@@ -276,7 +276,7 @@ const onChange = async (e) => {
       }
     }
   } catch (err) {
-    Log.Error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
+    console.error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
   }
 
 
@@ -301,7 +301,7 @@ const onChange = async (e) => {
         SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
         console.info(`Set Ticket URL: ${ticket.url} - Sheet: ${thisSheet} Row: ${thisRow}`);
       } catch (err) {
-        Log.Error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+        console.error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
       }
     }
   }
@@ -322,7 +322,7 @@ const onChange = async (e) => {
   });
 
   // Send email with appropriate response and cc Chris and Cody.
-  Log.Info(`Sending email....`);
+  console.warn(`Sending email....`);
   new Emailer({
     name : name, 
     status : status,

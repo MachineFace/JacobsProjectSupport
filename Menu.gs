@@ -152,7 +152,7 @@ const PopupGetSingleStudentPriority = async () => {
       ui.ButtonSet.OK,
     );
   } catch(err) {
-    Log.Error(`"PopupGetSingleStudentPriority()" failed : ${err} : Couldn't set priority for ${name}`);
+    console.error(`"PopupGetSingleStudentPriority()" failed : ${err} : Couldn't set priority for ${name}`);
     ui.alert(
       `${SERVICE_NAME} : Error!`,
       `Whoops, couldn't set priority for ${name}`,
@@ -308,7 +308,7 @@ const BillFromSelected = async () => {
       console.warn(`User clicked "No / Cancel"....\nOrder NOT Created.`);
     }
   } catch (err) {
-    Log.Error(`"BillFromSelected()" failed : ${err}`);
+    console.error(`"BillFromSelected()" failed : ${err}`);
     return 1;
   } 
 };
@@ -424,7 +424,7 @@ const BarMenu = () => {
         SpreadsheetApp
           .getUi()
           .createMenu(`Chris & Cody ONLY`)
-          .addItem(`DO NOT USE THESE FUNCTIONS UNLESS YOU ARE CHRIS OR CODY!`, `_testStaff`)
+          .addItem(`DO NOT USE THESE FUNCTIONS UNLESS YOU ARE CHRIS OR CODY!`, `PopupHelp`)
           .addItem(`ENABLE JPS`, `EnableJPS`)
           .addItem(`DISABLE JPS`, `DisableJPS`)
           .addItem(`Update Start and End Dates`, `PrintServiceDates`)

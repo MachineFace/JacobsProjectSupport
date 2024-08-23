@@ -1,5 +1,7 @@
 {
   "timeZone": "America/Los_Angeles",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
   "dependencies": {
     "enabledAdvancedServices": [
       {
@@ -22,17 +24,8 @@
         "serviceId": "sheets",
         "version": "v4"
       }
-    ],
-    "libraries": [
-      {
-        "userSymbol": "Log",
-        "version": "0",
-        "libraryId": "1Z1YXYpuN2j2owNQIYk4NeDEgzW9450Sts-y77VMFnnbw7gTMP96b3awX",
-        "developmentMode": true
-      }
     ]
   },
-  "exceptionLogging": "STACKDRIVER",
   "oauthScopes": [
     "https://www.googleapis.com/auth/forms",
     "https://www.googleapis.com/auth/spreadsheets",
@@ -47,5 +40,8 @@
     "https://www.googleapis.com/auth/script.container.ui",
     "https://www.googleapis.com/auth/script.scriptapp"
   ],
-  "runtimeVersion": "V8"
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "DOMAIN"
+  }
 }

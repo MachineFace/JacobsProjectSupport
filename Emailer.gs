@@ -9,7 +9,7 @@ class Emailer {
     name : name = `Unknown Name`, 
     status : status = STATUS.received,
     email : email = `Unknown Email`,    
-    designspecialistemail : designspecialistemail = `jacobsprojectsupport@berkeley.edu`,
+    designspecialistemail : designspecialistemail = `jacobs-project-support@berkeley.edu`,
     message : message = ``,
   }) {
     this.name = name;
@@ -147,10 +147,10 @@ class Emailer {
 /**
  * Send an email
  * @NOTIMPLEMENTED
- */
+ *
 const SendEmail = async ({
-  email : email = `jacobsprojectsupport@berkeley.edu`,
-  staffEmail : staffEmail = `jacobsprojectsupport@berkeley.edu`,
+  email : email = `jacobs-project-support@berkeley.edu`,
+  staffEmail : staffEmail = `jacobs-project-support@berkeley.edu`,
   status : status = `Default`,
   message : message = new CreateMessage({}),
 }) => {
@@ -169,10 +169,11 @@ const SendEmail = async ({
     return 1;
   }
 }
+*/
 
 /** 
  * @NOTIMPLEMENTED
- */
+ *
 const __CountTotalEmailsSent__ = async () => {
   let count = 0;
   try {
@@ -196,14 +197,14 @@ const __CountTotalEmailsSent__ = async () => {
   console.warn(`Total Emails Sent : ${count}`);
   return count;
 }
-
+*/
 
 /**
  * Lists, for each thread in the user's Inbox, a
  * snippet associated with that thread.
  *
- * 
-const __ListInboxSnippets__ = () => {
+ *
+const _ListInboxSnippets = () => {
   try {
     let pageToken;
     do {
@@ -225,6 +226,26 @@ const __ListInboxSnippets__ = () => {
 */
 
 
+const _testEmail = async() => {
+  const name = `Dingus`; 
+  const email = "codyglen@berkeley.edu";
+  const jobnumber = new JobnumberService().jobnumber;
+  const projectname = `Some Kinda Project`;
+  const message = new CreateMessage({
+    name : name,
+    jobnumber : jobnumber,
+    projectname : projectname,
+  });
+  console.warn(`Email to ${email} from ${SUPPORT_ALIAS}, ${name}, ${jobnumber}`);
+
+  GmailApp.sendEmail(email, `${SERVICE_NAME} : Project Closed`, "", {
+    htmlBody: message.billedMessage,
+    from: SUPPORT_ALIAS,
+    cc: email,
+    name: SERVICE_NAME,
+  });
+
+}
 
 
 

@@ -4,7 +4,10 @@
  */
 
 
-const SUPPORT_ALIAS = GmailApp.getAliases()[0];
+const SUPPORT_ALIAS = Gmail.Users.getProfile(`me`).emailAddress ? 
+  Gmail.Users.getProfile(`me`).emailAddress : 
+  `jacobs-project-support@berkeley.edu`;
+  
 const SERVICE_NAME = `Jacobs Project Support`;
 
 const DaysRetentionNumber = 15; //How many days to hold a file

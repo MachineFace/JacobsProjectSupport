@@ -512,9 +512,5 @@ const TitleCase = (str) => {
 
 
 
-const _testGet = () => {
-  GetRowData(SHEETS.Advancedlab, 10);
-}
-
 
 

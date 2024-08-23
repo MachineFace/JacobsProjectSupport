@@ -100,7 +100,7 @@ class QRCodeGenerator {
  * For use with barcode scanner.
  * Searches for job number found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
  * @DEFUNCT
- */
+ *
 const PickupByBarcode = () => {
   const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
   const jobnumber = JobnumberService.decimalToUUID(text);
@@ -126,11 +126,12 @@ const PickupByBarcode = () => {
   });
   progress.setValue(`Job number not found. Try again.`);
 } 
+*/
 
 /**
  * Mark a job as abandoned and email student.
  * @DEFUNCT
- */
+ *
 const MarkAsAbandonedByBarcode = async () => {
   const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
   const jobnumber = JobnumberService.decimalToUUID(text);
@@ -179,7 +180,7 @@ const MarkAsAbandonedByBarcode = async () => {
   });
   progress.setValue(`Job number not found. Try again.`);
 }
-
+*/
 
 
 

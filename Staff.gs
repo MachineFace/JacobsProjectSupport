@@ -14,7 +14,7 @@ class DesignSpecialist {
     this.id = Utilities.getUuid();
     this.name = name ? name : `DS`;
     this.fullname = fullname ? fullname : `Design Specialist`;
-    this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
+    this.email = email ? email : `jacobs-project-support@berkeley.edu`;
     this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = `Design Specialist`;
     this.isAdmin = true;
@@ -83,7 +83,7 @@ class StudentSupervisor extends DesignSpecialist {
     this.id = Utilities.getUuid();
     this.name = name ? name : `SS`;
     this.fullname = fullname ? fullname : `Student Supervisor`;
-    this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
+    this.email = email ? email : `jacobs-project-support@berkeley.edu`;
     this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = 'Student Supervisor';
     this.isAdmin = false;
@@ -124,7 +124,7 @@ class Manager extends DesignSpecialist {
     this.id = Utilities.getUuid();
     this.name = name ? name : `MA`;
     this.fullname = fullname ? fullname : `Manager`;
-    this.email = email ? email : `jacobsprojectsupport@berkeley.edu`;
+    this.email = email ? email : `jacobs-project-support@berkeley.edu`;
     this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = 'Manager';
     this.isAdmin = true;

@@ -6,10 +6,10 @@
  */
 class CheckPriority {
   constructor({
-    email : email = `jacobsprojectsupport@berkeley.edu`,
+    email : email = `jacobs-project-support@berkeley.edu`,
     sid : sid = 1293487129348,
   }) {
-    this.email = email ? email.toString().replace(/\s+/g, "") : `jacobsprojectsupport@berkeley.edu`;
+    this.email = email ? email.toString().replace(/\s+/g, "") : `jacobs-project-support@berkeley.edu`;
     this.sid = sid ? sid.toString().replace(/\s+/g, "") : 19238471239847;
   }
 
@@ -119,6 +119,5 @@ const CheckMissingAccessStudents = () => {
 
 
 const _testCheck = () => {
-  // CheckMissingAccessStudents();
-  console.info(Object.keys(PRIORITY))
+  CheckMissingAccessStudents();
 }
