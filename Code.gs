@@ -342,7 +342,10 @@ const onChange = async (e) => {
 
   //----------------------------------------------------------------------------------------------------------------
   // Generate an estimate
-  if(mat1 && mat1quantity) BuildEstimate(thisSheet, thisRow);
+  if(mat1 && mat1quantity) {
+    // const { Link } = GetStoreInfo(thisSheet, mat1);
+    BuildEstimate(thisSheet, thisRow);
+  }
 
 
 }

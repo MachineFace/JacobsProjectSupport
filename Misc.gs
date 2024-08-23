@@ -392,7 +392,51 @@ const ValidateEmail = (email) => {
   return match;
 }
 
+/**
+ * Get Store Sheet Association
+ * @param {sheet} sheet
+ * @returns {sheet} store sheet
+ */
+const GetStoreSheet = (sheet) => {
+  const sheetName = sheet.getSheetName();
+  switch(sheetName) {
+    case SHEETS.Laser.getSheetName():
+      return STORESHEETS.LaserStoreItems;
+    case SHEETS.Fablight.getSheetName():
+      return STORESHEETS.FablightStoreItems;
+    case SHEETS.Waterjet.getSheetName():
+      return STORESHEETS.WaterjetStoreItems;
+    case SHEETS.Advancedlab.getSheetName():
+      return STORESHEETS.AdvLabStoreItems;
+    case SHEETS.Shopbot.getSheetName():
+      return STORESHEETS.ShopbotStoreItems;
+    case SHEETS.Vinyl.getSheetName():
+      return STORESHEETS.VinylCutterStoreItems;
+    case SHEETS.Othertools.getSheetName():
+      return STORESHEETS.OthermillStoreItems;
+    case SHEETS.Plotter.getSheetName():
+    case SHEETS.GSI_Plotter.getSheetName():
+      return STORESHEETS.VinylCutterStoreItems;
+    default:
+      return STORESHEETS.LaserStoreItems;
+  }  
+}
 
+/**
+ * Look up Item's Info in Store Sheet
+ * @param {sheet} sheet
+ * @param {material} material
+ * @param {object} row data
+ */
+const GetStoreInfo = (sheet, material) => {
+  sheet = sheet ? sheet : SHEETS.Laser;
+  material = material ? material : GetByHeader(sheet, HEADERNAMES.mat1, 2);
+
+  const storesheet = GetStoreSheet(sheet);
+  const row = SearchSpecificSheet(storesheet, material);
+  const data = GetRowData(storesheet, row);
+  return data;
+}
 
 
 const GetAllProjectNames = () => {

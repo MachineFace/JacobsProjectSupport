@@ -88,8 +88,8 @@ const PopUpMarkAsPickedUp = async () => {
 /** 
  * Creates a pop-up for counting users.
  */
-const PopupCountUsers = async () => {
-  const ui = await SpreadsheetApp.getUi();
+const PopupCountUsers = () => {
+  const ui = SpreadsheetApp.getUi();
   const count = Calculate.CountActiveUsers();
   ui.alert(
     `${SERVICE_NAME}`,
@@ -103,7 +103,7 @@ const PopupCountUsers = async () => {
  * Create a pop-up to check for ALL missing students
  */
 const PopupCheckMissingAccessStudents = async () => {
-  const ui = await SpreadsheetApp.getUi();
+  const ui = SpreadsheetApp.getUi();
   const names = await CheckMissingAccessStudents().join(",\n");
   console.info(names);
   ui.alert(
@@ -119,7 +119,7 @@ const PopupCheckMissingAccessStudents = async () => {
  */
 const PopupGetSingleStudentPriority = async () => {
   try {
-    const ui = await SpreadsheetApp.getUi();
+    const ui = SpreadsheetApp.getUi();
     const thisSheet = SpreadsheetApp.getActiveSheet();
     let thisRow = thisSheet.getActiveRange().getRow();
 
@@ -166,8 +166,8 @@ const PopupGetSingleStudentPriority = async () => {
 /**
  * Create a pop-up to make a new Jobnumber
  */
-const PopupCreateNewJobNumber = async () => {
-  const ui = await SpreadsheetApp.getUi();
+const PopupCreateNewJobNumber = () => {
+  const ui = SpreadsheetApp.getUi();
   const thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
   const jobnumberService = new JobnumberService();
@@ -204,7 +204,7 @@ const PopupCreateNewJobNumber = async () => {
  * Bill from a selected line
  */
 const BillFromSelected = async () => {
-  const ui = await SpreadsheetApp.getUi();
+  const ui = SpreadsheetApp.getUi();
   const shopify = await new ShopifyAPI(); 
   let thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
@@ -360,7 +360,6 @@ const PopupCreateTicket = async () => {
  */
 const BuildHTMLHELP = () => {
   let items = [
-    `Note : All status changes trigger an email to the student except for 'CLOSED' status`,
     `New Project comes into a sheet and status will automatically be set to 'Received'.`,
     `Assign yourself as the DS / SS and fill in the materials as best you can.`,
     `Change the status to 'In-Progress' when you're ready to start the project.`,
@@ -371,20 +370,17 @@ const BuildHTMLHELP = () => {
     `If you don't need to bill the student, choose 'CLOSED' status.`,
     `If you need to cancel the job, choose 'Cancelled'. `,
     `If the project can't be fabricated at all, choose 'FAILED', and email the student why it failed.`,
-    `'Missing Access' will be set automatically, and you should not choose this as an option.`,
     `If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. `,
-    `See Cody or Chris for additional help + protips.`,
+    `'Missing Access' will be set automatically, and you should not choose this as an option.`,
   ];
   let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`
-  + `<h3 style="font-family:Roboto">How to Use JPS : </h3>`
+  + `<h3 style="font-family:Roboto">How to Use ${SERVICE_NAME} : </h3>`
   + `<hr>`
-  + `<p>${items[0]}</p>`
+  + `<p>Note : All status changes trigger an email to the student except for 'CLOSED' status</p>`
   + `<ol style="font-family:Roboto font-size:10">`;
-  items.forEach((item, index) => {
-    if (index > 0 && index < items.length - 1) html += `<li>${item}</li>`;
-  });
+  items.forEach(item => html += `<li>${item}</li>`);
   html += `</ol>`;
-  html += `<p>${items[items.length - 1]}</p>`;
+  html += `<p>See Cody or Chris for additional help / protips.</p>`;
 
   console.info(html);
   return html;
