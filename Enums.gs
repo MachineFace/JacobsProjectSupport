@@ -3,7 +3,6 @@
  * Code Enumerations
  */
 
-
 const SUPPORT_ALIAS = `jacobs-project-support@berkeley.edu`;
   
 const SERVICE_NAME = `Jacobs Project Support`;
