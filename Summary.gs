@@ -116,7 +116,7 @@ class SummaryBuilder {
       let htmlBodyText = await this._GetEmailHtml(items);
 
       // Email DS
-      await GmailApp.sendEmail('codyglen@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
+      await GmailApp.sendEmail('jacobs-project-support@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
         htmlBody: this._SummaryText() + htmlBodyText,
         'from': 'jacobs-project-support@berkeley.edu',
         // 'cc' : `codyglen@berkeley.edu`,

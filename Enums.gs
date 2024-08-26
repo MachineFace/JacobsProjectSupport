@@ -4,9 +4,7 @@
  */
 
 
-const SUPPORT_ALIAS = Gmail.Users.getProfile(`me`).emailAddress ? 
-  Gmail.Users.getProfile(`me`).emailAddress : 
-  `jacobs-project-support@berkeley.edu`;
+const SUPPORT_ALIAS = `jacobs-project-support@berkeley.edu`;
   
 const SERVICE_NAME = `Jacobs Project Support`;
 
