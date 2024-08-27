@@ -48,9 +48,9 @@ class CreateMessage {
     /** @private */
     this.help = `If you have questions or need assistance please email ${this.designspecialistemaillink}.<br/>`;
     /** @private */
-    this.survey = `<p>Please help us improve JPS by taking a moment for a brief survey:<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></p><br/>`;
-    /** @private */
     this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
+    /** @private */
+    this.survey = `<p><small>Please help us improve JPS by taking a moment for a brief survey:<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></small></p><br/>`;
   }
 
   get defaultMessage() {
@@ -60,8 +60,8 @@ class CreateMessage {
       message += `A Design Specialist is reviewing you application, and will respond to you shortly.<br/><br/>`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations; 
+      message += this.survey;
     return message; 
   }
   get receivedMessage() {
@@ -69,12 +69,12 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Your project, <b><i>${this.projectname}</i></b> has been received.<br/>`;
-      message += `Your part or parts have been assigned a job number: <i>${this.jobnumber}</i>.<br/>`;
+      message += `Your part or parts have been assigned a Jobnumber: <b><i>${this.jobnumber}.</i></b><br/>`;
       message += `We will update you when it has been started by a staff member.`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get inProgressMessage() {
@@ -83,13 +83,13 @@ class CreateMessage {
       message += this.thanks;
       message += `Your project has started. <br/>`;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> has been started by ${this.designspecialist}.<br/>`;
-      message += `Jobnumber: <i>${this.jobnumber}</i>.<br/>`;
+      message += `Jobnumber: <b><i>${this.jobnumber}.</i></b><br/>`;
       message += `Please email ${this.designspecialistemaillink} for further details.<br/><br/>`;
       message += `<b>We will update you when it is done.</b>`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get completedMessage() {
@@ -97,9 +97,8 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished.<br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i><br/>`;
-      message += `Your parts are now available for pickup.<br/>`;
-      message += `Please email ${this.designspecialist} at ${this.designspecialistemaillink} for further details.<br/>`;
+      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
+      message += `<b>Your parts are now available for pickup.</b><br/>`;
       message += `</p>`;
       message += `<p>`;
       message += `Your Jacobs Store account will be billed for:<br/>`;
@@ -127,20 +126,20 @@ class CreateMessage {
       message += `${PickupHours}</b><br/><br/>`
       message += `</p>`
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get pickedUpMessage() {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> have been picked up and the project is now CLOSED.<br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i><br/>`;
+      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> have been picked up and the project is now <b>CLOSED.</b><br/>`;
+      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/>`;
       message += `</p>`
       message += this.help;
-      message += this.survey;
       message += this.salutations; 
+      message += this.survey;
     return message;
   }
   get abandonedMessage() {
@@ -148,7 +147,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished and have not been picked up yet.<br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i><br/>`;
+      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/>`;
       message += `<font style="color:#FF0000";><b>Please pick up your parts SOON before they are disposed of in the free-prints bin.</b></font><br/>`;
       message += `Completed projects can be picked up in-person.<br/><br/>`;
       message += `<b>Pick-Up Location:<br/>`;
@@ -158,8 +157,8 @@ class CreateMessage {
       message += `${PickupHours}</b><br/><br/>`
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations; 
+      message += this.survey;
     return message;
   }
   get failedMessage() {
@@ -167,12 +166,12 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Your project, <b><i>${this.projectname}</i></b> has unfortunately failed.<br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i><br/><br/>`;
+      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}<br/><br/>`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get rejectedByStudentMessage() {
@@ -180,12 +179,12 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `You have elected not to proceed with the design process.<br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i><br/><br/>`;
+      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br/><br/>`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get rejectedByStaffMessage() {
@@ -193,13 +192,13 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `A staff member has cancelled and/or declined this job with the Project Name: <b><i>${this.projectname}</b></i>.<br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i><br/><br/>`;
+      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br/><br/>`;
       message += `You may also choose to resubmit this job as a new submission.<br/>`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get waitlistMessage() {
@@ -213,8 +212,8 @@ class CreateMessage {
       message += `No action is required at this time.<br/><br/>`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get billedMessage() {
@@ -222,7 +221,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Your project <b><i>${this.projectname}</b></i> is now <b>CLOSED.</b><br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i>.<br/><br/>`;
+      message += `Job Number: <b><i>${this.jobnumber}.</i></b><br/><br/>`;
       message += `Your Jacobs Store account has been billed for: <br/> `;
       message += `</p>`;
       message += `<p><ul>`;
@@ -240,8 +239,8 @@ class CreateMessage {
       message += `If you have not picked up your parts, they can be picked up in-person.`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
   get noAccessMessage() {
@@ -262,8 +261,8 @@ class CreateMessage {
       message += `Once your registration has been updated, or your PI has fixed the issue, we will update you when your project has been started.`;
       message += `</p>`;
       message += this.help;
-      message += this.survey;
       message += this.salutations;
+      message += this.survey;
     return message;
   }
 }

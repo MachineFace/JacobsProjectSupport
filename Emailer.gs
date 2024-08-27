@@ -22,124 +22,139 @@ class Emailer {
   }
 
   SendEmail () {
-    const staff = BuildStaff();
-    switch (this.status) {
-      case STATUS.received:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : ${STATUS.received}`, "", {
-          htmlBody: this.message.receivedMessage,
-          from: SUPPORT_ALIAS,
-          cc: this.designspecialistemail,
-          bcc: staff.Chris.email,
-          name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.inProgress:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Started`, "", {
-            htmlBody: this.message.inProgressMessage,
+    try {
+      const staff = BuildStaff();
+      switch (this.status) {
+        case STATUS.received:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : ${STATUS.received}`, "", {
+            htmlBody: this.message.receivedMessage,
             from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
+            cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
             bcc: staff.Chris.email,
             name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.completed:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Completed`, "", {
-            htmlBody: this.message.completedMessage,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.inProgress:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Started`, "", {
+              htmlBody: this.message.inProgressMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.completed:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Completed`, "", {
+              htmlBody: this.message.completedMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.abandoned:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project waiting for you to pick up!`, "", {
+              htmlBody: this.message.abandonedMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.pickedUp:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Picked Up`, "", {
+              htmlBody: this.message.pickedUpMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.failed:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has Failed`, "", {
+              htmlBody: this.message.failedMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.rejectedByStudent:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Declined`, "", {
+              htmlBody: this.message.rejectedByStudentMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.rejectedByStaff:
+        case STATUS.cancelled:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Cancelled`, "", {
+              htmlBody: this.message.rejectedByStaffMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.billed:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Closed`, "", {
+            htmlBody: this.message.billedMessage,
             from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
             bcc: staff.Chris.email,
             name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.abandoned:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project waiting for you to pick up!`, "", {
-            htmlBody: this.message.abandonedMessage,
-            from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.pickedUp:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Picked Up`, "", {
-            htmlBody: this.message.pickedUpMessage,
-            from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.failed:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has Failed`, "", {
-            htmlBody: this.message.failedMessage,
-            from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.rejectedByStudent:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Declined`, "", {
-            htmlBody: this.message.rejectedByStudentMessage,
-            from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.rejectedByStaff:
-      case STATUS.cancelled:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Cancelled`, "", {
-            htmlBody: this.message.rejectedByStaffMessage,
-            from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.billed:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Closed`, "", {
-          htmlBody: this.message.billedMessage,
-          from: SUPPORT_ALIAS,
-          cc: this.designspecialistemail,
-          bcc: staff.Chris.email,
-          name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.waitlist:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Waitlisted`, "", {
-            htmlBody: this.message.waitlistMessage,
-            from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
-        });
-        break;
-      case STATUS.missingAccess:
-        console.warn(`Sending ${this.status} email to student.`);
-        MailApp.sendEmail(this.email, `${SERVICE_NAME} : Missing Access`, "", {
-            htmlBody: this.message.noAccessMessage,
-            from: SUPPORT_ALIAS,
-            cc: this.designspecialistemail,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
-        });
-        break;   
-      case "":
-      case undefined:
-        break;
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.waitlist:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Waitlisted`, "", {
+              htmlBody: this.message.waitlistMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;
+        case STATUS.missingAccess:
+          console.warn(`Sending ${this.status} email to student.`);
+          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Missing Access`, "", {
+              htmlBody: this.message.noAccessMessage,
+              from: SUPPORT_ALIAS,
+              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              bcc: staff.Chris.email,
+              name: SERVICE_NAME,
+          });
+          console.warn(`Sent ${this.status} email to student.`);
+          break;   
+        case "":
+        case undefined:
+          break;
+      }
+    } catch(err) {
+      console.error(`"SendEmail()" failed : ${err}`);
+      return 1;
     }
-
   }
 }
 

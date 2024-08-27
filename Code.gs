@@ -322,7 +322,6 @@ const onChange = async (e) => {
   });
 
   // Send email with appropriate response and cc Chris and Cody.
-  console.warn(`Sending email....`);
   new Emailer({
     name : name, 
     status : status,
