@@ -6,10 +6,10 @@
  */
 class CheckPriority {
   constructor({
-    email : email = `jacobs-project-support@berkeley.edu`,
+    email : email = SERVICE_EMAIL,
     sid : sid = 1293487129348,
   }) {
-    this.email = email ? email.toString().replace(/\s+/g, "") : `jacobs-project-support@berkeley.edu`;
+    this.email = email ? email.toString().replace(/\s+/g, "") : SERVICE_EMAIL;
     this.sid = sid ? sid.toString().replace(/\s+/g, "") : 19238471239847;
   }
 

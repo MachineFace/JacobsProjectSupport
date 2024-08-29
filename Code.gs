@@ -227,7 +227,7 @@ const onChange = async (e) => {
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
   } catch (err) {
-    console.error(`Whoops: Couldn't double-check priority: ${err}`);
+    console.error(`Setting priority failed: ${err}`);
   }
 
   ds = ds ? ds : `a Design Specialist`;

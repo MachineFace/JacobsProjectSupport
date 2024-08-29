@@ -40,23 +40,24 @@ class DesignSpecialist {
   /** @private */
   SetAreas () {
     switch (this.name) {
-      case "Staff":
-        this.areas = [SHEETS.Laser.getSheetName(),];
-        break;
       case "Chris":
-        this.areas = [SHEETS.Advancedlab.getSheetName(),];
+        this.areas = [ SHEETS.Advancedlab.getSheetName(), ];
         break;
       case "ChrisMyers":
-        this.areas = [SHEETS.Shopbot.getSheetName(), ];
+        this.areas = [ SHEETS.Shopbot.getSheetName(), ];
         break;
       case "Cody":
-        this.areas = [SHEETS.Plotter.getSheetName(), SHEETS.GSI_Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Vinyl.getSheetName()];
+        this.areas = [ SHEETS.Plotter.getSheetName(), SHEETS.GSI_Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Vinyl.getSheetName(), ];
         break;
       case "Gary":
-        this.areas = [SHEETS.Waterjet.getSheetName(), SHEETS.Othertools.getSheetName(),];
+        this.areas = [ SHEETS.Waterjet.getSheetName(), SHEETS.Othertools.getSheetName(), ];
         break;
       case "Nicole":
         break;
+      case "Staff":
+        this.areas = [ SHEETS.Laser.getSheetName(), ];
+        break;
+      default:
       case undefined:
         this.areas = [];
         break;
@@ -83,7 +84,7 @@ class StudentSupervisor extends DesignSpecialist {
     this.id = Utilities.getUuid();
     this.name = name ? name : `SS`;
     this.fullname = fullname ? fullname : `Student Supervisor`;
-    this.email = email ? email : `jacobs-project-support@berkeley.edu`;
+    this.email = email ? email : SERVICE_EMAIL;
     this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = 'Student Supervisor';
     this.isAdmin = false;
@@ -124,7 +125,7 @@ class Manager extends DesignSpecialist {
     this.id = Utilities.getUuid();
     this.name = name ? name : `MA`;
     this.fullname = fullname ? fullname : `Manager`;
-    this.email = email ? email : `jacobs-project-support@berkeley.edu`;
+    this.email = email ? email : SERVICE_EMAIL;
     this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = 'Manager';
     this.isAdmin = true;

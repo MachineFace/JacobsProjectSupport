@@ -164,8 +164,8 @@ class Emailer {
  * @NOTIMPLEMENTED
  *
 const SendEmail = async ({
-  email : email = `jacobs-project-support@berkeley.edu`,
-  staffEmail : staffEmail = `jacobs-project-support@berkeley.edu`,
+  email : email = SERVICE_EMAIL,
+  staffEmail : staffEmail = SERVICE_EMAIL,
   status : status = `Default`,
   message : message = new CreateMessage({}),
 }) => {
