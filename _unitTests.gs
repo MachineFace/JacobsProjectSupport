@@ -2,22 +2,18 @@
  * Load GasT for Testing
  * See : https://github.com/huan/gast for instructions
  */
-
+const gasT_URL = UrlFetchApp
+  .fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js')
+  .getContentText();
+if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+const test = new GasTap();
 
 /**
  * Test with GasT
  */
 const _gasTMainTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
 
-  // await test(`Checking...`, (t) => {    
-  //     let i = 3 + 4
-  //     t.equal(i, 7, `Calc : 3 + 4 = 7  : Correct`)
-  // })
-  
   await test(`Priority Test`, (t) => {
     let types = {
       staff : {
@@ -104,7 +100,7 @@ const _gasTMainTesting = async () => {
   });
   
   await test(`JobNumber`, (t) => {
-    const jobnumberService = new JobnumberService()
+    const jobnumberService = new JobnumberService();
     const x = jobnumberService.jobnumber;
     t.equal(jobnumberService.IsValid(x), true, `Standard Job Number should be valid : Acutal : ${jobnumberService.IsValid(x)}.`);
     const y = jobnumberService.jobnumber;
@@ -129,18 +125,12 @@ const _gasTMainTesting = async () => {
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
-
-
 /**
  * Test Logger and Message with GasT
  */
 const _gasTMessagingTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
 
-  // ------------------------------------------------------------------------------------------------------------------------------
   await test(`CreateMessage DEFAULT`, (t) => {
     const message = new CreateMessage({});
 
@@ -231,10 +221,7 @@ const _gasTMessagingTesting = async () => {
  * Test Logging with GasT
  */
 const _gasTLoggerTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
 
   await test(`Log`, (t) => {
     const logger = new Log();
@@ -261,12 +248,8 @@ const _gasTLoggerTesting = async () => {
  * Test Misc with GasT
  */
 const _gasTMiscTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
-  
-  // ------------------------------------------------------------------------------------------------------------------------------
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+
   await test(`Search`, (t) => {
     const x = Search(`Cody`);
     t.notEqual(x, undefined || null, `Search should not return undefined or null. ${JSON.stringify(x)}`);
@@ -374,12 +357,8 @@ const _gasTMiscTesting = async () => {
  * Test Calculations with GasT
  */
 const _gasTCalculationTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
 
-  // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Calc Average Turnaround`, (t) => {
     const x = Calculate.GetAverageTurnaround(SHEETS.Laser);
     t.ok(x, `Time string is ok.`);
@@ -458,14 +437,10 @@ const _gasTCalculationTesting = async () => {
  * Test Shopify API with GasT
  */
 const _gasTShopifyTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+
   const shopify = new ShopifyAPI();
 
-
-  // ------------------------------------------------------------------------------------------------------------------------------
   await test(`Get Last Shopify Order`, async(t) => {
     const x = await shopify.GetLastOrder();
     console.info(x);
@@ -502,10 +477,7 @@ const _gasTShopifyTesting = async () => {
  * Test Ticket with GasT
  */
 const _gasTTicketTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
 
   await test(`Ticket`, t => {
     const name = `Dingus`; 
@@ -541,10 +513,7 @@ const _gasTTicketTesting = async () => {
  * Test Email Service with GasT
  */
 const _gasTEmailTesting = async () => {
-  if ((typeof GasTap) === 'undefined') { 
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-  } 
-  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
 
   await test(`Emailer`, async(t) => {
     const name = `Dingus`; 
