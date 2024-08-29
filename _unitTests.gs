@@ -556,7 +556,7 @@ const _gasTEmailTesting = async () => {
       jobnumber : jobnumber,
       projectname : projectname,
     });
-    console.warn(`Email to ${email} from ${SUPPORT_ALIAS}, ${name}, ${jobnumber}`);
+    console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${jobnumber}`);
     Object.values(STATUS).forEach(async (status) => {
       const x = await new Emailer({
         name : name,

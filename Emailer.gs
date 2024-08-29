@@ -9,7 +9,7 @@ class Emailer {
     name : name = `Unknown Name`, 
     status : status = STATUS.received,
     email : email = `Unknown Email`,    
-    designspecialistemail : designspecialistemail = `jacobs-project-support@berkeley.edu`,
+    designspecialistemail : designspecialistemail = SERVICE_EMAIL,
     message : message = ``,
   }) {
     this.name = name;
@@ -29,8 +29,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : ${STATUS.received}`, "", {
             htmlBody: this.message.receivedMessage,
-            from: SUPPORT_ALIAS,
-            cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+            from: SERVICE_EMAIL,
+            cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
             bcc: staff.Chris.email,
             name: SERVICE_NAME,
           });
@@ -40,8 +40,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Started`, "", {
               htmlBody: this.message.inProgressMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -51,8 +51,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Completed`, "", {
               htmlBody: this.message.completedMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -62,8 +62,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project waiting for you to pick up!`, "", {
               htmlBody: this.message.abandonedMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -73,8 +73,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Picked Up`, "", {
               htmlBody: this.message.pickedUpMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -84,8 +84,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has Failed`, "", {
               htmlBody: this.message.failedMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -95,8 +95,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Declined`, "", {
               htmlBody: this.message.rejectedByStudentMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -107,8 +107,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Cancelled`, "", {
               htmlBody: this.message.rejectedByStaffMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -118,8 +118,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Closed`, "", {
             htmlBody: this.message.billedMessage,
-            from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+            from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
             bcc: staff.Chris.email,
             name: SERVICE_NAME,
           });
@@ -129,8 +129,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Waitlisted`, "", {
               htmlBody: this.message.waitlistMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -140,8 +140,8 @@ class Emailer {
           console.warn(`Sending ${this.status} email to student.`);
           MailApp.sendEmail(this.email, `${SERVICE_NAME} : Missing Access`, "", {
               htmlBody: this.message.noAccessMessage,
-              from: SUPPORT_ALIAS,
-              cc: `${this.designspecialistemail}, ${SUPPORT_ALIAS}`,
+              from: SERVICE_EMAIL,
+              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
               bcc: staff.Chris.email,
               name: SERVICE_NAME,
           });
@@ -172,7 +172,7 @@ const SendEmail = async ({
   try {
     await MailApp.sendEmail(email, `${SERVICE_NAME} : ${status}`, ``, {
       htmlBody: message,
-      from: SUPPORT_ALIAS,
+      from: SERVICE_EMAIL,
       cc: staffEmail,
       bcc: staff.Chris.email,
       name: SERVICE_NAME,
@@ -243,7 +243,7 @@ const _ListInboxSnippets = () => {
 
 const _testEmail = async() => {
   const name = `Dingus`; 
-  const email = "codyglen@berkeley.edu";
+  const email = `codyglen@berkeley.edu`;
   const jobnumber = new JobnumberService().jobnumber;
   const projectname = `Some Kinda Project`;
   const message = new CreateMessage({
@@ -251,11 +251,11 @@ const _testEmail = async() => {
     jobnumber : jobnumber,
     projectname : projectname,
   });
-  console.warn(`Email to ${email} from ${SUPPORT_ALIAS}, ${name}, ${jobnumber}`);
+  console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${jobnumber}`);
 
   MailApp.sendEmail(email, `${SERVICE_NAME} : Project Closed`, "", {
     htmlBody: message.billedMessage,
-    from: SUPPORT_ALIAS,
+    from: SERVICE_EMAIL,
     cc: email,
     name: SERVICE_NAME,
   });

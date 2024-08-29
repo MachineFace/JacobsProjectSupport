@@ -37,7 +37,7 @@ class CreateMessage {
     this.rowData = rowData;
 
     this.designspecialist = designspecialist ? designspecialist.toString() : `Staff`;
-    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "mailto:${SUPPORT_ALIAS}">${SUPPORT_ALIAS}</a>`;
+    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "mailto:${SERVICE_EMAIL}">${SERVICE_EMAIL}</a>`;
     this.cost = cost ? Number(cost).toFixed(2) : 0;
     this.costFormatted = `$ ${this.cost.toString()}`;
 
@@ -46,11 +46,17 @@ class CreateMessage {
     /** @private */
     this.thanks = `Thank you for applying to ${SERVICE_NAME}.<br/><br/>`;
     /** @private */
+    this.location = `<b>Pick-Up & Drop-off Location:<br/>
+        <a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby.<br/>
+        2530 Ridge Rd, Berkeley, CA 94709</a></b><br/><br/>`;
+    /** @private */
+    this.hours = `<b>Pick-Up & Drop-off Hours:<br/>${PICKUP_HOURS}</b><br/><br/>`;
+    /** @private */
     this.help = `If you have questions or need assistance please email ${this.designspecialistemaillink}.<br/>`;
     /** @private */
     this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
     /** @private */
-    this.survey = `<p><small>Please help us improve JPS by taking a moment for a brief survey:<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLSe_yCGqiGa4U51DodKWjOWPFt-ZfpxGUwaAYJqBV0GZ0q_IUQ/viewform">Take Survey</a></small></p><br/>`;
+    this.survey = `<p><small>Please help us improve JPS by taking a moment for a brief survey:<br/><a href="https://docs.google.com/forms/d/1fICKWXj67v8k6EznXgkYz6qgiy45V8bV-X8dlRwRPDc/viewform">Take Survey</a></small></p><br/>`;
   }
 
   get defaultMessage() {
@@ -119,13 +125,10 @@ class CreateMessage {
       }
       message += `<p>`;
       message += `Completed projects can be picked up in-person.<br/><br/>`;
-      message += `<b>Pick-Up Location:<br/>`;
-      message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby. <br/>`; 
-      message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
-      message += `<b>Pick-Up Hours:<br/>`;
-      message += `${PickupHours}</b><br/><br/>`
-      message += `</p>`
+      message += this.location;
+      message += this.hours;
       message += this.help;
+      message += `</p>`
       message += this.salutations;
       message += this.survey;
     return message;
@@ -136,8 +139,8 @@ class CreateMessage {
       message += this.thanks;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> have been picked up and the project is now <b>CLOSED.</b><br/>`;
       message += `Job Number: <b><i>${this.jobnumber}</i></b><br/>`;
-      message += `</p>`
       message += this.help;
+      message += `</p>`;
       message += this.salutations; 
       message += this.survey;
     return message;
@@ -150,13 +153,10 @@ class CreateMessage {
       message += `Job Number: <b><i>${this.jobnumber}</i></b><br/>`;
       message += `<font style="color:#FF0000";><b>Please pick up your parts SOON before they are disposed of in the free-prints bin.</b></font><br/>`;
       message += `Completed projects can be picked up in-person.<br/><br/>`;
-      message += `<b>Pick-Up Location:<br/>`;
-      message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby. <br/>`; 
-      message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
-      message += `<b>Pick-Up Hours:<br/>`;
-      message += `${PickupHours}</b><br/><br/>`
-      message += `</p>`;
+      message += this.location;
+      message += this.hours;
       message += this.help;
+      message += `</p>`;
       message += this.salutations; 
       message += this.survey;
     return message;
@@ -167,9 +167,8 @@ class CreateMessage {
       message += this.thanks;
       message += `Your project, <b><i>${this.projectname}</i></b> has unfortunately failed.<br/>`;
       message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
-      message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}<br/><br/>`;
-      message += `</p>`;
       message += this.help;
+      message += `</p>`;
       message += this.salutations;
       message += this.survey;
     return message;
@@ -181,8 +180,8 @@ class CreateMessage {
       message += `You have elected not to proceed with the design process.<br/>`;
       message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br/><br/>`;
-      message += `</p>`;
       message += this.help;
+      message += `</p>`;
       message += this.salutations;
       message += this.survey;
     return message;
@@ -195,8 +194,8 @@ class CreateMessage {
       message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br/><br/>`;
       message += `You may also choose to resubmit this job as a new submission.<br/>`;
-      message += `</p>`;
       message += this.help;
+      message += `</p>`;
       message += this.salutations;
       message += this.survey;
     return message;
@@ -210,8 +209,8 @@ class CreateMessage {
       message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}.<br/>`;
       message += `No action is required at this time.<br/><br/>`;
-      message += `</p>`;
       message += this.help;
+      message += `</p>`;
       message += this.salutations;
       message += this.survey;
     return message;
@@ -289,7 +288,7 @@ class CreateSubmissionMessage {
     /** @private */
     this.thanks = `Thank you for choosing ${SERVICE_NAME}.<br/>`;
     /** @private */
-    this.help = `If you have questions or need assistance please email ${this.designspecialistemaillink}.<br/>`;
+    this.help = `If you have questions or need assistance please email <a href = "mailto:${SERVICE_EMAIL}">${SERVICE_EMAIL}.</a><br/>`;
     /** @private */
     this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
   }
@@ -298,11 +297,12 @@ class CreateSubmissionMessage {
       message += `<p>`;
       message += `You have a new submission to your area.<br/>`;
       message += `Please assign yourself as the DS in the <a href = "https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/">Spreadsheet</a><br/>`;
-      message += `Reminder: Only changing the status of the job will trigger emails to you and the student.<br/>`; message += `Below is a summary of the student submission.<br/>`;
+      message += `Reminder: Only changing the status of the job will trigger emails to you and the student.<br/>`; 
+      message += `Below is a summary of the student submission.<br/>`;
       message += `</p>`;
       message += `<p>Best,<br/>${SERVICE_NAME}</p>`;
       message += `<br/>`;
-      message += `SUMMARY:`;
+      message += `<b>SUMMARY:</b>`;
       message += `<br/>`;
     return message;
   }
@@ -320,10 +320,9 @@ class CreateSubmissionMessage {
       message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>`; 
       message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
       message += `<b>Pick-up Hours:<br/>`;
-      message += `${PickupHours}</b><br/><br/>`
-      message += `Please email ${InvokeDS("Cody", "fullname")} at ${InvokeDS("Cody", "emaillink")} for further details.<br/>`;
-      message += `</p>`;
+      message += `${PICKUP_HOURS}</b><br/><br/>`
       message += this.help;
+      message += `</p>`;
       message += this.salutations;
     return message;
   }

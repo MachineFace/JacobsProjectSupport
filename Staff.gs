@@ -14,7 +14,7 @@ class DesignSpecialist {
     this.id = Utilities.getUuid();
     this.name = name ? name : `DS`;
     this.fullname = fullname ? fullname : `Design Specialist`;
-    this.email = email ? email : `jacobs-project-support@berkeley.edu`;
+    this.email = email ? email : SERVICE_EMAIL;
     this.link = `<a href = "${this.email}">${this.email}</a>`;
     this.type = `Design Specialist`;
     this.isAdmin = true;

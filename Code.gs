@@ -6,7 +6,7 @@
  * This project creates a project-tracking and notification system for remote project management.
  * This project notifies students automatically via email about the status of their projects as they are fabricated, as well as calculates metrics about fab lab usage.
  * Release 20200611 - Version 0.1
- * Last Updated: 20210105 - Version 2.7.0
+ * Last Updated: 20240827 - Version 2.7.0
  * URL for Spreadsheet: https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/edit#gid=1063176066
  * =======================================================================================================================================================================
  * =======================================================================================================================================================================
@@ -69,7 +69,7 @@ const onSubmission = async (e) => {
       // Email
       GmailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
         htmlBody: message.missingAccessMessage,
-        from: SUPPORT_ALIAS,
+        from: SERVICE_EMAIL,
         bcc: staff.Chris.email,
         name: SERVICE_NAME,
       });
@@ -133,7 +133,7 @@ const onSubmission = async (e) => {
   try {
     GmailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
       htmlBody: dsMessage,
-      from: SUPPORT_ALIAS,
+      from: SERVICE_EMAIL,
       bcc: staff.Chris.email,
       name: SERVICE_NAME,
     });
@@ -149,7 +149,7 @@ const onSubmission = async (e) => {
       SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.status, lastRow, STATUS.received );
       GmailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
         htmlBody: message.gsiPlotterMessage,
-        from: SUPPORT_ALIAS,
+        from: SERVICE_EMAIL,
         bcc: staff.Chris.email,
         name: SERVICE_NAME,
       });
