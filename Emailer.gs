@@ -12,10 +12,15 @@ class Emailer {
     designspecialistemail : designspecialistemail = SERVICE_EMAIL,
     message : message = ``,
   }) {
+    /** @private */
     this.name = name;
+    /** @private */
     this.status = status;
+    /** @private */
     this.email = email;
+    /** @private */
     this.designspecialistemail = designspecialistemail;
+    /** @private */
     this.message = message;
 
     this.SendEmail();
@@ -244,14 +249,14 @@ const _ListInboxSnippets = () => {
 const _testEmail = async() => {
   const name = `Dingus`; 
   const email = `codyglen@berkeley.edu`;
-  const jobnumber = new JobnumberService().jobnumber;
+  const id = new IDService().id;
   const projectname = `Some Kinda Project`;
   const message = new CreateMessage({
     name : name,
-    jobnumber : jobnumber,
+    id : id,
     projectname : projectname,
   });
-  console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${jobnumber}`);
+  console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${id}`);
 
   MailApp.sendEmail(email, `${SERVICE_NAME} : Project Closed`, "", {
     htmlBody: message.billedMessage,

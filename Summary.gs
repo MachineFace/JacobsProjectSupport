@@ -42,7 +42,7 @@ class SummaryBuilder {
         approved : value[2],
         files : value[3],
         ticket : value[4],
-        jobnum : value[5],
+        id : value[5],
         studentApproved : value[6],
         timestamp : value[7],
         email : value[8],
@@ -116,15 +116,14 @@ class SummaryBuilder {
       let htmlBodyText = await this._GetEmailHtml(items);
 
       // Email DS
-      await GmailApp.sendEmail('jacobs-project-support@berkeley.edu', 'JPS: SUMMARY EMAIL', '', {
+      MailApp.sendEmail(SERVICE_EMAIL, `JPS: SUMMARY EMAIL`, ``, {
         htmlBody: this._SummaryText() + htmlBodyText,
-        'from': 'jacobs-project-support@berkeley.edu',
-        // 'cc' : `codyglen@berkeley.edu`,
-        'cc': StaffEmailAsString(),
-        'bcc': 'cparsell@berkeley.edu',
-        'name': 'JPS DAILY SUMMARY'
+        from : SERVICE_EMAIL,
+        cc : StaffEmailAsString(),
+        bcc : `cparsell@berkeley.edu, codyglen@berkeley.edu`,
+        name: `JPS DAILY SUMMARY`,
       });
-      console.warn('DS Team Emailed with Summary for the day.');
+      console.warn(`DS Team Emailed with Summary for the day.`);
     } catch(err) {
       console.error(`"SendEmail()" failed : ${err}`);
     }

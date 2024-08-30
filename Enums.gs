@@ -339,7 +339,7 @@ const HEADERNAMES = Object.freeze({
   fablightMaterial : `Material?`,
   fiberReinforcement : `Continuous Fiber Reinforcement?`,	
   fiberPattern : `Continuous fiber pattern (if applicable)`,	
-  jobnumber : `(INTERNAL AUTO) Job Number`,	
+  id : `(INTERNAL AUTO) Job Number`,	
   studentApproved : `Student Has Approved Job`,	
   timestamp : `Timestamp`,	
   sid : `Your Student ID Number?`,	

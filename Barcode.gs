@@ -1,13 +1,13 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Barcode
- * @required {number} jobnumber
+ * @required {number} id
  */
 class BarcodeGenerator {
   constructor({
-    jobnumber : jobnumber,
+    id : id,
   }) {
-    this.jobnumber = jobnumber ? jobnumber : new JobnumberService().jobnumber;
+    this.id = id ? id : new IDService().id;
   }
 
   /**
@@ -21,10 +21,10 @@ class BarcodeGenerator {
       const scaleX = `&scaleX=6`
       const scaleY = '&scaleY=6';
 
-      if(!JobnumberService.isValid(this.jobnumber)) throw new Error(`Invalid UUID jobnumber...`);
-      const text = JobnumberService.toDecimal(this.jobnumber);
+      if(!IDService.isValid(this.id)) throw new Error(`Invalid UUID id...`);
+      const text = IDService.toDecimal(this.id);
 
-      const barcodeLoc = root + type + ts + text + scaleX + scaleY + `&includetext` + `&parsefnc&alttext=` + this.jobnumber;
+      const barcodeLoc = root + type + ts + text + scaleX + scaleY + `&includetext` + `&parsefnc&alttext=` + this.id;
 
       const params = {
         method : "GET",
@@ -38,7 +38,7 @@ class BarcodeGenerator {
       const responseCode = response.getResponseCode();
       if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
-      let barcode = await DriveApp.createFile( Utilities.newBlob(response.getContent()).setName(`Barcode : ${this.jobnumber}`) );
+      let barcode = await DriveApp.createFile( Utilities.newBlob(response.getContent()).setName(`Barcode : ${this.id}`) );
       barcode.setTrashed(true);
       console.info(`BARCODE CREATED ---> ${barcode?.getId()?.toString()}, URL: ${barcode?.getUrl()}`);
       return barcode;
@@ -52,8 +52,8 @@ class BarcodeGenerator {
 }
 
 const _testBarcode = () => {
-  const jobnumber = new JobnumberService().jobnumber;
-  const b = new BarcodeGenerator({ jobnumber : jobnumber }).GenerateBarCodeForTicketHeader();
+  const id = new IDService().id;
+  const b = new BarcodeGenerator({ id : id }).GenerateBarCodeForTicketHeader();
 }
 
 /**
@@ -63,6 +63,10 @@ const _testBarcode = () => {
 class QRCodeGenerator {
   constructor({ url : url, }) {
     this.url = url ? url : `jps.jacobshall.org/`;
+    /** @private */
+    this.id = new IDService().id;
+    /** @private */
+    this.filename = `QRCode-${this.id}`;
     this.GenerateQRCode();
   }
 
@@ -83,12 +87,13 @@ class QRCodeGenerator {
       const response = await UrlFetchApp.fetch(loc, params);
       const responseCode = response.getResponseCode();
       if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-      const blob = await Utilities.newBlob(response.getContent()).setName(`QRCode-${this.jobnumber}` );
+      const blob = await Utilities.newBlob(response.getContent()).setName(this.filename);
       let qrCode = await DriveApp.getFolderById(DRIVEFOLDERS.tickets).createFile(blob);
       console.info(`QR CODE ---> ${qrCode.getUrl()} for ${this.url}`);
-      return qrCode;
+      return qrCode.getUrl();
     } catch(err) {
       console.error(`Failed to generate QRCode ---> ${err}`);
+      return 1;
     }
   }
   
@@ -98,61 +103,61 @@ class QRCodeGenerator {
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * For use with barcode scanner.
- * Searches for job number found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
+ * Searches for id found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
  * @DEFUNCT
  *
 const PickupByBarcode = () => {
   const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
-  const jobnumber = JobnumberService.decimalToUUID(text);
+  const id = IDService.decimalToUUID(text);
   let progress = OTHERSHEETS.Pickup.getRange(4,2);
 
-  progress.setValue(`Searching for job number...`);
-  if (jobnumber == null || jobnumber == "") {
-    progress.setValue(`No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
+  progress.setValue(`Searching for id...`);
+  if (id == null || id == "") {
+    progress.setValue(`No id number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
     return;
   }
   Object.values(SHEETS).forEach(sheet => {
-    const textFinder = sheet.createTextFinder(jobnumber);
+    const textFinder = sheet.createTextFinder(id);
     const searchFind = textFinder.findNext();
     if (searchFind != null) {
       let searchRow = searchFind.getRow();
       SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.pickedUp);
-      progress.setValue(`Job number ${jobnumber} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
-      console.info(`Job number ${jobnumber} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+      progress.setValue(`ID number ${id} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+      console.info(`ID number ${id} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();
-      //ui.alert("Job marked as picked up. Job located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
+      //ui.alert("ID marked as picked up. ID located on sheet " + searchSheet.getSheetName() + " row " + searchRow)
       return;
     }
   });
-  progress.setValue(`Job number not found. Try again.`);
+  progress.setValue(`ID number not found. Try again.`);
 } 
 */
 
 /**
- * Mark a job as abandoned and email student.
+ * Mark an id as abandoned and email student.
  * @DEFUNCT
  *
 const MarkAsAbandonedByBarcode = async () => {
   const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
-  const jobnumber = JobnumberService.decimalToUUID(text);
+  const id = IDService.decimalToUUID(text);
   let progress = OTHERSHEETS.Pickup.getRange(4,2);
 
-  progress.setValue(`Searching for job number...`);
-  if (jobnumber == null || jobnumber == "") {
-    progress.setValue(`No job number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
+  progress.setValue(`Searching for id number...`);
+  if (id == null || id == "") {
+    progress.setValue(`No id number provided. Select the yellow cell, scan, then press enter to make sure the cell's value has been changed.`);
     return;
   }
   Object.values(SHEETS).forEach(sheet => {
-    const textFinder = sheet.createTextFinder(jobnumber);
+    const textFinder = sheet.createTextFinder(id);
     const searchFind = textFinder.findNext();
     if (searchFind != null) {
       let searchRow = searchFind.getRow();
       SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.abandoned);
-      progress.setValue(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
-      console.info(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+      progress.setValue(`ID number ${id} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
+      console.info(`ID number ${id} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       
       const rowData = GetRowData(sheet, searchRow);
-      let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
+      let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
         mat1quantity, mat1, mat2quantity, mat2, 
         mat3quantity, mat3, mat4quantity, mat4, 
         mat5quantity, mat5, affiliation, elapsedTime, estimate, 
@@ -161,7 +166,7 @@ const MarkAsAbandonedByBarcode = async () => {
       var message = new CreateMessage({
         name : name,
         projectname : projectName, 
-        jobnumber : jobnumber,
+        id : id,
         rowData : rowData,
         designspecialist : ds,
       });
@@ -170,7 +175,7 @@ const MarkAsAbandonedByBarcode = async () => {
         name : name, 
         status : STATUS.abandoned,
         projectname : projectName,
-        jobnumber : jobnumber,
+        id : id,
         material1Quantity : mat1quantity,
         message : message,
       });
@@ -178,7 +183,7 @@ const MarkAsAbandonedByBarcode = async () => {
       return;
     }
   });
-  progress.setValue(`Job number not found. Try again.`);
+  progress.setValue(`ID number not found. Try again.`);
 }
 */
 

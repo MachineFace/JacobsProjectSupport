@@ -298,9 +298,9 @@ const PrintServiceDates = () => {
     <li data-stringify-indent="1" data-stringify-border="0">Hands-on trainings begin: Jan 23</li>
     <li data-stringify-indent="1" data-stringify-border="0">Last day of hands-on trainings: Mar 3</li>
     <li data-stringify-indent="1" data-stringify-border="0"><strong>Spring Recess (no makerspace access or JPS service):</strong> Mar 27-31</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Last day to submit JPS job: May 5</li>
+    <li data-stringify-indent="1" data-stringify-border="0">Last day to submit JPS project: May 5</li>
     <li data-stringify-indent="1" data-stringify-border="0">Makerspace early closure (at 7pm): May 8-12</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Last day to pick up JPS jobs: May 12</li>
+    <li data-stringify-indent="1" data-stringify-border="0">Last day to pick up JPS projects: May 12</li>
     <li data-stringify-indent="1" data-stringify-border="0">Last day to access Makerspace: May 12</li>
   </ul>
 */

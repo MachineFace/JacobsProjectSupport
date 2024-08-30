@@ -1,22 +1,26 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Generate new Job number from a date
- * @param {time} date
- * @return {number} job number
+ * ID Service
  */
-class JobnumberService {
+class IDService {
   constructor() {
 
   }
 
   /**
-   * Get a New Jobnumber
+   * Get a New UUID
    * @return {string} uuid
    */
-  get jobnumber(){
-    const id = Utilities.getUuid();
-    console.info(`Id Created: ${id}`);
-    return id;
+  get id(){
+    return Utilities.getUuid();
+  }
+
+  /**
+   * Get a new UUID
+   * @return {string} uuid
+   */
+  static createId() {
+    return Utilities.getUuid();
   }
 
   /**
@@ -24,32 +28,38 @@ class JobnumberService {
    * @param {string} uuid
    * @returns {bool} valid
    */
-  IsValid(jobnumber) {
+  IsValid(uuid) {
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return uuidPattern.test(jobnumber);
-  };
-  static isValid(jobnumber) {
-    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return uuidPattern.test(jobnumber);
+    return uuidPattern.test(uuid);
   };
 
   /**
-   * Find by Jobnumber
+   * Is Valid UUID
+   * @param {string} uuid
+   * @returns {bool} valid
+   */
+  static isValid(uuid) {
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidPattern.test(uuid);
+  };
+
+  /**
+   * Find by ID
    * @param {string} uuid
    * @returns {object} sheet and row 
    */
-  FindByJobNumber(jobnumber) {
+  FindByID(id) {
     let res = {};
     try {
-      if (!this.IsValid(jobnumber)) throw new Error(`Invalid jobnumber supplied...`);
+      if (!this.IsValid(id)) throw new Error(`Invalid id supplied...`);
       Object.values(SHEETS).forEach(sheet => {
-        const finder = sheet.createTextFinder(jobnumber).findNext();
+        const finder = sheet.createTextFinder(id).findNext();
         if (finder != null) res[sheet.getName()] = finder.getRow();
       });
       console.info(JSON.stringify(res));
       return res;
     } catch(err) {
-      console.error(`"FindByJobnumber()" failed: ${err}`);
+      console.error(`"FindByID()" failed: ${err}`);
     }
   }
 
@@ -87,16 +97,31 @@ class JobnumberService {
   }
 }
 
+/**
+ * Create ID
+ * @return {string} uuid
+ */
+const CreateID = () => IDService.createId();
+
 const _testJ = () => {
-  const j = new JobnumberService().jobnumber;
-  console.info(j)
-  // const testUUID = `b819a295-66b7-4b82-8f91-81cf227c5216`;
-  // const dec = JobnumberService.toDecimal(testUUID);
-  // console.info(`TEST: ${testUUID} ---> ${dec}`);
-  // const back = JobnumberService.decimalToUUID(dec);
-  // console.info(`BACK: ${dec} ----> ${back}`);
-  // const val = JobnumberService.isValid(back);
-  // console.info(`Valid? : ${val}`);
+  console.time(`Instanced`);
+  const j = new IDService().id;
+  console.info(j);
+  console.timeEnd(`Instanced`);
+
+  console.time(`Non Instanced`);
+  const k = IDService.createId();
+  console.info(k);
+  console.timeEnd(`Non Instanced`);
+
+  const testUUID = `b819a295-66b7-4b82-8f91-81cf227c5216`;
+  const dec = IDService.toDecimal(testUUID);
+  console.info(`TEST: ${testUUID} ---> ${dec}`);
+
+  const back = IDService.decimalToUUID(dec);
+  console.info(`BACK: ${dec} ----> ${back}`);
+  const val = IDService.isValid(back);
+  console.info(`Valid? : ${val}`);
 }
 
 

@@ -13,9 +13,9 @@ const PopUpMarkAsAbandoned = async () => {
 
   // Process the user's response.
   if (response.getSelectedButton() == ui.Button.OK) {
-    let jobnumber = response.getResponseText();
-    console.warn(`Finding ${jobnumber}`);
-    let res = FindOne(jobnumber);
+    let id = response.getResponseText();
+    console.warn(`Finding ${id}`);
+    let res = FindOne(id);
     if(res == null) {
       progressUpdate.setValue(`Job number not found. Try again.`);
     } else {
@@ -23,22 +23,22 @@ const PopUpMarkAsAbandoned = async () => {
       let row = res.row;
       let email = res.email;
       SetByHeader(sheet, HEADERNAMES.status, row, STATUS.abandoned);
-      console.info(`Job number ${jobnumber} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${row}`);
+      console.info(`Job number ${id} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${row}`);
       const message = await new CreateMessage({
         name : res.name, 
         projectname : res.projectName, 
-        jobnumber : jobnumber, 
+        id : id, 
         designspecialist : res.ds, 
       })
       await new Emailer({
         email : email, 
         status : STATUS.abandoned,
         projectname : res.projectName,
-        jobnumber : jobnumber,
+        id : id,
         message : message,
       })
-      console.warn(`Owner ${email} of abandoned job: ${jobnumber} emailed...`);
-      ui.alert(`Marked as Abandoned`, `${email}, Job: ${jobnumber} emailed... Sheet: ${sheet.getSheetName()} row: ${row}`, ui.ButtonSet.OK);
+      console.warn(`Owner ${email} of abandoned job: ${id} emailed...`);
+      ui.alert(`Marked as Abandoned`, `${email}, Job: ${id} emailed... Sheet: ${sheet.getSheetName()} row: ${row}`, ui.ButtonSet.OK);
     }
   } else if (response.getSelectedButton() == ui.Button.CANCEL) {
     console.warn(`User chose not to send an email...`);
@@ -62,9 +62,9 @@ const PopUpMarkAsPickedUp = async () => {
 
   // Process the user's response.
   if (response.getSelectedButton() == ui.Button.OK) {
-    let jobnumber = response.getResponseText();
-    console.warn(`Finding ${jobnumber}`);
-    let res = FindOne(jobnumber);
+    let id = response.getResponseText();
+    console.warn(`Finding ${id}`);
+    let res = FindOne(id);
     if(res == null) {
       console.warn(`Job number not found. Try again.`);
     } else {
@@ -72,8 +72,8 @@ const PopUpMarkAsPickedUp = async () => {
       let row = res.row;
       let email = res.email;
       SetByHeader(sheet, HEADERNAMES.status, row, STATUS.pickedUp);
-      console.warn(`${email}, Job: ${jobnumber} marked as picked up... Sheet: ${sheet.getSheetName()} row: ${row}`);
-      ui.alert(`Marked as Picked Up`, `${email}, Job: ${jobnumber}... Sheet: ${sheet.getSheetName()} row: ${row}`, ui.ButtonSet.OK);
+      console.warn(`${email}, Job: ${id} marked as picked up... Sheet: ${sheet.getSheetName()} row: ${row}`);
+      ui.alert(`Marked as Picked Up`, `${email}, Job: ${id}... Sheet: ${sheet.getSheetName()} row: ${row}`, ui.ButtonSet.OK);
     }
   } else if (response.getSelectedButton() == ui.Button.CANCEL) {
     console.warn(`User chose not to mark as picked up...`);
@@ -124,7 +124,7 @@ const PopupGetSingleStudentPriority = async () => {
     let thisRow = thisSheet.getActiveRange().getRow();
 
     const rowData = GetRowData(thisSheet, thisRow);
-    let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, sheetName, row, } = rowData;
+    let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, sheetName, row, } = rowData;
     console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
 
     
@@ -140,7 +140,7 @@ const PopupGetSingleStudentPriority = async () => {
         message :  new CreateMessage({
           name : name,
           projectname : projectName, 
-          jobnumber : jobnumber,
+          id : id,
           rowData : rowData,
           designspecialist : rowData.ds,
         }),
@@ -164,13 +164,13 @@ const PopupGetSingleStudentPriority = async () => {
 
 
 /**
- * Create a pop-up to make a new Jobnumber
+ * Create a pop-up to make a new ID
  */
-const PopupCreateNewJobNumber = () => {
+const PopupCreateNewID = () => {
   const ui = SpreadsheetApp.getUi();
   const thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
-  const jobnumberService = new JobnumberService();
+  const idService = new IDService();
 
   if(CheckSheetIsForbidden(thisSheet) == true) {
     const a = ui.alert(
@@ -180,20 +180,20 @@ const PopupCreateNewJobNumber = () => {
     );
     if(a === ui.Button.OK) return;
   } 
-  const { name, jobnumber } = GetRowData(thisSheet, thisRow);
-  if(jobnumberService.IsValid(jobnumber)) {
+  const { name, id } = GetRowData(thisSheet, thisRow);
+  if(idService.IsValid(id)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Error!`,
-      `Jobnumber for ${name} exists already!\n${jobnumber}`,
+      `ID for ${name} exists already!\n${id}`,
       ui.ButtonSet.OK
     );
     if(a === ui.Button.OK) return;
   }
-  const newJobnumber = jobnumberService.jobnumber;
-  SetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow, newJobnumber);
+  const newID = idService.id;
+  SetByHeader(thisSheet, HEADERNAMES.id, thisRow, newID);
   const a = ui.alert(
     `${SERVICE_NAME}:\n Job Number Created!`,
-    `Created a New Jobnumber for ${name}:\n${newJobnumber}`,
+    `Created a New ID for ${name}:\n${newID}`,
     ui.ButtonSet.OK
   );
   if(a === ui.Button.OK) return;
@@ -211,7 +211,7 @@ const BillFromSelected = async () => {
   let response;
 
   const rowData = GetRowData(thisSheet, thisRow);
-  let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
+  let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
@@ -269,7 +269,7 @@ const BillFromSelected = async () => {
   let msg = `Would you like to Generate a Bill to:\n`
   + `${customer?.first_name} ${customer?.last_name}\n`
   + `Email: ${email}\n`
-  + `Job Number : ${jobnumber?.toString()}\n`
+  + `Job Number : ${id?.toString()}\n`
   + `Shopify ID : ${customer.id?.toString()}\n`
   + `For Materials : \n`
   + `----- ${mat1quantity} of ${mat1}\n`
@@ -287,7 +287,7 @@ const BillFromSelected = async () => {
     );
     if (response == ui.Button.YES) {      
       const order = await shopify.CreateOrder({
-        jobnumber : jobnumber, 
+        id : id, 
         email : email,
         material1Name : mat1, material1Quantity : mat1quantity,
         material2Name : mat2, material2Quantity : mat2quantity,
@@ -333,9 +333,9 @@ const PopupCreateTicket = async () => {
   }
   const thisRow = thisSheet.getActiveRange().getRow();
   const rowData = await GetRowData(thisSheet, thisRow);
-  const { ds, jobnumber, timestamp, email, name, sid, projectName, sheetName, row } = rowData;
+  const { ds, id, timestamp, email, name, sid, projectName, sheetName, row } = rowData;
   const x = await new Ticket({
-    jobnumber : jobnumber,
+    id : id,
     designspecialist : ds,
     submissiontime : timestamp,
     name : name,
@@ -349,7 +349,7 @@ const PopupCreateTicket = async () => {
   SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
   response = ui.alert(
     `${SERVICE_NAME} : Ticket Created!`,
-    `Ticket Created for : ${name}, Job Number : ${jobnumber}`,
+    `Ticket Created for : ${name}, Job Number : ${id}`,
     ui.ButtonSet.OK
   );
   if(response === ui.Button.OK) return;
@@ -403,12 +403,12 @@ const PopupHelp = async () => {
 const BarMenu = () => {
   SpreadsheetApp.getUi()
     .createMenu(`JPS Menu`)
-      .addItem(`Bill Selected Student`, `BillFromSelected`)
-      .addItem(`Create a New Jobnumber for Selected Student`, `PopupCreateNewJobNumber`)
-      .addItem(`Create a Ticket for Selected Student`, `PopupCreateTicket`)
-      .addItem(`Check Access for Selected Student`, `PopupGetSingleStudentPriority`)
+      .addItem(`Bill SELECTED User`, `BillFromSelected`)
+      .addItem(`Create a New ID for SELECTED User`, `PopupCreateNewID`)
+      .addItem(`Create a Ticket for SELECTED User`, `PopupCreateTicket`)
+      .addItem(`Check Access for SELECTED User`, `PopupGetSingleStudentPriority`)
       .addSeparator()
-      .addItem(`Check All Missing Access Students`, `PopupCheckMissingAccessStudents`)
+      .addItem(`Check All Missing Access Users`, `PopupCheckMissingAccessStudents`)
       .addSeparator()
       .addSubMenu(
         SpreadsheetApp.getUi()

@@ -12,7 +12,7 @@ class ShopifyAPI {
     /** @private */
     this.api_pass = PropertiesService.getScriptProperties().getProperty(`SHOPIFY_PASS`);
     /** @private */
-    this.jobnumber;
+    this.id;
     /** @private */
     this.email;
     /** @private */
@@ -143,7 +143,7 @@ class ShopifyAPI {
    * @returns {object} order
    */
   async CreateOrder({
-    jobnumber : jobnumber = new JobnumberService().jobnumber,
+    id : id = new IDService().id,
     email : email = `jacobsinstitutestore@gmail.com`,
     material1Name : material1Name = `None`,
     material1Quantity : material1Quantity = 0,
@@ -176,7 +176,7 @@ class ShopifyAPI {
         "financial_status": "paid",
         "fulfillment_status": "fulfilled",
         "inventory_behaviour" : "decrement_ignoring_policy",
-        "note": "Job Number : " + jobnumber,
+        "note": "ID Number : " + id,
       }
     };
     console.info(`ORDER SUMMARY ----> ${JSON.stringify(order, null, 4)}`);
@@ -508,11 +508,11 @@ class ShopifyAPI {
 
 
 const _testAPI = async () => {
-  const jobnumber = new JobnumberService().jobnumber;
-  // const shopify = new ShopifyAPI({jobnumber : jobnumber, email : "jacobsinstitutestore@gmail.com"});
-  const shopify = new ShopifyAPI();
+  const id = new IDService().id;
+  // const shopify = new ShopifyAPI({id : id, email : "jacobsinstitutestore@gmail.com"});
+  // const shopify = new ShopifyAPI();
   // let product = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-  let lastOrder = await shopify.GetLastOrder();
+  // let lastOrder = await shopify.GetLastOrder();
   // let orders = await shopify.GetOrdersList();
   // let product = await shopify.GetProductByID(7751141320);
   // let customer = await shopify.GetCustomerByEmail('jacobsinstitutestore@gmail.com');
@@ -522,21 +522,21 @@ const _testAPI = async () => {
   // let lookup = shopify.LookupShopifyProductFromSheet2();
   // let customer = shopify.SetCustomer("jacobsinstitutestore@gmail.com");
 
-  // const order = await shopify.CreateOrder({
-  //   jobnumber : jobnumber,
-  //   email : `pico@pico.com`,
-  //   material1Name : 'Fortus Red ABS-M30',
-  //   material1Quantity : 5,
-  //   material2Name : 'Objet Polyjet VeroMagenta RGD851',
-  //   material2Quantity : 10,
-  //   material3Name : null,
-  //   material3Quantity : 123234,
-  //   material4Name : 'Stainless Steel - 0.125" - priced per square inch',
-  //   material4Quantity : 15,
-  //   material5Name : null,
-  //   material5Quantity : 20,
-  // });
-  // console.info(JSON.stringify(order, null, 4));
+  const order = await shopify.CreateOrder({
+    id : id,
+    email : `pico@pico.com`,
+    material1Name : 'Fortus Red ABS-M30',
+    material1Quantity : 5,
+    material2Name : 'Objet Polyjet VeroMagenta RGD851',
+    material2Quantity : 10,
+    material3Name : null,
+    material3Quantity : 123234,
+    material4Name : 'Stainless Steel - 0.125" - priced per square inch',
+    material4Quantity : 15,
+    material5Name : null,
+    material5Quantity : 20,
+  });
+  console.info(JSON.stringify(order, null, 4));
 
   // const order = await shopify.GetLastOrder();
   // console.info(JSON.stringify(order))

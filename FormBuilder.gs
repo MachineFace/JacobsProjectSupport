@@ -4,19 +4,19 @@
  * @REMOVEDFROMSERVICE
  * Class for Building an Approval Form
  * @param {string} name
- * @param {string} jobnumber
+ * @param {string} id
  * @param {float} cost
  */
 class ApprovalFormBuilder {
   constructor({
     name : name = `Some Name`,
-    jobnumber : jobnumber = new JobnumberService().jobnumber,
+    id : id = new IDService().id,
     cost : cost = 2.50,
   }) {
     /** @private */
     this.name = name;
     /** @private */
-    this.jobnumber = jobnumber;
+    this.id = id;
     /** @private */
     this.cost = cost;
     /** @private */
@@ -37,7 +37,7 @@ class ApprovalFormBuilder {
       this.form
         .setDestination(FormApp.DestinationType.SPREADSHEET, sendloc )
         .setTitle(`Approval Form`)
-        .setDescription(`Referrence Number: ${this.jobnumber}`)
+        .setDescription(`Referrence Number: ${this.id}`)
         .setConfirmationMessage(`Thanks for responding!`)
         .setAllowResponseEdits(false)
         .setAcceptingResponses(true);
@@ -49,7 +49,7 @@ class ApprovalFormBuilder {
         item = this.form.addMultipleChoiceItem();
         item
           .setRequired(true)
-          .setTitle(`For this job, the cost of materials was not specified. 
+          .setTitle(`The cost of materials for this project were not specified. 
             Please speak with a Design Specialist if you have questions. 
             Do you approve the work to be completed by a Design Specialist or Student Supervisor, and approve of a bill being generated for the materials used?`)
           .setChoices([
@@ -62,7 +62,7 @@ class ApprovalFormBuilder {
         item = this.form.addMultipleChoiceItem();
         item
           .setRequired(true)
-          .setTitle(`For this job, the cost of materials is estimated to be: ${costFormatted}. Do you approve the work to be completed by a Design Specialist or Student Supervisor, 
+          .setTitle(`The cost of materials for this project are estimated to be: ${costFormatted}. Do you approve the work to be completed by a Design Specialist or Student Supervisor, 
             and approve of a bill being generated for the materials used?`)
           .setChoices([
             item.createChoice(`Yes, I approve.`),
@@ -79,9 +79,9 @@ class ApprovalFormBuilder {
       let item3 = this.form.addMultipleChoiceItem();
       item3
         .setRequired(true)
-        .setTitle(`Please select the job number below.`)
+        .setTitle(`Please select the ID number below.`)
         .setChoices([
-          item3.createChoice(this.jobnumber)
+          item3.createChoice(this.id)
         ]);
       this.url = this.form.getPublishedUrl();
       console.info(`Created an Approval Form for the student.`);

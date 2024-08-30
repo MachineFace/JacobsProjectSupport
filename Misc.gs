@@ -43,14 +43,15 @@ const SearchSpecificSheet = (sheet, value) => {
 }
 
 /**
- * Search all Sheets for a jobnumber
- * @required {string} jobnumber
+ * Search all Sheets for an id
+ * @required {string} id
  * @returns {[sheet, row]} list of sheets with a row
- */
-const FindByJobNumber = (jobnumber) => {
+ * @DEFUNCT (ABSORBED BY IDService)
+ *
+const FindByID = (id) => {
   let res = {};
   Object.values(SHEETS).forEach(sheet => {
-    const finder = sheet.createTextFinder(jobnumber).findNext();
+    const finder = sheet.createTextFinder(id).findNext();
     if (finder != null) {
       res[sheet.getName()] = finder.getRow();
     }
@@ -58,6 +59,8 @@ const FindByJobNumber = (jobnumber) => {
   console.info(JSON.stringify(res));
   return res;
 }
+*/
+
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
@@ -163,7 +166,7 @@ const testSetRow = () => {
     status: STATUS.received,
     ds: 'Cody',
     priority: PRIORITY.Tier1,
-    jobnumber: new JobnumberService().jobnumber,
+    id: new IDService().id,
     timestamp: new Date().toDateString(),
     email: 'dingus@berkeley.edu',
     name: 'Testy Fiesty',
@@ -458,7 +461,7 @@ const BuildEstimate = (sheet, row) => {
     if(CheckSheetIsForbidden(sheet)) throw new Error(`Forbidden Sheet....`);
 
     const rowData = GetRowData(sheet, row);
-    let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
+    let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
       mat1quantity, mat1, mat2quantity, mat2, 
       mat3quantity, mat3, mat4quantity, mat4, 
       mat5quantity, mat5, affiliation, elapsedTime, estimate, 

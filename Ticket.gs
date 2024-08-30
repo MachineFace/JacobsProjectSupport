@@ -1,7 +1,7 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Printable Ticket
- * @required {number} jobnumber
+ * @required {number} id
  * @param {string} designspecialist
  * @param {date} submissiontime
  * @param {string} name
@@ -12,7 +12,7 @@
  */
 class Ticket {
   constructor({
-    jobnumber : jobnumber = new JobnumberService().jobnumber,
+    id : id = new IDService().id,
     designspecialist : designspecialist = `Staff`,
     submissiontime : submissiontime = new Date(),
     name : name = `Unknown`,
@@ -20,12 +20,19 @@ class Ticket {
     projectname : projectname = `Unknown`,
     rowData : rowData = [],
   }){
-    this.jobnumber = jobnumber;
+    /** @private */
+    this.id = id;
+    /** @private */
     this.designspecialist  = designspecialist;
+    /** @private */
     this.submissiontime = submissiontime;
+    /** @private */
     this.name = name;
+    /** @private */
     this.email = email;
+    /** @private */
     this.projectname = projectname;
+    /** @private */
     this.rowData = rowData;
 
     this.doc;
@@ -37,10 +44,10 @@ class Ticket {
    * Create Ticket
    */
   async CreateTicket() {
-    const barcode = await new BarcodeGenerator({ jobnumber : this.jobnumber }).GenerateBarCodeForTicketHeader();
+    const barcode = await new BarcodeGenerator({ id : this.id }).GenerateBarCodeForTicketHeader();
 
     const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
-    this.doc = await DocumentApp.create(`JPS-Ticket-${this.jobnumber}`); // Make Document
+    this.doc = await DocumentApp.create(`JPS-Ticket-${this.id}`); // Make Document
     this.url = this.doc.getUrl();
     let body = this.doc.getBody();
     let docId = this.doc.getId();
@@ -65,7 +72,7 @@ class Ticket {
     let tb = [];
 
     tb.push([`Design Specialist`, this.designspecialist ? this.designspecialist.toString() : `Staff`]);
-    tb.push([`Job Number`, this.jobnumber.toString()]);
+    tb.push([`ID Number`, this.id.toString()]);
     tb.push([`Student Name`, this.name?.toString()]);
     tb.push([`Project Name`, this.projectname?.toString()]);
     tb.push([`Status`, status ? status.toString() : STATUS.received]);
@@ -141,7 +148,7 @@ class Ticket {
           [DocumentApp.Attribute.BOLD]: true,
           [DocumentApp.Attribute.LINE_SPACING]: 1,
         });
-      body.insertParagraph(3, `Job Number: ${this.jobnumber.toString()}`)
+      body.insertParagraph(3, `ID Number: ${this.id.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING2)
         .setAttributes({
           [DocumentApp.Attribute.FONT_SIZE]: 9,
@@ -204,16 +211,16 @@ class Ticket {
  */
 const GenerateMissingTickets = () => {
   Object.values(SHEETS).forEach(sheet => {
-    let jobnumbers = [...GetColumnDataByHeader(sheet, HEADERNAMES.jobnumber)];
+    let ids = [...GetColumnDataByHeader(sheet, HEADERNAMES.id)];
     let tickets = [...GetColumnDataByHeader(sheet, HEADERNAMES.ticket)];
     console.info(`Sheet --> ${sheet.getSheetName()}`)
-    jobnumbers.forEach( async(jobnumber, index) => {
-      if(jobnumber && !tickets[index]) {
+    ids.forEach( async(id, index) => {
+      if(id && !tickets[index]) {
         let thisRow = index + 2;
         console.info(index + 2);
         let data = await GetRowData(sheet, thisRow);
         let ticket = await new Ticket({
-          jobnumber : jobnumber,
+          id : id,
           designspecialist : data.ds,
           submissiontime : data.timestamp,
           name : data.name,

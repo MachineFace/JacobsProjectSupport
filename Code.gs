@@ -28,7 +28,7 @@
  */
 const onSubmission = async (e) => {
 
-  const jobNumberService = new JobnumberService();
+  const idService = new IDService();
   const staff = new MakeStaff().Staff;
   // Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -54,8 +54,8 @@ const onSubmission = async (e) => {
   console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let jobnumber = jobNumberService.jobnumber;
-  SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobnumber);
+  let id = idService.id;
+  SetByHeader(sheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
   let priority = new CheckPriority({ email : email, sid : sid }).Priority;
@@ -83,7 +83,7 @@ const onSubmission = async (e) => {
   }
 
   // Create Messages
-  const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, jobnumber : jobnumber });
+  const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, id : id });
 
   // Get DS-Specific Message
   let dsMessage = message.dsMessage;
@@ -160,8 +160,8 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  if(jobNumberService.IsValid(jobnumber) == false) {
-    SetByHeader(sheet, HEADERNAMES.jobnumber, lastRow, jobNumberService.jobnumber);
+  if(idService.IsValid(id) == false) {
+    SetByHeader(sheet, HEADERNAMES.id, lastRow, idService.id);
   }
 
   // Fix wrapping issues
@@ -208,7 +208,7 @@ const onChange = async (e) => {
 
   // Parse Data
   let rowData = GetRowData(thisSheet, thisRow);
-  let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
+  let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
@@ -231,8 +231,8 @@ const onChange = async (e) => {
   }
 
   ds = ds ? ds : `a Design Specialist`;
-  const jobnumberService = new JobnumberService();
-  jobnumber = jobnumberService.IsValid(jobnumber) ? jobnumber : jobnumberService.jobnumber;
+  const idService = new IDService();
+  id = idService.IsValid(id) ? id : idService.id;
   projectName = projectName ? projectName : `Your Project`;
 
 
@@ -245,10 +245,10 @@ const onChange = async (e) => {
   //----------------------------------------------------------------------------------------------------------------
   // Fix Job Number if it's missing
   try {
-    console.info(`Trying to fix job number : ${jobnumber}`)
+    console.info(`Trying to fix job number : ${id}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      jobnumber = jobnumberService.IsValid(jobnumber) ? jobnumber : jobnumberService.jobnumber;
-      SetByHeader(thisSheet, HEADERNAMES.jobnumber, thisRow, jobnumber);
+      id = idService.IsValid(id) ? id : idService.id;
+      SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
       console.warn(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }
   } catch (err) {
@@ -289,7 +289,7 @@ const onChange = async (e) => {
     } else {
       try {
         ticket = new Ticket({
-          jobnumber : jobnumber,
+          id : id,
           designspecialist : ds,
           submissiontime : timestamp,
           name : name,
@@ -314,7 +314,7 @@ const onChange = async (e) => {
   var message = new CreateMessage({
     name : name,
     projectname : projectName, 
-    jobnumber : jobnumber,
+    id : id,
     rowData : rowData,
     designspecialist : ds,
     designspecialistemaillink : designspecialistemaillink,

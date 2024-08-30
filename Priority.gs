@@ -100,7 +100,7 @@ const CheckMissingAccessStudents = () => {
       values.forEach( row => {
         const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
-        let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, } = GetRowData(thisSheet, row);
+        let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, } = GetRowData(thisSheet, row);
         priority = new CheckPriority({ email : email, sid : sid }).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
 

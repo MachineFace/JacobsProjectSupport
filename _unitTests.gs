@@ -5,14 +5,15 @@
 const gasT_URL = UrlFetchApp
   .fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js')
   .getContentText();
-if ((typeof GasTap) === 'undefined') eval(gasT_URL)
-const test = new GasTap();
+
 
 /**
  * Test with GasT
  */
 const _gasTMainTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   await test(`Priority Test`, (t) => {
     let types = {
@@ -54,7 +55,7 @@ const _gasTMainTesting = async () => {
   await test(`FormBuilder Test`, (t) => {
     const x = new ApprovalFormBuilder({
       name : "Dingus",
-      jobnumber : 19238712398,
+      id : 19238712398,
       cost : 50.00,
     });
     t.pass(`Good : ${x}`);
@@ -63,9 +64,9 @@ const _gasTMainTesting = async () => {
   */
 
   await test(`Generate Barcode: `, (t) => {
-    const x = new BarcodeGenerator({ jobnumber : 20230119105523 }).GenerateBarCodeForTicketHeader();
+    const x = new BarcodeGenerator({ id : 20230119105523 }).GenerateBarCodeForTicketHeader();
     t.notEqual(x, undefined || null, `Barcode SHOULD NOT be undefined or null : ${x}`);
-    const y = new BarcodeGenerator({ jobnumber : `alskdfjalsdkfj` }).GenerateBarCodeForTicketHeader();
+    const y = new BarcodeGenerator({ id : `alskdfjalsdkfj` }).GenerateBarCodeForTicketHeader();
     t.notEqual(y, undefined || null, `Barcode SHOULD NOT be undefined or null : ${y}`);
     const z = new BarcodeGenerator({}).GenerateBarCodeForTicketHeader();
     t.notEqual(z, undefined || null, `Barcode SHOULD NOT be undefined or null : ${z}`);
@@ -99,14 +100,14 @@ const _gasTMainTesting = async () => {
     t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
   });
   
-  await test(`JobNumber`, (t) => {
-    const jobnumberService = new JobnumberService();
-    const x = jobnumberService.jobnumber;
-    t.equal(jobnumberService.IsValid(x), true, `Standard Job Number should be valid : Acutal : ${jobnumberService.IsValid(x)}.`);
-    const y = jobnumberService.jobnumber;
-    t.notEqual(y, undefined || null, `DEFAULT / EMPTY jobnumber should not return undefined or null, ${y}`);
+  await test(`IDService`, (t) => {
+    const idService = new IDService();
+    const x = idService.id;
+    t.equal(idService.IsValid(x), true, `Standard ID Number should be valid : Acutal : ${idService.IsValid(x)}.`);
+    const y = idService.id;
+    t.notEqual(y, undefined || null, `DEFAULT / EMPTY id should not return undefined or null, ${y}`);
     const z = `20220505`;
-    t.equal(jobnumberService.IsValid(z), false, `Test Job Number should be invalid : Acutal : ${jobnumberService.IsValid(z)}.`);
+    t.equal(idService.IsValid(z), false, `Test ID Number should be invalid : Acutal : ${idService.IsValid(z)}.`);
   
   });
   
@@ -130,6 +131,8 @@ const _gasTMainTesting = async () => {
  */
 const _gasTMessagingTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   await test(`CreateMessage DEFAULT`, (t) => {
     const message = new CreateMessage({});
@@ -162,7 +165,7 @@ const _gasTMessagingTesting = async () => {
     const message = new CreateMessage({
       name : 'Cody', 
       projectname : 'Test Project',
-      jobnumber : '101293874098', 
+      id : '101293874098', 
       rowData : rowData,
       designspecialist : 'designspecialist', 
       designspecialistemaillink : 'cody@glen.com', 
@@ -204,7 +207,7 @@ const _gasTMessagingTesting = async () => {
     const message = new CreateSubmissionMessage({ 
       name : 'Cody', 
       projectname : 'SomeProject', 
-      jobnumber : 102938471431,
+      id : 102938471431,
     } );
     const w = `DS MESSAGE : ${message.dsMessage}`;
     t.notEqual(w, undefined || null, `DS MESSAGE message should not return undefined or null. \n${w}`);
@@ -222,6 +225,8 @@ const _gasTMessagingTesting = async () => {
  */
 const _gasTLoggerTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   await test(`Log`, (t) => {
     const logger = new Log();
@@ -249,6 +254,8 @@ const _gasTLoggerTesting = async () => {
  */
 const _gasTMiscTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   await test(`Search`, (t) => {
     const x = Search(`Cody`);
@@ -258,11 +265,6 @@ const _gasTMiscTesting = async () => {
   await test(`Search Specific Sheet`, (t) => {
     const x = SearchSpecificSheet(SHEETS.Fablight,`Cody`);
     t.notEqual(x, undefined || null, `SearchSpecificSheet should not return undefined or null. ${JSON.stringify(x)}`);
-  });
-
-  await test(`FindByJobNumber`, (t) => {
-    const x = FindByJobNumber(20211025144607);
-    t.notEqual(x, undefined || null, `FindByJobNumber should not return undefined or null. ${JSON.stringify(x)}`);
   });
 
   await test(`GetByHeader`, (t) => {
@@ -358,6 +360,8 @@ const _gasTMiscTesting = async () => {
  */
 const _gasTCalculationTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   await test(`Calc Average Turnaround`, (t) => {
     const x = Calculate.GetAverageTurnaround(SHEETS.Laser);
@@ -438,6 +442,8 @@ const _gasTCalculationTesting = async () => {
  */
 const _gasTShopifyTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   const shopify = new ShopifyAPI();
 
@@ -478,18 +484,20 @@ const _gasTShopifyTesting = async () => {
  */
 const _gasTTicketTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   await test(`Ticket`, t => {
     const name = `Dingus`; 
     const email = "codyglen@berkeley.edu";
-    const jobnumber = new JobnumberService().jobnumber;
+    const id = new IDService().id;
     const projectname = `Some Kinda Project`;
     const rowData = GetRowData(SHEETS.Fablight, 2);
 
     let tick = new Ticket({
       name : name, 
       email : email, 
-      jobnumber : jobnumber,
+      id : id,
       projectname : projectname,
       rowData : rowData,
     });
@@ -514,18 +522,20 @@ const _gasTTicketTesting = async () => {
  */
 const _gasTEmailTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  const test = new GasTap();
 
   await test(`Emailer`, async(t) => {
     const name = `Dingus`; 
     const email = "codyglen@berkeley.edu";
-    const jobnumber = new JobnumberService().jobnumber;
+    const id = new IDService().id;
     const projectname = `Some Kinda Project`;
     const message = new CreateMessage({
       name : name,
-      jobnumber : jobnumber,
+      id : id,
       projectname : projectname,
     });
-    console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${jobnumber}`);
+    console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${id}`);
     Object.values(STATUS).forEach(async (status) => {
       const x = await new Emailer({
         name : name,

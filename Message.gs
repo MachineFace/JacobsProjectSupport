@@ -4,7 +4,7 @@
  * Properties accessed via `this.receivedMessage` or `this.failedMessage`
  * @param {string} name
  * @param {string} projectname
- * @param {number} jobnumber
+ * @param {number} id
  * @param {string} mat1
  * @param {number} material1Quantity
  * @param {string} material1Name
@@ -18,7 +18,7 @@ class CreateMessage {
   constructor({
     name : name, 
     projectname : projectname, 
-    jobnumber : jobnumber, 
+    id : id, 
     rowData : rowData,
     designspecialist : designspecialist, 
     designspecialistemaillink : designspecialistemaillink, 
@@ -26,9 +26,9 @@ class CreateMessage {
   }) {
     this.name = name ? name.toString() : `Unknown Name`;
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
-    this.jobnumber = jobnumber ? jobnumber.toString() : new JobnumberService().jobnumber;
+    this.id = id ? id.toString() : new IDService().id;
 
-    // let { status, ds, priority, ticket, jobnumber, timestamp, email, name, sid, projectName, 
+    // let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
     // mat1quantity, mat1, mat2quantity, mat2, 
     // mat3quantity, mat3, mat4quantity, mat4, 
     // mat5quantity, mat5, affiliation, elapsedTime, estimate, 
@@ -75,7 +75,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Your project, <b><i>${this.projectname}</i></b> has been received.<br/>`;
-      message += `Your part or parts have been assigned a Jobnumber: <b><i>${this.jobnumber}.</i></b><br/>`;
+      message += `Your part or parts have been assigned an ID: <b><i>${this.id}.</i></b><br/>`;
       message += `We will update you when it has been started by a staff member.`;
       message += `</p>`;
       message += this.help;
@@ -89,7 +89,7 @@ class CreateMessage {
       message += this.thanks;
       message += `Your project has started. <br/>`;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> has been started by ${this.designspecialist}.<br/>`;
-      message += `Jobnumber: <b><i>${this.jobnumber}.</i></b><br/>`;
+      message += `ID Number: <b><i>${this.id}.</i></b><br/>`;
       message += `Please email ${this.designspecialistemaillink} for further details.<br/><br/>`;
       message += `<b>We will update you when it is done.</b>`;
       message += `</p>`;
@@ -103,7 +103,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished.<br/>`;
-      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
+      message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += `<b>Your parts are now available for pickup.</b><br/>`;
       message += `</p>`;
       message += `<p>`;
@@ -138,7 +138,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> have been picked up and the project is now <b>CLOSED.</b><br/>`;
-      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/>`;
+      message += `ID Number: <b><i>${this.id}</i></b><br/>`;
       message += this.help;
       message += `</p>`;
       message += this.salutations; 
@@ -150,7 +150,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished and have not been picked up yet.<br/>`;
-      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/>`;
+      message += `ID Number: <b><i>${this.id}</i></b><br/>`;
       message += `<font style="color:#FF0000";><b>Please pick up your parts SOON before they are disposed of in the free-prints bin.</b></font><br/>`;
       message += `Completed projects can be picked up in-person.<br/><br/>`;
       message += this.location;
@@ -166,7 +166,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Your project, <b><i>${this.projectname}</i></b> has unfortunately failed.<br/>`;
-      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
+      message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += this.help;
       message += `</p>`;
       message += this.salutations;
@@ -178,7 +178,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `You have elected not to proceed with the design process.<br/>`;
-      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
+      message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br/><br/>`;
       message += this.help;
       message += `</p>`;
@@ -190,10 +190,10 @@ class CreateMessage {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `A staff member has cancelled and/or declined this job with the Project Name: <b><i>${this.projectname}</b></i>.<br/>`;
-      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
+      message += `A staff member has cancelled and/or declined this project with the Project Name: <b><i>${this.projectname}</b></i>.<br/>`;
+      message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information, or if you believe this to be an error: ${this.designspecialistemaillink}<br/><br/>`;
-      message += `You may also choose to resubmit this job as a new submission.<br/>`;
+      message += `You may also choose to resubmit this project as a new submission.<br/>`;
       message += this.help;
       message += `</p>`;
       message += this.salutations;
@@ -205,8 +205,8 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Your project, <b><i>${this.projectname}</i></b> has been temporarily waitlisted. `;
-      message += `You will be notified when your job starts.<br/>`; 
-      message += `Job Number: <b><i>${this.jobnumber}</i></b><br/><br/>`;
+      message += `You will be notified when your project starts.<br/>`; 
+      message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}.<br/>`;
       message += `No action is required at this time.<br/><br/>`;
       message += this.help;
@@ -220,7 +220,7 @@ class CreateMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Your project <b><i>${this.projectname}</b></i> is now <b>CLOSED.</b><br/>`;
-      message += `Job Number: <b><i>${this.jobnumber}.</i></b><br/><br/>`;
+      message += `ID Number: <b><i>${this.id}.</i></b><br/><br/>`;
       message += `Your Jacobs Store account has been billed for: <br/> `;
       message += `</p>`;
       message += `<p><ul>`;
@@ -271,17 +271,17 @@ class CreateMessage {
  * Class for Creating a Submission Response Message
  * @param {string} name
  * @param {string} projectname
- * @param {string} jobnumber
+ * @param {string} id
  */
 class CreateSubmissionMessage {
   constructor({
     name : name, 
     projectname : projectname, 
-    jobnumber : jobnumber,
+    id : id,
   }) {
     this.name = name ? name : `Unknown Name`;
     this.projectname = projectname ? projectname : `Unknown Project Name`;
-    this.jobnumber = jobnumber ? jobnumber : new JobnumberService().jobnumber;
+    this.id = id ? id : new IDService().id;
 
     /** @private */
     this.greetings = `Hi ${this.name},`;
@@ -297,7 +297,7 @@ class CreateSubmissionMessage {
       message += `<p>`;
       message += `You have a new submission to your area.<br/>`;
       message += `Please assign yourself as the DS in the <a href = "https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/">Spreadsheet</a><br/>`;
-      message += `Reminder: Only changing the status of the job will trigger emails to you and the student.<br/>`; 
+      message += `Reminder: Only changing the status of the submission will trigger emails to you and the student.<br/>`; 
       message += `Below is a summary of the student submission.<br/>`;
       message += `</p>`;
       message += `<p>Best,<br/>${SERVICE_NAME}</p>`;
@@ -311,7 +311,7 @@ class CreateSubmissionMessage {
       message += this.greetings;
       message += this.thanks;
       message += `Large-format paper plotting has been requested for your course.<br/>`;
-      message += `Job Number: <i>${this.jobnumber}</i><br/>`;
+      message += `ID Number: <i>${this.id}</i><br/>`;
       message += `<br/>`;
       message += `A staff member will begin plotting your courses prints as soon as possible. <br/><br/>`;
       message += `</p>`;
