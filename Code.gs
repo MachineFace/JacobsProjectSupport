@@ -28,7 +28,6 @@
  */
 const onSubmission = async (e) => {
 
-  const idService = new IDService();
   const staff = new MakeStaff().Staff;
   // Set status to RECEIVED on new submission
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -54,7 +53,7 @@ const onSubmission = async (e) => {
   console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let id = idService.id;
+  let id = new IDService().id;
   SetByHeader(sheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
@@ -131,7 +130,7 @@ const onSubmission = async (e) => {
 
   // Email each DS
   try {
-    GmailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
+    MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
       htmlBody: dsMessage,
       from: SERVICE_EMAIL,
       bcc: staff.Chris.email,
@@ -147,7 +146,7 @@ const onSubmission = async (e) => {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
       SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.priority, lastRow, 1);
       SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.status, lastRow, STATUS.received );
-      GmailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
+      MailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
         htmlBody: message.gsiPlotterMessage,
         from: SERVICE_EMAIL,
         bcc: staff.Chris.email,
@@ -160,8 +159,8 @@ const onSubmission = async (e) => {
   }
 
   // Check again
-  if(idService.IsValid(id) == false) {
-    SetByHeader(sheet, HEADERNAMES.id, lastRow, idService.id);
+  if(IDService.isValid(id) == false) {
+    SetByHeader(sheet, HEADERNAMES.id, lastRow, new IDService().id);
   }
 
   // Fix wrapping issues
@@ -231,8 +230,7 @@ const onChange = async (e) => {
   }
 
   ds = ds ? ds : `a Design Specialist`;
-  const idService = new IDService();
-  id = idService.IsValid(id) ? id : idService.id;
+  id = IDService.isValid(id) ? id : new IDService().id;
   projectName = projectName ? projectName : `Your Project`;
 
 
@@ -247,7 +245,7 @@ const onChange = async (e) => {
   try {
     console.info(`Trying to fix job number : ${id}`)
     if (status == STATUS.received || status == STATUS.inProgress) {
-      id = idService.IsValid(id) ? id : idService.id;
+      id = IDService.isValid(id) ? id : new IDService().id;
       SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
       console.warn(`Job Number was missing, so the script fixed it. Submission by ${email}`);
     }

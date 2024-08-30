@@ -170,7 +170,7 @@ const PopupCreateNewID = () => {
   const ui = SpreadsheetApp.getUi();
   const thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
-  const idService = new IDService();
+  const newID = new IDService().id;
 
   if(CheckSheetIsForbidden(thisSheet) == true) {
     const a = ui.alert(
@@ -181,7 +181,7 @@ const PopupCreateNewID = () => {
     if(a === ui.Button.OK) return;
   } 
   const { name, id } = GetRowData(thisSheet, thisRow);
-  if(idService.IsValid(id)) {
+  if(IDService.isValid(id)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Error!`,
       `ID for ${name} exists already!\n${id}`,
@@ -189,7 +189,6 @@ const PopupCreateNewID = () => {
     );
     if(a === ui.Button.OK) return;
   }
-  const newID = idService.id;
   SetByHeader(thisSheet, HEADERNAMES.id, thisRow, newID);
   const a = ui.alert(
     `${SERVICE_NAME}:\n Job Number Created!`,
