@@ -22,6 +22,10 @@ class Log {
       Debug : `DEBUG`,
     }
   }
+
+  /**
+   * Throw Error Message
+   */
   static Error(message = ``) {
     const text = [this.date, this.type.Error, message, ];
     this.sheet.appendRow(text);
@@ -37,7 +41,12 @@ class Log {
     this.sheet.setConditionalFormatRules(rules);
     this._PopItem();
     this._CleanupSheet();
+    return;
   }
+
+  /**
+   * Throw Warning Message
+   */
   static Warning(message = ``) {
     const text = [this.date, this.type.Warning, message, ];
     this.sheet.appendRow(text);
@@ -53,7 +62,12 @@ class Log {
     this.sheet.setConditionalFormatRules(rules);
     this._PopItem();
     this._CleanupSheet();
+    return;
   }
+
+  /**
+   * Throw Info Message
+   */
   static Info(message = ``) {
     const text = [this.date, this.type.Info, message, ];
     this.sheet.appendRow(text);
@@ -69,7 +83,12 @@ class Log {
     this.sheet.setConditionalFormatRules(rules);
     this._PopItem();
     this._CleanupSheet();
+    return;
   }
+
+  /**
+   * Throw Debug Message
+   */
   static Debug(message = ``) {
     const text = [this.date, this.type.Debug, message, ];
     this.sheet.appendRow(text);
@@ -85,7 +104,13 @@ class Log {
     this.sheet.setConditionalFormatRules(rules);
     this._PopItem();
     this._CleanupSheet();
+    return;
   }
+
+  /**
+   * Remove First Item in Sheet
+   * @private
+   */
   _PopItem() {
     if(this.row > 100) {
       this.sheet.deleteRows(2, 1);
@@ -93,6 +118,11 @@ class Log {
       this.sheet.insertRowAfter(this.sheet.getMaxRows() - 1);
     }
   }
+
+  /**
+   * Cleanup Sheet
+   * @private
+   */
   _CleanupSheet() {
     if(this.row < 2000) return;
     this.sheet.deleteRows(2, 1999);

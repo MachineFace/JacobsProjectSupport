@@ -12,6 +12,8 @@ class ShopifyAPI {
     /** @private */
     this.api_pass = PropertiesService.getScriptProperties().getProperty(`SHOPIFY_PASS`);
     /** @private */
+    this.api_email = PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`);
+    /** @private */
     this.id;
     /** @private */
     this.email;
@@ -21,17 +23,26 @@ class ShopifyAPI {
     this.customerID;
     /** @private */
     this.totalprice;
+
+    /** @private */
+    this.getParams = {
+      method : `GET`,
+      headers : { "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
+      contentType : "application/json",
+      followRedirects : true,
+      muteHttpExceptions : true,
+    };
   }
 
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Better Lookup
-   * @private
    * @param {string} material name
    * @returns {[string, string]} productID, link, price
+   * @private
    */
-  _LookupStoreProductDetails(material) {
+  _GetStoreProductID(material) {
     if(!material) throw new Error(`No material supplied`);
     let productID;
     try {
@@ -45,7 +56,7 @@ class ShopifyAPI {
       });
       return productID;
     } catch(err) {
-      console.error(`"_LookupStoreProductDetails()" failed : ${err}`);
+      console.error(`"_GetStoreProductID()" failed : ${err}`);
       return 1;
     }
   }
@@ -53,9 +64,9 @@ class ShopifyAPI {
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Packages Materials in a way that can be used in MakeLineItems
-   * @private
    * @param {object} list of material names and quantities
    * @returns {[{string}]} materials
+   * @private
    */
   async _PackageMaterials({
       material1Name, material1Quantity,
@@ -95,7 +106,7 @@ class ShopifyAPI {
     for(const [key, values] of Object.entries(pack)) {
       if(!values.name || !values.ammount) {
         delete pack[key];
-      } else values.id = this._LookupStoreProductDetails(values.name);
+      } else values.id = this._GetStoreProductID(values.name);
     }
     for(const [key, values] of Object.entries(pack)) {
       if(!values.id) delete pack[key];
@@ -106,13 +117,17 @@ class ShopifyAPI {
     for(const [key, values] of Object.entries(pack)) {
       console.info(values.id);
       let info = await this.GetProductByID(values.id);
-      let price = info?.variants[0]?.price * pack[key].ammount ? info?.variants[0]?.price * pack[key].ammount : info?.price * pack[key].ammount;
-      let subtotal = +Number.parseFloat(price).toFixed(2);
+
+      let calcultedPrice = Number(info?.variants[0]?.price * pack[key].ammount).toFixed(2);
+      let fallbackPrice = Number(info?.price * pack[key].ammount).toFixed(2);
+      let price = calcultedPrice ? calcultedPrice : fallbackPrice;
+      let subtotal = +Number(price).toFixed(2);
+
       sum += subtotal;
       shopifyPack.push({ 
         name : key,
         title : info?.title,
-        id : +Number(info?.id),
+        id : Number(info?.id),
         price : info?.variants[0]?.price,
         quantity : pack[key].ammount,
         subtotal : subtotal,
@@ -128,7 +143,7 @@ class ShopifyAPI {
         // }], 
       });
     }
-    const total = +Number.parseFloat(sum).toFixed(2);
+    const total = Number(sum).toFixed(2);
     this.totalprice = total;
 
     // console.info(`Total Price = ${total}`);
@@ -144,7 +159,7 @@ class ShopifyAPI {
    */
   async CreateOrder({
     id : id = new IDService().id,
-    email : email = `jacobsinstitutestore@gmail.com`,
+    email : email = this.api_email,
     material1Name : material1Name = `None`,
     material1Quantity : material1Quantity = 0,
     material2Name : material2Name = `None`,
@@ -158,7 +173,7 @@ class ShopifyAPI {
   }) {
     const repo = 'orders.json/';
     const customer = await this.GetCustomerByEmail(email);
-    if(!customer) customer = await this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
+    if(!customer) customer = await this.GetCustomerByEmail(this.api_email);
     this.customerID = customer.id;
     const pack = await this._PackageMaterials({
       material1Name, material1Quantity,
@@ -176,7 +191,7 @@ class ShopifyAPI {
         "financial_status": "paid",
         "fulfillment_status": "fulfilled",
         "inventory_behaviour" : "decrement_ignoring_policy",
-        "note": "ID Number : " + id,
+        "note": "(JPS) ID Number : " + id,
       }
     };
     console.info(`ORDER SUMMARY ----> ${JSON.stringify(order, null, 4)}`);
@@ -217,23 +232,15 @@ class ShopifyAPI {
     const scope = `customers/search.json?query=email:${email}`;
     const repo = scope + fields;
 
-    const params = {
-      method : "GET",
-      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      contentType : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true,
-    };
-
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
       const user = JSON.parse(response.getContentText())['customers'][0];
       if(!user) {
         console.warn('User Shopify Account Does Not Exist.\nTrying as internal sale.....');
-        return await this.GetCustomerByEmail("jacobsinstitutestore@gmail.com");
+        return await this.GetCustomerByEmail(this.api_email);
       }
 
       this.customerID = user.id;
@@ -261,19 +268,11 @@ class ShopifyAPI {
 
     const repo = 'products/' + productID + '.json?' + status + fields;
 
-    let params = {
-      method : "GET",
-      headers : { Authorization : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      contentType : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : false,
-    };
-
     // Fetch Products
     try {
       if(!productID) throw new Error(`No product ID supplied....`);
 
-      let response = await UrlFetchApp.fetch(this.root + repo, params);
+      let response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
       let responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
       let parsed = JSON.parse(response.getContentText())['product'];
@@ -307,17 +306,9 @@ class ShopifyAPI {
     // Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
     const repo = 'orders.json?' + status + limit + fields;
 
-    const params = {
-      method : "GET",
-      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      contentType : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true,
-    };
-
     try {
       // Fetch Products
-      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
       const responseCode = response.getResponseCode();
       console.info(response.getContentText());
       if (responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
@@ -328,7 +319,7 @@ class ShopifyAPI {
       const name = parsed ? parsed['orders'][0]?.name : [];
       const email = parsed ? parsed['orders'][0]?.email : [];
       const total_price = parsed ? parsed['orders'][0]?.total_price : [];
-      console.info(`ORDER PLACED ----> TIME : ${createdAt}\\n ORDER NUMBER : ${name}\\n TO : ${email}\\n FOR : $${total_price}`);
+      console.info(`ORDER PLACED ---->\n${JSON.stringify(parsed[`orders`][0], null, 3)}`);
       return parsed['orders'][0];  
     } catch(err) {
       console.error(`"GetLastOrder()" failed: ${err}`);
@@ -344,21 +335,13 @@ class ShopifyAPI {
    */
   async GetSpecificOrder(order) {
     const repo = `orders/${order}.json?`;
-
-    const params = {
-      method : "GET",
-      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      contentType : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true,
-    };
     
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
-      const content = JSON.parse(response.getContentText())["order"];
+      const content = JSON.parse(response.getContentText())[`order`];
       return content;  
     } catch(err) {
       console.error(`"GetSpecificOrder(${order})" failed: ${err}`);
@@ -380,15 +363,8 @@ class ShopifyAPI {
 
     const repo = 'orders.json?' + status + limit + fields;
 
-    const params = {
-      method : "GET",
-      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      contentType : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true,
-    };
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
@@ -430,15 +406,8 @@ class ShopifyAPI {
 
     const repo = 'orders.json?' + status + limit + additionalFields + fulfillment + fields;
 
-    const params = {
-      method : "GET",
-      headers : { "Authorization": "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) },
-      contentType : "application/json",
-      followRedirects : true,
-      muteHttpExceptions : true,
-    };
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
       let responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
@@ -464,6 +433,7 @@ class ShopifyAPI {
    * Retrieve list of open orders
    * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
    * @return {string} order data
+   * @private
    */
   async CloseUnfulfilledOrders() {
     console.info(`Putting to this Repo -----> ${this.root + repo}`);
@@ -474,10 +444,10 @@ class ShopifyAPI {
     const payload = {  
       "order" : {
         "id" : order.toString(),
-        "financial_status": "paid",
-        "fulfillment_status": "fulfilled",
+        "financial_status" : "paid",
+        "fulfillment_status" : "fulfilled",
         "note" : "Order closed by Jacobs Billing Support.",
-        "closed_at": new Date().toISOString(),
+        "closed_at" : new Date().toISOString(),
         "confirmed": true,
       },
     }
@@ -509,74 +479,87 @@ class ShopifyAPI {
 
 const _testAPI = async () => {
   const id = new IDService().id;
-  // const shopify = new ShopifyAPI({id : id, email : "jacobsinstitutestore@gmail.com"});
-  // const shopify = new ShopifyAPI();
-  // let product = await shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
-  // let lastOrder = await shopify.GetLastOrder();
-  // let orders = await shopify.GetOrdersList();
-  // let product = await shopify.GetProductByID(7751141320);
-  // let customer = await shopify.GetCustomerByEmail('jacobsinstitutestore@gmail.com');
-  // let pack = await shopify.PackageMaterials('Fortus Red ABS-M30', 5,'Objet Polyjet VeroMagenta RGD851',10,null,123234,'Stratasys Dimension Soluble Support Material P400SR',15,null,20);
+  const shopify = new ShopifyAPI();
+  /*
+  let productID = await shopify._GetStoreProductID(`Fortus Red ABS-M30`);
+  console.info(`PRODUCT_ID for Fortus Red ABS-M30: ${JSON.stringify(productID, null, 3)}`);
+
+  let lastOrder = await shopify.GetLastOrder();
+  console.info(`LAST_ORDER: ${JSON.stringify(lastOrder, null, 3)}`);
+
+  let orderList = await shopify.GetOrdersList();
+  console.info(`ORDERLIST: ${orderList}`);
+
+  let product = await shopify.GetProductByID(7751141320);
+  console.info(`PRODUCT: ${JSON.stringify(product, null, 3)}`);
+
+  let customer = await shopify.GetCustomerByEmail(PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`));
+  console.info(`CUSTOMER: ${JSON.stringify(customer, null, 3)}`);
+  */
+
+  let pack = await shopify._PackageMaterials('Fortus Red ABS-M30', 5,'Objet Polyjet VeroMagenta RGD851',10,null,123234,'Stratasys Dimension Soluble Support Material P400SR',15,null,20);
+  console.info(`PACK: ${pack}`);
+
   // let lineItems = await shopify.MakeLineItems(pack);
   // let order = await shopify.CreateShopifyOrder(customer, 1293847123, pack, lineItems);
   // let lookup = shopify.LookupShopifyProductFromSheet2();
-  // let customer = shopify.SetCustomer("jacobsinstitutestore@gmail.com");
+  // let customer = shopify.SetCustomer(PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`));
 
-  const order = await shopify.CreateOrder({
-    id : id,
-    email : `pico@pico.com`,
-    material1Name : 'Fortus Red ABS-M30',
-    material1Quantity : 5,
-    material2Name : 'Objet Polyjet VeroMagenta RGD851',
-    material2Quantity : 10,
-    material3Name : null,
-    material3Quantity : 123234,
-    material4Name : 'Stainless Steel - 0.125" - priced per square inch',
-    material4Quantity : 15,
-    material5Name : null,
-    material5Quantity : 20,
-  });
-  console.info(JSON.stringify(order, null, 4));
+  // const order = await shopify.CreateOrder({
+  //   id : id,
+  //   email : `pico@pico.com`,
+  //   material1Name : 'Fortus Red ABS-M30',
+  //   material1Quantity : 5,
+  //   material2Name : 'Objet Polyjet VeroMagenta RGD851',
+  //   material2Quantity : 10,
+  //   material3Name : null,
+  //   material3Quantity : 123234,
+  //   material4Name : 'Stainless Steel - 0.125" - priced per square inch',
+  //   material4Quantity : 15,
+  //   material5Name : null,
+  //   material5Quantity : 20,
+  // });
+  // console.info(JSON.stringify(order, null, 4));
 
-  // const order = await shopify.GetLastOrder();
-  // console.info(JSON.stringify(order))
 }
 
 
-// /**
-//  * Configure the service
-//  * @private
-//  */
-// const CreateService = () => {
-//   const service = OAuth2.createService(`Shopify`)
-//     .setAuthorizationBaseUrl(`https://jacobs-student-store.myshopify.com/admin/api/2023-04/`)
-//     .setTokenUrl(`https://jacobs-student-store.myshopify.com/admin/api/2023-04/token`)
-//     .setClientId(PropertiesService.getScriptProperties().getProperty(`shopify_api_key`))
-//     .setClientSecret(PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`))
-//     .setCallbackFunction((request) => {
-//       const service = CreateService();
-//       const isAuthorized = service.handleCallback(request);
-//       if (isAuthorized) { 
-//         return HtmlService
-//           .createTemplateFromFile("auth_success")
-//           .evaluate();
-//       } else {
-//         return HtmlService
-//           .createTemplateFromFile("auth_error")
-//           .evaluate();
-//       }
-//     })
-//     .setPropertyStore(PropertiesService.getUserProperties())
-//     .setCache(CacheService.getUserCache())
-//     .setLock(LockService.getUserLock())
-//     // .setScope('user-library-read playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private');
-//   // if (!service.hasAccess()) {
-//   //   throw new Error('Error: Missing Shopify authorization.');
-//   // }
-//   console.info(`Service Access: ${service.hasAccess()}`);
-//   console.info(service)
-//   return service;
-// }
+/**
+ * Configure the service
+ * @private
+@NOTIMPLEMENTED
+ *
+const CreateService = () => {
+  const service = OAuth2.createService(`Shopify`)
+    .setAuthorizationBaseUrl(`https://jacobs-student-store.myshopify.com/admin/api/2023-04/`)
+    .setTokenUrl(`https://jacobs-student-store.myshopify.com/admin/api/2023-04/token`)
+    .setClientId(PropertiesService.getScriptProperties().getProperty(`shopify_api_key`))
+    .setClientSecret(PropertiesService.getScriptProperties().getProperty(`shopify_api_pass`))
+    .setCallbackFunction((request) => {
+      const service = CreateService();
+      const isAuthorized = service.handleCallback(request);
+      if (isAuthorized) { 
+        return HtmlService
+          .createTemplateFromFile("auth_success")
+          .evaluate();
+      } else {
+        return HtmlService
+          .createTemplateFromFile("auth_error")
+          .evaluate();
+      }
+    })
+    .setPropertyStore(PropertiesService.getUserProperties())
+    .setCache(CacheService.getUserCache())
+    .setLock(LockService.getUserLock())
+    // .setScope('user-library-read playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private');
+  // if (!service.hasAccess()) {
+  //   throw new Error('Error: Missing Shopify authorization.');
+  // }
+  console.info(`Service Access: ${service.hasAccess()}`);
+  console.info(service)
+  return service;
+}
+*/
 
 
 

@@ -61,12 +61,19 @@ const onSubmission = async (e) => {
   SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority);
 
   try {
-    if (priority == `STUDENT NOT FOUND!`) {
+    if (priority == PRIORITY.None) {
       // Set access to Missing Access
       SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
       // Email
-      GmailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
+      // new Emailer({
+      //   name : name, 
+      //   status : STATUS.missingAccess,
+      //   email : email,    
+      //   message : message.missingAccessMessage,
+      // });
+
+      MailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
         htmlBody: message.missingAccessMessage,
         from: SERVICE_EMAIL,
         bcc: staff.Chris.email,
@@ -130,6 +137,13 @@ const onSubmission = async (e) => {
 
   // Email each DS
   try {
+    // new Emailer({
+    //   name : name, 
+    //   status : status,
+    //   email : email,    
+    //   designspecialistemail : designspecialistemail,
+    //   message : message,
+    // });
     MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
       htmlBody: dsMessage,
       from: SERVICE_EMAIL,
@@ -146,6 +160,7 @@ const onSubmission = async (e) => {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
       SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.priority, lastRow, 1);
       SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.status, lastRow, STATUS.received );
+      // Email
       MailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
         htmlBody: message.gsiPlotterMessage,
         from: SERVICE_EMAIL,

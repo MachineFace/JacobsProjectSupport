@@ -103,6 +103,9 @@ class IDService {
  */
 const CreateID = () => IDService.createId();
 
+/**
+ * 
+ *
 const _testJ = () => {
   console.time(`Instanced`);
   const j = new IDService().id;
@@ -123,6 +126,6 @@ const _testJ = () => {
   const val = IDService.isValid(back);
   console.info(`Valid? : ${val}`);
 }
-
+*/
 
 

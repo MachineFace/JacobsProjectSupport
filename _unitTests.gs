@@ -2,9 +2,6 @@
  * Load GasT for Testing
  * See : https://github.com/huan/gast for instructions
  */
-const gasT_URL = UrlFetchApp
-  .fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js')
-  .getContentText();
 
 
 /**
@@ -12,7 +9,9 @@ const gasT_URL = UrlFetchApp
  */
 const _gasTMainTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   await test(`Priority Test`, (t) => {
@@ -131,7 +130,9 @@ const _gasTMainTesting = async () => {
  */
 const _gasTMessagingTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   await test(`CreateMessage DEFAULT`, (t) => {
@@ -225,23 +226,20 @@ const _gasTMessagingTesting = async () => {
  */
 const _gasTLoggerTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   await test(`Log`, (t) => {
-    const logger = new Log();
-    const x = logger.Warning(`Warning Test ----> Message`);
-    const y = logger.Info(`Info Test ----> Message`);
-    const z = logger.Error(`ERROR Test ----> Message`);
-    const w = logger.Debug(`Debugging Test ----> Message`);
+    const x = Log.Warning(`Warning Test ----> Message`);
+    const y = Log.Info(`Info Test ----> Message`);
+    const z = Log.Error(`ERROR Test ----> Message`);
+    const w = Log.Debug(`Debugging Test ----> Message`);
     t.notThrow(() => x, `Warning SHOULD NOT throw error.`);
-    t.equal(x, 0, `Warning returns 0 : ${x}`);
     t.notThrow(() => y, `Info SHOULD NOT throw error.`);
-    t.equal(y, 0, `Info returns 0 : ${y}`);
     t.notThrow(() => z, `Error SHOULD NOT throw error.`);
-    t.equal(z, 0, `Error returns 0 : ${z}`);
     t.notThrow(() => w, `Debug SHOULD NOT throw error.`);
-    t.equal(w, 0, `Debug returns 0 : ${w}`);
   });
 
   await test.finish();
@@ -254,7 +252,9 @@ const _gasTLoggerTesting = async () => {
  */
 const _gasTMiscTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   await test(`Search`, (t) => {
@@ -360,7 +360,9 @@ const _gasTMiscTesting = async () => {
  */
 const _gasTCalculationTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   await test(`Calc Average Turnaround`, (t) => {
@@ -442,7 +444,9 @@ const _gasTCalculationTesting = async () => {
  */
 const _gasTShopifyTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   const shopify = new ShopifyAPI();
@@ -458,8 +462,8 @@ const _gasTShopifyTesting = async () => {
     t.notEqual(x, undefined || null, `Get Shopify Orders List should not return undefined or null.`);
   });
 
-  await test(`Shopify _LookupStoreProductDetails`, (t) => {
-    const x = shopify._LookupStoreProductDetails(`Fortus Red ABS-M30`);
+  await test(`Shopify _GetStoreProductID`, (t) => {
+    const x = shopify._GetStoreProductID(`Fortus Red ABS-M30`);
     t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${x}`);
   });
 
@@ -484,7 +488,9 @@ const _gasTShopifyTesting = async () => {
  */
 const _gasTTicketTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   await test(`Ticket`, t => {
@@ -522,7 +528,9 @@ const _gasTTicketTesting = async () => {
  */
 const _gasTEmailTesting = async () => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') eval(gasT_URL)
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText());
+  }
   const test = new GasTap();
 
   await test(`Emailer`, async(t) => {
