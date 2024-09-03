@@ -413,7 +413,6 @@ const BarMenu = () => {
         SpreadsheetApp.getUi()
           .createMenu(`Calculate`)
           .addItem(`Count Active Users`, `PopupCountUsers`)
-          .addItem(`Count Total Emails Sent`, `CountTotalEmailsSent`)
           .addItem(`Generate Metrics`, `Metrics`)
           .addItem(`Generate Top Ten`, `RunTopTen`)
           .addItem(`Generate Standard Deviation`, `RunStandardDeviation`)
