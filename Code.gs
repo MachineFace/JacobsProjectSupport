@@ -250,7 +250,7 @@ const onChange = async (e) => {
 
 
   // Log submission info to sheet
-  console.info(`Submission Time = ${timestamp}, Name = ${name}, Email = ${email}, Project = ${projectName}`);
+  console.info(`Submission Time: ${timestamp}, Name: ${name}, Email: ${email}, Project: ${projectName}`);
 
   // Ignore
   if(status == STATUS.closed) return;

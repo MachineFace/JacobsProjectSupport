@@ -43,9 +43,9 @@ class ShopifyAPI {
    * @private
    */
   _GetStoreProductID(material) {
-    if(!material) throw new Error(`No material supplied`);
     let productID;
     try {
+      if(!material) throw new Error(`No material supplied`);
       Object.values(STORESHEETS).forEach(sheet => {
         const idx = SearchSpecificSheet(sheet, material);
         if(idx) {
@@ -69,42 +69,43 @@ class ShopifyAPI {
    * @private
    */
   async _PackageMaterials({
-      material1Name, material1Quantity,
-      material2Name, material2Quantity,
-      material3Name, material3Quantity,
-      material4Name, material4Quantity,
-      material5Name, material5Quantity,
+      material1Name = ``, material1Quantity = 0,
+      material2Name = ``, material2Quantity = 0,
+      material3Name = ``, material3Quantity = 0,
+      material4Name = ``, material4Quantity = 0,
+      material5Name = ``, material5Quantity = 0,
   }) {
+
     let pack = {
       material1 : { 
         name : material1Name, 
-        ammount : material1Quantity, 
+        amount : material1Quantity, 
         id : 0, 
       },
       material2 : { 
         name : material2Name, 
-        ammount : material2Quantity, 
+        amount : material2Quantity, 
         id : 0,
       },
       material3 : { 
         name : material3Name, 
-        ammount : material3Quantity, 
+        amount : material3Quantity, 
         id : 0,
       },
       material4 : { 
         name : material4Name, 
-        ammount : material4Quantity, 
+        amount : material4Quantity, 
         id : 0,
       },
       material5 : { 
         name : material5Name, 
-        ammount : material5Quantity, 
+        amount : material5Quantity, 
         id : 0,
       },
     };
 
     for(const [key, values] of Object.entries(pack)) {
-      if(!values.name || !values.ammount) {
+      if(!values.name || !values.amount) {
         delete pack[key];
       } else values.id = this._GetStoreProductID(values.name);
     }
@@ -118,8 +119,8 @@ class ShopifyAPI {
       console.info(values.id);
       let info = await this.GetProductByID(values.id);
 
-      let calcultedPrice = Number(info?.variants[0]?.price * pack[key].ammount).toFixed(2);
-      let fallbackPrice = Number(info?.price * pack[key].ammount).toFixed(2);
+      let calcultedPrice = Number(info?.variants[0]?.price * pack[key].amount).toFixed(2);
+      let fallbackPrice = Number(info?.price * pack[key].amount).toFixed(2);
       let price = calcultedPrice ? calcultedPrice : fallbackPrice;
       let subtotal = +Number(price).toFixed(2);
 
@@ -129,7 +130,7 @@ class ShopifyAPI {
         title : info?.title,
         id : Number(info?.id),
         price : info?.variants[0]?.price,
-        quantity : pack[key].ammount,
+        quantity : pack[key].amount,
         subtotal : subtotal,
         // discount_allocations : [{
         //   amount: "0.00",
@@ -147,7 +148,7 @@ class ShopifyAPI {
     this.totalprice = total;
 
     // console.info(`Total Price = ${total}`);
-    // console.info(`PACKED ----> ${JSON.stringify(shopifyPack, null, 4)}`);
+    console.info(`PACKED ----> ${JSON.stringify(shopifyPack, null, 4)}`);
     return shopifyPack;
   }
 
@@ -171,9 +172,8 @@ class ShopifyAPI {
     material5Name : material5Name = `None`,
     material5Quantity : material5Quantity = 0,
   }) {
-    const repo = 'orders.json/';
-    const customer = await this.GetCustomerByEmail(email);
-    if(!customer) customer = await this.GetCustomerByEmail(this.api_email);
+    const url = `${this.root}orders.json/`;
+    const customer = await this.GetCustomerByEmail(email) ? await this.GetCustomerByEmail(email) : await this.GetCustomerByEmail(this.api_email);
     this.customerID = customer.id;
     const pack = await this._PackageMaterials({
       material1Name, material1Quantity,
@@ -184,17 +184,17 @@ class ShopifyAPI {
     });
 
     const order = {
-      "order": {
-        "line_items": pack,
-        "customer": { "id": customer.id },
-        "total_price": this.totalprice,
-        "financial_status": "paid",
-        "fulfillment_status": "fulfilled",
-        "inventory_behaviour" : "decrement_ignoring_policy",
-        "note": "(JPS) ID Number : " + id,
+      order: {
+        line_items : pack,
+        customer : { id : customer.id },
+        total_price : this.totalprice,
+        financial_status : `paid`,
+        fulfillment_status : `fulfilled`,
+        inventory_behaviour : `decrement_ignoring_policy`,
+        note : `(JPS) Billing:\n${id}`,
       }
     };
-    console.info(`ORDER SUMMARY ----> ${JSON.stringify(order, null, 4)}`);
+    // console.info(`ORDER SUMMARY ----> ${JSON.stringify(order, null, 3)}`);
 
     const params = {
       "method" : "POST",
@@ -206,12 +206,12 @@ class ShopifyAPI {
     };
 
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
       if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
       const content = JSON.parse(response.getContentText());
-      // console.info(`Posted Order! : ${JSON.stringify(content, null, 4)}`);
+      console.info(`Posted Order! : ${JSON.stringify(content, null, 3)}`);
       return content;
     } catch(err) {
       console.error(`"CreateOrder()" failed: ${err}`);
@@ -228,18 +228,18 @@ class ShopifyAPI {
    */
   async GetCustomerByEmail(email) {
 
-    const fields = `&fields=id,first_name,last_name,total_spent`;
     const scope = `customers/search.json?query=email:${email}`;
-    const repo = scope + fields;
+    const fields = `&fields=id,first_name,last_name,total_spent`;
+    const url = `${this.root}${scope}${fields}`;
 
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
+      const response = await UrlFetchApp.fetch(url, this.getParams);
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
-      const user = JSON.parse(response.getContentText())['customers'][0];
+      const user = JSON.parse(response.getContentText())[`customers`][0];
       if(!user) {
-        console.warn('User Shopify Account Does Not Exist.\nTrying as internal sale.....');
+        console.warn(`User Shopify Account Does Not Exist.\nTrying as internal sale.....`);
         return await this.GetCustomerByEmail(this.api_email);
       }
 
@@ -263,24 +263,23 @@ class ShopifyAPI {
    * Access individual properties by invoking GetShopifyProductByID(productID).productTitle or GetShopifyProductByID(productID).id or GetShopifyProductByID(productID).price
    */
   async GetProductByID(productID) {
-    let status = '&status=active';
-    let fields = '&fields=id,title,price,variants';
+    const status = `&status=active`;
+    const fields = `&fields=id,title,price,variants`;
 
-    const repo = 'products/' + productID + '.json?' + status + fields;
+    const url = `${this.root}products/${productID}.json?${status}${fields}`;
 
-    // Fetch Products
     try {
       if(!productID) throw new Error(`No product ID supplied....`);
 
-      let response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
+      let response = await UrlFetchApp.fetch(url, this.getParams);
       let responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
-      let parsed = JSON.parse(response.getContentText())['product'];
-
+      let parsed = JSON.parse(response.getContentText())[`product`];
       if(!parsed) throw new Error(`Couldn't find Product!`);
-      if(parsed.title == undefined) parsed.title = parsed.variants[0].title;
-      if(parsed.id == undefined) parsed.id = parsed.variants[0].id;
-      if(parsed.price == undefined) parsed.price = parsed.variants[0].price;
+
+      parsed.title = parsed.title ? parsed.title : parsed.variants[0].title;
+      parsed.id = parsed.id ? parsed.id : parsed.variants[0].id;
+      parsed.price = parsed.price ? parsed.price : parsed.variants[0].price;
 
       // console.info(`Title : ${parsed.title}, ID : ${parsed.id}, Price : ${price}`);
       return parsed; 
@@ -296,31 +295,25 @@ class ShopifyAPI {
   /**
    * ----------------------------------------------------------------------------------------------------------------
    * Look up the last order
+   * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
    * @return {string} order data
    */
   async GetLastOrder() {
-    const status = '&status=any';
-    const limit = '&limit=1'
-    const fields = '&fields=created_at,id,name,last_name,first_name,email,total-price';
-
-    // Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
-    const repo = 'orders.json?' + status + limit + fields;
+    const status = `&status=any`;
+    const limit = `&limit=1`
+    const fields = `&fields=created_at,id,name,last_name,first_name,email,total-price`;
+    const url = `${this.root}orders.json?${status}${limit}${fields}`;
 
     try {
-      // Fetch Products
-      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
+      const response = await UrlFetchApp.fetch(url, this.getParams);
       const responseCode = response.getResponseCode();
       console.info(response.getContentText());
       if (responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
       const parsed = JSON.parse(response.getContentText());
-      if(!parsed) throw new Error(`No orders...`);
-      const createdAt = parsed ? parsed['orders'][0]?.created_at : [];
-      const name = parsed ? parsed['orders'][0]?.name : [];
-      const email = parsed ? parsed['orders'][0]?.email : [];
-      const total_price = parsed ? parsed['orders'][0]?.total_price : [];
-      console.info(`ORDER PLACED ---->\n${JSON.stringify(parsed[`orders`][0], null, 3)}`);
-      return parsed['orders'][0];  
+      const orders = parsed[`orders`][0];
+      console.info(`ORDER PLACED ---->\n${JSON.stringify(orders, null, 3)}`);
+      return orders;  
     } catch(err) {
       console.error(`"GetLastOrder()" failed: ${err}`);
       return 1;
@@ -341,8 +334,9 @@ class ShopifyAPI {
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
-      const content = JSON.parse(response.getContentText())[`order`];
-      return content;  
+      const content = JSON.parse(response.getContentText());
+      const order = content ? content[`order`] : ``;
+      return order;  
     } catch(err) {
       console.error(`"GetSpecificOrder(${order})" failed: ${err}`);
       return 1;
@@ -357,18 +351,17 @@ class ShopifyAPI {
    * @return {string} order data
    */
   async GetOrdersList() {
-    const status = 'status=any';
-    const limit = '&limit=250'
-    const fields = '&fields=name,total_price';
-
-    const repo = 'orders.json?' + status + limit + fields;
+    const status = `status=any`;
+    const limit = `&limit=250`
+    const fields = `&fields=name,total_price`;
+    const url = `${this.root}orders.json?${status}${limit}${fields}`;
 
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
+      const response = await UrlFetchApp.fetch(url, this.getParams);
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
-      const parsed = JSON.parse(response.getContentText())['orders'];
+      const parsed = JSON.parse(response.getContentText())[`orders`];
 
       let orderNums = [];
       let spent = [];
@@ -378,8 +371,8 @@ class ShopifyAPI {
       });
 
       const storeSpent = spent.reduce((a, b) => a + b, 0);
-      this.total = storeSpent;
-      console.info(`${orderNums} : ${storeSpent}`);
+      this.total = storeSpent ? storeSpent : 0.0;
+      console.info(`Total Store Expenditure: $${storeSpent}`);
       return orderNums;  
     } catch(err) {
       console.error(`"GetOrdersList()" failed: ${err}`);
@@ -404,15 +397,14 @@ class ShopifyAPI {
     const fulfillment = `&fulfillment_status=fulfilled`;
     const fields = `&fields=id,email,name,total_price,fulfillment_status,financial_status`;
 
-    const repo = 'orders.json?' + status + limit + additionalFields + fulfillment + fields;
+    const url = `${this.root}orders.json?${status}${limit}${additionalFields}${fulfillment}${fields}`;
 
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, this.getParams);
+      const response = await UrlFetchApp.fetch(url, this.getParams);
       let responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
-      let parsed = JSON.parse(response.getContentText())['orders'];
-
+      let parsed = JSON.parse(response.getContentText())[`orders`];
       parsed.forEach(item => {
         if(item.fulfillment_status == `fulfilled`) {
           orders.push(item);
@@ -434,12 +426,12 @@ class ShopifyAPI {
    * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
    * @return {string} order data
    * @private
-   */
+   *
   async CloseUnfulfilledOrders() {
-    console.info(`Putting to this Repo -----> ${this.root + repo}`);
     let order = 4244891041958;
 
-    const repo = `orders/${order}.json?`;
+    const url = `${this.root}orders/${order}.json?`;
+    console.info(`Putting to this Repo -----> ${url}`);
 
     const payload = {  
       "order" : {
@@ -461,18 +453,18 @@ class ShopifyAPI {
     };
 
     try {
-      const response = await UrlFetchApp.fetch(this.root + repo, params);
+      const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
       const content = response.getContentText();
-      console.info(`Content -----> ${content}`);
       return content;
     } catch(err) {
       console.error(`"CloseUnfulfilledOrders()" failed: ${err}`);
       return 1;
     }
   }
+  */
 
 }
 
@@ -480,46 +472,60 @@ class ShopifyAPI {
 const _testAPI = async () => {
   const id = new IDService().id;
   const shopify = new ShopifyAPI();
-  /*
-  let productID = await shopify._GetStoreProductID(`Fortus Red ABS-M30`);
-  console.info(`PRODUCT_ID for Fortus Red ABS-M30: ${JSON.stringify(productID, null, 3)}`);
 
-  let lastOrder = await shopify.GetLastOrder();
-  console.info(`LAST_ORDER: ${JSON.stringify(lastOrder, null, 3)}`);
+  // let productID = await shopify._GetStoreProductID(`Fortus Red ABS-M30`);
+  // console.info(`PRODUCT_ID for Fortus Red ABS-M30: ${JSON.stringify(productID, null, 3)}`);
 
-  let orderList = await shopify.GetOrdersList();
-  console.info(`ORDERLIST: ${orderList}`);
+  // let lastOrder = await shopify.GetLastOrder();
+  // console.info(`LAST_ORDER: ${JSON.stringify(lastOrder, null, 3)}`);
 
-  let product = await shopify.GetProductByID(7751141320);
-  console.info(`PRODUCT: ${JSON.stringify(product, null, 3)}`);
+  // let orderList = await shopify.GetOrdersList();
+  // console.info(`ORDERLIST: ${orderList}`);
 
-  let customer = await shopify.GetCustomerByEmail(PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`));
-  console.info(`CUSTOMER: ${JSON.stringify(customer, null, 3)}`);
-  */
+  // let unfulfilled = await shopify.GetUnfulfilledOrders();
+  // console.info(`UNFULFILLED: ${unfulfilled}`);
 
-  let pack = await shopify._PackageMaterials('Fortus Red ABS-M30', 5,'Objet Polyjet VeroMagenta RGD851',10,null,123234,'Stratasys Dimension Soluble Support Material P400SR',15,null,20);
-  console.info(`PACK: ${pack}`);
+  // let product = await shopify.GetProductByID(7751141320);
+  // console.info(`PRODUCT: ${JSON.stringify(product, null, 3)}`);
+
+  // let customer = await shopify.GetCustomerByEmail(PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`));
+  // console.info(`CUSTOMER: ${JSON.stringify(customer, null, 3)}`);
+  
+
+  // let pack = await shopify._PackageMaterials({
+  //     material1Name : `Fortus Red ABS-M30`, 
+  //     material1Quantity : 5,
+  //     material2Name : `Objet Polyjet VeroMagenta RGD851`, 
+  //     material2Quantity : 10,
+  //     material3Name : null, 
+  //     material3Quantity : 12345,
+  //     material4Name : `Stratasys Dimension Soluble Support Material P400SR`, 
+  //     material4Quantity : 15,
+  //     material5Name : null, 
+  //     material5Quantity : 20,
+  // });
+  // console.info(`PACK: ${JSON.stringify(pack, null, 3)}`);
 
   // let lineItems = await shopify.MakeLineItems(pack);
   // let order = await shopify.CreateShopifyOrder(customer, 1293847123, pack, lineItems);
   // let lookup = shopify.LookupShopifyProductFromSheet2();
   // let customer = shopify.SetCustomer(PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`));
 
-  // const order = await shopify.CreateOrder({
-  //   id : id,
-  //   email : `pico@pico.com`,
-  //   material1Name : 'Fortus Red ABS-M30',
-  //   material1Quantity : 5,
-  //   material2Name : 'Objet Polyjet VeroMagenta RGD851',
-  //   material2Quantity : 10,
-  //   material3Name : null,
-  //   material3Quantity : 123234,
-  //   material4Name : 'Stainless Steel - 0.125" - priced per square inch',
-  //   material4Quantity : 15,
-  //   material5Name : null,
-  //   material5Quantity : 20,
-  // });
-  // console.info(JSON.stringify(order, null, 4));
+  const order = await shopify.CreateOrder({
+    id : id,
+    email : `pico@pico.com`,
+    material1Name : `Fortus Red ABS-M30`,
+    material1Quantity : 5,
+    material2Name : `Objet Polyjet VeroMagenta RGD851`,
+    material2Quantity : 10,
+    material3Name : null,
+    material3Quantity : 123234,
+    material4Name : `Stainless Steel - 0.125" - priced per square inch`,
+    material4Quantity : 15,
+    material5Name : null,
+    material5Quantity : 20,
+  });
+  console.info(JSON.stringify(order, null, 4));
 
 }
 
@@ -551,9 +557,9 @@ const CreateService = () => {
     .setPropertyStore(PropertiesService.getUserProperties())
     .setCache(CacheService.getUserCache())
     .setLock(LockService.getUserLock())
-    // .setScope('user-library-read playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private');
+    // .setScope(`user-library-read playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private`);
   // if (!service.hasAccess()) {
-  //   throw new Error('Error: Missing Shopify authorization.');
+  //   throw new Error(`Error: Missing Shopify authorization.`);
   // }
   console.info(`Service Access: ${service.hasAccess()}`);
   console.info(service)
