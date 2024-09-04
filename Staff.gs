@@ -11,7 +11,7 @@ class DesignSpecialist {
     email : email,
     areas : areas,
   }) {
-    this.id = Utilities.getUuid();
+    this.id = new IDService().id;
     this.name = name ? name : `DS`;
     this.fullname = fullname ? fullname : `Design Specialist`;
     this.email = email ? email : SERVICE_EMAIL;
@@ -81,7 +81,7 @@ class StudentSupervisor extends DesignSpecialist {
   }) {
     // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
     super(name, fullname, email, areas);
-    this.id = Utilities.getUuid();
+    this.id = new IDService().id;
     this.name = name ? name : `SS`;
     this.fullname = fullname ? fullname : `Student Supervisor`;
     this.email = email ? email : SERVICE_EMAIL;
@@ -122,7 +122,7 @@ class Manager extends DesignSpecialist {
   }) 
   {
     super(name, fullname, email, areas);
-    this.id = Utilities.getUuid();
+    this.id = new IDService().id;
     this.name = name ? name : `MA`;
     this.fullname = fullname ? fullname : `Manager`;
     this.email = email ? email : SERVICE_EMAIL;

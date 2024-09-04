@@ -74,7 +74,7 @@ class SummaryBuilder {
    * @return {string} text 
    */
   async _DocToHtml(docId) {
-    let url = 'https://docs.google.com/feeds/download/documents/export/Export?id=' + docId + '&exportFormat=html';
+    let url = `https://docs.google.com/feeds/download/documents/export/Export?id=${docId}&exportFormat=html`;
     let param = {
       method: 'GET',
       headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
@@ -91,9 +91,11 @@ class SummaryBuilder {
    */
   _SummaryText() {
     let text = `<p>Hello!</p> `;
-      text += `<p>Here is a summary of all the recent submissions.<br/><br/>`;
+      text += `<p>`;
+      text += `Here is a summary of all the recent submissions.<br/><br/>`;
       text += `<a href="https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ"><b> ** GO TO SHEET NOW ** </b></a><br/><br/>`;
-      text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:jacobs-project-support@berkeley.edu">jacobs-project-support@berkeley.edu</a>. </p>`;
+      text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:${SERVICE_EMAIL}">${SERVICE_EMAIL}</a>.`;
+      text += `</p>`;
       text += `<p>Best,<br/>${SERVICE_NAME}</p>`;
       text += `<br/>`;
       text += `SUMMARY:`;
