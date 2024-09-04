@@ -433,7 +433,7 @@ const BarMenu = () => {
       .addToUi();
 };
 
-const RunStandardDeviation = () => Calculate.GetStandardDeviation();
+const RunStandardDeviation = () => Calculate.GetUserSubmissionStandardDeviation();
 const RunTopTen = () => Calculate.CreateTopTen();
 
 

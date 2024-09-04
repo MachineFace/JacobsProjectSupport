@@ -437,7 +437,7 @@ const _gasTCalculationTesting = async () => {
   });
 
   await test(`Calc Distribution`, (t) => {
-    const x = Calculate.GetDistribution();
+    const x = Calculate.GetUserDistribution();
     t.notEqual(x, undefined, `Distribution should not return undefined.`);
   });
 
@@ -447,12 +447,12 @@ const _gasTCalculationTesting = async () => {
   });
   
   await test(`Calc Standard Deviation`, (t) => {
-    const x = Calculate.GetStandardDeviation();
+    const x = Calculate.GetUserSubmissionStandardDeviation();
     t.notEqual(x, undefined || null, `Standard Deviation should not return undefined or null.`);
   });
 
   await test(`Calculate Arithmetic Mean`, (t) => {
-    const x = Calculate.GetArithmeticMean();
+    const x = Calculate.GetUserSubmissionArithmeticMean();
     t.notEqual(x, undefined || null, `Arithmetic Mean should not return undefined or null.`);
   });
   
