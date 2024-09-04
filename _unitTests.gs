@@ -414,12 +414,6 @@ const _gasTCalculationTesting = async () => {
     t.ok(x, `Time string is ok.`);
   });
   
-  await test(`Calc Duration`, (t) => {
-    const x = Calculate.GetDuration( new Date(1992,03,27), new Date(2022,01,01) );
-    t.equal(x.toString(), `10872 1:00:00`, `Good calc`);
-    t.notEqual(x, new Date(), `Not Equal to a new date.`);
-  });
-  
   await test(`Count Active Users`, (t) => {
     const x = Calculate.CountActiveUsers();
     t.notEqual(x, undefined, `Count of active users should not return undefined.`);
@@ -478,6 +472,68 @@ const _gasTCalculationTesting = async () => {
     t.notEqual(x, undefined || null, `Count Funding should not return undefined or null.`);
   });
 
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
+
+
+/**
+ * Test TimeService with GasT
+ * @private
+ */
+const _gasTTimeTesting = async () => {
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch(gasT_URL).getContentText());
+  }
+  const test = new GasTap();
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+
+  await test(`Format Timer GOOD`, (t) => {
+    const x = TimeService.FormatTimerToString(15, 6, 35, 12);
+    t.equal(x, `15 days, 06:35:12`, `Format Timer GOOD: ${x}`);
+  });
+
+  await test(`Format Timer BAD`, (t) => {
+    const x = TimeService.FormatTimerToString(`ten`, `six`, `35`, `12`);
+    t.equal(x, `ten days, six:35:12`, `Format Timer BAD: ${x}`);
+  });
+
+  await test(`Timer String to Millis`, (t) => {
+    const x = TimeService.TimerStringToMilliseconds(`0 days, 0:34:18`);
+    t.equal(x, 2058000, `Timer String to Millis GOOD: ${x}`);
+  });
+
+  await test(`Date to Millis`, (t) => {
+    const x = TimeService.DateToMilliseconds(new Date(1986, 1, 2));
+    t.equal(x, 507715200000, `Date to Millis GOOD: ${x}`);
+  });
+
+  await test(`Millis to Timer String`, (t) => {
+    const x = TimeService.MillisecondsToTimerString(507715200000);
+    t.equal(x, `5876 days, 08:000:000`, `Millis to Timer String GOOD: ${x}`);
+  });
+
+  await test(`Duration`, (t) => {
+    const x = TimeService.Duration(new Date(1986, 01, 02), new Date(2086, 01, 02));
+    t.equal(x, `36525 days, 00:000:000`, `Duration GOOD: ${x}`);
+  });
+
+  await test(`Return Date`, (t) => {
+    const x = TimeService.ReturnDate(new Date(1986, 01, 02));
+    t.equal(x, `Sun Feb 16 1986 00:06:40 GMT-0800 (Pacific Standard Time)`, `Return Date GOOD: ${x}`);
+  });
+
+  await test(`Remaining Time`, (t) => {
+    const x = TimeService.RemainingTime(new Date(2086, 01, 02));
+    t.notThrow(() => x, `Remaining Time SHOULD NOT throw error: ${x}`);
+  });
+
+  await test(`Days to Millis`, (t) => {
+    const x = TimeService.DaysToMillis(100);
+    t.equal(x, 8640000000, `Days to Millis GOOD: ${x}`);
+  });
+  
+  
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
@@ -616,6 +672,7 @@ const _gasTTestAll = async () => {
     await _gasTLoggerTesting(),
     await _gasTMiscTesting(),
     await _gasTCalculationTesting(),
+    await _gasTTimeTesting(),
     await _gasTShopifyTesting(),
     await _gasTTicketTesting(),
     await _gasTEmailTesting(),

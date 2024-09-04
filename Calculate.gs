@@ -12,47 +12,20 @@ class Calculate {
    * @param {sheet} sheet
    * @returns {string} formatted average time
    */
-  static GetAverageTurnaround(sheet) {
+  static GetAverageTurnaround(sheet = SHEETS.Laser) {
     try {
-      if(typeof(sheet) != typeof(SHEETS.Advancedlab)) throw new Error(`Bad sheet supplied...`)
       let totals = [];
       GetColumnDataByHeader(sheet, HEADERNAMES.elapsedTime)
         .filter(Boolean)
         .forEach(time => {
-          if(time === typeof(String)) console.error(`Not a number: ${time}`) 
-          else {
-            let days = +Number(time[0]) * 24 * 60; // days to hours to minutes
-            let hours = +Number(time[1]) * 60; // hours to minutes
-            let minutes = +Number(time[2]); // minutes     
-            let seconds = +Number(time[3]); // seconds, forget about seconds
-            let total = days + hours + minutes;
-            totals.push(total);
-          }
+          totals.push(TimeService.TimeToMillis(time));
         });
 
-      // Sum all the totals
-      let sum = 0;
-      totals.forEach( (item, index) => sum += item);
-
-      // Average the totals (a list of times in minutes)
-      let average = sum / totals.length;
-
-      let mins = parseInt((average % 60), 10); // Calc mins
-      average = Math.floor(average / 60); // Difference mins to hrs
-      let minutesAsString = mins < 10 ? `0${mins}` : mins + ""; // Pad with a zero
-
-      let hrs = average % 24; // Calc hrs
-      average = Math.floor(average / 24); // Difference hrs to days
-      let dys = average;
-
-      //Format into readable time and return (if data is still missing, set it to zero)
-      if (isNaN(dys)) dys = 0;
-      if (isNaN(hrs)) hrs = 0;
-      if (isNaN(minutesAsString)) minutesAsString = 0;
-
-      let formatted = `${dys}d ${hrs}h ${minutesAsString}m`;
-      console.info(formatted);
-      return formatted;
+      let sum = totals.reduce((a, b) => a + b);  // Sum all the totals
+      let average = sum / totals.length;  // Average the totals (a list of times in millis)
+      let averageString = TimeService.MillisecondsToTimerString(average);
+      console.info(`VALS: ${totals}, SUM: ${sum}, AVERAGE: ${average} = ${averageString}`);
+      return averageString;
     }
     catch (err) {
       console.error(`"GetAverageTurnaround()" failed : ${err}`);
@@ -76,41 +49,6 @@ class Calculate {
       return 0;
     } catch (err) {
       console.error(`"PrintTurnaroundTimes()" failed : ${err}`);
-      return 1;
-    }
-  }
-
-  /**
-   * Calculate Duration from start to finish
-   * @param {Date} start
-   * @param {Date} end
-   * @returns {string} formatted duration
-   */ 
-  static GetDuration(start, end) {
-    try {
-      end = end instanceof Date ? new Date(end) : new Date();  // if supplied with nothing, set end time to now
-      start = start instanceof Date ? new Date(start) : new Date(end - 87000000);  // if supplied with nothing, set start time to now minus 24 hours.
-
-      let timeDiff = +Number(Math.abs((end - start) / 1000)); // Abs Value Milliseconds to sec
-      let secs = Math.floor(timeDiff % 60); // Calc seconds
-      timeDiff = Math.floor(timeDiff / 60); // Difference seconds to minutes
-      let secondsAsString = secs < 10 ? `0${secs}` : secs + ""; // Pad with a zero
-
-      let mins = timeDiff % 60; //Calc mins 
-      timeDiff = Math.floor(timeDiff / 60); //Difference mins to hrs
-      let minutesAsString = mins < 10 ? `0${mins}` : mins + ""; //Pad with a zero
-
-      let hrs = timeDiff % 24; //Calc hrs
-      timeDiff = Math.floor(timeDiff / 24); //Difference hrs to days
-      let days = timeDiff.toString();
-
-      let formatted = `days : ${days.toString()}, hrs : ${hrs.toString()}, mins : ${minutesAsString}, secs : ${secondsAsString}`;
-      let out = `${days} ${hrs}:${minutesAsString}:${secondsAsString}`;
-      console.info(`Duration = ${out}`);
-      return out;  // Return Completed time
-    }
-    catch (err) {
-      console.error(`"GetDuration()" failed : ${err}`);
       return 1;
     }
   }
@@ -560,11 +498,10 @@ const Metrics = () => {
 
 const _testDist = () => {
   // c.GetAverageTurnaround(SHEETS.Advancedlab);
-  // c.GetDuration();
   // c.CountActiveUsers();
   // Calculate.GetDistribution();
   // Calculate.CountFunding();
-  Calculate.PrintTurnaroundTimes();
+  Calculate.GetAverageTurnaround(SHEETS.Advancedlab);
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);

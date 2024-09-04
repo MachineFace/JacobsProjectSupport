@@ -283,7 +283,7 @@ const onChange = async (e) => {
     if (!elapsedTime) {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
-        let time = await Calculate.GetDuration(new Date(timestamp), endTime);
+        let time = TimeService.Duration(new Date(timestamp), endTime);
         SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
         SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
       }
