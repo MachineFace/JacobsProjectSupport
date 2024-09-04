@@ -196,7 +196,58 @@ class TimeService {
     return days * 24 * 60 * 60 * 1000;
   }
 
+  /**
+   * Parse a string to date
+   * @param {string} date string
+   * @returns {Date} actual date
+   * DEFUNCT
+   */
+  ParseStringToDate(dateString) {
+    let array = dateString.toString().split(" ");
+    let months = [
+      `Jan.`, `Jan`, `January`, `1`, 
+      `Feb.`, `Feb`, `February`, `2`,
+      `Mar.`, `Mar`, `March`, `3`,
+      `Apr.`, `Apr`, `April`, `4`,
+      `May`, `5`,	`June`, `6`, `July`, `7`,	
+      `Aug.`, `Aug`, `August`, `8`,
+      `Sept.`, `Sept`, `September`, `9`,
+      `Oct.`, `Oct`, `October`, `10`,
+      `Nov.`, `Nov`, `November`, `11`,
+      `Dec.`, `Dec`, `December`, `12`,
+    ];
+    let month = array[4].toLowerCase();
+    months.find(m => {
+      if(m.toLowerCase() == month) {
+        month = new Date(Date.parse(`${array[4]} 1, ${new Date().getFullYear()}`)).getMonth();
+      }
+    });
+    let day =  !isNaN(Number(array[5])) ? Number(array[5]) : 1;
+    let year = !isNaN(Number(array[6])) ? Number(array[6]) : new Date().getFullYear();
+    console.info(`${new Date(year, month, day)}`);
+    return new Date(year, month, day);
+  }
+
 }
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Test if value is a date and return true or false
+ * @param {date} d
+ * @returns {boolean} b
+ */
+const isValidDate = (d) => {
+  if (Object.prototype.toString.call(d) !== "[object Date]") return false;
+  return !isNaN(d.getTime());
+};
+
+/**
+ * Convert Datetime to Date
+ * @param {date} d
+ * @return {date} date
+ */
+const datetimeToDate = (d) => new Date(d.getYear(), d.getMonth(), d.getDate());
 
 
 

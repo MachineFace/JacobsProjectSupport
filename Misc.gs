@@ -42,24 +42,6 @@ const SearchSpecificSheet = (sheet, value) => {
   }
 }
 
-/**
- * Search all Sheets for an id
- * @required {string} id
- * @returns {[sheet, row]} list of sheets with a row
- * @DEFUNCT (ABSORBED BY IDService)
- *
-const FindByID = (id) => {
-  let res = {};
-  Object.values(SHEETS).forEach(sheet => {
-    const finder = sheet.createTextFinder(id).findNext();
-    if (finder != null) {
-      res[sheet.getName()] = finder.getRow();
-    }
-  })
-  console.info(JSON.stringify(res));
-  return res;
-}
-*/
 
 
 /**
@@ -297,55 +279,8 @@ Array.prototype.findIndex = (search) => {
   return -1;
 };
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Test if value is a date and return true or false
- * @param {date} d
- * @returns {boolean} b
- */
-const isValidDate = (d) => {
-  if (Object.prototype.toString.call(d) !== "[object Date]") return false;
-  return !isNaN(d.getTime());
-};
-
-/**
- * Convert Datetime to Date
- * @param {date} d
- * @return {date} date
- */
-const datetimeToDate = (d) => new Date(d.getYear(), d.getMonth(), d.getDate());
 
 
-/**
- * Parse a string to date
- * @param {string} date string
- * @returns {Date} actual date
- */
-const ParseStringToDate = (dateString) => {
-  let array = dateString.toString().split(" ");
-  let months = [
-    `Jan.`, `Jan`, `January`, `1`, 
-    `Feb.`, `Feb`, `February`, `2`,
-    `Mar.`, `Mar`, `March`, `3`,
-    `Apr.`, `Apr`, `April`, `4`,
-    `May`, `5`,	`June`, `6`, `July`, `7`,	
-    `Aug.`, `Aug`, `August`, `8`,
-    `Sept.`, `Sept`, `September`, `9`,
-    `Oct.`, `Oct`, `October`, `10`,
-    `Nov.`, `Nov`, `November`, `11`,
-    `Dec.`, `Dec`, `December`, `12`,
-  ];
-  let month = array[4].toLowerCase();
-  months.find(m => {
-    if(m.toLowerCase() == month) {
-      month = new Date(Date.parse(`${array[4]} 1, ${new Date().getFullYear()}`)).getMonth();
-    }
-  });
-  let day =  !isNaN(Number(array[5])) ? Number(array[5]) : 1;
-  let year = !isNaN(Number(array[6])) ? Number(array[6]) : new Date().getFullYear();
-  console.info(`${new Date(year, month, day)}`);
-  return new Date(year, month, day);
-}
 
 
 /**

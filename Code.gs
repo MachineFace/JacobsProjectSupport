@@ -297,8 +297,7 @@ const onChange = async (e) => {
   // Generating a "Ticket"
   if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
     if (ticket !== null || ticket !== undefined) {
-      console.info("Already seems to have a ticket.");
-      console.info(`Current Ticket: ${ticket}`);
+      console.info(`Already seems to have a ticket, Current Ticket: ${ticket}`);
     } else {
       try {
         ticket = new Ticket({
