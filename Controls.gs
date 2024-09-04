@@ -292,7 +292,7 @@ const DeleteOldFiles = () => {
     var files = folder.getFiles();
     while (files.hasNext()) {
       var file = files.next();
-      if (new Date() - file.getLastUpdated() > RetentionPeriod) {
+      if (new Date() - file.getLastUpdated() > RETENTION_PERIOD) {
         //file.setTrashed(true); //uncomment this line to put them in the trash
         //Drive.Files.remove(file.getId()); //uncomment this line to delete them immediately; CAREFUL!
       }

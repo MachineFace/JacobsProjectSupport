@@ -92,7 +92,7 @@ const PopupCountUsers = () => {
   const ui = SpreadsheetApp.getUi();
   const count = Calculate.CountActiveUsers();
   ui.alert(
-    `${SERVICE_NAME}`,
+    SERVICE_NAME,
     `Students Currently Using JPS : ${count}`,
     ui.ButtonSet.OK
   );

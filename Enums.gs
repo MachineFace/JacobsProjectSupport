@@ -7,7 +7,7 @@ const SERVICE_EMAIL = `jacobs-project-support@berkeley.edu`;
 const SERVICE_NAME = `Jacobs Project Support`;
 
 const DaysRetentionNumber = 15; //How many days to hold a file
-const RetentionPeriod = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
+const RETENTION_PERIOD = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
 const PICKUP_HOURS = `Monday - Friday: 11am - 1pm.`  //`Monday - Friday: 11am - 1pm & 4pm - 6pm.`
 
 const COLORS = Object.freeze({

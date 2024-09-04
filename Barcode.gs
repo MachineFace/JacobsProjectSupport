@@ -8,6 +8,8 @@ class BarcodeGenerator {
     id : id,
   }) {
     this.id = id ? id : new IDService().id;
+    /** @private */
+    this.root = `http://bwipjs-api.metafloor.com/`;
   }
 
   /**
@@ -15,7 +17,6 @@ class BarcodeGenerator {
    */
   async GenerateBarCodeForTicketHeader() {
     try {
-      const root = 'http://bwipjs-api.metafloor.com/';
       const type = '?bcid=code128';
       const ts = '&text=';
       const scaleX = `&scaleX=6`
@@ -24,7 +25,7 @@ class BarcodeGenerator {
       if(!IDService.isValid(this.id)) throw new Error(`Invalid UUID id...`);
       const text = IDService.toDecimal(this.id);
 
-      const barcodeLoc = root + type + ts + text + scaleX + scaleY + `&includetext` + `&parsefnc&alttext=` + this.id;
+      const url = `${this.root}${type}${ts}${text}${scaleX}${scaleY}&includetext&parsefnc&alttext=${this.id}`;
 
       const params = {
         method : "GET",
@@ -33,8 +34,8 @@ class BarcodeGenerator {
         followRedirects : true,
         muteHttpExceptions : true,
       };
-      console.info(barcodeLoc, params);
-      const response = await UrlFetchApp.fetch(barcodeLoc, params);
+      console.info(url, params);
+      const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
       if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
 
