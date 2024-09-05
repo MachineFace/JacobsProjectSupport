@@ -449,6 +449,31 @@ const TitleCase = (str) => {
 }
 
 
-
+/**
+ * Build Summary Equation:
+ * @TRIGGERED
+ * FORMAT: `QUERY(${sheetName}!A2:U, "Select * Where A = 'Received' OR A = 'In-Progress' or A = '(INTERNAL) Status' or A = 'Pending Approval' or A = 'Waitlist' or A = 'Missing Access' LABEL A '${sheetName}' ")`
+ */
+const BuildSummaryEquation = () => {
+  try {
+    let query = `={`
+    Object.values(SHEETS).forEach((sheet, idx) => {
+      // console.info(`ENTRY: IDX: ${idx}, Value: ${sheet.getSheetName()}`);
+      const sheetName = sheet.getSheetName();
+      const queryString = `QUERY('${sheetName}'!A2:U, "Select * Where A = '${STATUS.received}' or A = '${STATUS.inProgress}' or A = '(INTERNAL) Status' or A = '${STATUS.waitlist}' or A = '${STATUS.missingAccess}' LABEL A '${sheetName}' ")`;
+      query += queryString;
+      if(idx != Object.values(SHEETS).length -1) {
+        query += `;\n`; // The very last semicolon throws an error when present.
+      }
+    });
+    query += `}`;
+    console.info(query);
+    OTHERSHEETS.Summary.getRange(3, 1, 1, 1).setValue(query);
+    return 0;
+  } catch(err) {
+    console.error(`"BuildSummaryEquation()" failed: ${err}`);
+    return 1;
+  }
+}
 
 
