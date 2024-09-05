@@ -202,7 +202,7 @@ class TimeService {
    * @returns {Date} actual date
    * DEFUNCT
    */
-  ParseStringToDate(dateString) {
+  static ParseStringToDate(dateString) {
     let array = dateString.toString().split(" ");
     let months = [
       `Jan.`, `Jan`, `January`, `1`, 
@@ -227,6 +227,66 @@ class TimeService {
     console.info(`${new Date(year, month, day)}`);
     return new Date(year, month, day);
   }
+
+  /**
+   * Get the Calendar Week Number for a Date
+   * @param {string} date
+   * @return {number} week number
+   */
+  static GetWeekNumber(dateString = `Aug. 21`) {
+    try {
+      let date = new Date(dateString + ', ' + new Date().getFullYear());
+      let weekNumber = TimeService.GetWeekNumberFromDate(date);
+      return weekNumber;
+    } catch (err) {
+      console.error(`"GetWeekNumber()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Get the Calendar Week Number for a Date
+   * @param {string} date
+   * @return {number} week number
+   */
+  static GetWeekNumberFromDate(date = new Date()) {
+    try {
+      date = date instanceof Date ? date : new Date();
+      let firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+      let dayOfYear = ((date - firstDayOfYear + 86400000) / 86400000); // Days from Jan 1
+
+      // Calculate the week number
+      let weekNumber = Math.ceil((dayOfYear + firstDayOfYear.getDay()) / 7);
+      return weekNumber;
+    } catch (err) {
+      console.error(`"GetWeekNumber()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Get the Monday for the Week Number
+   * @param {number} 0 - 52
+   * @param {year} 2024 Full year
+   * @return {date} Monday of that week
+   */
+  static GetMondayOfWeek(weekNumber = 52, year = new Date().getFullYear()) {
+    try {
+      weekNumber = (weekNumber - 1) % 52 + 1;
+      let date = new Date(year, 0, 1);
+      let dayOffset = (date.getDay() <= 1) ? (1 - date.getDay()) : (8 - date.getDay());
+      date.setDate(date.getDate() + dayOffset);
+      
+      // Calculate the Monday of the requested week number
+      let mondayOfWeek = new Date(date);
+      mondayOfWeek.setDate(mondayOfWeek.getDate() + (weekNumber - 1) * 7);
+      
+      return mondayOfWeek;
+    } catch (err) {
+      console.error(`"GetMondayOfWeek()" failed : ${err}`);
+      return 1;
+    }
+}
 
 }
 
@@ -254,8 +314,92 @@ const datetimeToDate = (d) => new Date(d.getYear(), d.getMonth(), d.getDate());
 
 
 const _testT = () => {
-  const s = TimeService.TimeToMillis(`17 20:57:45`);
-  console.info(s);
+  // const s = TimeService.TimeToMillis(`17 20:57:45`);
+  // console.info(s);
+
+  const dates = {
+    springSemesterStart : `Jan. 14`, 
+    springHoliday : `Jan. 20`, 
+    springInstruction : `Jan. 21`, 
+    springHoliday2 : `Feb. 17`, 
+    springBreak : `Mar. 24`, 
+    springHoliday3 : `Mar. 28`, 
+    springRRRWeek : `May 5`, 
+    springClassesEnd : `May 9`, 
+    springFinals : `May 12`, 
+    springSemesterEnd : `May 16`, 
+    springCommencement : `May 17`,
+    summerHoliday1 : `May 26`,
+    summerSessionAStart : `May 27`, 
+    summerSessionBStart : `June 9`,  
+    summerHoliday2 : `June 19`,  
+    summerSessionCStart : `June 23`,  
+    summerSessionAEnd : `July 3`,  
+    summerHoliday3 : `July 4`,  
+    summerSessionDStart : `July 7`,  
+    summerSessionFStart : `July 7`,  
+    summerSessionFEnd : `July 25`,  
+    summerSessionEStart : `July 28`,  
+    summerSessionAllEnd :  `Aug. 15`, 
+    fallRegistration : `Aug. 21`,
+    fallSemesterStart : `Aug. 28`,
+    fallHoliday1 : `Sept. 2`,
+    fallHandsOnTrainingStart : `Sept. 2`,
+    fallHandsOnTrainingEnd : `Oct. 24`,
+    fallHoliday2 : `Nov. 9`,
+    fallThanksgiving : `Nov. 27`,
+    fallLastJPSDay : `Dec. 13`,
+    fallSemesterEnd : `Dec. 15`,
+    fallRRRWeek : `Dec. 16`,
+    fallLastJPSPickupDay : `Dec. 20`,
+    fallClosed : `Dec. 20`,
+  }
+
+
+  const weeks = {
+    springSemesterStart : 3, 
+    springHoliday : 3, 
+    springInstruction : 4,
+    springHoliday2 : 7, 
+    springBreak : 13, 
+    springHoliday3 : 13, 
+    springRRRWeek : 19, 
+    springClassesEnd : 19, 
+    springFinals : 20, 
+    springSemesterEnd : 20, 
+    springCommencement : 20,
+    summerHoliday1 : 22,
+    summerSessionAStart : 22, 
+    summerSessionBStart : 24,  
+    summerHoliday2 : 25,  
+    summerSessionCStart : 26,  
+    summerSessionAEnd : 27,  
+    summerHoliday3 : 27,  
+    summerSessionDStart : 28,  
+    summerSessionFStart : 28,  
+    summerSessionFEnd : 30,  
+    summerSessionEStart : 31,  
+    summerSessionAllEnd :  33, 
+    fallRegistration : 34,
+    fallSemesterStart : 35,
+    fallHandsOnTrainingStart : 36,
+    fallHandsOnTrainingEnd : 43,
+    fallHoliday : 45,
+    fallThanksgiving : 48,
+    fallLastJPSDay : 50,
+    fallSemesterEnd : 51,
+    fallRRRWeek : 51,
+    fallLastJPSPickupDay : 51,
+    fallClosed : 51,
+  }
+
+  Object.values(dates).forEach(date => {
+    const weekNumber = TimeService.GetWeekNumber(date);
+    console.info(`Date: ${date}, WeekNumber: ${weekNumber}`);
+    const monday = TimeService.GetMondayOfWeek(weekNumber);
+    console.info(`MONDAY: ${monday}`)
+  });
+
 }
 
 
