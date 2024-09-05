@@ -60,6 +60,18 @@ const CreateTimeDrivenTrigger = () => {
       .timeBased()
       .everyDays(1)
       .create();
+    ScriptApp.newTrigger(`BuildSummaryEquation`)
+      .timeBased()
+      .everyWeeks(1)
+      .onWeekDay(ScriptApp.WeekDay.MONDAY)
+      .atHour(2)
+      .create();
+    ScriptApp.newTrigger(`AuxillaryEquations`)
+      .timeBased()
+      .everyWeeks(1)
+      .onWeekDay(ScriptApp.WeekDay.MONDAY)
+      .atHour(2)
+      .create();
   } catch (err) {
     console.error(`"CreateTimeDrivenTrigger()" failed : ${err}`);
   }
@@ -87,6 +99,30 @@ const RemoveTimedTriggers = () => {
     ScriptApp.newTrigger(`Metrics`)
       .timeBased()
       .everyMinutes(30)
+      .create();
+    ScriptApp.newTrigger(`SetConditionalFormatting`)
+      .timeBased()
+      .everyHours(1)
+      .create();
+    ScriptApp.newTrigger(`SetStatusDropdowns`)
+      .timeBased()
+      .everyHours(1)
+      .create();
+    ScriptApp.newTrigger(`SetSummaryPageRowHeight`)
+      .timeBased()
+      .everyDays(1)
+      .create();
+    ScriptApp.newTrigger(`BuildSummaryEquation`)
+      .timeBased()
+      .everyWeeks(1)
+      .onWeekDay(ScriptApp.WeekDay.MONDAY)
+      .atHour(2)
+      .create();
+    ScriptApp.newTrigger(`AuxillaryEquations`)
+      .timeBased()
+      .everyWeeks(1)
+      .onWeekDay(ScriptApp.WeekDay.MONDAY)
+      .atHour(2)
       .create();
     console.info(`Removed Triggers for Summary Emails`);
     return 0;
@@ -312,6 +348,57 @@ const FormatCell = (cell) => {
     return 0;
   } catch (err) {
     console.error(`"FormatCell()" failed : ${err}`);
+    return 1;
+  }
+}
+
+
+
+
+/**
+ * Build Summary Equation:
+ * @TRIGGERED
+ * FORMAT: `QUERY(${sheetName}!A2:U, "Select * Where A = 'Received' OR A = 'In-Progress' or A = '(INTERNAL) Status' or A = 'Pending Approval' or A = 'Waitlist' or A = 'Missing Access' LABEL A '${sheetName}' ")`
+ */
+const BuildSummaryEquation = () => {
+  try {
+    let query = `={`
+    Object.values(SHEETS).forEach((sheet, idx) => {
+      // console.info(`ENTRY: IDX: ${idx}, Value: ${sheet.getSheetName()}`);
+      const sheetName = sheet.getSheetName();
+      const queryString = `QUERY('${sheetName}'!A2:U, "Select * Where 
+        A = '${STATUS.received}' or 
+        A = '${STATUS.inProgress}' or 
+        A = '(INTERNAL) Status' or 
+        A = '${STATUS.waitlist}' or 
+        A = '${STATUS.missingAccess}' LABEL A '${sheetName}' ")`;
+      query += queryString;
+      if(idx != Object.values(SHEETS).length -1) {
+        query += `;\n`; // The very last semicolon throws an error when present.
+      }
+    });
+    query += `}`;
+    console.info(query);
+    OTHERSHEETS.Summary.getRange(3, 1, 1, 1).setValue(query);
+    return 0;
+  } catch(err) {
+    console.error(`"BuildSummaryEquation()" failed: ${err}`);
+    return 1;
+  }
+}
+
+/**
+ * Auxillary Equations
+ * @TRIGGERED
+ */
+const AuxillaryEquations = () => {
+  try {
+    const eq1 = `=SUM(COUNTIF(A2:A, "${STATUS.received}"), COUNTIF(A2:A, "${STATUS.inProgress}"), COUNTIF(A2:A, "${STATUS.waitlist}"), COUNTIF(A2:A, "(INTERNAL) Status"), 0)`;
+    const eq2 = `=IF(B2=0,"  <-- Party on Dude! Let's go to the beach!", "")`;
+    OTHERSHEETS.Summary.getRange(2, 2, 1, 2).setValues([[ eq1, eq2 ]]);
+    return 0;
+  } catch(err) {
+    console.error(`"AuxillaryEquations()" failed: ${err}`);
     return 1;
   }
 }
