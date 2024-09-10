@@ -172,7 +172,7 @@ const PopupCreateNewID = () => {
   let thisRow = thisSheet.getActiveRange().getRow();
   const newID = new IDService().id;
 
-  if(CheckSheetIsForbidden(thisSheet) == true) {
+  if(!IsValidSheet(thisSheet)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Incorrect Sheet!`,
       `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
@@ -216,7 +216,7 @@ const BillFromSelected = async () => {
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
     price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
 
-  if(CheckSheetIsForbidden(thisSheet) == true) {
+  if(!IsValidSheet(thisSheet)) {
     response = ui.alert(
       `${SERVICE_NAME}: Error!`,
       `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight).\nSelect one cell in the row and a ticket will be created.`,
@@ -322,7 +322,7 @@ const PopupCreateTicket = async () => {
 
   let response;
 
-  if(CheckSheetIsForbidden(thisSheet)) {
+  if(!IsValidSheet(thisSheet)) {
     response = ui.alert(
       `${SERVICE_NAME} : Error!`,
       `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight). \nSelect one cell in the row and a ticket will be created.`,

@@ -215,7 +215,7 @@ const onChange = async (e) => {
   }
 
   // Ignore Edits on background sheets like Logger and StoreItems 
-  if (CheckSheetIsForbidden(thisSheet)) return;
+  if (!IsValidSheet(thisSheet)) return;
 
   // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
   if (thisCol > 1 && thisCol != 3) return;

@@ -236,11 +236,9 @@ const SHEETS = Object.freeze({
  */
 const OTHERSHEETS = Object.freeze({
   Summary : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
-  Approved : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
   Staff : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Staff List`),
   Logger : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Logger`),
   Data : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
-  Master : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Master Intake Form Responses`),
 });
 
 
@@ -270,7 +268,7 @@ const DEFUNCT = Object.freeze({
   HaasTormachStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('HaasTormachStoreItems'),
 });
 
-const NONITERABLESHEETS = Object.freeze({...OTHERSHEETS, ...STORESHEETS, });
+const NONITERABLESHEETS = Object.freeze({ ...OTHERSHEETS, ...STORESHEETS, });
 
 
 /**

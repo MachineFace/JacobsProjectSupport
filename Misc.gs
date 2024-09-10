@@ -191,12 +191,12 @@ const SetByHeader = (sheet, columnName, row, val) => {
  * @returns {bool} false if sheet is allowed
  * @returns {bool} true if forbidden
  */
-const IsValidSheet = (someSheet) => {
+const IsValidSheet = (someSheet = SHEETS.Laser) => {
   try {
-    if (typeof(someSheet) !== `object`) throw new Error(`A non-sheet argument was passed to a function that requires a sheet.`);
+    const thisSheetName = someSheet.getSheetName();
     let forbiddenNames = [];
     Object.values(NONITERABLESHEETS).forEach(sheet => forbiddenNames.push(sheet.getSheetName()));
-    return !forbiddenNames.includes(someSheet.getName());
+    return !forbiddenNames.includes(thisSheetName);
   } catch(err) {
     console.error(`"IsValidSheet()" failed : ${err}`);
     return 1;
@@ -283,24 +283,6 @@ Array.prototype.findIndex = (search) => {
 
 
 
-/**
- * Check if this sheet is forbidden
- * @param {sheet} sheet to check
- * @returns {bool} false if sheet is allowed
- * @returns {bool} true if forbidden
- */
-const CheckSheetIsForbidden = (someSheet) => {
-  let forbiddenNames = [];
-  Object.values(NONITERABLESHEETS).forEach( sheet => forbiddenNames.push(sheet.getName()));
-  const index = forbiddenNames.indexOf(someSheet.getName());
-  if(index == -1 || index == undefined) {
-    console.info(`Sheet is NOT FORBIDDEN : ${someSheet.getName()}`)
-    return false;
-  } 
-  console.error(`SHEET FORBIDDEN : ${forbiddenNames[index]}`);
-  return true;
-  
-}
 
 
 /**
@@ -393,7 +375,7 @@ const GetAllProjectNames = () => {
 const BuildEstimate = (sheet, row) => {
   try {
     if(row < 2) throw new Error(`Row ${row}, not allowed...`);
-    if(CheckSheetIsForbidden(sheet)) throw new Error(`Forbidden Sheet....`);
+    if(!IsValidSheet(sheet)) throw new Error(`Forbidden Sheet....`);
 
     const rowData = GetRowData(sheet, row);
     let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 

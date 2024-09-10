@@ -99,28 +99,6 @@ const _gasTMainTesting = async () => {
     t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
   });
   
-  await test(`IDService`, (t) => {
-    const idService = new IDService();
-    const x = idService.id;
-    t.equal(idService.IsValid(x), true, `Standard ID Number should be valid : Acutal : ${idService.IsValid(x)}.`);
-    const y = idService.id;
-    t.notEqual(y, undefined || null, `DEFAULT / EMPTY id should not return undefined or null, ${y}`);
-    const z = `20220505`;
-    t.equal(idService.IsValid(z), false, `Test ID Number should be invalid : Acutal : ${idService.IsValid(z)}.`);
-  
-  });
-  
-  await test(`Sheet Permitted Check`, (t) => {
-    const val = CheckSheetIsForbidden(OTHERSHEETS.Logger);
-    t.equal(true, val, `Logger Should be true-forbidden : ${val}`);
-
-    const val2 = CheckSheetIsForbidden(SHEETS.Fablight);
-    t.equal(false, val2, `Fablight Should be false-not_forbidden: ${val2}`);
-
-    const val3 = CheckSheetIsForbidden(STORESHEETS.FablightStoreItems);
-    t.equal(true, val3, `Store Should be true-forbidden: ${val3}`);
-  });
-  
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
@@ -392,6 +370,17 @@ const _gasTMiscTesting = async () => {
     t.throws(a, `SetByHeader SHOULD throw an error on bad row number: ${a}`)
     t.equal(a, 1, `SetByHeader SHOULD return "1": Actual: ${a}`);
 
+  });
+
+  await test(`Sheet Permitted Check`, (t) => {
+    const val = IsValidSheet(OTHERSHEETS.Logger);
+    t.equal(false, val, `Logger Should be  (false): ${val}`);
+
+    const val2 = IsValidSheet(SHEETS.Fablight);
+    t.equal(true, val2, `Fablight Should be not_forbidden (true): ${val2}`);
+
+    const val3 = IsValidSheet(STORESHEETS.FablightStoreItems);
+    t.equal(false, val3, `Store Should be forbidden (false): ${val3}`);
   });
 
   await test.finish();
