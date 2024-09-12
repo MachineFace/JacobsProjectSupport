@@ -93,7 +93,7 @@ const PopupCountUsers = () => {
   const count = Calculate.CountActiveUsers();
   ui.alert(
     SERVICE_NAME,
-    `Students Currently Using JPS : ${count}`,
+    `JPS User Count: ${count}`,
     ui.ButtonSet.OK
   );
 };
@@ -147,7 +147,7 @@ const PopupGetSingleStudentPriority = async () => {
       });
     }
     ui.alert(
-      `${SERVICE_NAME}: Checked Access`,
+      SERVICE_NAME,
       `Access for ${name} set to : "${priority}"`,
       ui.ButtonSet.OK,
     );
@@ -175,7 +175,7 @@ const PopupCreateNewID = () => {
   if(!IsValidSheet(thisSheet)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Incorrect Sheet!`,
-      `Please select from the correct sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+      `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
       Browser.Buttons.OK,
     );
     if(a === ui.Button.OK) return;
@@ -191,7 +191,7 @@ const PopupCreateNewID = () => {
   }
   SetByHeader(thisSheet, HEADERNAMES.id, thisRow, newID);
   const a = ui.alert(
-    `${SERVICE_NAME}:\n Job Number Created!`,
+    SERVICE_NAME,
     `Created a New ID for ${name}:\n${newID}`,
     ui.ButtonSet.OK
   );
@@ -217,13 +217,13 @@ const BillFromSelected = async () => {
     price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
 
   if(!IsValidSheet(thisSheet)) {
-    response = ui.alert(
-      `${SERVICE_NAME}: Error!`,
-      `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight).\nSelect one cell in the row and a ticket will be created.`,
-      Browser.Buttons.OK
+    const a = ui.alert(
+      `${SERVICE_NAME}: Incorrect Sheet!`,
+      `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+      Browser.Buttons.OK,
     );
-    if (response === ui.Button.OK) return;
-  }
+    if(a === ui.Button.OK) return;
+  } 
 
   // TODO: Fix this messy shit.
   if(thisSheet == SHEETS.Plotter || thisSheet == SHEETS.GSI_Plotter) {
@@ -323,13 +323,13 @@ const PopupCreateTicket = async () => {
   let response;
 
   if(!IsValidSheet(thisSheet)) {
-    response = ui.alert(
-      `${SERVICE_NAME} : Error!`,
-      `Incorrect Sheet Active!\nPlease select from the correct sheet (eg. Laser Cutter or Fablight). \nSelect one cell in the row and a ticket will be created.`,
-      Browser.Buttons.OK
+    const a = ui.alert(
+      `${SERVICE_NAME}: Incorrect Sheet!`,
+      `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+      Browser.Buttons.OK,
     );
-    if(response === ui.Button.OK) return;
-  }
+    if(a === ui.Button.OK) return;
+  } 
   const thisRow = thisSheet.getActiveRange().getRow();
   const rowData = await GetRowData(thisSheet, thisRow);
   const { ds, id, timestamp, email, name, sid, projectName, sheetName, row } = rowData;

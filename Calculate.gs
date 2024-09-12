@@ -369,6 +369,103 @@ class Calculate {
   }
 
   /**
+   * Calculate Arithmetic Mean
+   * @returns {number} arithmetic mean
+   *
+  static ArithmeticMean(distribution = []) {
+    try {
+      const n = distribution.length;
+      if(n == 0) throw new Error(`Distribution is empty: ${n}`);
+
+      let values = [];
+      distribution.forEach(x => values.push(x[1]))
+      const mean = values.reduce((a, b) => a + b) / n;
+      console.warn(`ARITHMETIC MEAN: ${mean}`);
+      return mean.toFixed(3);
+    } catch(err) {
+      console.error(`"ArithmeticMean()" failed : ${err}`);
+      return 1;
+    }
+  }
+  */
+
+  /**
+   * Geometric Mean
+   * @param {Array} numbers
+   * @returns {number} Geometric Mean
+   */
+  static GeometricMean(numbers = []) {
+    try {
+      const n = numbers.length;
+      if(n == 0) throw new Error(`Distribution is empty: ${n}`);
+      const product = numbers.reduce((product, num) => product * num, 1);
+      const geometricMean = Math.pow(product, 1 / n);
+      console.warn(`GEOMETRIC MEAN: ${geometricMean}`);
+      return geometricMean;
+    } catch(err) {
+      console.error(`"GeometricMean()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Harmonic Mean
+   * @param {Array} numbers
+   * @returns {number} Harmonic Mean
+   */
+  static HarmonicMean(numbers = []) {
+    try {
+      const n = numbers.length;
+      if(n == 0) throw new Error(`Distribution is empty: ${n}`);
+      const harmonicMean = n / numbers.reduce((sum, num) => sum + 1 / num, 0);
+      console.warn(`HERMONIC MEAN: ${harmonicMean}`);
+      return harmonicMean;
+    } catch(err) {
+      console.error(`"HarmonicMean()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Quadratic Mean
+   * @param {Array} numbers
+   * @returns {number} Quadratic Mean
+   */
+  static QuadraticMean(numbers = []) {
+    try {
+      const n = numbers.length;
+      if(n == 0) throw new Error(`Distribution is empty: ${n}`);
+      const quadraticMean = Math.sqrt(numbers.reduce((sum, num) => sum + num * num, 0) / n);
+      console.warn(`QUADRATIC MEAN: ${quadraticMean}`);
+      return quadraticMean;
+    } catch(err) {
+      console.error(`"QuadraticMean()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Median Mean
+   * @param {Array} numbers
+   * @returns {number} Median
+   */
+  static Median(numbers = []) {
+    try {
+      const sortedNumbers = [...numbers].sort((a, b) => a - b);
+      const middle = Math.floor(sortedNumbers.length / 2);
+      const median = sortedNumbers.length % 2 === 0 ?
+          (sortedNumbers[middle - 1] + sortedNumbers[middle]) / 2 :
+          sortedNumbers[middle];
+
+      console.warn(`MEDIAN: ${median}`);
+      return median;
+    } catch(err) {
+      console.error(`"Median()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
    * Print Statistics
    */
   static PrintStatistics() {
