@@ -29,23 +29,24 @@
 const onSubmission = async (e) => {
 
   const staff = new MakeStaff().Staff;
+
   // Set status to RECEIVED on new submission
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var sheetName = e.range.getSheet().getName();
+  const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const thisSheetName = e.range.getSheet().getSheetName();
 
   // Get last row and set status to received
-  let lastRow = GetColumnDataByHeader(sheet, HEADERNAMES.timestamp)
+  let lastRow = [...GetColumnDataByHeader(thisSheet, HEADERNAMES.timestamp)]
     .filter(Boolean)
     .length + 1;
   console.info(`This Row: ${lastRow}`);
 
   // Parse variables
   let name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : undefined;
-  SetByHeader(sheet, HEADERNAMES.name, lastRow, name);
-  let email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(sheet, HEADERNAMES.email, lastRow);
-  let sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(sheet, HEADERNAMES.sid, lastRow);
-  let studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(sheet, HEADERNAMES.affiliation, lastRow);
-  let projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : GetByHeader(sheet, HEADERNAMES.projectName, lastRow);
+  SetByHeader(thisSheet, HEADERNAMES.name, lastRow, name);
+  let email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(thisSheet, HEADERNAMES.email, lastRow);
+  let sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(thisSheet, HEADERNAMES.sid, lastRow);
+  let studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(thisSheet, HEADERNAMES.affiliation, lastRow);
+  let projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : GetByHeader(thisSheet, HEADERNAMES.projectName, lastRow);
   let timestamp = e.namedValues[HEADERNAMES.timestamp][0];
 
   let values = e.namedValues;
@@ -54,16 +55,16 @@ const onSubmission = async (e) => {
 
   // Generate new Job number
   let id = new IDService().id;
-  SetByHeader(sheet, HEADERNAMES.id, lastRow, id);
+  SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
   let priority = new CheckPriority({ email : email, sid : sid }).Priority;
-  SetByHeader(sheet, HEADERNAMES.priority, lastRow, priority);
+  SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);
 
   try {
     if (priority == PRIORITY.None) {
       // Set access to Missing Access
-      SetByHeader(sheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
+      SetByHeader(thisSheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
       // Email
       // new Emailer({
@@ -76,13 +77,13 @@ const onSubmission = async (e) => {
       MailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
         htmlBody: message.missingAccessMessage,
         from: SERVICE_EMAIL,
-        bcc: staff.Chris.email,
+        bcc: `"${staff.Chris.email}, ${staff.Cody.email}"`,
         name: SERVICE_NAME,
       });
       console.warn(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     } else {
       // Set Status to Received
-      SetByHeader(sheet, HEADERNAMES.status,  lastRow, STATUS.received); 
+      SetByHeader(thisSheet, HEADERNAMES.status,  lastRow, STATUS.received); 
     }
   } catch(err) {
     console.error(`${err} : Couldn't determine student access`);
@@ -103,35 +104,35 @@ const onSubmission = async (e) => {
 
   // Set the Staff member for the sheet.
   let designspecialistemail;
-  switch (sheetName) {
+  switch (thisSheetName) {
     case SHEETS.Advancedlab.getName():
       designspecialistemail = staff.Chris.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
+      SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
       break;
     case SHEETS.Plotter.getName():
     case SHEETS.Fablight.getName():
     case SHEETS.Vinyl.getName():
     case SHEETS.GSI_Plotter.getName():
       designspecialistemail = staff.Cody.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
+      SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
       break;
     case SHEETS.Waterjet.getName():
     case SHEETS.Othertools.getName():
       designspecialistemail = staff.Gary.email;
-      SetByHeader(sheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
+      SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
       break;
     case SHEETS.Laser.getName():
     case SHEETS.Shopbot.getName():
       designspecialistemail = staff.Staff.email;
-      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
     case undefined:
       designspecialistemail = staff.Staff.email;
-      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
     default:
       designspecialistemail = staff.Staff.email;
-      SetByHeader(sheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
   }
 
@@ -147,7 +148,7 @@ const onSubmission = async (e) => {
     MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
       htmlBody: dsMessage,
       from: SERVICE_EMAIL,
-      bcc: staff.Chris.email,
+      bcc: `"${staff.Chris.email}, ${staff.Cody.email}"`,
       name: SERVICE_NAME,
     });
     console.info(`Design Specialist has been emailed.`);
@@ -164,7 +165,7 @@ const onSubmission = async (e) => {
       MailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
         htmlBody: message.gsiPlotterMessage,
         from: SERVICE_EMAIL,
-        bcc: staff.Chris.email,
+        bcc: `"${staff.Chris.email}, ${staff.Cody.email}"`,
         name: SERVICE_NAME,
       });
       console.info(`GSI Plotter instruction email sent.`);
@@ -175,11 +176,11 @@ const onSubmission = async (e) => {
 
   // Check again
   if(IDService.isValid(id) == false) {
-    SetByHeader(sheet, HEADERNAMES.id, lastRow, new IDService().id);
+    SetByHeader(thisSheet, HEADERNAMES.id, lastRow, new IDService().id);
   }
 
   // Fix wrapping issues
-  let driveloc = sheet.getRange(`D` + lastRow);
+  let driveloc = thisSheet.getRange(`D` + lastRow);
   FormatCell(driveloc);
 }
 
@@ -235,7 +236,7 @@ const onChange = async (e) => {
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
-    } else if(sheet.getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
+    } else if(thisSheet.getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
       priority = PRIORITY.Tier1;
       SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
