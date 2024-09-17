@@ -228,7 +228,6 @@ const onChange = async (e) => {
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
     price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
 
-  //----------------------------------------------------------------------------------------------------------------
   // Check Priority
   try {
     if(!priority) {
@@ -248,17 +247,15 @@ const onChange = async (e) => {
   id = IDService.isValid(id) ? id : new IDService().id;
   projectName = projectName ? projectName : `Your Project`;
 
-
   // Log submission info to sheet
   console.info(`Submission Time: ${timestamp}, Name: ${name}, Email: ${email}, Project: ${projectName}`);
 
   // Ignore
-  if(status == STATUS.closed) return;
+  if(status == STATUS.closed || status == STATUS.cancelled) return;
 
-  //----------------------------------------------------------------------------------------------------------------
-  // Fix Job Number if it's missing
+  // Fix ID if it's missing
   try {
-    console.info(`Trying to fix job number : ${id}`)
+    console.info(`Trying to fix job number : ${id}`);
     if (status == STATUS.received || status == STATUS.inProgress) {
       id = IDService.isValid(id) ? id : new IDService().id;
       SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
@@ -344,7 +341,7 @@ const onChange = async (e) => {
 
   // Check priority one more time:
   if(priority == PRIORITY.None){
-    if(status != STATUS.closed || status != STATUS.cancelled ) {
+    if(status != STATUS.closed && status != STATUS.cancelled ) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     }
   } else if (!priority) {
