@@ -194,12 +194,12 @@ const onSubmission = async (e) => {
 const onChange = async (e) => {
 
   // Fetch Data from Sheets
-  var thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // var thisSheetName = e.range.getSheet().getSheetName();
+  const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  // const thisSheetName = e.range.getSheet().getSheetName();
 
   // Fetch Columns and rows and check validity
-  var thisCol = e.range.getColumn();
-  var thisRow = e.range.getRow();
+  const thisCol = e.range.getColumn();
+  const thisRow = e.range.getRow();
 
   // Skip the first 2 rows of data.
   if (thisRow <= 1) return;
@@ -220,7 +220,7 @@ const onChange = async (e) => {
   // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
   if (thisCol > 1 && thisCol != 3) return;
 
-  // Parse Data
+  // Parse Row Data
   let rowData = GetRowData(thisSheet, thisRow);
   let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
@@ -251,29 +251,27 @@ const onChange = async (e) => {
   console.info(`Submission Time: ${timestamp}, Name: ${name}, Email: ${email}, Project: ${projectName}`);
 
   // Ignore
-  if(status == STATUS.closed || status == STATUS.cancelled) return;
+  if(status == STATUS.closed) return;
 
   // Fix ID if it's missing
   try {
-    console.info(`Trying to fix job number : ${id}`);
+    console.info(`Trying to fix ID : ${id}`);
     if (status == STATUS.received || status == STATUS.inProgress) {
       id = IDService.isValid(id) ? id : new IDService().id;
       SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
-      console.warn(`Job Number was missing, so the script fixed it. Submission by ${email}`);
+      console.warn(`ID was missing: fixed it. Submission by ${email}`);
     }
   } catch (err) {
-    console.error(`${err} : Job Number failed onSubmit, and has now failed onEdit`);
+    console.error(`${err} : ID failed onSubmit, and has now failed onEdit`);
   }
   
-  //----------------------------------------------------------------------------------------------------------------
   // Fix Casing on the name field
   try {
     if(name) SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
   } catch (err) {
-    console.error(`${err} : Couldn't fix their name.....`)
+    console.error(`Fixing Name casing on ${name}: ${err}`);
   }
 
-  //----------------------------------------------------------------------------------------------------------------
   // Calculate Turnaround Time only when cell is empty
   try {
     console.info(`Attempting to Calculate turnaround times`);
@@ -286,14 +284,12 @@ const onChange = async (e) => {
       }
     }
   } catch (err) {
-    console.error( `${err} : Calculating the turnaround time and completion time has failed for some reason.` );
+    console.error( `Turnaround time and completion time calc has failed: ${err}`);
   }
 
-
-  //----------------------------------------------------------------------------------------------------------------
   // Generating a "Ticket"
-  if ( status != STATUS.closed || status != STATUS.pickedUp || status != STATUS.abandoned ) {
-    if (ticket !== null || ticket !== undefined) {
+  if ( status != STATUS.closed && status != STATUS.pickedUp && status != STATUS.abandoned ) {
+    if (ticket !== null && ticket !== undefined) {
       console.info(`Already seems to have a ticket, Current Ticket: ${ticket}`);
     } else {
       try {
@@ -310,17 +306,17 @@ const onChange = async (e) => {
         SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
         console.info(`Set Ticket URL: ${ticket.url} - Sheet: ${thisSheet} Row: ${thisRow}`);
       } catch (err) {
-        console.error(`${err} : Couldn't generate a ticket. Check docUrl / id and repair.` );
+        console.error(`Ticket Creation failed: ${err}`);
       }
     }
   }
   
   // Case switch for different Design Specialists email
-  var designspecialistemaillink = InvokeDS(ds, `emaillink`);
-  var designspecialistemail = InvokeDS(ds, `email`);
+  const designspecialistemaillink = InvokeDS(ds, `emaillink`);
+  const designspecialistemail = InvokeDS(ds, `email`);
 
   // Create a Message and Return Appropriate Responses.
-  var message = new CreateMessage({
+  const message = new CreateMessage({
     name : name,
     projectname : projectName, 
     id : id,
@@ -344,11 +340,8 @@ const onChange = async (e) => {
     if(status != STATUS.closed && status != STATUS.cancelled ) {
       SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     }
-  } else if (!priority) {
-    if(status == STATUS.closed) return;
-  }
+  } else if (!priority && status == STATUS.closed) return;
 
-  //----------------------------------------------------------------------------------------------------------------
   // Generate an estimate
   if(mat1 && mat1quantity) {
     // const { Link } = GetStoreInfo(thisSheet, mat1);
