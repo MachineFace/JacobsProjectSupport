@@ -214,7 +214,6 @@ const PRIORITY = Object.freeze({
 });
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheets : Dictionary of key / value pair.
  * Example: Calling 'SHEETS.laser' returns value sheet.
  */
@@ -231,19 +230,18 @@ const SHEETS = Object.freeze({
 });
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const OTHERSHEETS = Object.freeze({
   Summary : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
   Staff : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Staff List`),
   Logger : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Logger`),
+  Approved : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
   Data : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
 });
 
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const STORESHEETS = Object.freeze({
@@ -257,6 +255,9 @@ const STORESHEETS = Object.freeze({
   OthermillStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OthermillStoreItems'),
 });
 
+/**
+ * DEFUNCT SHEETS
+ */
 const DEFUNCT = Object.freeze({
   Ultimaker : `1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8`, // Ultimaker Form
   Haas : `1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk`,  // Haas Form
@@ -272,7 +273,6 @@ const NONITERABLESHEETS = Object.freeze({ ...OTHERSHEETS, ...STORESHEETS, });
 
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Collection of Forms : Dictionary of key / value pair.
  * Example: Calling 'formDict.laser' returns value string.
  */
@@ -292,7 +292,6 @@ const FORMS = Object.freeze({
 
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Drive Folder Locations
  */
 const DRIVEFOLDERS = Object.freeze({
@@ -302,24 +301,26 @@ const DRIVEFOLDERS = Object.freeze({
 
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
- * Collection of Student Types
+ * Student Types
  */
-const TYPES = [
-  `Researcher`,
-  `DES INV Faculty`,
-  `Jacobs-affiliated Course Faculty`,
-  `MDES Student`,
-  `DES INV Student`,
-  `Jacobs Engineering Design Scholar`,
-  `Innovation Catalysts Grantee`,
-  `Jacobs Staff (Including Work-studies)`,
-  `Students in Jacobs-affiliated courses (NON-DES INV)`,
-  `Club and/or Team`,
-  `Other: Berkeley Faculty, Berkeley Staff`,
-  `General Students`,
-];
+const TYPES = Object.freeze({
+  researcher : `Researcher`,
+  des_inv_faculty : `DES INV Faculty`,
+  jacobs_faculty : `Jacobs-affiliated Course Faculty`,
+  mdes: `MDES Student`,
+  des_inv_student : `DES INV Student`,
+  design_scholar : `Jacobs Engineering Design Scholar`,
+  innovation_catalyst : `Innovation Catalysts Grantee`,
+  staff : `Jacobs Staff (Including Work-studies)`,
+  jacobs_student : `Students in Jacobs-affiliated courses (NON-DES INV)`,
+  club_team : `Club and/or Team`,
+  other : `Other: Berkeley Faculty, Berkeley Staff`,
+  student : `General Students`,
+});
 
+/**
+ * Headernames
+ */
 const HEADERNAMES = Object.freeze({
   status : `(INTERNAL) Status`,	
   ds : `(INTERNAL): DS Assigned`,	
@@ -377,8 +378,9 @@ const HEADERNAMES = Object.freeze({
   price4 : `Price 4`,
 });
 
-
-
+/**
+ * Page Sizes
+ */
 const PAGESIZES = Object.freeze({
   letter: { width: 612.283, height: 790.866 },
   tabloid: { width: 790.866, height: 1224.57 },
