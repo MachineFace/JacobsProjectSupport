@@ -22,9 +22,8 @@ class Calculate {
           totals.push(t);
         });
 
-      const average = Calculate.GeometricMean(totals);  // Average the totals (a list of times in millis)
-      const averageString = TimeService.MillisecondsToTimerString(average);
-      console.info(`AVERAGE: ${averageString}`);
+      const average = totals && Calculate.GeometricMean(totals);  // Average the totals (a list of times in millis)
+      const averageString = TimeService.MillisecondsToTimerString(average) || 0;
       return averageString;
     }
     catch (err) {
@@ -38,14 +37,14 @@ class Calculate {
    */
   static PrintTurnaroundTimes() {
     try {
-      let data = [];
+      let data = [
+        [`Turnaround Times`, `Days`],
+      ];
       Object.values(SHEETS).forEach(sheet => {
-        data.push([`${sheet.getName()} Turnaround`, Calculate.GetAverageTurnaround(sheet)]);
-      })
-      data.forEach( (entry, index) => {
-        OTHERSHEETS.Data.getRange(26 + index, 2, 1, 1 ).setValue(entry[0]);
-        OTHERSHEETS.Data.getRange(26 + index, 4, 1, 1 ).setValue(entry[1]);
+        let days = Calculate.GetAverageTurnaround(sheet).split(`,`)[0];
+        data.push([`${sheet.getName()} Turnaround`, days]);
       });
+      OTHERSHEETS.Data.getRange(1, 13, data.length, 2).setValues(data);
       return 0;
     } catch (err) {
       console.error(`"PrintTurnaroundTimes()" failed : ${err}`);
@@ -110,9 +109,11 @@ class Calculate {
       });
 
       // Print
-      console.info(data);
-      OTHERSHEETS.Data.getRange(12, 2, 1, 3).setValues([[ `SUBMISSION BREAKDOWN`, `Count`, `Percentage` ]]);
-      OTHERSHEETS.Data.getRange(13, 2, data.length, 3).setValues(data);
+      const values = [
+        [ `Submission Area`, `Count`, `Percentage` ],
+        ...data,
+      ];
+      OTHERSHEETS.Data.getRange(1, 9, values.length, 3).setValues(values);
       return data;
     } catch(err) {
       console.error(`"CountEachSubmission()" failed : ${err}`);
@@ -210,10 +211,11 @@ class Calculate {
       });
       
       // Print
-      console.info(distribution);
-      OTHERSHEETS.Data.getRange(44, 2, 1, 2).setValues([ [`Student Type`, `Count`], ]);
-      OTHERSHEETS.Data.getRange(45, 2, types.length, 2).setValues(types);
-
+      let values = [
+        [ `Student Type`, `Count` ],
+        ...distribution,
+      ];
+      OTHERSHEETS.Data.getRange(1, 19, values.length, 2).setValues(values);
       return distribution;
     } catch(err) {
       console.error(`"CountTypes()" failed: ${err}`);
@@ -337,10 +339,14 @@ class Calculate {
    * Print User Tiers
    */
   static PrintTiers() {
-    const tiers = Calculate.CountTiers();
-    tiers.forEach( (tier, index) => {
-      OTHERSHEETS.Data.getRange(39 + index, 2, 1, 2).setValues([[ `Tier ${tier[0]} Users`, tier[1] ]]);
-    });
+    let tiers = [
+      [ `Applicant Tier`, `Count`],
+    ];
+    [...Calculate.CountTiers()]
+      .forEach(( [ tier, count ], idx) => {
+        tiers.push([ `Tier ${tier} Users`, count ]);
+      });
+    OTHERSHEETS.Data.getRange(1, 16, tiers.length, 2,).setValues(tiers);
   }
 
 
@@ -367,31 +373,19 @@ class Calculate {
    */
   static PrintStatusCounts() {
     let data = Calculate.CountStatuses();
-    for(const [status, count] of Object.entries(data)) {
-      if(status == STATUS.completed || status == STATUS.billed || status == STATUS.closed || status == STATUS.pickedUp || status == STATUS.abandoned) {
-        data.completed += count;
-      }
-    }
-    const total = Object.values(data).reduce((a, b) => a + b);
+    const total = data
+      .map(x => x[1])
+      .reduce((a, b) => a + b);
 
-    const completed = data.completed ? data.completed : 0;
-    const completedRatio = `${Number((completed / total) * 100).toFixed(2)}%`;
-
-    const cancelled = data.cancelled ? data.cancelled : 0;
-    const cancelledRatio = `${Number((cancelled / total) * 100).toFixed(2)}%`;
-
-    const inProgress = data.inProgress ? data.inProgress : 0;
-    const inProgressRatio = `${Number((inProgress / total) * 100).toFixed(2)}%`;
-
-    const failed = data.failed ? data.failed : 0;
-    const failedRatio = `${Number((failed / total) * 100).toFixed(2)}%`;
+    let stats = data.map(tuple => {
+      let percent = Number((Number(tuple[1]) / Number(total)) * 100).toFixed(2) || 0;
+      let percentString = `${percent}%`;
+      return [ TitleCase(tuple[0]), tuple[1], percentString ];
+    });
 
     const values = [
       [ `STATUS`, `COUNT`, `RATIO`, ],
-      [ `COMPLETED`, completed, completedRatio, ],
-      [ `CANCELLED`, cancelled, cancelledRatio, ],
-      [ `IN-PROGRESS`, inProgress, inProgressRatio, ],
-      [ `FAILED`, failed, failedRatio, ],
+      ...stats,
     ];
     OTHERSHEETS.Data.getRange(1, 5, values.length, 3).setValues(values);
   }
@@ -632,7 +626,7 @@ class Calculate {
    */
   static GeometricMean(numbers = []) {
     try {
-      if(numbers.length < 2) throw new Error(`Distribution is empty: ${numbers.length}`);
+      if(numbers.length < 1) throw new Error(`Distribution is empty: ${numbers.length}`);
 
       let values = [];
       if (Array.isArray(numbers[0])) values = numbers.map(item => Number(item[1]));
@@ -757,7 +751,7 @@ const _testDist = () => {
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
-  Calculate.PrintStatusCounts();
+  Calculate.CountTypes();
 
 }
 
