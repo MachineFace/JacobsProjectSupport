@@ -76,9 +76,12 @@ class Calculate {
       console.info(`Active JPS Users : ${count}`);
 
       // Print
-      const values = [ [ `TOTAL STUDENTS CURRENTLY USING JPS`, count ], ];
-      OTHERSHEETS.Data.getRange(3, 2, 1, 2).setValues(values);
-      
+      const values = [ 
+        [ `TOTAL STUDENTS CURRENTLY USING JPS` ], 
+        [ count ], 
+      ];
+      OTHERSHEETS.Data.getRange(1, 2, 2, 1).setValues(values);
+
       return count;
     } catch(err) {
       console.error(`"CountActiveUsers()" failed : ${err}`);
@@ -108,6 +111,7 @@ class Calculate {
 
       // Print
       console.info(data);
+      OTHERSHEETS.Data.getRange(12, 2, 1, 3).setValues([[ `SUBMISSION BREAKDOWN`, `Count`, `Percentage` ]]);
       OTHERSHEETS.Data.getRange(13, 2, data.length, 3).setValues(data);
       return data;
     } catch(err) {
@@ -130,8 +134,11 @@ class Calculate {
     const projectSet = new Set(projects);
     const size = projectSet.size;
     console.info(`Size of Set --> ${size}`);
-    const values = [ [`TOTAL PROJECTS SUBMISSION:`, size ], ];
-    OTHERSHEETS.Data.getRange(6, 2, 1, 2).setValues(values);
+    const values = [ 
+      [ `TOTAL PROJECTS SUBMISSIONS` ], 
+      [ size ], 
+    ];
+    OTHERSHEETS.Data.getRange(1, 3, 2, 1).setValues(values);
   }
 
   /**
@@ -358,7 +365,7 @@ class Calculate {
   /**
    * Print Statuses
    */
-  static PrintStatusCounts () {
+  static PrintStatusCounts() {
     let data = Calculate.CountStatuses();
     for(const [status, count] of Object.entries(data)) {
       if(status == STATUS.completed || status == STATUS.billed || status == STATUS.closed || status == STATUS.pickedUp || status == STATUS.abandoned) {
@@ -380,12 +387,13 @@ class Calculate {
     const failedRatio = `${Number((failed / total) * 100).toFixed(2)}%`;
 
     const values = [
-      [ `COMPLETED JOBS`, completed, completedRatio ],
-      [ `CANCELLED JOBS`, cancelled, cancelledRatio ],
-      [ `IN-PROGRESS JOBS`, inProgress, inProgressRatio ],
-      [ `FAILED JOBS`, failed, failedRatio ],
+      [ `STATUS`, `COUNT`, `RATIO`, ],
+      [ `COMPLETED`, completed, completedRatio, ],
+      [ `CANCELLED`, cancelled, cancelledRatio, ],
+      [ `IN-PROGRESS`, inProgress, inProgressRatio, ],
+      [ `FAILED`, failed, failedRatio, ],
     ];
-    OTHERSHEETS.Data.getRange(7, 2, 4, 3).setValues(values);
+    OTHERSHEETS.Data.getRange(1, 5, values.length, 3).setValues(values);
   }
 
   /**
@@ -749,7 +757,7 @@ const _testDist = () => {
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
-  Calculate.CountFunding();
+  Calculate.PrintStatusCounts();
 
 }
 
