@@ -167,17 +167,18 @@ class Calculate {
   static CreateTopTen() {
     try {
       const distribution = Calculate.GetUserDistribution();
-      if(distribution.length == 0) throw new Error(`Distribution is empty: ${distribution}`);
-
-      return distribution
+      let values = [
+        [ `Place`, `Top 10 Power Users - Most Submissions`, `Number of Submissions`, `Email`, ],
+      ];
+      
+      distribution
         .slice(0, 11)
-        .forEach((pair, index) => {
-          let email = Calculate._FindEmail(pair[0]) ? Calculate._FindEmail(pair[0]) : `Email not found`;
-          const values = [
-            [ index + 1, pair[0], pair[1], ``, email ],
-          ];
-          OTHERSHEETS.Data.getRange(106 + index, 1, 1, 5).setValues(values);
+        .forEach(([ user, count ], idx) => {
+          let email = Calculate._FindEmail(user) ? Calculate._FindEmail(user) : `Email not found`;
+          const entry = [ idx + 1, user, count, email ];
+          values.push(entry);
         });
+      OTHERSHEETS.Data.getRange(1, 24, values.length, 4).setValues(values);
     } catch(err) {
       console.error(`"CreateTopTen()" failed : ${err}`);
       return 1;
@@ -252,27 +253,6 @@ class Calculate {
   }
 
   /**
-   * Defunct
-   * @private
-   *
-  static PrintDistributionNumbers() {
-    let userList = [];
-    let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
-    Object.values(SHEETS).forEach(sheet => {
-      [...GetColumnDataByHeader(sheet, HEADERNAMES.name)]
-        .filter(Boolean)
-        .filter(x => !staff.includes(x))
-        .forEach(x => userList.push(x));
-    })
-    let occurrences = Calculate.Distribution(userList);
-    let items = Object.keys(occurrences).map((key) => occurrences[key])
-      .sort((first, second) => second - first)
-      .forEach((item, index) => OTHERSHEETS.Backgrounddata.getRange(2 + index, 22, 1, 1).setValue(item));
-    console.warn(items);
-  }
-  */
-
-  /**
    * Calculate Standard Deviation
    * @returns {number} Standard Deviation
    */
@@ -307,13 +287,25 @@ class Calculate {
    * Print Statistics
    */
   static PrintStatistics() {
-    const mean = Calculate.GetUserSubmissionArithmeticMean();
-    const stand = Calculate.GetUserSubmissionStandardDeviation();
+    const distribution = Calculate.GetUserDistribution();
+    const am = Number(Calculate.ArithmeticMean(distribution)).toFixed(3) || 0;
+    const gm = Number(Calculate.GeometricMean(distribution)).toFixed(3) || 0;
+    const hm = Number(Calculate.HarmonicMean(distribution)).toFixed(3) || 0;
+    const qm = Number(Calculate.QuadraticMean(distribution)).toFixed(3) || 0;
+    const stdDev = Calculate.StandardDeviation(distribution);
+    const kurtosis = Number(Calculate.Kurtosis(distribution, stdDev)).toFixed(3) || 0;
+    const skewness = Number(Calculate.Skewness(distribution, stdDev)).toFixed(3) || 0;
     const values = [
-      [`Arithmetic Mean for Number of Project Submissions: `, mean],
-      [`Standard Deviation for Number of Project Submissions: `, `+/- ${stand}`],
+      [ `Statistics`, `Count`, ],
+      [ `Average Number of Project Submissions`, am ],
+      [ `Geometric Mean of Submissions`, gm ],
+      [ `Harmonic Mean of Submissions`, hm ],
+      [ `Quadratic Mean of Submissions`, qm ],
+      [ `Standard Deviation for Number of Project Submissions: `, `+/- ${stdDev}` ],
+      [ `Kurtosis`, kurtosis, ],
+      [ `Skewness`, skewness, ],
     ];
-    OTHERSHEETS.Data.getRange(102, 2, 2, 2).setValues(values);
+    OTHERSHEETS.Data.getRange(1, 29, values.length, 2).setValues(values);
   }
 
   /**
@@ -410,8 +402,12 @@ class Calculate {
       const fixed = Number(sum).toFixed(2);
       console.info(`Funding = $${fixed}`);
 
+      const values = [
+        [ `Funds Generated From JPS` ], 
+        [ `$${fixed}` ],
+      ];
       // Print
-      OTHERSHEETS.Data.getRange(99, 2, 1, 2).setValues([[`Total Funds`, `$${fixed}`],]);
+      OTHERSHEETS.Data.getRange(1, 22, 2, 1).setValues(values);
       return fixed;
     } catch(err) {
       console.error(`"CountFunding()" failed : ${err}`);
@@ -751,7 +747,7 @@ const _testDist = () => {
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
-  Calculate.CountTypes();
+  Calculate.PrintStatistics();
 
 }
 
