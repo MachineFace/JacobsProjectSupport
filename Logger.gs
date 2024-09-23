@@ -4,43 +4,31 @@
  */
 class Log {
   constructor() {
-    /** @private */ 
-    this.date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
-    /** @private */ 
-    this.sheet = OTHERSHEETS.Logger;
-    /** @private */ 
-    this.row = OTHERSHEETS.Logger.getLastRow();
-    /** @private */ 
-    this.maxRows = OTHERSHEETS.Logger.getMaxRows();
-    /** @private */ 
-    this.maxColumns = OTHERSHEETS.Logger.getMaxColumns();
-    /** @private */ 
-    this.type = {
-      Error : `ERROR!!`,
-      Warning : `WARNING!`,
-      Info : `INFO`,
-      Debug : `DEBUG`,
-    }
+    
   }
 
   /**
    * Throw Error Message
    */
   static Error(message = ``) {
-    const text = [this.date, this.type.Error, message, ];
-    this.sheet.appendRow(text);
-    console.error(`${text[0]}, ${text[1]} : ${message}`);
+    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
+    const sheet = OTHERSHEETS.Logger;
+    const maxRows = sheet.getMaxRows();
+    const maxColumns = sheet.getMaxColumns();
+    const values = [ date, LOG_TYPE.Error, message, ];
+    console.error(values);
+    sheet.appendRow(values);
     let rules = [
       SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$B2="${this.type.Error}"`)
-        .setRanges([this.sheet.getRange(2, 1, this.maxRows, this.maxColumns),])
+        .whenFormulaSatisfied(`=$B2="${LOG_TYPE.Error}"`)
+        .setRanges([ sheet.getRange(2, 1, maxRows, maxColumns), ])
         .setBackground(COLORS.red_light)
         .setFontColor(COLORS.red)
         .build(),
     ];
-    this.sheet.setConditionalFormatRules(rules);
-    this._PopItem();
-    this._CleanupSheet();
+    sheet.setConditionalFormatRules(rules);
+    this.prototype._PopItem();
+    this.prototype._CleanupSheet();
     return;
   }
 
@@ -48,20 +36,24 @@ class Log {
    * Throw Warning Message
    */
   static Warning(message = ``) {
-    const text = [this.date, this.type.Warning, message, ];
-    this.sheet.appendRow(text);
-    console.warn(`${text[0]}, ${text[1]} : ${message}`);
+    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
+    const sheet = OTHERSHEETS.Logger;
+    const maxRows = sheet.getMaxRows();
+    const maxColumns = sheet.getMaxColumns();
+    const values = [ date, LOG_TYPE.Warning, message, ];
+    console.warn(values);
+    sheet.appendRow(values);
     let rules = [
       SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$B2="${this.type.Warning}"`)
-        .setRanges([this.sheet.getRange(2, 1, this.maxRows, this.maxColumns),])
+        .whenFormulaSatisfied(`=$B2="${LOG_TYPE.Warning}"`)
+        .setRanges([ sheet.getRange(2, 1, maxRows, maxColumns), ])
         .setBackground(COLORS.orange_light)
         .setFontColor(COLORS.orange)
         .build(),
     ];
-    this.sheet.setConditionalFormatRules(rules);
-    this._PopItem();
-    this._CleanupSheet();
+    sheet.setConditionalFormatRules(rules);
+    this.prototype._PopItem();
+    this.prototype._CleanupSheet();
     return;
   }
 
@@ -69,20 +61,24 @@ class Log {
    * Throw Info Message
    */
   static Info(message = ``) {
-    const text = [this.date, this.type.Info, message, ];
-    this.sheet.appendRow(text);
-    console.info(`${text[0]}, ${text[1]} : ${message}`);
+    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
+    const sheet = OTHERSHEETS.Logger;
+    const maxRows = sheet.getMaxRows();
+    const maxColumns = sheet.getMaxColumns();
+    const values = [ date, LOG_TYPE.Info, message, ];
+    console.info(values);
+    sheet.appendRow(values);
     let rules = [
       SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$B2="${this.type.Info}"`)
-        .setRanges([this.sheet.getRange(2, 1, this.maxRows, this.maxColumns),])
+        .whenFormulaSatisfied(`=$B2="${LOG_TYPE.Info}"`)
+        .setRanges([ sheet.getRange(2, 1, maxRows, maxColumns),])
         .setBackground(COLORS.grey_light)
         .setFontColor(COLORS.grey_dark)
         .build(),
     ];
-    this.sheet.setConditionalFormatRules(rules);
-    this._PopItem();
-    this._CleanupSheet();
+    sheet.setConditionalFormatRules(rules);
+    this.prototype._PopItem();
+    this.prototype._CleanupSheet();
     return;
   }
 
@@ -90,20 +86,24 @@ class Log {
    * Throw Debug Message
    */
   static Debug(message = ``) {
-    const text = [this.date, this.type.Debug, message, ];
-    this.sheet.appendRow(text);
-    console.log(`${text[0]}, ${text[1]} : ${message}`);
+    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
+    const sheet = OTHERSHEETS.Logger;
+    const maxRows = sheet.getMaxRows();
+    const maxColumns = sheet.getMaxColumns();
+    const values = [ date, LOG_TYPE.Debug, message, ];
+    console.log(values);
+    sheet.appendRow(values);
     let rules = [
       SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$B2="${this.type.Debug}"`)
-        .setRanges([this.sheet.getRange(2, 1, this.maxRows, this.maxColumns),])
+        .whenFormulaSatisfied(`=$B2="${LOG_TYPE.Debug}"`)
+        .setRanges([ sheet.getRange(2, 1, maxRows, maxColumns),])
         .setBackground(COLORS.purle_light)
         .setFontColor(COLORS.purple_dark)
         .build(),
     ];
-    this.sheet.setConditionalFormatRules(rules);
-    this._PopItem();
-    this._CleanupSheet();
+    sheet.setConditionalFormatRules(rules);
+    this.prototype._PopItem();
+    this.prototype._CleanupSheet();
     return;
   }
 
@@ -112,10 +112,12 @@ class Log {
    * @private
    */
   _PopItem() {
+    const sheet = OTHERSHEETS.Logger;
+    const maxRows = sheet.getMaxRows();
     if(this.row > 100) {
-      this.sheet.deleteRows(2, 1);
+      sheet.deleteRows(2, 1);
     } else {
-      this.sheet.insertRowAfter(this.sheet.getMaxRows() - 1);
+      sheet.insertRowAfter(maxRows - 1);
     }
   }
 
@@ -124,8 +126,10 @@ class Log {
    * @private
    */
   _CleanupSheet() {
-    if(this.row < 2000) return;
-    this.sheet.deleteRows(2, 1999);
+    const sheet = OTHERSHEETS.Logger;
+    const lastRow = sheet.getLastRow();
+    if(lastRow < 2000) return;
+    sheet.deleteRows(2, 1999);
   }
   
 }

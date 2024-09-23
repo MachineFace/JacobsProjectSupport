@@ -396,5 +396,15 @@ const PAGESIZES = Object.freeze({
   custom: { width: 204.000, height: 566.000 }
 });
 
+/**
+ * Log Types
+ */
+const LOG_TYPE = Object.freeze({
+  Error : `ERROR!!`,
+  Warning : `WARNING!`,
+  Info : `INFO`,
+  Debug : `DEBUG`,
+});
+
 
 
