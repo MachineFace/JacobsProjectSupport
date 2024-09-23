@@ -5,12 +5,10 @@
  * Used in EnableJPS()
  */
 const CreateTimeDrivenTrigger = () => {
-  // Trigger every 6 hours.
-  // ScriptApp.newTrigger('myFunction').timeBased().everyHours(6).create();
-
-  const timetoEmail = 6; // Trigger summary email to every DS every Weekday at 07:00.
-  const triggerName = `CreateSummaryEmail`;
   try {
+    // ScriptApp.newTrigger('myFunction').timeBased().everyHours(6).create();
+    const timetoEmail = 6; // Trigger summary email to every DS every Weekday at 07:00.
+    const triggerName = `CreateSummaryEmail`;
     ScriptApp.newTrigger(triggerName)
       .timeBased()
       .onWeekDay(ScriptApp.WeekDay.MONDAY)
@@ -72,8 +70,10 @@ const CreateTimeDrivenTrigger = () => {
       .onWeekDay(ScriptApp.WeekDay.MONDAY)
       .atHour(2)
       .create();
+    return 0;
   } catch (err) {
     console.error(`"CreateTimeDrivenTrigger()" failed : ${err}`);
+    return 1;
   }
 };
 
@@ -84,8 +84,8 @@ const CreateTimeDrivenTrigger = () => {
  * Used in 'DisableJPS()'
  */
 const RemoveTimedTriggers = () => {
-  let triggers = ScriptApp.getProjectTriggers();
   try {
+    let triggers = ScriptApp.getProjectTriggers();
     triggers.forEach( trigger => {
       if (trigger.getEventType() == ScriptApp.EventType.ON_EDIT)
         console.info(`OnEdit Trigger : ${trigger.getUniqueId()}`); // KEEP THIS TRIGGER
@@ -182,12 +182,18 @@ const EnableJPS = () => {
  * @TRIGGERED
  */
 const SetStatusDropdowns = () => {
-  Object.values(SHEETS).forEach(sheet => {
-    const rule = SpreadsheetApp
-      .newDataValidation()
-      .requireValueInList(Object.values(STATUS));
-    sheet.getRange(2, 1, sheet.getLastRow(), 1).setDataValidation(rule);
-  })
+  try {
+    Object.values(SHEETS).forEach(sheet => {
+      const rule = SpreadsheetApp
+        .newDataValidation()
+        .requireValueInList(Object.values(STATUS));
+      sheet.getRange(2, 1, sheet.getLastRow(), 1).setDataValidation(rule);
+    });
+    return 0;
+  } catch(err) {
+    console.error(`"SetStatusDropdowns()" failed: ${err}`);
+    return 1;
+  }
 }
 
 
@@ -197,93 +203,101 @@ const SetStatusDropdowns = () => {
  * @TRIGGERED
  */
 const SetConditionalFormatting = () => {
-  Object.values(SHEETS).forEach(sheet => {
-    if(sheet.getSheetName() == SHEETS.Advancedlab.getSheetName()) return;
-    console.warn(`Changing sheet: ${sheet.getSheetName()}'s conditional formatting rules....`);
-    let rules = [
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.received}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.green_light)
-        .setFontColor(COLORS.green_dark_2)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.inProgress}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.yellow_light)
-        .setFontColor(COLORS.yellow_dark_2)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.missingAccess}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.orange_light)
-        .setFontColor(COLORS.orange_bright)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.cancelled}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.purle_light)
-        .setFontColor(COLORS.purple)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.completed}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.green_light)
-        .setFontColor(COLORS.grey)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.closed}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.grey_light)
-        .setFontColor(COLORS.grey)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.billed}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.grey_light)
-        .setFontColor(COLORS.grey)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.failed}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.red_light)
-        .setFontColor(COLORS.red)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.pickedUp}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.grey_light)
-        .setFontColor(COLORS.grey)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.abandoned}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.red_light)
-        .setFontColor(COLORS.red_dark_berry_2)
-        .build()
-      ,
-      SpreadsheetApp.newConditionalFormatRule()
-        .whenFormulaSatisfied(`=$A2="${STATUS.waitlist}"`)
-        .setRanges([sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()),])
-        .setBackground(COLORS.orange)
-        .setFontColor(COLORS.orange_dark_2)
-        .build()
-      ,
-    ];
-    // let existingRules = sheet.getConditionalFormatRules();
-    // console.warn(existingRules)
-    // existingRules.push(rules)
-    sheet.setConditionalFormatRules(rules);
-  });
+  try {
+    Object.values(SHEETS).forEach(sheet => {
+      const lastRow = sheet.getLastRow();
+      const lastColumn = sheet.getLastColumn();
+      if(sheet.getSheetName() == SHEETS.Advancedlab.getSheetName()) return;
+      console.warn(`Changing sheet: ${sheet.getSheetName()}'s conditional formatting rules....`);
+      let rules = [
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.received}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.green_light)
+          .setFontColor(COLORS.green_dark_2)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.inProgress}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.yellow_light)
+          .setFontColor(COLORS.yellow_dark_2)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.missingAccess}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.orange_light)
+          .setFontColor(COLORS.orange_bright)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.cancelled}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.purle_light)
+          .setFontColor(COLORS.purple)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.completed}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.green_light)
+          .setFontColor(COLORS.grey)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.closed}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.grey_light)
+          .setFontColor(COLORS.grey)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.billed}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.grey_light)
+          .setFontColor(COLORS.grey)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.failed}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.red_light)
+          .setFontColor(COLORS.red)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.pickedUp}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.grey_light)
+          .setFontColor(COLORS.grey)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.abandoned}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.red_light)
+          .setFontColor(COLORS.red_dark_berry_2)
+          .build()
+        ,
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${STATUS.waitlist}"`)
+          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
+          .setBackground(COLORS.orange)
+          .setFontColor(COLORS.orange_dark_2)
+          .build()
+        ,
+      ];
+      // let existingRules = sheet.getConditionalFormatRules();
+      // console.warn(existingRules)
+      // existingRules.push(rules)
+      sheet.setConditionalFormatRules(rules);
+    });
+    return 0;
+  } catch(err) {
+    console.error(`"SetConditionalFormatting()" failed: ${err}`);
+    return 1;
+  }
 }
 
 
@@ -292,9 +306,19 @@ const SetConditionalFormatting = () => {
  * @TRIGGERED
  */
 const SetSummaryPageRowHeight = () => {
-  OTHERSHEETS.Summary.setRowHeightsForced(3, OTHERSHEETS.Summary.getMaxRows() - 3, 21);
-  OTHERSHEETS.Summary.getRange(3, 1, OTHERSHEETS.Summary.getMaxRows() -1, OTHERSHEETS.Summary.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-  console.info(`Set Row Height.`)
+  try {
+    const sheet = OTHERSHEETS.Summary;
+    const maxRows = sheet.getMaxRows();
+    const maxCols = sheet.getMaxColumns();
+    const height = 21;
+    sheet.setRowHeightsForced(3, maxRows - 3, height);
+    sheet.getRange(3, 1, maxRows -1, maxCols).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+    console.info(`Set Row Height.`);
+    return 0;
+  } catch(err) {
+    console.error(`"SetSummaryPageRowHeight()" failed: ${err}`);
+    return 1;
+  }
 }
 
 
@@ -302,16 +326,22 @@ const SetSummaryPageRowHeight = () => {
  * Set Row Height
  */
 const SetRowHeight = () => {
-  Object.values(SHEETS).forEach(sheet => {
-    const lastRow = sheet.getMaxRows();
-    const lastColumn = sheet.getMaxColumns();
-    sheet
-      .setRowHeightsForced(2, lastRow, 21);
-    sheet
-      .getRange(2, 1, lastRow, lastColumn)
-      .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-    console.info(`Set Row Height for ${sheet.getSheetName()}`);
-  })
+  try {
+    Object.values(SHEETS).forEach(sheet => {
+      const lastRow = sheet.getMaxRows();
+      const lastColumn = sheet.getMaxColumns();
+      sheet
+        .setRowHeightsForced(2, lastRow, 21);
+      sheet
+        .getRange(2, 1, lastRow, lastColumn)
+        .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+      console.info(`Set Row Height for ${sheet.getSheetName()}`);
+    });
+    return 0;
+  } catch(err) {
+    console.error(`"SetRowHeight()" failed: ${err}`);
+    return 1;
+  }
 }
 
 
@@ -323,16 +353,22 @@ const SetRowHeight = () => {
  * @param {number} RetentionPeriod
  */
 const DeleteOldFiles = () => {
-  const folder = DriveApp.getFoldersByName(`Job Forms`);
-  const processFolder = (folder) => {
-    var files = folder.getFiles();
-    while (files.hasNext()) {
-      var file = files.next();
-      if (new Date() - file.getLastUpdated() > RETENTION_PERIOD) {
-        //file.setTrashed(true); //uncomment this line to put them in the trash
-        //Drive.Files.remove(file.getId()); //uncomment this line to delete them immediately; CAREFUL!
+  try {
+    const folder = DriveApp.getFoldersByName(`Job Forms`);
+    const processFolder = (folder) => {
+      let files = folder.getFiles();
+      while (files.hasNext()) {
+        let file = files.next();
+        if (new Date() - file.getLastUpdated() > RETENTION_PERIOD) {
+          //file.setTrashed(true); //uncomment this line to put them in the trash
+          //Drive.Files.remove(file.getId()); //uncomment this line to delete them immediately; CAREFUL!
+        }
       }
     }
+    return 0;
+  } catch(err) {
+    console.error(`"DeleteOldFiles()" failed: ${err}`);
+    return 1;
   }
 };
 
