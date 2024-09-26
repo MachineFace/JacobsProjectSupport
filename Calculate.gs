@@ -297,13 +297,13 @@ class Calculate {
     const skewness = Number(Calculate.Skewness(distribution, stdDev)).toFixed(3) || 0;
     const values = [
       [ `Statistics`, `Count`, ],
-      [ `Average Number of Project Submissions`, am ],
-      [ `Geometric Mean of Submissions`, gm ],
-      [ `Harmonic Mean of Submissions`, hm ],
-      [ `Quadratic Mean of Submissions`, qm ],
-      [ `Standard Deviation for Number of Project Submissions: `, `+/- ${stdDev}` ],
-      [ `Kurtosis`, kurtosis, ],
-      [ `Skewness`, skewness, ],
+      [ `Average # of Project Submissions Per User`, am ],
+      [ `Geometric Mean of Submissions Per User`, gm ],
+      [ `Harmonic Mean of Submissions Per User`, hm ],
+      [ `Quadratic Mean of Submissions Per User`, qm ],
+      [ `Std. Deviation for # of Project Submissions Per User: `, `+/- ${stdDev}` ],
+      [ `Kurtosis (High kurtosis means more outliers in data)`, kurtosis, ],
+      [ `Skewness (Measures the asymmetry of the data)`, skewness, ],
     ];
     OTHERSHEETS.Data.getRange(1, 29, values.length, 2).setValues(values);
   }
