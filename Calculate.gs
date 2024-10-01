@@ -594,6 +594,41 @@ class Calculate {
   }
 
   /**
+   * Quartiles
+   * The list is divided into two halves for computing the lower (Q1) and upper (Q3) quartiles.
+   * The median of the whole distribution is computed as Q2.
+   * @param {Array} distribution [[key, value], [key, value]...]
+   * @returns {Object} quartiles { q1 : value, q2 : value, q3 : value, }
+   */
+  static Quartiles(distribution = []) {
+    try {
+      const sorted = distribution
+        .map(([key, value]) => value)
+        .slice()
+        .sort((a, b) => a - b);
+      const len = sorted.length;
+
+      // Split the sorted data into two halves
+      const lowerHalf = sorted.slice(0, Math.floor(len * 0.5));
+      const upperHalf = sorted.slice(Math.ceil(len * 0.5));
+
+      // Calculate Q1, Q2 (median), and Q3
+      const q1 = Calculate.Median(lowerHalf);
+      const q2 = Calculate.Median(sorted);
+      const q3 = Calculate.Median(upperHalf);
+
+      return { 
+        Q1 : q1, 
+        Q2 : q2, 
+        Q3 : q3, 
+      }
+    } catch(err) {
+      console.error(`"Quartiles()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
    * Calculate Arithmetic Mean
    * @returns {number} arithmetic mean
    */
