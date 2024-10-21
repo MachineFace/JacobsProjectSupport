@@ -15,7 +15,7 @@ class Calculate {
   static GetAverageTurnaround(sheet = SHEETS.Laser) {
     let totals = [];
     try {
-      GetColumnDataByHeader(sheet, HEADERNAMES.elapsedTime)
+      [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.elapsedTime)]
         .filter(Boolean)
         .forEach(time => {
           let t = Number(TimeService.TimeToMillis(time)) || 0;
@@ -60,8 +60,8 @@ class Calculate {
     let persons = [];
     try {
       Object.values(SHEETS).forEach(sheet => {
-        let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
-        [...GetColumnDataByHeader(sheet, HEADERNAMES.name)]
+        let staff = SheetService.GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
+        [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.name)]
           .filter(x => x != `FORMULA ROW`)
           .filter(x => x != `Formula Row`)
           .filter(x => x != `Test`)
@@ -101,7 +101,7 @@ class Calculate {
       const total = x || 0;
 
       Object.values(SHEETS).forEach(sheet => {
-        let range = [...GetColumnDataByHeader(sheet, HEADERNAMES.timestamp)]
+        let range = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.timestamp)]
           .filter(Boolean);
         let count = range.length - 2 > 0 ? range.length - 2 : 0;
         const percentage = `${Number((count / total) * 100).toFixed(2)}%`;
@@ -127,7 +127,7 @@ class Calculate {
   static PrintTotalSubmissions() {
     let projects = [];
     Object.values(SHEETS).forEach(sheet => {
-      const projectnames = [...GetColumnDataByHeader(sheet, HEADERNAMES.projectName)]
+      const projectnames = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.projectName)]
         .filter(Boolean)
         .filter(name => name !== `FORMULA ROW`);
       projects.push(...projectnames);
@@ -155,7 +155,7 @@ class Calculate {
       const finder = sheet.createTextFinder(name).findNext();
       if (finder != null) {
         let row = finder.getRow();
-        email = GetByHeader(sheet, HEADERNAMES.email, row);
+        email = SheetService.GetByHeader(sheet, HEADERNAMES.email, row);
       }
     })
     return email;
@@ -193,7 +193,7 @@ class Calculate {
     try {
       let typeList = [];
       Object.values(SHEETS).forEach(sheet => {
-        [...GetColumnDataByHeader(sheet, HEADERNAMES.affiliation)]
+        [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.affiliation)]
           .filter(Boolean)
           .filter(x => x != `Test`)
           .filter(x => x != `FORMULA ROW`)
@@ -232,9 +232,9 @@ class Calculate {
   static GetUserDistribution() {
     try {
       let userList = [];
-      let staff = GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
+      let staff = SheetService.GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
       Object.values(SHEETS).forEach(sheet => {
-        GetColumnDataByHeader(sheet, HEADERNAMES.name)
+        SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.name)
           .filter(Boolean)
           .filter(x => !x.includes(HEADERNAMES.name))
           .filter(x => x != `FORMULA ROW`)
@@ -313,7 +313,7 @@ class Calculate {
    * @returns {[]} tiers
    */
   static CountTiers() {
-    let tiers = [...GetColumnDataByHeader(OTHERSHEETS.Approved, `Tier`)]
+    let tiers = [...SheetService.GetColumnDataByHeader(OTHERSHEETS.Approved, `Tier`)]
       .filter(Boolean);
     const distribution = Calculate.Distribution(tiers);
     const distSet = new Set(distribution.map(([key, _]) => key));
@@ -349,7 +349,7 @@ class Calculate {
   static CountStatuses() {
     let statuses = [];
     Object.values(SHEETS).forEach(sheet => {
-      GetColumnDataByHeader(sheet, HEADERNAMES.status)
+      SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.status)
         .filter(Boolean)
         .forEach(status => {
           let key = Object.keys(STATUS).find(x => STATUS[x] === status);
@@ -390,7 +390,7 @@ class Calculate {
     try {
       let subtotals = [];
       Object.values(SHEETS).forEach(sheet => {
-        let sum = [...GetColumnDataByHeader(sheet, HEADERNAMES.estimate)]
+        let sum = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.estimate)]
           .filter(x => x !== '#REF!')        
           .filter(Boolean)
           .filter(a => !a.isNaN)

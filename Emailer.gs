@@ -163,6 +163,18 @@ class Emailer {
   }
 }
 
+/**
+ * Validate an email string
+ * @param {string} email
+ * @returns {bool} boolean
+ */
+const ValidateEmail = (email) => {
+  const regex = new RegExp(/^[a-zA-Z0-9+_.-]+@[berkeley.edu]+$/);
+  let match = regex.test(email);
+  console.warn(`Email is valid? : ${match}`)
+  return match;
+}
+
 
 /**
  * Send an email

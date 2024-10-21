@@ -211,14 +211,14 @@ class Ticket {
  */
 const GenerateMissingTickets = () => {
   Object.values(SHEETS).forEach(sheet => {
-    let ids = [...GetColumnDataByHeader(sheet, HEADERNAMES.id)];
-    let tickets = [...GetColumnDataByHeader(sheet, HEADERNAMES.ticket)];
+    let ids = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.id)];
+    let tickets = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.ticket)];
     console.info(`Sheet --> ${sheet.getSheetName()}`)
     ids.forEach( async(id, index) => {
       if(id && !tickets[index]) {
         let thisRow = index + 2;
         console.info(index + 2);
-        let data = await GetRowData(sheet, thisRow);
+        let data = await SheetService.GetRowData(sheet, thisRow);
         let ticket = await new Ticket({
           id : id,
           designspecialist : data.ds,
@@ -228,7 +228,7 @@ const GenerateMissingTickets = () => {
           projectname : data.projectName,
           rowData : data,
         }).CreateTicket();
-        SetByHeader(sheet, HEADERNAMES.ticket, thisRow, ticket.getUrl());
+        SheetService.SetByHeader(sheet, HEADERNAMES.ticket, thisRow, ticket.getUrl());
       }
     })
   })

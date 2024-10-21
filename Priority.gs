@@ -40,7 +40,7 @@ class CheckPriority {
         return false;
       }
       let row = finder.getRow();
-      let priority = GetByHeader(OTHERSHEETS.Approved, `Tier`, row);
+      let priority = SheetService.GetByHeader(OTHERSHEETS.Approved, `Tier`, row);
       console.info(`${this.email} is registered. Priority: ${priority}`);
       return priority;
     } catch(err) {
@@ -59,7 +59,7 @@ class CheckPriority {
         return false;
       }
       let row = finder.getRow();
-      let priority = GetByHeader(OTHERSHEETS.Approved, `Tier`, row);
+      let priority = SheetService.GetByHeader(OTHERSHEETS.Approved, `Tier`, row);
       console.info(`${this.email}, ${this.sid} is registered. Priority: ${priority}`);
       return priority;
     } catch(err) {
@@ -100,14 +100,14 @@ const CheckMissingAccessStudents = () => {
       values.forEach( row => {
         const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
-        let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, } = GetRowData(thisSheet, row);
+        let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, } = SheetService.GetRowData(thisSheet, row);
         priority = new CheckPriority({ email : email, sid : sid }).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
 
-        SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
+        SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
         if(p != PRIORITY.None && status == STATUS.missingAccess) {
           list.push(email);
-          SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
+          SheetService.SetByHeader(thisSheet, HEADERNAMES.status, row, STATUS.received);
         }
       });
     }

@@ -210,7 +210,7 @@ class MakeStaff {
  * @USED in Daily Email Summary
  */
 const StaffEmailAsString = () => {
-  let emaillist = GetColumnDataByHeader(OTHERSHEETS.Staff, `EMAIL`)
+  let emaillist = SheetService.GetColumnDataByHeader(OTHERSHEETS.Staff, `EMAIL`)
     .filter(Boolean);
   let f = [...new Set(emaillist)].toString();
   return f;

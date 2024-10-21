@@ -18,7 +18,7 @@ class HackyStoreAutomation {
    */
   _WritePrice (sheet) {
     try {
-      [...GetColumnDataByHeader(sheet, "Link")]
+      [...SheetService.GetColumnDataByHeader(sheet, "Link")]
         .filter(Boolean)
         .forEach( async (link, index) => {
           const price = await this.GetPriceFromStore(link);
@@ -96,7 +96,7 @@ class HackyStoreAutomation {
    */
   UpdatePricePerSheet (sheet) {
     const shopify = new ShopifyAPI();
-    const ids = GetColumnDataByHeader(sheet, "Product ID (Shopify)")
+    const ids = SheetService.GetColumnDataByHeader(sheet, "Product ID (Shopify)")
       .filter(Boolean);
     console.info(ids.toString())
     ids.forEach( async (id, index) => {
@@ -104,7 +104,7 @@ class HackyStoreAutomation {
       console.info(info)
       let price = info?.variants[0]?.price;
       console.info(`Price : $${price}`);
-      SetByHeader(sheet, "Price", index + 2, price);
+      SheetService.SetByHeader(sheet, "Price", index + 2, price);
     })
     return true;
   }
@@ -146,7 +146,7 @@ class HackyStoreAutomation {
     };
       
     try {
-      [...GetColumnDataByHeader(sheet, "Link")]
+      [...SheetService.GetColumnDataByHeader(sheet, "Link")]
         .filter(Boolean)
         .forEach( async (url, index) => {
           const response = await UrlFetchApp.fetch(url, params);
@@ -189,7 +189,7 @@ class MaterialLookup {
         let finder = sheet.createTextFinder(this.materialName).findNext();
         if(finder) {
           let row = finder.getRow();
-          url = GetByHeader(sheet, `Link`, row);
+          url = SheetService.GetByHeader(sheet, `Link`, row);
           console.info(`Name: ${this.materialName}, URL: ${url}`);
         }
       })

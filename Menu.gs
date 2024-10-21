@@ -22,7 +22,7 @@ const PopUpMarkAsAbandoned = async () => {
       let sheet = SHEETS[res.sheetName];
       let row = res.row;
       let email = res.email;
-      SetByHeader(sheet, HEADERNAMES.status, row, STATUS.abandoned);
+      SheetService.SetByHeader(sheet, HEADERNAMES.status, row, STATUS.abandoned);
       console.info(`Job number ${id} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${row}`);
       const message = await new CreateMessage({
         name : res.name, 
@@ -71,7 +71,7 @@ const PopUpMarkAsPickedUp = async () => {
       let sheet = SHEETS[res.sheetName];
       let row = res.row;
       let email = res.email;
-      SetByHeader(sheet, HEADERNAMES.status, row, STATUS.pickedUp);
+      SheetService.SetByHeader(sheet, HEADERNAMES.status, row, STATUS.pickedUp);
       console.warn(`${email}, Job: ${id} marked as picked up... Sheet: ${sheet.getSheetName()} row: ${row}`);
       ui.alert(`Marked as Picked Up`, `${email}, Job: ${id}... Sheet: ${sheet.getSheetName()} row: ${row}`, ui.ButtonSet.OK);
     }
@@ -123,16 +123,16 @@ const PopupGetSingleStudentPriority = async () => {
     const thisSheet = SpreadsheetApp.getActiveSheet();
     let thisRow = thisSheet.getActiveRange().getRow();
 
-    const rowData = GetRowData(thisSheet, thisRow);
+    const rowData = SheetService.GetRowData(thisSheet, thisRow);
     let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, sheetName, row, } = rowData;
     console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
 
     
     priority = await new CheckPriority({ email : email, sid : sid }).Priority;
     console.info(`Priority: ${priority}`);
-    SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     if(priority == PRIORITY.None) {
-      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
       new Emailer({ 
         name : name, 
         status : STATUS.missingAccess,
@@ -172,7 +172,7 @@ const PopupCreateNewID = () => {
   let thisRow = thisSheet.getActiveRange().getRow();
   const newID = new IDService().id;
 
-  if(!IsValidSheet(thisSheet)) {
+  if(!SheetService.IsValidSheet(thisSheet)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Incorrect Sheet!`,
       `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
@@ -180,7 +180,7 @@ const PopupCreateNewID = () => {
     );
     if(a === ui.Button.OK) return;
   } 
-  const { name, id } = GetRowData(thisSheet, thisRow);
+  const { name, id } = SheetService.GetRowData(thisSheet, thisRow);
   if(IDService.isValid(id)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Error!`,
@@ -189,7 +189,7 @@ const PopupCreateNewID = () => {
     );
     if(a === ui.Button.OK) return;
   }
-  SetByHeader(thisSheet, HEADERNAMES.id, thisRow, newID);
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, newID);
   const a = ui.alert(
     SERVICE_NAME,
     `Created a New ID for ${name}:\n${newID}`,
@@ -209,14 +209,14 @@ const BillFromSelected = async () => {
   let thisRow = thisSheet.getActiveRange().getRow();
   let response;
 
-  const rowData = GetRowData(thisSheet, thisRow);
+  const rowData = SheetService.GetRowData(thisSheet, thisRow);
   let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
     price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
 
-  if(!IsValidSheet(thisSheet)) {
+  if(!SheetService.IsValidSheet(thisSheet)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Incorrect Sheet!`,
       `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
@@ -294,7 +294,7 @@ const BillFromSelected = async () => {
         material4Name : mat4, material4Quantity : mat4quantity,
         material5Name : mat5, material5Quantity : mat5quantity, 
       });
-      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
       let lastOrder =  JSON.stringify(order, null, 4);
       console.info(lastOrder);
       ui.alert(
@@ -322,7 +322,7 @@ const PopupCreateTicket = async () => {
 
   let response;
 
-  if(!IsValidSheet(thisSheet)) {
+  if(!SheetService.IsValidSheet(thisSheet)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Incorrect Sheet!`,
       `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
@@ -331,7 +331,7 @@ const PopupCreateTicket = async () => {
     if(a === ui.Button.OK) return;
   } 
   const thisRow = thisSheet.getActiveRange().getRow();
-  const rowData = await GetRowData(thisSheet, thisRow);
+  const rowData = SheetService.GetRowData(thisSheet, thisRow);
   const { ds, id, timestamp, email, name, sid, projectName, sheetName, row } = rowData;
   const x = await new Ticket({
     id : id,
@@ -345,7 +345,7 @@ const PopupCreateTicket = async () => {
   const t = await x.CreateTicket();
   console.info(t);
   
-  SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
   response = ui.alert(
     `${SERVICE_NAME} : Ticket Created!`,
     `Ticket Created for : ${name}, Job Number : ${id}`,

@@ -80,7 +80,7 @@ const PickupByBarcode = () => {
     const searchFind = textFinder.findNext();
     if (searchFind != null) {
       let searchRow = searchFind.getRow();
-      SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.pickedUp);
+      SheetService.SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.pickedUp);
       progress.setValue(`ID number ${id} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       console.info(`ID number ${id} marked as picked up. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       //var ui = SpreadsheetApp.getUi();
@@ -111,11 +111,11 @@ const MarkAsAbandonedByBarcode = async () => {
     const searchFind = textFinder.findNext();
     if (searchFind != null) {
       let searchRow = searchFind.getRow();
-      SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.abandoned);
+      SheetService.SetByHeader(sheet, HEADERNAMES.status, searchRow, STATUS.abandoned);
       progress.setValue(`ID number ${id} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       console.info(`ID number ${id} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${searchRow}`);
       
-      const rowData = GetRowData(sheet, searchRow);
+      const rowData = SheetService.GetRowData(sheet, searchRow);
       let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
         mat1quantity, mat1, mat2quantity, mat2, 
         mat3quantity, mat3, mat4quantity, mat4, 

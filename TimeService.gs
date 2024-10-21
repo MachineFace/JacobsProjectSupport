@@ -35,7 +35,7 @@ class TimeService {
    */
   static TimerStringToMilliseconds(timerString = `0 days, 0:34:18`) {
     try {
-      // timerString = GetByHeader(SHEETS.Main, HEADERNAMES.daysCheckedOut, 3);
+      // timerString = SheetService.GetByHeader(SHEETS.Main, HEADERNAMES.daysCheckedOut, 3);
       let m = timerString.split(`days`);
       let n = m[1].split(`,`);
       let q = n[1].split(`:`);

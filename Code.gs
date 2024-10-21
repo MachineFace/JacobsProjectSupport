@@ -35,18 +35,18 @@ const onSubmission = async (e) => {
   const thisSheetName = e.range.getSheet().getSheetName();
 
   // Get last row and set status to received
-  let lastRow = [...GetColumnDataByHeader(thisSheet, HEADERNAMES.timestamp)]
+  let lastRow = [...SheetService.GetColumnDataByHeader(thisSheet, HEADERNAMES.timestamp)]
     .filter(Boolean)
     .length + 1;
   console.info(`This Row: ${lastRow}`);
 
   // Parse variables
   let name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : undefined;
-  SetByHeader(thisSheet, HEADERNAMES.name, lastRow, name);
-  let email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : GetByHeader(thisSheet, HEADERNAMES.email, lastRow);
-  let sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : GetByHeader(thisSheet, HEADERNAMES.sid, lastRow);
-  let studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : GetByHeader(thisSheet, HEADERNAMES.affiliation, lastRow);
-  let projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : GetByHeader(thisSheet, HEADERNAMES.projectName, lastRow);
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.name, lastRow, name);
+  let email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.email, lastRow);
+  let sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.sid, lastRow);
+  let studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.affiliation, lastRow);
+  let projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.projectName, lastRow);
   let timestamp = e.namedValues[HEADERNAMES.timestamp][0];
 
   let values = e.namedValues;
@@ -55,16 +55,16 @@ const onSubmission = async (e) => {
 
   // Generate new Job number
   let id = new IDService().id;
-  SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
   let priority = new CheckPriority({ email : email, sid : sid }).Priority;
-  SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);
 
   try {
     if (priority == PRIORITY.None) {
       // Set access to Missing Access
-      SetByHeader(thisSheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
       // Email
       // new Emailer({
@@ -83,7 +83,7 @@ const onSubmission = async (e) => {
       console.warn(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     } else {
       // Set Status to Received
-      SetByHeader(thisSheet, HEADERNAMES.status,  lastRow, STATUS.received); 
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.status,  lastRow, STATUS.received); 
     }
   } catch(err) {
     console.error(`${err} : Couldn't determine student access`);
@@ -107,32 +107,32 @@ const onSubmission = async (e) => {
   switch (thisSheetName) {
     case SHEETS.Advancedlab.getName():
       designspecialistemail = staff.Chris.email;
-      SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
       break;
     case SHEETS.Plotter.getName():
     case SHEETS.Fablight.getName():
     case SHEETS.Vinyl.getName():
     case SHEETS.GSI_Plotter.getName():
       designspecialistemail = staff.Cody.email;
-      SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
       break;
     case SHEETS.Waterjet.getName():
     case SHEETS.Othertools.getName():
       designspecialistemail = staff.Gary.email;
-      SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
       break;
     case SHEETS.Laser.getName():
     case SHEETS.Shopbot.getName():
       designspecialistemail = staff.Staff.email;
-      SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
     case undefined:
       designspecialistemail = staff.Staff.email;
-      SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
     default:
       designspecialistemail = staff.Staff.email;
-      SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
       break;
   }
 
@@ -159,8 +159,8 @@ const onSubmission = async (e) => {
   // GSI Plotter
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
-      SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.priority, lastRow, 1);
-      SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.status, lastRow, STATUS.received );
+      SheetService.SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.priority, lastRow, 1);
+      SheetService.SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.status, lastRow, STATUS.received );
       // Email
       MailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
         htmlBody: message.gsiPlotterMessage,
@@ -176,7 +176,7 @@ const onSubmission = async (e) => {
 
   // Check again
   if(IDService.isValid(id) == false) {
-    SetByHeader(thisSheet, HEADERNAMES.id, lastRow, new IDService().id);
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, new IDService().id);
   }
 
   // Fix wrapping issues
@@ -207,22 +207,22 @@ const onChange = async (e) => {
 
   // Add link to DS List on Staff Sheet
   if(thisSheet.getSheetName() == OTHERSHEETS.Staff.getSheetName() && thisRow >= 2) {
-    const sLink = GetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow);
-    const staffEmail = GetByHeader(OTHERSHEETS.Staff, `EMAIL`, thisRow);
+    const sLink = SheetService.GetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow);
+    const staffEmail = SheetService.GetByHeader(OTHERSHEETS.Staff, `EMAIL`, thisRow);
     if ( sLink == undefined || sLink == null || (sLink == `` && staffEmail != ``) ) {
       const l = MakeLink(staffEmail);
-      SetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow, l);
+      SheetService.SetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow, l);
     }
   }
 
   // Ignore Edits on background sheets like Logger and StoreItems 
-  if (!IsValidSheet(thisSheet)) return;
+  if (!SheetService.IsValidSheet(thisSheet)) return;
 
   // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
   if (thisCol > 1 && thisCol != 3) return;
 
   // Parse Row Data
-  let rowData = GetRowData(thisSheet, thisRow);
+  let rowData = SheetService.GetRowData(thisSheet, thisRow);
   let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
@@ -233,12 +233,12 @@ const onChange = async (e) => {
   try {
     if(!priority) {
       priority = await new CheckPriority({ email : email, sid : sid }).Priority;
-      SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
-      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     } else if(thisSheet.getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
       priority = PRIORITY.Tier1;
-      SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
   } catch (err) {
     console.error(`Setting priority failed: ${err}`);
@@ -259,7 +259,7 @@ const onChange = async (e) => {
     console.info(`Trying to fix ID : ${id}`);
     if (status == STATUS.received || status == STATUS.inProgress) {
       id = IDService.isValid(id) ? id : new IDService().id;
-      SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
       console.warn(`ID was missing: fixed it. Submission by ${email}`);
     }
   } catch (err) {
@@ -268,7 +268,7 @@ const onChange = async (e) => {
   
   // Fix Casing on the name field
   try {
-    if(name) SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
+    if(name) SheetService.SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
   } catch (err) {
     console.error(`Fixing Name casing on ${name}: ${err}`);
   }
@@ -280,8 +280,8 @@ const onChange = async (e) => {
       if (status == STATUS.completed || status == STATUS.billed) {
         let endTime = new Date();
         let time = TimeService.Duration(new Date(timestamp), endTime);
-        SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
-        SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
+        SheetService.SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
+        SheetService.SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
       }
     }
   } catch (err) {
@@ -304,7 +304,7 @@ const onChange = async (e) => {
           rowData : rowData,
         });
         ticket.CreateTicket();
-        SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
+        SheetService.SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, ticket.url);
         console.info(`Set Ticket URL: ${ticket.url} - Sheet: ${thisSheet} Row: ${thisRow}`);
       } catch (err) {
         console.error(`Ticket Creation failed: ${err}`);
@@ -339,7 +339,7 @@ const onChange = async (e) => {
   // Check priority one more time:
   if(priority == PRIORITY.None){
     if(status != STATUS.closed && status != STATUS.cancelled ) {
-      SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     }
   } else if (!priority && status == STATUS.closed) return;
 
