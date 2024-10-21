@@ -4,7 +4,6 @@
  */
 
 
-
 /**
  * Search all Sheets for a value
  * @required {string} value
@@ -42,7 +41,6 @@ const SearchSpecificSheet = (sheet, value) => {
   }
 }
 
-
 /**
  * Search all Sheets for one specific value
  * @required {string} value
@@ -61,10 +59,7 @@ const FindOne = (value) => {
   return res;
 }
 
-
-
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Find an index in an array
  * @param {any} search
  * @returns {int} index
@@ -83,7 +78,7 @@ const FindIndexInArray = (array = [], search = ``) => {
  * @param {[]} array 2
  * @return {[]} array of indexes
  */
-const FindMissingElementsInArrays = (array1, array2) => {
+const FindMissingElementsInArrays = (array1 = [], array2 = []) => {
   let indexes = [];
   array1.forEach( item => {
     let i = array2.indexOf(item);
@@ -110,21 +105,28 @@ const GetStoreInfo = (sheet, material) => {
   return data;
 }
 
-
+/**
+ * Get All Project Names
+ * @returns {object} { sheetname : [...projectnames] }
+ * @NOTIMPLEMENTED
+ */
 const GetAllProjectNames = () => {
   let names = {}
   Object.values(SHEETS).forEach(sheet => {
+    const sheetName = sheet.getName();
     let titles = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.projectName)]
       .filter(Boolean)
       .filter(x => x != `FORMULA ROW`);
-    names[sheet.getName()] = [...new Set(titles)];
+    names[sheetName] = [...new Set(titles).values()];
   });
   console.info(names);
   return names;
 }
 
-
-const BuildEstimate = (sheet, row) => {
+/**
+ * Build Estimate
+ */
+const BuildEstimate = (sheet, row = 2) => {
   try {
     if(row < 2) throw new Error(`Row ${row}, not allowed...`);
     if(!SheetService.IsValidSheet(sheet)) throw new Error(`Forbidden Sheet....`);
@@ -162,10 +164,13 @@ const BuildEstimate = (sheet, row) => {
   }
 }
 
+/**
+ * 
+ *
 const _testEstimate = () => {
   BuildEstimate(SHEETS.Advancedlab, 10);
 }
-
+*/
 
 /**
  * Helper Method for TitleCasing Names

@@ -1,3 +1,8 @@
+/**
+ * SHEET SERVICE
+ * ----------------------------------------------------------------------------------------------------------------
+ */
+
 class SheetService {
   constructor() {
 
@@ -70,9 +75,8 @@ class SheetService {
       const data = sheet.getDataRange().getValues();
       const col = data[0].indexOf(columnName);
       if (col == -1) throw new Error(`Column not found`);
-      let colData = data
-        .map(d => d[col])
-        .splice(0, 1);
+      let colData = data.map(d => d[col]); // Chaining isn't allowed here.
+      colData.splice(0, 1); // Pop first item out.
       return colData;
     } catch (err) {
       console.error(`"GetColumnDataByHeader()" failed : ${err}`);
