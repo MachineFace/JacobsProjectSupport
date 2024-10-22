@@ -15,7 +15,7 @@ const PopUpMarkAsAbandoned = async () => {
   if (response.getSelectedButton() == ui.Button.OK) {
     let id = response.getResponseText();
     console.warn(`Finding ${id}`);
-    let res = FindOne(id);
+    let res = SheetService.FindOne(id);
     if(res == null) {
       progressUpdate.setValue(`Job number not found. Try again.`);
     } else {
@@ -64,7 +64,7 @@ const PopUpMarkAsPickedUp = async () => {
   if (response.getSelectedButton() == ui.Button.OK) {
     let id = response.getResponseText();
     console.warn(`Finding ${id}`);
-    let res = FindOne(id);
+    let res = SheetService.FindOne(id);
     if(res == null) {
       console.warn(`Job number not found. Try again.`);
     } else {

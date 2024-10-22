@@ -4,60 +4,6 @@
  */
 
 
-/**
- * Search all Sheets for a value
- * @required {string} value
- * @returns {[sheet, [values]]} list of sheets with lists of indexes
- */
-const Search = (value) => {
-  if (value) value.toString().replace(/\s+/g, "");
-  let res = {};
-  Object.values(SHEETS).forEach(sheet => {
-    const finder = sheet.createTextFinder(value).findAll();
-    if (finder != null) {
-      temp = [];
-      finder.forEach(result => temp.push(result.getRow()));
-      res[sheet.getName()] = temp;
-    }
-  })
-  console.info(JSON.stringify(res));
-  return res;
-}
-
-/**
- * Search a Specific Sheets for a value
- * @required {string} value
- * @returns {[sheet, [values]]} list of sheets with lists of indexes
- */
-const SearchSpecificSheet = (sheet, value) => { 
-  try {
-    if (value && value != undefined) value.toString().replace(/\s+/g, "");
-    const finder = sheet.createTextFinder(value).findNext();
-    if (!finder) return false;
-    return finder.getRow();
-  } catch(err) {
-    console.error(`"SearchSpecificSheet()" failed : ${err}`);
-    return 1;
-  }
-}
-
-/**
- * Search all Sheets for one specific value
- * @required {string} value
- * @returns {[sheet, [number]]} [sheetname, row]
- */
-const FindOne = (value) => {
-  if (value) value.toString().replace(/\s+/g, "");
-  let res = {};
-  for(const [key, sheet] of Object.entries(SHEETS)) {
-    const finder = sheet.createTextFinder(value).findNext();
-    if (finder != null) {
-      // res[key] = finder.getRow();
-      res = SheetService.GetRowData(sheet, finder.getRow());
-    }
-  }
-  return res;
-}
 
 /**
  * Find an index in an array
@@ -100,7 +46,7 @@ const GetStoreInfo = (sheet, material) => {
   material = material ? material : SheetService.GetByHeader(sheet, HEADERNAMES.mat1, 2);
 
   const storesheet = GetStoreSheet(sheet);
-  const row = SearchSpecificSheet(storesheet, material);
+  const row = SheetService.SearchSpecificSheet(storesheet, material);
   const data = SheetService.GetRowData(storesheet, row);
   return data;
 }
@@ -144,7 +90,7 @@ const BuildEstimate = (sheet, row = 2) => {
     materials.forEach( (material, index) => {
       if(material) {
         Object.values(STORESHEETS).forEach(materialSheet => {
-          const idx = SearchSpecificSheet(materialSheet, material);
+          const idx = SheetService.SearchSpecificSheet(materialSheet, material);
           if(idx) {
             const price = materialSheet.getRange(idx, 6, 1, 1).getValue();
             let subtotal = price * quantities[index];

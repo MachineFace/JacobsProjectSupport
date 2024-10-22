@@ -47,7 +47,7 @@ class ShopifyAPI {
     try {
       if(!material) throw new Error(`No material supplied`);
       Object.values(STORESHEETS).forEach(sheet => {
-        const idx = SearchSpecificSheet(sheet, material);
+        const idx = SheetService.SearchSpecificSheet(sheet, material);
         if(idx) {
           // let link = sheet.getRange(idx, 2, 1, 1).getValue();
           // let price = sheet.getRange(idx, 6, 1, 1).getValue();

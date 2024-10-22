@@ -280,12 +280,12 @@ const _gasTMiscTesting = async () => {
   const test = new GasTap();
 
   await test(`Search`, (t) => {
-    const x = Search(`Cody`);
+    const x = SheetService.Search(`Cody`);
     t.notEqual(x, undefined || null, `Search should not return undefined or null. ${JSON.stringify(x)}`);
   });
 
   await test(`Search Specific Sheet`, (t) => {
-    const x = SearchSpecificSheet(SHEETS.Fablight,`Cody`);
+    const x = SheetService.SearchSpecificSheet(SHEETS.Fablight,`Cody`);
     t.notEqual(x, undefined || null, `SearchSpecificSheet should not return undefined or null. ${JSON.stringify(x)}`);
   });
 
@@ -329,10 +329,10 @@ const _gasTMiscTesting = async () => {
   });
 
   await test(`FindOne`, (t) => {
-    const x = FindOne(`cparsell@berkeley.edu`);
+    const x = SheetService.FindOne(`cparsell@berkeley.edu`);
     t.notEqual(x, undefined || null, `FindOne should not return undefined or null. ${JSON.stringify(x)}`);
 
-    const y = FindOne(`BAD NAME`);
+    const y = SheetService.FindOne(`BAD NAME`);
     t.equal(0, Object.entries(y).length, `FindOne SHOULD return empty object: ${JSON.stringify(y)}`);
   });
 

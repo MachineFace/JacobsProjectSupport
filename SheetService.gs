@@ -195,7 +195,97 @@ class SheetService {
       indexes.push(index);
     }
     return indexes;
-  };
+  }
+
+  /**
+   * Search a Specific Sheets for a value
+   * @required {string} value
+   * @returns {[sheet, [values]]} list of sheets with lists of indexes
+   */
+  static SearchSpecificSheet(sheet, value = ``) { 
+    try {
+      if (value && value != undefined) value.toString().replace(/\s+/g, "");
+      const finder = sheet.createTextFinder(value).findNext();
+      if (!finder) return false;
+      return finder.getRow();
+    } catch(err) {
+      console.error(`"SearchSpecificSheet()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Search all Sheets for a value
+   * @required {string} value
+   * @returns {[sheet, [values]]} list of sheets with lists of indexes
+   */
+  static Search(value = ``) {
+    try {
+      if (value === null || value === undefined) throw new Error(`Bad inputs to function. Value: ${value}`);
+      value = value.toString().replace(/\s+/g, "");
+      let res = {};
+      Object.values(SHEETS).forEach(sheet => {
+        const sheetName = sheet.getSheetName();
+        const finder = sheet.createTextFinder(value).findAll();
+        if (finder != null) {
+          temp = [];
+          finder.forEach(result => temp.push(result.getRow()));
+          res[sheetName] = temp;
+        }
+      })
+      // console.info(JSON.stringify(res));
+      return res;
+    } catch(err) {
+      console.error(`"Search()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Search all Sheets for one specific value
+   * @required {string} value
+   * @returns {[sheet, [number]]} [sheetname, row]
+   */
+  static FindOne(value = ``) {
+    try {
+      if (value) value.toString().replace(/\s+/g, "");
+      let res = {};
+      for(const [key, sheet] of Object.entries(SHEETS)) {
+        const finder = sheet.createTextFinder(value).findNext();
+        if (finder == null) return false;
+        // res[key] = finder.getRow();
+        res = SheetService.GetRowData(sheet, finder.getRow());
+      }
+      return res;
+    } catch(err) {
+      console.error(`"FindOne()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Find Email
+   * @param {string} name
+   * @returns {string} email
+   */
+  static FindEmail(name = ``) {
+    try {
+      name.toString().replace(/\s+/g, "");
+      let email = ``;
+      const finder = SpreadsheetApp.getActiveSpreadsheet()
+        .createTextFinder(name)
+        .findAll()[0];
+      if (finder == null) return false;
+      const row = finder.getRow();
+      const sheet = finder.getSheet();
+      // console.info(`SH: ${sheet}, R: ${row}`);
+      email = SheetService.GetByHeader(sheet, HEADERNAMES.email, row);
+      return email;
+    } catch(err) {
+      console.error(`"FindEmail()" failed: ${err}`);
+      return 1;
+    }
+  }
 
   /**
    * Write Array to Column

@@ -94,7 +94,7 @@ class CheckPriority {
  */
 const CheckMissingAccessStudents = () => {
   let list = [];
-  const results = Search(PRIORITY.None);
+  const results = SheetService.Search(PRIORITY.None);
   if(results != null) {
     for(const [sheetName, values] of Object.entries(results)) {
       values.forEach( row => {
