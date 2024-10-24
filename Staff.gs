@@ -305,7 +305,7 @@ const _testStaff = () => {
 
 
 const MakeLink = (email) => {
-  if(!ValidateEmail(email)) return undefined;
+  if(!Emailer.ValidateEmail(email)) return undefined;
   let link = `<a href="${email}">${email}</a>`;
   return link;    
 }

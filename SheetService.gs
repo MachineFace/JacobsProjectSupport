@@ -59,7 +59,7 @@ class SheetService {
       sheet.getRange(row, col).setValue(val);
       return 0;
     } catch (err) {
-      console.error(`"SetByHeader()" failed : ${err} @ Sheet: ${sheet} Row: ${row} Col: ${col} Value: ${val}`);
+      console.error(`"SetByHeader()" failed : ${err} @ Sheet: ${sheet} Row: ${row}, Value: ${val}`);
       return 1;
     }
   }

@@ -337,19 +337,19 @@ const _gasTMiscTesting = async () => {
   });
 
   await test(`ValidateEmail`, (t) => {
-    const x = ValidateEmail(`cparsell@berkeley.edu`);
+    const x = Emailer.ValidateEmail(`cparsell@berkeley.edu`);
     t.equal(x, true, `ValidateEmail SHOULD return true: ${x}`);
 
-    const y = ValidateEmail(`BAD NAME`);
+    const y = Emailer.ValidateEmail(`BAD NAME`);
     t.equal(y, false, `ValidateEmail SHOULD return false: ${y}`);
 
-    const z = ValidateEmail(`!#$%^%$123@berkeley.edu`);
+    const z = Emailer.ValidateEmail(`!#$%^%$123@berkeley.edu`);
     t.equal(z, false, `ValidateEmail SHOULD return false: ${z}`);
 
-    const a = ValidateEmail(`normalname@!#&^*^&*$%^)$!#$#!`);
+    const a = Emailer.ValidateEmail(`normalname@!#&^*^&*$%^)$!#$#!`);
     t.equal(a, false, `ValidateEmail SHOULD return false: ${a}`);
 
-    const b = ValidateEmail(`12345675645634599293487529384752938745923845293485729348572934875@berkeley.edu`);
+    const b = Emailer.ValidateEmail(`12345675645634599293487529384752938745923845293485729348572934875@berkeley.edu`);
     t.equal(b, true, `ValidateEmail SHOULD return true: ${b}`);
 
   });

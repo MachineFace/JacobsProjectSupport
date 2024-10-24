@@ -10,7 +10,7 @@ class Emailer {
     status : status = STATUS.received,
     email : email = `Unknown Email`,    
     designspecialistemail : designspecialistemail = SERVICE_EMAIL,
-    message : message = ``,
+    message : message = new CreateMessage(),
   }) {
     /** @private */
     this.name = name;
@@ -28,129 +28,95 @@ class Emailer {
 
   SendEmail () {
     try {
-      const staff = BuildStaff();
       switch (this.status) {
         case STATUS.received:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : ${STATUS.received}`, "", {
-            htmlBody: this.message.receivedMessage,
-            from: SERVICE_EMAIL,
-            cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.receivedMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.inProgress:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Started`, "", {
-              htmlBody: this.message.inProgressMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.inProgressMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.completed:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Completed`, "", {
-              htmlBody: this.message.completedMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.completedMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.abandoned:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project waiting for you to pick up!`, "", {
-              htmlBody: this.message.abandonedMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.abandonedMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.pickedUp:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Picked Up`, "", {
-              htmlBody: this.message.pickedUpMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.pickedUpMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.failed:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has Failed`, "", {
-              htmlBody: this.message.failedMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.failedMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.rejectedByStudent:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Declined`, "", {
-              htmlBody: this.message.rejectedByStudentMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.rejectedByStudentMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.rejectedByStaff:
         case STATUS.cancelled:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project has been Cancelled`, "", {
-              htmlBody: this.message.rejectedByStaffMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.rejectedByStaffMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.billed:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Closed`, "", {
-            htmlBody: this.message.billedMessage,
-            from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-            bcc: staff.Chris.email,
-            name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.billedMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.waitlist:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Project Waitlisted`, "", {
-              htmlBody: this.message.waitlistMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.waitlistMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;
         case STATUS.missingAccess:
-          console.warn(`Sending ${this.status} email to student.`);
-          MailApp.sendEmail(this.email, `${SERVICE_NAME} : Missing Access`, "", {
-              htmlBody: this.message.noAccessMessage,
-              from: SERVICE_EMAIL,
-              cc: `${this.designspecialistemail}, ${SERVICE_EMAIL}`,
-              bcc: staff.Chris.email,
-              name: SERVICE_NAME,
+          Emailer.Mail({
+            to : this.email,
+            status : this.status,
+            message : this.message.noAccessMessage,
+            ds_email : this.designspecialistemail,
           });
-          console.warn(`Sent ${this.status} email to student.`);
           break;   
         case "":
         case undefined:
@@ -161,121 +127,151 @@ class Emailer {
       return 1;
     }
   }
-}
 
-/**
- * Validate an email string
- * @param {string} email
- * @returns {bool} boolean
- */
-const ValidateEmail = (email) => {
-  const regex = new RegExp(/^[a-zA-Z0-9+_.-]+@[berkeley.edu]+$/);
-  let match = regex.test(email);
-  console.warn(`Email is valid? : ${match}`)
-  return match;
-}
-
-
-/**
- * Send an email
- * @NOTIMPLEMENTED
- *
-const SendEmail = async ({
-  email : email = SERVICE_EMAIL,
-  staffEmail : staffEmail = SERVICE_EMAIL,
-  status : status = `Default`,
-  message : message = new CreateMessage({}),
-}) => {
-  try {
-    await MailApp.sendEmail(email, `${SERVICE_NAME} : ${status}`, ``, {
-      htmlBody: message,
-      from: SERVICE_EMAIL,
-      cc: staffEmail,
-      bcc: staff.Chris.email,
-      name: SERVICE_NAME,
-    });
-    console.warn(`"${status}" Email sent to student and status set to "${status}".`);
-    return 0;
-  } catch (err) {
-    console.error(`Could not email: ${err}`);
-    return 1;
-  }
-}
-*/
-
-/** 
- * @NOTIMPLEMENTED
- *
-const __CountTotalEmailsSent__ = async () => {
-  let count = 0;
-  try {
-    let pageToken;
-    do {
-      const threadList = Gmail.Users.Threads.list('me', {
-        q: `label:Jacobs Project Support/JPS Notifications`,
-        pageToken: pageToken
-      });
-      count += threadList.threads.length;
-      // if (threadList.threads && threadList.threads.length > 0) {
-      //   threadList.threads.forEach(thread => {
-      //     console.info(`Snip: ${thread.snippet}`);
-      //   });
-      // }
-      pageToken = threadList.nextPageToken;
-    } while (pageToken);
-  } catch (err) {
-    console.error(`Whoops ----> ${err}`);
-  }
-  console.warn(`Total Emails Sent : ${count}`);
-  return count;
-}
-*/
-
-/**
- * Lists, for each thread in the user's Inbox, a
- * snippet associated with that thread.
- *
- *
-const _ListInboxSnippets = () => {
-  try {
-    let pageToken;
-    do {
-      const threadList = Gmail.Users.Threads.list('me', {
-        q: `label:inbox`,
-        pageToken: pageToken
-      });
-      if (threadList.threads && threadList.threads.length > 0) {
-        threadList.threads.forEach(thread => {
-          console.info(`Snip: ${thread.snippet}`);
-        });
+  /**
+   * Mail
+   * @private
+   */
+  static Mail({
+    to : to = SERVICE_EMAIL,
+    status : status = STATUS.received,
+    message : message = new CreateMessage({}),
+    ds_email : ds_email = SERVICE_EMAIL,
+  }) {
+    try {
+      const staff = BuildStaff();
+      const subject = `${SERVICE_NAME}: Project ${status}`;
+      const options = {
+        htmlBody: message,
+        from: SERVICE_EMAIL,
+        cc: `${ds_email}, ${SERVICE_EMAIL}`,
+        bcc: staff.Chris.email,
+        name: SERVICE_NAME,
+        noReply: true,
       }
-      pageToken = threadList.nextPageToken;
-    } while (pageToken);
-  } catch (err) {
-    console.error(`Whoops ----> ${err}`);
+      MailApp.sendEmail(to, subject, ``, options);
+      console.warn(`User (${to}) emailed ${status} email.`);
+      return 0;
+    } catch(err) {
+      console.error(`"Mail()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Send an email
+   * @param {string} to
+   * @param {string} from
+   * @param {string} subject
+   * @param {string} message
+   * @param {string} status
+   * @param {string} staff email
+   * @returns {bool} success
+   */
+  static Email(to_email = SERVICE_EMAIL, from_email = SERVICE_EMAIL, subject = ``, message = new CreateMessage({}), status = STATUS.received, staffEmail = SERVICE_EMAIL,) {
+    try {
+      subject = subject ? subject : `${SERVICE_NAME} : ${status}`;
+      const options = {
+        htmlBody: message,
+        from: from_email,
+        cc: staffEmail,
+        bcc: BuildStaff().Chris.email,
+        name: SERVICE_NAME,
+      }
+      MailApp.sendEmail(to_email, subject, ``, options);
+      console.warn(`User (${to_email}) sent ${status} email.`);
+      return 0;
+    } catch (err) {
+      console.error(`"Email()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Count Total Emails Sent
+   * @NOTIMPLEMENTED
+   * @private
+   */
+  static async CountTotalEmailsSent() {
+    try {
+      let count = 0;
+      let pageToken;
+      while (pageToken) {
+        const threadList = Gmail.Users.Threads.list('me', {
+          q : `label:Jacobs Project Support/JPS Notifications`,
+          pageToken : pageToken
+        });
+        count += threadList.threads.length;
+        // if (threadList.threads && threadList.threads.length > 0) {
+        //   threadList.threads.forEach(thread => {
+        //     console.info(`Snip: ${thread.snippet}`);
+        //   });
+        // }
+        pageToken = threadList.nextPageToken;
+      }
+      console.warn(`Total Emails Sent : ${count}`);
+      return count;
+    } catch (err) {
+      console.error(`"CountTotalEmailsSent()" failed ----> ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Lists, for each thread in the user's Inbox, a snippet associated with that thread.
+   * @NOTIMPLEMENTED
+   * @private
+   */
+  static ListInboxSnippets() {
+    try {
+      let pageToken;
+      while (pageToken) {
+        const threadList = Gmail.Users.Threads.list('me', {
+          q: `label:inbox`,
+          pageToken: pageToken
+        });
+        if (threadList.threads && threadList.threads.length > 0) {
+          threadList.threads.forEach(thread => {
+            console.info(`Snip: ${thread.snippet}`);
+          });
+        }
+        pageToken = threadList.nextPageToken;
+      }
+      return 0;
+    } catch (err) {
+      console.error(`"ListInboxSnippets()" failed ----> ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Validate an email string
+   * @param {string} email
+   * @returns {bool} boolean
+   */
+  static ValidateEmail(email = ``) {
+    const regex = new RegExp(/^[a-zA-Z0-9+_.-]+@[berkeley.edu]+$/);
+    let match = regex.test(email);
+    console.warn(`Email is valid? : ${match}`);
+    return match;
   }
 }
-*/
+
 
 
 const _testEmail = async() => {
-  const name = `Dingus`; 
-  const email = `codyglen@berkeley.edu`;
-  const id = new IDService().id;
-  const projectname = `Some Kinda Project`;
-  const message = new CreateMessage({
-    name : name,
-    id : id,
-    projectname : projectname,
-  });
-  console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${id}`);
-
-  MailApp.sendEmail(email, `${SERVICE_NAME} : Project Closed`, "", {
-    htmlBody: message.billedMessage,
-    from: SERVICE_EMAIL,
-    cc: email,
-    name: SERVICE_NAME,
-  });
+  const obj = {
+    name : `Dingus`,
+    status : STATUS.received,
+    email : `codyglen@berkeley.edu`,
+    message : new CreateMessage({
+      name : `Dingus`,
+      id : IDService.createId(),
+      projectname : `Some Kinda Project`,
+    }),
+  }
+  console.warn(`Emailing: ${JSON.stringify(obj, null, 3)}`);
+  new Emailer(obj);
 
   console.warn(`Email fucking sent...`);
 
