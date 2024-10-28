@@ -128,7 +128,7 @@ const PopupGetSingleStudentPriority = async () => {
     console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
 
     
-    priority = await new CheckPriority({ email : email, sid : sid }).Priority;
+    priority = await new PriorityService({ email : email, sid : sid }).Priority;
     console.info(`Priority: ${priority}`);
     SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     if(priority == PRIORITY.None) {

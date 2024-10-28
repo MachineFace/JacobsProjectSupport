@@ -4,7 +4,7 @@
  * @param {string} email
  * @param {string} sid
  */
-class CheckPriority {
+class PriorityService {
   constructor({
     email : email = SERVICE_EMAIL,
     sid : sid = 1293487129348,
@@ -14,7 +14,7 @@ class CheckPriority {
   }
 
   /** @private */
-  _CheckForStaff () {
+  _CheckForStaff() {
     try {
       console.warn(`Checking if ${this.email} is staff....`);
       let finder = OTHERSHEETS.Staff.createTextFinder(this.email).findNext();
@@ -84,24 +84,19 @@ class CheckPriority {
     }
   }
 
-  
-}
-
-
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Check Students with Missing Access for their Priority Number if it exists.
- */
-const CheckMissingAccessStudents = () => {
-  let list = [];
-  const results = SheetService.Search(PRIORITY.None);
-  if(results != null) {
+  /**
+   * Check Users with Missing Access for their Priority Number if it exists.
+   */
+  static CheckMissingAccessStudents() {
+    let list = [];
+    const results = SheetService.Search(PRIORITY.None);
+    if(results == null) return; 
     for(const [sheetName, values] of Object.entries(results)) {
       values.forEach( row => {
         const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
         let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, } = SheetService.GetRowData(thisSheet, row);
-        priority = new CheckPriority({ email : email, sid : sid }).Priority;
+        priority = new PriorityService({ email : email, sid : sid }).Priority;
         console.info(`Email : ${email}, SID : ${sid}, Priority : ${p}`);
 
         SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, row, p);
@@ -111,11 +106,18 @@ const CheckMissingAccessStudents = () => {
         }
       });
     }
+    return list;
   }
-  return list;
-};
+
+  
+}
 
 
+/**
+ * ----------------------------------------------------------------------------------------------------------------
+ * Check Students with Missing Access for their Priority Number if it exists.
+ */
+const CheckMissingAccessStudents = () => PriorityService.CheckMissingAccessStudents();
 
 
 const _testCheck = () => {

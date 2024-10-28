@@ -26,7 +26,7 @@ class Emailer {
     this.SendEmail();
   }
 
-  SendEmail () {
+  SendEmail() {
     try {
       switch (this.status) {
         case STATUS.received:

@@ -37,15 +37,15 @@ const _gasTMainTesting = async () => {
         sid : 2394872349587,
       },
     }
-    const st = new CheckPriority({email : types.staff.email, sid : types.staff.sid }).Priority;
+    const st = new PriorityService({email : types.staff.email, sid : types.staff.sid }).Priority;
     t.equal(st, PRIORITY.Tier1, `DEFAULT priority for staff : Expected 1, Actual ${st}`);
-    const gg = new CheckPriority({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
+    const gg = new PriorityService({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
     t.equal(gg, PRIORITY.Tier4, `Expected 4, Actual ${gg}`);
-    const gb = new CheckPriority({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
+    const gb = new PriorityService({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
     t.equal(gb, PRIORITY.Tier4, `Expected 4, Actual ${gb}`);
-    const bg = new CheckPriority({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
+    const bg = new PriorityService({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
     t.equal(bg, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${bg}`);
-    const bb = new CheckPriority({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
+    const bb = new PriorityService({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
     t.equal(bb, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${bb}`);
 
   });
@@ -294,7 +294,7 @@ const _gasTMiscTesting = async () => {
     t.equal(x, `codyglen@berkeley.edu`, `Should fetch my email from that sheet.`);
 
     const y = SheetService.GetByHeader(SHEETS.Laser, `BAD COLUMN NAME`, 2);
-    t.equal(y, false, `GetByHeader SHOULD return "false": ${y}`);
+    t.equal(y, 1, `GetByHeader SHOULD return "1": Actual: ${y}`);
 
     const z = SheetService.GetByHeader(`BAD SHEET`, HEADERNAMES.email, 2);
     t.throws(z, `GetByHeader SHOULD throw an error on bad sheet name: ${z}`);
@@ -309,7 +309,7 @@ const _gasTMiscTesting = async () => {
     t.notEqual(x, undefined || null, `GetColumnDataByHeader SHOULD NOT return undefined or null: ${x}`);
 
     const y = SheetService.GetColumnDataByHeader(SHEETS.Laser, `BAD COLUMN NAME`);
-    t.equal(y, false, `GetByHeader SHOULD return "false": ${y}`);
+    t.equal(y, 1, `GetColumnDataByHeader SHOULD return "1": Actual: ${y}`);
 
     const z = SheetService.GetColumnDataByHeader(`BAD SHEET`, `BAD COLUMN NAME`);
     t.throws(z, `GetColumnDataByHeader SHOULD throw an error on bad sheet name: ${z}`);

@@ -58,7 +58,7 @@ const onSubmission = async (e) => {
   SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
-  let priority = new CheckPriority({ email : email, sid : sid }).Priority;
+  let priority = new PriorityService({ email : email, sid : sid }).Priority;
   SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);
 
   try {
@@ -232,7 +232,7 @@ const onChange = async (e) => {
   // Check Priority
   try {
     if(!priority) {
-      priority = await new CheckPriority({ email : email, sid : sid }).Priority;
+      priority = await new PriorityService({ email : email, sid : sid }).Priority;
       SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
