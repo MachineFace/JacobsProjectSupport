@@ -122,7 +122,7 @@ const MarkAsAbandonedByBarcode = async () => {
         mat5quantity, mat5, affiliation, elapsedTime, estimate, 
         price1, price2, sheetName, row, } = rowData;
 
-      var message = new CreateMessage({
+      var message = new MessageService({
         name : name,
         projectname : projectName, 
         id : id,

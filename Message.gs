@@ -14,7 +14,7 @@
  * @param {string} designspecialist
  * @param {string} designspecialistemaillink
  */
-class CreateMessage {
+class MessageService {
   constructor({
     name : name, 
     projectname : projectname, 

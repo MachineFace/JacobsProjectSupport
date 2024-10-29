@@ -157,8 +157,8 @@ const _gasTMessagingTesting = async () => {
   }
   const test = new GasTap();
 
-  await test(`CreateMessage DEFAULT`, (t) => {
-    const message = new CreateMessage({});
+  await test(`MessageService DEFAULT`, (t) => {
+    const message = new MessageService({});
 
     const a = `DEFAULT ${message.defaultMessage}`;
     t.notThrow(() => a, `DEFAULT SHOULD NOT throw error.`);
@@ -183,9 +183,9 @@ const _gasTMessagingTesting = async () => {
 
   });
 
-  await test(`CreateMessage`, (t) => {
+  await test(`MessageService`, (t) => {
     const rowData = GetRowData(SHEETS.Fablight, 2);
-    const message = new CreateMessage({
+    const message = new MessageService({
       name : 'Cody', 
       projectname : 'Test Project',
       id : '101293874098', 
@@ -627,7 +627,7 @@ const _gasTEmailTesting = async () => {
     const email = "codyglen@berkeley.edu";
     const id = new IDService().id;
     const projectname = `Some Kinda Project`;
-    const message = new CreateMessage({
+    const message = new MessageService({
       name : name,
       id : id,
       projectname : projectname,

@@ -11,8 +11,7 @@ class HackyStoreAutomation {
 
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * DEFUNCT : Write the price to sheet
+   * Write the price to sheet
    * Used in "UpdatePriced()" function
    * @private
    */
@@ -34,8 +33,7 @@ class HackyStoreAutomation {
 
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * DEFUNCT : Get Price From Shopify Store URL (NOT USING SHOPIFY API)
+   * Get Price From Shopify Store URL (NOT USING SHOPIFY API)
    * Used in "WritePrice()" function
    * @private
    * @param {string} url
@@ -74,7 +72,6 @@ class HackyStoreAutomation {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
    * AUTOMATION : Get Price From Shopify
    * Used in "UpdatePricePerSheet()" function
    * @param {string} none
@@ -89,7 +86,6 @@ class HackyStoreAutomation {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
    * AUTOMATION : Update Price Per Sheet
    * @param {sheet} sheet
    * @return {bool} true
@@ -110,7 +106,6 @@ class HackyStoreAutomation {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
    * AUTOMATION : Update Each Sheet with Product IDs : Uses FetchProductIDInProductURL()
    */
   UpdateProductID () {    
@@ -129,7 +124,6 @@ class HackyStoreAutomation {
 
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
    * AUTOMATION : Parses html to find the Product ID. (NOT USING SHOPIFY API)
    */
   async FetchProductIDInProductURL (sheet) {
@@ -166,7 +160,9 @@ class HackyStoreAutomation {
       return 1;
     }
   }
+
 }
+
 const RunHackySheetUpdater = () => new HackyStoreAutomation();
 
 

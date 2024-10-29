@@ -10,7 +10,7 @@ class Emailer {
     status : status = STATUS.received,
     email : email = `Unknown Email`,    
     designspecialistemail : designspecialistemail = SERVICE_EMAIL,
-    message : message = new CreateMessage(),
+    message : message = new MessageService(),
   }) {
     /** @private */
     this.name = name;
@@ -135,7 +135,7 @@ class Emailer {
   static Mail({
     to : to = SERVICE_EMAIL,
     status : status = STATUS.received,
-    message : message = new CreateMessage({}),
+    message : message = new MessageService({}),
     ds_email : ds_email = SERVICE_EMAIL,
   }) {
     try {
@@ -168,7 +168,7 @@ class Emailer {
    * @param {string} staff email
    * @returns {bool} success
    */
-  static Email(to_email = SERVICE_EMAIL, from_email = SERVICE_EMAIL, subject = ``, message = new CreateMessage({}), status = STATUS.received, staffEmail = SERVICE_EMAIL,) {
+  static Email(to_email = SERVICE_EMAIL, from_email = SERVICE_EMAIL, subject = ``, message = new MessageService({}), status = STATUS.received, staffEmail = SERVICE_EMAIL,) {
     try {
       subject = subject ? subject : `${SERVICE_NAME} : ${status}`;
       const options = {
@@ -264,7 +264,7 @@ const _testEmail = async() => {
     name : `Dingus`,
     status : STATUS.received,
     email : `codyglen@berkeley.edu`,
-    message : new CreateMessage({
+    message : new MessageService({
       name : `Dingus`,
       id : IDService.createId(),
       projectname : `Some Kinda Project`,

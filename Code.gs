@@ -317,7 +317,7 @@ const onChange = async (e) => {
   const designspecialistemail = InvokeDS(ds, `email`);
 
   // Create a Message and Return Appropriate Responses.
-  const message = new CreateMessage({
+  const message = new MessageService({
     name : name,
     projectname : projectName, 
     id : id,

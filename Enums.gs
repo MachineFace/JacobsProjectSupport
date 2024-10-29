@@ -10,6 +10,9 @@ const DaysRetentionNumber = 15; //How many days to hold a file
 const RETENTION_PERIOD = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
 const PICKUP_HOURS = `Monday - Friday: 11am - 1pm.`  //`Monday - Friday: 11am - 1pm & 4pm - 6pm.`
 
+/**
+ * Colors
+ */
 const COLORS = Object.freeze({
   green_light : `#d9ead3`,
   green : `74d975`, 
@@ -39,6 +42,9 @@ const COLORS = Object.freeze({
   black : `#000000`,
 });
 
+/**
+ * All Colors
+ */
 const ALLCOLORS = Object.freeze({
   black : `#000000`,
   dark_gray_4 : `#434343`,
@@ -122,6 +128,9 @@ const ALLCOLORS = Object.freeze({
   dark_magenta_3 : `#4c1130`,
 });
 
+/**
+ * Response Codes
+ */
 const RESPONSECODES = Object.freeze({
 	200 : `OK`,
 	201 : `Created`,
@@ -191,6 +200,9 @@ const RESPONSECODES = Object.freeze({
 	599 : `Network connect timeout error`,
 });
 
+/**
+ * Status
+ */
 const STATUS = Object.freeze({
   received : `Received`,
   inProgress : `In-Progress`,
@@ -205,6 +217,9 @@ const STATUS = Object.freeze({
   abandoned : `Abandoned`,
 });
 
+/**
+ * Priority
+ */
 const PRIORITY = Object.freeze({
   None : `STUDENT NOT FOUND!`,
   Tier1 : 1,
@@ -271,7 +286,6 @@ const DEFUNCT = Object.freeze({
 
 const NONITERABLESHEETS = Object.freeze({ ...OTHERSHEETS, ...STORESHEETS, });
 
-
 /**
  * Collection of Forms : Dictionary of key / value pair.
  * Example: Calling 'formDict.laser' returns value string.
@@ -288,9 +302,6 @@ const FORMS = Object.freeze({
   gsi_plotter: `1F_lEMi0HoV6Ej4RPxn8FuWqsPWJdfjmwyJs7v2SkoCg`,
 });
 
-
-
-
 /**
  * Drive Folder Locations
  */
@@ -298,7 +309,6 @@ const DRIVEFOLDERS = Object.freeze({
   tickets : `1xpjeqTju9ELRrQJ3GzFdv-nHYjoCfUjl`,
   jobforms : `1G31sd5TZiAWCus4Gi_JSpFTSY1xVOV2o`,
 });
-
 
 /**
  * Student Types

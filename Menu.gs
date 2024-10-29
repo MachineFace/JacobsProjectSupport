@@ -24,7 +24,7 @@ const PopUpMarkAsAbandoned = async () => {
       let email = res.email;
       SheetService.SetByHeader(sheet, HEADERNAMES.status, row, STATUS.abandoned);
       console.info(`Job number ${id} marked as abandoned. Sheet: ${sheet.getSheetName()} row: ${row}`);
-      const message = await new CreateMessage({
+      const message = await new MessageService({
         name : res.name, 
         projectname : res.projectName, 
         id : id, 
@@ -137,7 +137,7 @@ const PopupGetSingleStudentPriority = async () => {
         name : name, 
         status : STATUS.missingAccess,
         email : email,    
-        message :  new CreateMessage({
+        message :  new MessageService({
           name : name,
           projectname : projectName, 
           id : id,
