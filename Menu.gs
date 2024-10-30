@@ -1,4 +1,3 @@
-
 /**
  * Mark a job as abandoned and send an email to that student
  * DEFUNCT
@@ -449,12 +448,3 @@ const OpenBarcodeTab = async () => SpreadsheetApp
   .getRange(`B3`)
   .activate();
 */
-
-
-
-
-
-
-
-
-

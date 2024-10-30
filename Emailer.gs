@@ -255,6 +255,7 @@ class Emailer {
     console.warn(`Email is valid? : ${match}`);
     return match;
   }
+  
 }
 
 

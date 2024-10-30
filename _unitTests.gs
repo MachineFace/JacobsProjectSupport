@@ -62,12 +62,12 @@ const _gasTMainTesting = async () => {
   });
   */
 
-  await test(`Generate Barcode: `, (t) => {
-    const x = new BarcodeGenerator({ id : 20230119105523 }).GenerateBarCodeForTicketHeader();
+  await test(`Generate Barcode: `, async (t) => {
+    const x = await BarcodeGenerator.GenerateBarCodeForTicketHeader(20230119105523);
     t.notEqual(x, undefined || null, `Barcode SHOULD NOT be undefined or null : ${x}`);
-    const y = new BarcodeGenerator({ id : `alskdfjalsdkfj` }).GenerateBarCodeForTicketHeader();
+    const y = await BarcodeGenerator.GenerateBarCodeForTicketHeader(`alskdfjalsdkfj`);
     t.notEqual(y, undefined || null, `Barcode SHOULD NOT be undefined or null : ${y}`);
-    const z = new BarcodeGenerator({}).GenerateBarCodeForTicketHeader();
+    const z = await BarcodeGenerator.GenerateBarCodeForTicketHeader({});
     t.notEqual(z, undefined || null, `Barcode SHOULD NOT be undefined or null : ${z}`);
   });
 

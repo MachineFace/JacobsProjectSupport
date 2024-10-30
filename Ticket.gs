@@ -44,7 +44,7 @@ class Ticket {
    * Create Ticket
    */
   async CreateTicket() {
-    const barcode = await new BarcodeGenerator({ id : this.id }).GenerateBarCodeForTicketHeader();
+    const barcode = await BarcodeGenerator.GenerateBarCodeForTicketHeader(this.id);
 
     const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
     this.doc = await DocumentApp.create(`JPS-Ticket-${this.id}`); // Make Document
