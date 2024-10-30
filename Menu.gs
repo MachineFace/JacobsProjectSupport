@@ -170,7 +170,7 @@ const PopupCreateNewID = () => {
   const ui = SpreadsheetApp.getUi();
   const thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
-  const newID = new IDService().id;
+  const newID = IDService.createId();
 
   if(!SheetService.IsValidSheet(thisSheet)) {
     const a = ui.alert(

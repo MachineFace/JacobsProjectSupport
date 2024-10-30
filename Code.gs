@@ -54,7 +54,7 @@ const onSubmission = async (e) => {
   console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let id = new IDService().id;
+  let id = IDService.createId();
   SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
@@ -67,20 +67,8 @@ const onSubmission = async (e) => {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
 
       // Email
-      // new Emailer({
-      //   name : name, 
-      //   status : STATUS.missingAccess,
-      //   email : email,    
-      //   message : message.missingAccessMessage,
-      // });
+      Emailer.Email(email, SERVICE_EMAIL, `${SERVICE_NAME} : Missing Access`, message.missingAccessMessage, STATUS.missingAccess, staff.Cody.email );
 
-      MailApp.sendEmail(email, `${SERVICE_NAME} : Missing Access`, ``, {
-        htmlBody: message.missingAccessMessage,
-        from: SERVICE_EMAIL,
-        bcc: `"${staff.Chris.email}, ${staff.Cody.email}"`,
-        name: SERVICE_NAME,
-      });
-      console.warn(`'Missing Access' Email sent to student and status set to 'Missing Access'.`);
     } else {
       // Set Status to Received
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status,  lastRow, STATUS.received); 
@@ -138,13 +126,6 @@ const onSubmission = async (e) => {
 
   // Email each DS
   try {
-    // new Emailer({
-    //   name : name, 
-    //   status : status,
-    //   email : email,    
-    //   designspecialistemail : designspecialistemail,
-    //   message : message,
-    // });
     MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
       htmlBody: dsMessage,
       from: SERVICE_EMAIL,
@@ -176,7 +157,7 @@ const onSubmission = async (e) => {
 
   // Check again
   if(IDService.isValid(id) == false) {
-    SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, new IDService().id);
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, IDService.createId());
   }
 
   // Fix wrapping issues
@@ -245,7 +226,7 @@ const onChange = async (e) => {
   }
 
   ds = ds ? ds : `a Design Specialist`;
-  id = IDService.isValid(id) ? id : new IDService().id;
+  id = IDService.isValid(id) ? id : IDService.createId();
   projectName = projectName ? projectName : `Your Project`;
 
   // Log submission info to sheet
@@ -258,7 +239,7 @@ const onChange = async (e) => {
   try {
     console.info(`Trying to fix ID : ${id}`);
     if (status == STATUS.received || status == STATUS.inProgress) {
-      id = IDService.isValid(id) ? id : new IDService().id;
+      id = IDService.isValid(id) ? id : IDService.createId();
       SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
       console.warn(`ID was missing: fixed it. Submission by ${email}`);
     }

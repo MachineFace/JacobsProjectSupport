@@ -26,7 +26,7 @@ class MessageService {
   }) {
     this.name = name ? name.toString() : `Unknown Name`;
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
-    this.id = id ? id.toString() : new IDService().id;
+    this.id = id ? id.toString() : IDService.createId();
 
     // let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
     // mat1quantity, mat1, mat2quantity, mat2, 
@@ -281,7 +281,7 @@ class CreateSubmissionMessage {
   }) {
     this.name = name ? name : `Unknown Name`;
     this.projectname = projectname ? projectname : `Unknown Project Name`;
-    this.id = id ? id : new IDService().id;
+    this.id = id ? id : IDService.createId();
 
     /** @private */
     this.greetings = `Hi ${this.name},`;

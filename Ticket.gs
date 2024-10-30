@@ -12,7 +12,7 @@
  */
 class Ticket {
   constructor({
-    id : id = new IDService().id,
+    id : id = IDService.createId(),
     designspecialist : designspecialist = `Staff`,
     submissiontime : submissiontime = new Date(),
     name : name = `Unknown`,
@@ -128,19 +128,10 @@ class Ticket {
         .setMarginBottom(2)
         .setMarginLeft(2)
         .setMarginRight(2);
-    } catch (err) {
-      console.error(`${err} : Couldn't set ticket main properties.`);
-    }
-    try {
       body.insertImage(0, barcode)
         .setWidth(260)
         .setHeight(100);
-    } catch (err) {
-      console.error(`${err} : Couldn't insert barcode into ticket.`);
-    }
-    try {
       body.insertHorizontalRule(1);
-      
       body.insertParagraph(2, `Name: ${this.name.toString()}`)
         .setHeading(DocumentApp.ParagraphHeading.HEADING1)
         .setAttributes({
@@ -182,7 +173,6 @@ class Ticket {
   };
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
    * Replace table entries with an Image blob
    * @private
    * @param {DocumentApp.create(`doc`).getbody()} body
@@ -202,7 +192,7 @@ class Ticket {
       console.error(`"_ReplaceTextToImage()" failed : ${err}`);
       return 1;
     }
-  };
+  }
   
 }
 

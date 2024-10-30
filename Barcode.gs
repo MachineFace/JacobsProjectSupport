@@ -7,7 +7,7 @@ class BarcodeGenerator {
   constructor({
     id : id,
   }) {
-    this.id = id ? id : new IDService().id;
+    this.id = id ? id : IDService.createId();
     /** @private */
     this.root = `http://bwipjs-api.metafloor.com/`;
   }
@@ -53,7 +53,7 @@ class BarcodeGenerator {
 }
 
 const _testBarcode = () => {
-  const id = new IDService().id;
+  const id = IDService.createId();
   const b = new BarcodeGenerator({ id : id }).GenerateBarCodeForTicketHeader();
 }
 
