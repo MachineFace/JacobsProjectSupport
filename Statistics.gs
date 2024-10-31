@@ -813,6 +813,64 @@ class StatisticsService {
   }
 
   /**
+   * Given the output of `linearRegression`: an object with `m` and `b` values indicating slope and intercept,
+   * respectively, generate a line function that translates x values into y values.
+   *
+   * @param {Object} mb object with `m` and `b` members, representing
+   * slope and intersect of desired line
+   * @returns {Function} method that computes y-value at any given
+   * x-value on the line.
+   * @example
+   * var l = linearRegressionLine(linearRegression([[0, 0], [1, 1]]));
+   * l(0) // = 0
+   * l(2) // = 2
+   * linearRegressionLine({ b: 0, m: 1 })(1); // => 1
+   * linearRegressionLine({ b: 1, m: 1 })(1); // => 2
+   */
+  static LinearRegressionLine(mb /*: { b: number, m: number }*/) {
+    // Return a function that computes a `y` value for each x value it is given, based on the values of `b` and `a` that we just computed.
+    return function (x) {
+      return mb.b + mb.m * x;
+    }
+  }
+
+  /**
+   * [Log average](https://en.wikipedia.org/wiki/https://en.wikipedia.org/wiki/Geometric_mean#Relationship_with_logarithms)
+   * is an equivalent way of computing the geometric mean of an array suitable for large or small products.
+   *
+   * It's found by calculating the average logarithm of the elements and exponentiating.
+   *
+   * @param {Array<number>} x sample of one or more data points
+   * @returns {number} geometric mean
+   * @throws {Error} if x is empty
+   * @throws {Error} if x contains a negative number
+   */
+  static LogAverage(numbers = []) {
+    if (numbers.length === 0) throw new Error("logAverage requires at least one data point");
+
+    let value = 0;
+    for (let i = 0; i < numbers.length; i++) {
+      if (numbers[i] < 0) throw new Error(`Requires only non-negative numbers as input`);
+      value += Math.log(numbers[i]);
+    }
+
+    return Math.exp(value / numbers.length);
+  }
+
+  /**
+   * The [Logit](https://en.wikipedia.org/wiki/Logit)
+   * is the inverse of cumulativeStdLogisticProbability,
+   * and is also known as the logistic quantile function.
+   *
+   * @param {number} p
+   * @returns {number} logit
+   */
+  static Logit(p = 2.0) {
+    if (p <= 0 || p >= 1) throw new Error("p must be strictly between zero and one");
+    return Math.log(p / (1 - p));
+  }
+
+  /**
    * Median Mean
    * @param {Array} numbers
    * @returns {number} Median
