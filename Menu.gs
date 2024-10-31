@@ -95,7 +95,7 @@ const PopupCountUsers = () => {
     `JPS User Count: ${count}`,
     ui.ButtonSet.OK
   );
-};
+}
 
 
 /**
@@ -110,7 +110,7 @@ const PopupCheckMissingAccessStudents = async () => {
     `Checked Missing Access Students on All Sheets :\n ${names}`,
     ui.ButtonSet.OK
   );
-};
+}
 
 
 /**
@@ -159,7 +159,7 @@ const PopupGetSingleStudentPriority = async () => {
     );
   }
   
-};
+}
 
 
 /**
@@ -195,7 +195,7 @@ const PopupCreateNewID = () => {
     ui.ButtonSet.OK
   );
   if(a === ui.Button.OK) return;
-};
+}
 
 
 /**
@@ -309,7 +309,7 @@ const BillFromSelected = async () => {
     console.error(`"BillFromSelected()" failed : ${err}`);
     return 1;
   } 
-};
+}
 
 
 /**
@@ -351,7 +351,7 @@ const PopupCreateTicket = async () => {
     ui.ButtonSet.OK
   );
   if(response === ui.Button.OK) return;
-};
+}
 
 /**
  * Builds HTML file for the modal pop-up from the help list.
@@ -382,7 +382,7 @@ const BuildHTMLHELP = () => {
 
   console.info(html);
   return html;
-};
+}
 
 /**
  * Creates a modal pop-up for the help text.
@@ -393,7 +393,7 @@ const PopupHelp = async () => {
     .setWidth(640)
     .setHeight(480);
   ui.showModalDialog(htmlOutput, `${SERVICE_NAME} HELP!!`);
-};
+}
 
 /**
  * Builds our JPS Menu and sets functions.
@@ -430,7 +430,7 @@ const BarMenu = () => {
       .addSeparator()
       .addItem(`Help`, `PopupHelp`)
       .addToUi();
-};
+}
 
 const RunStandardDeviation = () => Calculate.GetUserSubmissionStandardDeviation();
 const RunTopTen = () => Calculate.CreateTopTen();
