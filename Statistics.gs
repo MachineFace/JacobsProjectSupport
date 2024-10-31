@@ -20,7 +20,13 @@ class StatisticsService {
   }
 
   /**
-   * Calculate Arithmetic Mean
+   * [Arithmetic Mean] (https://en.wikipedia.org/wiki/Central_tendency)
+   * is the sum of all values over the number of values.
+   * This is a measure of central tendency
+   * a method of finding a typical or central value of a set of numbers.
+   *
+   * This runs in `O(n)`, linear time, with respect to the length of the array.
+   * @param {Array<number>} x sample of one or more data points
    * @returns {number} arithmetic mean
    */
   static ArithmeticMean(distribution = []) {
@@ -871,6 +877,27 @@ class StatisticsService {
   }
 
   /**
+   * Create a new column x row matrix.
+   * @private
+   * @param {number} columns
+   * @param {number} rows
+   * @return {Array<Array<number>>} matrix
+   * @example
+   * makeMatrix(10, 10);
+   */
+  static MakeMatrix(columns, rows) {
+    let matrix = [];
+    for (let i = 0; i < columns; i++) {
+      let column = [];
+      for (let j = 0; j < rows; j++) {
+        column.push(0);
+      }
+      matrix.push(column);
+    }
+    return matrix;
+  }
+
+  /**
    * Median Mean
    * @param {Array} numbers
    * @returns {number} Median
@@ -895,6 +922,30 @@ class StatisticsService {
       console.error(`"Median()" failed : ${err}`);
       return 1;
     }
+  }
+
+  /**
+   * The [Median Absolute Deviation](http://en.wikipedia.org/wiki/Median_absolute_deviation) is
+   * a robust measure of statistical
+   * dispersion. It is more resilient to outliers than the standard deviation.
+   *
+   * @param {Array<number>} x input array
+   * @returns {number} median absolute deviation
+   * @example
+   * medianAbsoluteDeviation([1, 1, 2, 2, 4, 6, 9]); // => 1
+   */
+  static MedianAbsoluteDeviation(numbers = []) {
+    const medianValue = StatisticsService.ArithmeticMean(numbers);
+
+    // Make a list of absolute deviations from the median
+    const medianAbsoluteDeviations = [];
+    for (let i = 0; i < numbers.length; i++) {
+      medianAbsoluteDeviations.push(Math.abs(numbers[i] - medianValue));
+    }
+
+    // Find the median value of that list
+    const median = StatisticsService.ArithmeticMean(medianAbsoluteDeviations);
+    return median;
   }
 
   /**
@@ -941,6 +992,231 @@ class StatisticsService {
       console.error(`"Max()" failed: ${err}`);
       return 1;
     }
+  }
+
+  /**
+   * [Mode](https://en.wikipedia.org/wiki/Mode_%28statistics%29) is the number that appears in a list the highest number of times.
+   * There can be multiple modes in a list: in the event of a tie, this algorithm will return the most recently seen mode.
+   *
+   * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+   * a method of finding a typical or central value of a set of numbers.
+   *
+   * @param {Array<*>} x a sample of one or more data points
+   * @returns {?*} mode
+   * @throws {ReferenceError} if the JavaScript environment doesn't support Map
+   * @throws {Error} if x is empty
+   * @example
+   * modeFast(['rabbits', 'rabbits', 'squirrels']); // => 'rabbits'
+   */
+  static Mode(array = []) {
+    if (array.length === 0) throw new Error(`"Mode()" requires at last one data point`);
+    const index = new Map();  // This index will reflect the incidence of different values, indexing them like { value: count }
+
+    let mode;
+    let modeCount = 0;
+    for (let i = 0; i < array.length; i++) {
+      let newCount = index.get(array[i]);
+      if (newCount === undefined) newCount = 1;
+      else newCount++;
+      if (newCount > modeCount) {
+        mode = array[i];
+        modeCount = newCount;
+      }
+      index.set(array[i], newCount);
+    }
+    return mode;
+  }
+
+  /**
+   * Sort an array of numbers by their numeric value
+   *
+   * This is necessary because the default behavior of .sort
+   * in JavaScript is to sort arrays as string values
+   *
+   *     [1, 10, 12, 102, 20].sort()
+   *     // output
+   *     [1, 10, 102, 12, 20]
+   *
+   * @param {Array<number>} x input array
+   * @return {Array<number>} sorted (ascending) array
+   * @private
+   * @example
+   * numericSort([3, 2, 1]) // => [1, 2, 3]
+   */
+  static NumericSort(numbers = []) {
+    return numbers
+      .slice()
+      .sort((a, b) => Number(a) - Number(b));
+  }
+
+  /**
+   * The [Poisson Distribution](http://en.wikipedia.org/wiki/Poisson_distribution)
+   * is a discrete probability distribution that expresses the probability
+   * of a given number of events occurring in a fixed interval of time
+   * and/or space if these events occur with a known average rate and
+   * independently of the time since the last event.
+   *
+   * The Poisson Distribution is characterized by the strictly positive
+   * mean arrival or occurrence rate, `λ`.
+   *
+   * @param {number} lambda location poisson distribution
+   * @returns {number[]} values of poisson distribution at that point
+   */
+  static PoissonDistribution(lambda = 2.0) /*: ?number[] */ {  
+    if (lambda <= 0) return undefined; // Check that lambda is strictly positive
+
+    let x = 0;
+    let cumulativeProbability = 0;  // and we keep track of the current cumulative probability, in order to know when to stop calculating chances.
+    
+    const cells = []; // the calculated cells to be returned
+    let factorialX = 1;
+
+    // This algorithm iterates through each potential outcome, until the `cumulativeProbability` is very close to 1, at
+    // which point we've defined the vast majority of outcomes
+    while (cumulativeProbability < 1 - 0.0001) {
+      cells[x] = (Math.exp(-lambda) * Math.pow(lambda, x)) / factorialX;  // [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function)
+      cumulativeProbability += cells[x];
+      x++;
+      factorialX *= x;  // when the cumulativeProbability is nearly 1, we've calculated the useful range of this distribution
+    }
+
+    return cells;
+  }
+
+  /**
+   * [Product](https://en.wikipedia.org/wiki/Product_(mathematics)) of an array
+   * is the result of multiplying all numbers together, starting using one as the multiplicative identity.
+   *
+   * This runs in `O(n)`, linear time, with respect to the length of the array.
+   *
+   * @param {Array<number>} x input
+   * @return {number} product of all input numbers
+   * @example
+   * product([1, 2, 3, 4]); // => 24
+   */
+  static Product(numbers = []) {
+    try {
+      let value = 1;
+      numbers.forEach(x => value *= Number(x));
+      return value;
+    } catch(err) {
+      console.error(`"Product()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * [Permutation](https://en.wikipedia.org/wiki/Resampling_(statistics)#Permutation_tests)
+   * Determines if two data sets are *significantly* different from each other, using
+   * the difference of means between the groups as the test statistic.
+   * The function allows for the following hypotheses:
+   * - two_tail = Null hypothesis: the two distributions are equal.
+   * - greater = Null hypothesis: observations from sampleX tend to be smaller than those from sampleY.
+   * - less = Null hypothesis: observations from sampleX tend to be greater than those from sampleY.
+   * [Learn more about one-tail vs two-tail tests.](https://en.wikipedia.org/wiki/One-_and_two-tailed_tests)
+   *
+   * @param {Array<number>} sampleX first dataset (e.g. treatment data)
+   * @param {Array<number>} sampleY second dataset (e.g. control data)
+   * @param {string} alternative alternative hypothesis, either 'two_sided' (default), 'greater', or 'less'
+   * @param {number} k number of values in permutation distribution.
+   * @param {Function} [randomSource=Math.random] an optional entropy source
+   * @returns {number} p-value The probability of observing the difference between groups (as or more extreme than what we did), assuming the null hypothesis.
+   *
+   * @example
+   * var control = [2, 5, 3, 6, 7, 2, 5];
+   * var treatment = [20, 5, 13, 12, 7, 2, 2];
+   * permutationTest(control, treatment); // ~0.1324
+   */
+  static Permutation(sampleX = [], sampleY = [], alternative = `two_sided`, k = 10000, randomSource = Math.random()) {
+    if(alternative !== "two_sided" && alternative !== "greater" && alternative !== "less") alternative = "two_sided"
+
+    const meanX = StatisticsService.ArithmeticMean(sampleX);
+    const meanY = StatisticsService.ArithmeticMean(sampleY);
+    const testStatistic = meanX - meanY;
+
+    // create test-statistic distribution
+    const testStatDsn = new Array(k);
+
+    // combine datsets so we can easily shuffle later
+    const allData = sampleX.concat(sampleY);
+    const midIndex = Math.floor(allData.length / 2);
+
+    for (let i = 0; i < k; i++) {
+      // 1. shuffle data assignments
+      StatisticsService.Shuffle(allData, randomSource);
+      const permLeft = allData.slice(0, midIndex);
+      const permRight = allData.slice(midIndex, allData.length);
+
+      // 2.re-calculate test statistic
+      const permTestStatistic = StatisticsService.ArithmeticMean(permLeft) - StatisticsService.ArithmeticMean(permRight);
+
+      // 3. store test statistic to build test statistic distribution
+      testStatDsn[i] = permTestStatistic;
+    }
+
+    // Calculate p-value depending on alternative
+    // For this test, we calculate the percentage of 'extreme' test statistics (subject to our hypothesis)
+    // more info on permutation test p-value calculations: https://onlinecourses.science.psu.edu/stat464/node/35
+    let numExtremeTStats = 0;
+    if (alternative === "two_side") {
+      for (let i = 0; i <= k; i++) {
+        if (Math.abs(testStatDsn[i]) >= Math.abs(testStatistic)) {
+          numExtremeTStats += 1;
+        }
+      }
+    } else if (alternative === "greater") {
+      for (let i = 0; i <= k; i++) {
+        if (testStatDsn[i] >= testStatistic) {
+          numExtremeTStats += 1;
+        }
+      }
+    } else {
+      // alternative === 'less'
+      for (let i = 0; i <= k; i++) {
+        /* c8 ignore start */
+        if (testStatDsn[i] <= testStatistic) {
+          numExtremeTStats += 1;
+        }
+      }
+    }
+
+    return numExtremeTStats / k;
+  }
+
+  /**
+   * [Heap's Algorithm](https://en.wikipedia.org/wiki/Heap%27s_algorithm)
+   * for generating permutations.
+   *
+   * @param {Array} elements any type of data
+   * @returns {Array<Array>} array of permutations
+   */
+  static PermutationsHeap(elements = []) {
+    const indexes = new Array(elements.length);
+    const permutations = [elements.slice()];
+
+    for (let i = 0; i < elements.length; i++) {
+      indexes[i] = 0;
+    }
+
+    for (let i = 0; i < elements.length; ) {
+      if (indexes[i] < i) {
+        let swapFrom = 0; // At odd indexes, swap from indexes[i] instead of from the beginning of the array
+        if (i % 2 !== 0) swapFrom = indexes[i];
+
+        // swap between swapFrom and i, using a temporary variable as storage.
+        const temp = elements[swapFrom];
+        elements[swapFrom] = elements[i];
+        elements[i] = temp;
+        permutations.push(elements.slice());
+        indexes[i]++;
+        i = 0;
+      } else {
+        indexes[i] = 0;
+        i++;
+      }
+    }
+
+    return permutations;
   }
 
   /**
@@ -1001,6 +1277,46 @@ class StatisticsService {
   }
 
   /**
+   * [R Squared](http://en.wikipedia.org/wiki/Coefficient_of_determination)
+   * value of data compared with a function `f`
+   * is the sum of the squared differences between the prediction
+   * and the actual value.
+   *
+   * @param {Array<Array<number>>} x input data: this should be doubly-nested
+   * @param {Function} func function called on `[i][0]` values within the dataset
+   * @returns {number} r-squared value
+   * @example
+   * var samples = [[0, 0], [1, 1]];
+   * var regressionLine = linearRegressionLine(linearRegression(samples));
+   * rSquared(samples, regressionLine); // = 1 this line is a perfect fit
+   */
+  static R_Squared(array = [], func = StatisticsService.LinearRegressionLine) {
+    if (array.length < 2) return 1;
+
+    // Compute the average y value for the actual data set in order to compute the
+    let sum = 0;
+    for (let i = 0; i < array.length; i++) {
+      sum += array[i][1];
+    }
+    const average = sum / array.length;
+
+    // Compute the total sum of squares - the squared difference between each point and the average of all points.
+    let sumOfSquares = 0;
+    for (let j = 0; j < array.length; j++) {
+      sumOfSquares += Math.pow(average - array[j][1], 2);
+    }
+
+    // Finally estimate the error: the squared difference between the estimate and the actual data value at each point.
+    let err = 0;
+    for (let k = 0; k < array.length; k++) {
+      err += Math.pow(array[k][1] - func(array[k][0]), 2);
+    }
+
+    // As the error grows larger, its ratio to the sum of squares increases and the r squared value grows lower.
+    return 1 - err / sumOfSquares;
+  }
+
+  /**
    * Relative error.
    * This is more difficult to calculate than it first appears [1,2].  The usual
    * formula for the relative error between an actual value A and an expected
@@ -1034,6 +1350,41 @@ class StatisticsService {
   static RelativeError(actual = 3.0, expected = 5.0) {
     if (actual === 0 && expected === 0) return 0;
     return Math.abs((actual - expected) / expected);
+  }
+
+  /**
+   * [Fisher-Yates Shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
+   * in-place - which means that it **will change the order of the original
+   * array by reference**.
+   *
+   * This is an algorithm that generates a random [permutation](https://en.wikipedia.org/wiki/Permutation)
+   * of a set.
+   *
+   * @param {Array} x sample of one or more numbers
+   * @param {Function} [randomSource=Math.random] an optional entropy source that
+   * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+   * @returns {Array} x
+   * @example
+   * var x = [1, 2, 3, 4];
+   * shuffleInPlace(x);
+   * // x is shuffled to a value like [2, 1, 4, 3]
+   */
+  static Shuffle(numbers = [], randomSource = Math.random) {
+    // store the current length of the x to determine when no elements remain to shuffle.
+    let length = numbers.length;
+
+    // While there are still items to shuffle
+    while(length > 0) {
+        // choose a random index within the subset of the array that is not yet shuffled
+        let index = Math.floor(randomSource() * length--);
+        let temporary = numbers[length];
+
+        // swap the value at `x[length]` with `x[index]`
+        numbers[length] = numbers[index];
+        numbers[index] = temporary;
+    }
+
+    return numbers;
   }
 
   /**
@@ -1142,7 +1493,40 @@ class StatisticsService {
     return standardNormalTable;
   }
 
+  /**
+   * The sum of deviations to the Nth power.
+   * When n=2 it's the sum of squared deviations.
+   * When n=3 it's the sum of cubed deviations.
+   *
+   * @param {Array<number>} x
+   * @param {number} n power
+   * @returns {number} sum of nth power deviations
+   *
+   * @example
+   * var input = [1, 2, 3];
+   * // since the variance of a set is the mean squared
+   * // deviations, we can calculate that with sumNthPowerDeviations:
+   * sumNthPowerDeviations(input, 2) / input.length;
+   */
+  static SumNthPowerDeviations(numbers, n) {
+    const meanValue = StatisticsService.ArithmeticMean(numbers);
+    let sum = 0;
 
+    // This is an optimization: when n is 2 (we're computing a number squared),
+    // multiplying the number by itself is significantly faster than using
+    // the Math.pow method.
+    if (n === 2) {
+      for (let i = 0; i < numbers.length; i++) {
+        let tempValue = numbers[i] - meanValue;
+        sum += tempValue * tempValue;
+      }
+    } else {
+      for (let i = 0; i < numbers.length; i++) {
+        sum += Math.pow(numbers[i] - meanValue, n);
+      }
+    }
+    return sum;
+  }
 
 
 
@@ -1833,6 +2217,92 @@ class BayesianClassifier {
     return oddsSums;
   }
   
+}
+
+/**
+ * This is a single-layer [Perceptron Classifier](http://en.wikipedia.org/wiki/Perceptron) that takes
+ * arrays of numbers and predicts whether they should be classified
+ * as either 0 or 1 (negative or positive examples).
+ * @class
+ * @example
+ * // Create the model
+ * var p = new PerceptronModel();
+ * // Train the model with input with a diagonal boundary.
+ * for (var i = 0; i < 5; i++) {
+ *     p.train([1, 1], 1);
+ *     p.train([0, 1], 0);
+ *     p.train([1, 0], 0);
+ *     p.train([0, 0], 0);
+ * }
+ * p.predict([0, 0]); // 0
+ * p.predict([0, 1]); // 0
+ * p.predict([1, 0]); // 0
+ * p.predict([1, 1]); // 1
+ */
+class PerceptronModel {
+  /*:: bias: number */
+  /*:: weights: Array<number> */
+  constructor() {
+    // The weights, or coefficients of the model;
+    // weights are only populated when training with data.
+    this.weights = [];
+    // The bias term, or intercept; it is also a weight but
+    // it's stored separately for convenience as it is always
+    // multiplied by one.
+    this.bias = 0;
+  }
+  /**
+   * **Predict**: Use an array of features with the weight array and bias
+   * to predict whether an example is labeled 0 or 1.
+   *
+   * @param {Array<number>} features an array of features as numbers
+   * @returns {number} 1 if the score is over 0, otherwise 0
+   */
+  Predict(features = []) {
+    // Only predict if previously trained on the same size feature array(s).
+    if (features.length !== this.weights.length) return null;
+
+    // Calculate the sum of features times weights, with the bias added (implicitly times one).
+    let score = 0;
+    for (let i = 0; i < this.weights.length; i++) {
+      score += this.weights[i] * features[i];
+    }
+    score += this.bias;
+
+    // Classify as 1 if the score is over 0, otherwise 0.
+    if (score > 0) return 1;
+    else return 0;
+  }
+
+  /**
+   * **Train** the classifier with a new example, which is a numeric array of features and a 0 or 1 label.
+   *
+   * @param {Array<number>} features an array of features as numbers
+   * @param {number} label either 0 or 1
+   * @returns {PerceptronModel} this
+   */
+  Train(features = [], label = 0) {
+    if (label !== 0 && label !== 1) return null;  // Require that only labels of 0 or 1 are considered.
+
+    // The length of the feature array determines the length of the weight array.
+    // The perceptron will continue learning as long as it keeps seeing feature arrays of the same length.
+    // When it sees a new data shape, it initializes.
+    if (features.length !== this.weights.length) {
+      this.weights = features;
+      this.bias = 1;
+    }
+    // Make a prediction based on current weights.
+    const prediction = this.Predict(features);
+    // Update the weights if the prediction is wrong.
+    if (typeof prediction === "number" && prediction !== label) {
+      const gradient = label - prediction;
+      for (let i = 0; i < this.weights.length; i++) {
+        this.weights[i] += gradient * features[i];
+      }
+      this.bias += gradient;
+    }
+    return this;
+  }
 }
 
 
