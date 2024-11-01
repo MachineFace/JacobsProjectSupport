@@ -678,6 +678,27 @@ class StatisticsService {
   }
 
   /**
+   * [Simple Random Sample](http://en.wikipedia.org/wiki/Simple_random_sample)
+   *
+   * The sampled values will be in any order, not necessarily the order
+   * they appear in the input. Shuffle the original array using a fisher-yates shuffle.
+   *
+   * @param {Array<any>} x input array. can contain any type
+   * @param {number} n count of how many elements to take
+   * @param {Function} [randomSource=Math.random] an optional entropy source that
+   * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+   * @return {Array} subset of n elements in original array
+   *
+   * @example
+   * var values = [1, 2, 4, 5, 6, 7, 8, 9];
+   * sample(values, 3); // returns 3 random values, like [2, 5, 8];
+   */
+  static GetRandomSample(array = [], n = 1, randomSource = Math.random) {
+    const shuffled = StatisticsService.Shuffle(array, randomSource);
+    return shuffled.slice(0, n);
+  }
+
+  /**
    * [Harmonic Mean](https://en.wikipedia.org/wiki/Harmonic_mean) is a mean function typically used to find the average of rates.
    * This mean is calculated by taking the reciprocal of the arithmetic mean of the reciprocals of the input numbers.
    *
@@ -885,7 +906,7 @@ class StatisticsService {
    * @example
    * makeMatrix(10, 10);
    */
-  static MakeMatrix(columns, rows) {
+  static Matrix(columns = 10, rows = 10) {
     let matrix = [];
     for (let i = 0; i < columns; i++) {
       let column = [];
@@ -1353,12 +1374,193 @@ class StatisticsService {
   }
 
   /**
-   * [Fisher-Yates Shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
-   * in-place - which means that it **will change the order of the original
-   * array by reference**.
+   * The Root Mean Square (RMS) is a mean function used as a measure of the magnitude of a set of numbers, regardless of their sign.
+   * This is the square root of the mean of the squares of the input numbers.
+   * This runs in `O(n)`, linear time, with respect to the length of the array.
    *
-   * This is an algorithm that generates a random [permutation](https://en.wikipedia.org/wiki/Permutation)
-   * of a set.
+   * @param {Array<number>} x a sample of one or more data points
+   * @returns {number} root mean square
+   * @throws {Error} if x is empty
+   * @example
+   * rootMeanSquare([-1, 1, -1, 1]); // => 1
+   */
+  static RootMeanSquare(numbers = []) {
+    if (numbers.length <= 0) throw new Error("rootMeanSquare requires at least one data point");
+    let sumOfSquares = 0;
+    for (let i = 0; i < numbers.length; i++) {
+      sumOfSquares += Math.pow(numbers[i], 2);
+    }
+    return Math.sqrt(sumOfSquares / numbers.length);
+  }
+
+  /**
+   * The [correlation](http://en.wikipedia.org/wiki/Correlation_and_dependence) is
+   * a measure of how correlated two datasets are, between -1 and 1
+   *
+   * @param {Array<number>} x first input
+   * @param {Array<number>} y second input
+   * @returns {number} sample correlation
+   * @example
+   * sampleCorrelation([1, 2, 3, 4, 5, 6], [2, 2, 3, 4, 5, 60]).toFixed(2);
+   * // => '0.69'
+   */
+  static Sample_Correlation(numbersA = [], numbersB = []) {
+    const cov = StatisticsService.Sample_Covariance(numbersA, numbersB);
+    const xstd = StatisticsService.StandardDeviation(numbersA);
+    const ystd = StatisticsService.StandardDeviation(numbersB);
+    return cov / xstd / ystd;
+  }
+
+  /**
+   * [Sample Covariance](https://en.wikipedia.org/wiki/Sample_mean_and_covariance) of two datasets:
+   * how much do the two datasets move together?
+   * x and y are two datasets, represented as arrays of numbers.
+   *
+   * @param {Array<number>} x a sample of two or more data points
+   * @param {Array<number>} y a sample of two or more data points
+   * @throws {Error} if x and y do not have equal lengths
+   * @throws {Error} if x or y have length of one or less
+   * @returns {number} sample covariance
+   * @example
+   * sampleCovariance([1, 2, 3, 4, 5, 6], [6, 5, 4, 3, 2, 1]); // => -3.5
+   */
+  static Sample_Covariance(numbersA = [], numbersB = []) {
+    // The two datasets must have the same length which must be more than 1
+    if(numbersA.length !== numbersB.length) throw new Error("sampleCovariance requires samples with equal lengths");
+    if(numbersA.length < 2) throw new Error(`sampleCovariance requires at least two data points in each sample`);
+
+    // Determine the mean of each dataset so that we can judge each value  as the difference from the mean. 
+    // If one dataset is [1, 2, 3] and [2, 3, 4], their covariance does not suffer because of the difference 
+    // in absolute values.
+    const xmean = StatisticsService.ArithmeticMean(numbersA);
+    const ymean = StatisticsService.ArithmeticMean(numbersB);
+
+    // For each pair of values, the covariance increases when their difference from the mean is associated - 
+    // if both are well above or if both are well below the mean, the covariance increases significantly.
+    let sum = 0;
+    for (let i = 0; i < numbersA.length; i++) {
+      sum += (numbersA[i] - xmean) * (numbersB[i] - ymean);
+    }
+
+    // this is Bessels' Correction: an adjustment made to sample statistics that allows for the reduced 
+    // degree of freedom entailed in calculating values from samples rather than complete populations.
+    const besselsCorrection = numbersA.length - 1;
+
+    // the covariance is weighted by the length of the datasets.
+    return sum / besselsCorrection;
+  }
+
+  /**
+   * [Kurtosis](http://en.wikipedia.org/wiki/Kurtosis)
+   * A measure of the heaviness of a distribution's tails relative to its variance. 
+   * The kurtosis value can be positive or negative, or even undefined.
+   *
+   * Implementation is based on Fisher's excess kurtosis definition and uses
+   * unbiased moment estimators. This is the version found in Excel and available
+   * in several statistical packages, including SAS and SciPy.
+   *
+   * @param {Array<number>} x a sample of 4 or more data points
+   * @returns {number} sample kurtosis
+   * @throws {Error} if x has length less than 4
+   * @example
+   * sampleKurtosis([1, 2, 2, 3, 5]); // => 1.4555765595463122
+   */
+  static Sample_Kurtosis(numbers = []) {
+    const n = numbers.length;
+    if (n < 4) throw new Error(`Requires at least four data points`);
+
+    const meanValue = StatisticsService.ArithmeticMean(numbers);
+    let secondCentralMoment = 0;
+    let fourthCentralMoment = 0;
+
+    for (let i = 0; i < n; i++) {
+      let tempValue = numbers[i] - meanValue;
+      secondCentralMoment += tempValue * tempValue;
+      fourthCentralMoment += tempValue * tempValue * tempValue * tempValue;
+    }
+
+    return (
+      ((n - 1) / ((n - 2) * (n - 3))) *
+      ((n * (n + 1) * fourthCentralMoment) /
+          (secondCentralMoment * secondCentralMoment) -
+          3 * (n - 1))
+    );
+  }
+
+  /**
+   * [Rank Correlation](https://en.wikipedia.org/wiki/Rank_correlation)
+   * a measure of the strength of monotonic relationship between two arrays
+   *
+   * @param {Array<number>} x first input
+   * @param {Array<number>} y second input
+   * @returns {number} sample rank correlation
+   */
+  static Sample_RankCorrelation(numbersA = [], numbersB = []) {
+    const xIndexes = numbersA
+      .map((value, index) => [value, index])
+      .sort((a, b) => a[0] - b[0])
+      .map((pair) => pair[1]);
+    const yIndexes = numbersB
+      .map((value, index) => [value, index])
+      .sort((a, b) => a[0] - b[0])
+      .map((pair) => pair[1]);
+
+    // At this step, we have an array of indexes that map from sorted numbers to their original indexes. 
+    // We reverse that so that it is an array of the sorted destination index.
+    const xRanks = Array(xIndexes.length);
+    const yRanks = Array(xIndexes.length);
+    for (let i = 0; i < xIndexes.length; i++) {
+      xRanks[xIndexes[i]] = i;
+      yRanks[yIndexes[i]] = i;
+    }
+
+    return StatisticsService.Sample_Correlation(xRanks, yRanks);
+  }
+
+  /**
+   * [Skewness](http://en.wikipedia.org/wiki/Skewness)
+   * a measure of the extent to which a probability distribution of a real-valued random variable "leans" to one side of the mean.
+   * The skewness value can be positive or negative, or even undefined.
+   *
+   * Implementation is based on the adjusted Fisher-Pearson standardized moment coefficient, 
+   * which is the version found in Excel and several statistical packages including Minitab, SAS and SPSS.
+   *
+   * @param {Array<number>} x a sample of 3 or more data points
+   * @returns {number} sample skewness
+   * @example
+   * sampleSkewness([2, 4, 6, 3, 1]); // => 0.590128656384365
+   */
+  static Sample_Skewness(numbers = []) {
+    if (numbers.length < 3) throw new Error(`Requires at least three data points`);
+
+    const meanValue = StatisticsService.ArithmeticMean(numbers);
+
+    let sumSquaredDeviations = 0;
+    let sumCubedDeviations = 0;
+    for (let i = 0; i < numbers.length; i++) {
+      let tempValue = numbers[i] - meanValue;
+      sumSquaredDeviations += tempValue * tempValue;
+      sumCubedDeviations += tempValue * tempValue * tempValue;
+    }
+
+    // this is Bessels' Correction: an adjustment made to sample statistics
+    // that allows for the reduced degree of freedom entailed in calculating
+    // values from samples rather than complete populations.
+    const besselsCorrection = numbers.length - 1;
+
+    // Find the mean value of that list
+    const theSampleStandardDeviation = Math.sqrt(sumSquaredDeviations / besselsCorrection);
+
+    const n = numbers.length;
+    const cubedS = Math.pow(theSampleStandardDeviation, 3);
+
+    return (n * sumCubedDeviations) / ((n - 1) * (n - 2) * cubedS);
+  }
+
+  /**
+   * [Fisher-Yates Shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
+   * in-place - which means that it **will change the order of the original array by reference**.
+   * This generates a random [permutation](https://en.wikipedia.org/wiki/Permutation) of a set.
    *
    * @param {Array} x sample of one or more numbers
    * @param {Function} [randomSource=Math.random] an optional entropy source that
@@ -1399,11 +1601,11 @@ class StatisticsService {
    * @example
    * sign(2); // => 1
    */
-  static SignFunction(x = 2) {
+  static SignFunction(number = 2) {
     try {
-      if (typeof x !== "number") throw new TypeError("not a number");
-      if (x < 0) return -1;
-      else if (x === 0) return 0;
+      if (typeof number !== "number") throw new TypeError("not a number");
+      if (number < 0) return -1;
+      else if (number === 0) return 0;
       else return 1;
     } catch(err) {
       console.error(`"SignFunction()" failed : ${err}`);
@@ -1476,19 +1678,18 @@ class StatisticsService {
   static StandardNormalTable() {
     const SQRT_2PI = Math.sqrt(2 * Math.PI);
     const cumulativeDistribution = (z) => {
-      let sum = z;
-      let tmp = z;
-
       // 15 iterations are enough for 4-digit precision
+      let sum = z;
       for (let i = 1; i < 15; i++) {
-          tmp *= (z * z) / (2 * i + 1);
-          sum += tmp;
+        let tmp = z;
+        tmp *= (z * z) / (2 * i + 1);
+        sum += tmp;
       }
       return ( Math.round((0.5 + (sum / SQRT_2PI) * Math.exp((-z * z) / 2)) * 1e4) / 1e4 );
     }
     const standardNormalTable = [];
     for (let z = 0; z <= 3.09; z += 0.01) {
-        standardNormalTable.push(cumulativeDistribution(z));
+      standardNormalTable.push(cumulativeDistribution(z));
     }
     return standardNormalTable;
   }
