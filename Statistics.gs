@@ -8,6 +8,11 @@ class StatisticsService {
   }
 
   /**
+   * -------------------------------------------------------------------------------------------------------------
+   * Properties
+   */
+
+  /**
    * ** Percentage Points of the χ2 (Chi-Squared) Distribution **
    *
    * The [χ2 (Chi-Squared) Distribution](http://en.wikipedia.org/wiki/Chi-squared_distribution) is used in the common
@@ -505,6 +510,62 @@ class StatisticsService {
   }
 
   /**
+   * We use `ε`, epsilon, as a stopping criterion when we want to iterate until we're "close enough". 
+   * Epsilon is a very small number: for simple statistics, that number is **0.0001**
+   *
+   * This is used in calculations like the binomialDistribution, in which the process of finding a value is 
+   * [iterative](https://en.wikipedia.org/wiki/Iterative_method): it progresses until it is close enough.
+   *
+   * Example of using epsilon in [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent),
+   * where we're trying to find a local minimum of a function's derivative,
+   * given by the `fDerivative` method.
+   *
+   * @example
+   * while (Math.abs(x_new - x_old) > ss.epsilon) {
+   *   x_old = x_new;
+   *   x_new = x_old - stepSize * fDerivative(x_old);
+   * }
+   *
+   * console.log('Local minimum occurs at', x_new);
+   */
+  static get Epsilon() {
+    return 0.0001;
+  }
+
+  /**
+   * Standard Normal Table, also called the unit normal table or Z table,
+   * is a mathematical table for the values of Φ (phi), which are the values of
+   * the [cumulative distribution function](https://en.wikipedia.org/wiki/Normal_distribution#Cumulative_distribution_function)
+   * of the normal distribution. It is used to find the probability that a
+   * statistic is observed below, above, or between values on the standard
+   * normal distribution, and by extension, any normal distribution.
+   */
+  static get StandardNormalTable() {
+    const cumulativeDistribution = (z) => {
+      // 15 iterations are enough for 4-digit precision
+      let sum = z;
+      for (let i = 1; i < 15; i++) {
+        let tmp = z;
+        tmp *= (z * z) / (2 * i + 1);
+        sum += tmp;
+      }
+      const SQRT_2PI = Math.sqrt(2 * Math.PI);
+      return ( Math.round((0.5 + (sum / SQRT_2PI) * Math.exp((-z * z) / 2)) * 1e4) / 1e4 );
+    }
+    const standardNormalTable = [];
+    for (let z = 0; z <= 3.09; z += 0.01) {
+      standardNormalTable.push(cumulativeDistribution(z));
+    }
+    standardNormalTable.sort((a,b) => a - b);
+    return standardNormalTable;
+  }
+
+  /**
+   * -------------------------------------------------------------------------------------------------------------
+   * Static Methods
+   */
+
+  /**
    * When adding a new value to a list, one does not have to necessary recompute the mean of the list in linear time. 
    * Use this function to compute the new mean by providing the current mean, the number of elements 
    * in the list that produced it and the new value to add.
@@ -529,7 +590,7 @@ class StatisticsService {
    * @param {number} tolerance The acceptable relative difference.
    * @return {boolean} Whether numbers are within tolerance.
    */
-  static ApproxEqual(actual = 3.0, expected = 5.0, tolerance = 0.0001) {
+  static ApproxEqual(actual = 3.0, expected = 5.0, tolerance = StatisticsService.Epsilon) {
     return StatisticsService.RelativeError(actual, expected) <= tolerance;
   }
 
@@ -633,7 +694,7 @@ class StatisticsService {
    * @example
    * bisect(Math.cos,0,4,100,0.003); // => 1.572265625
    */
-  static Bisect(func, start = 0, end = 99, maxIterations = 10, errorTolerance = 0.0001) {
+  static Bisect(func, start = 0, end = 99, maxIterations = 10, errorTolerance = StatisticsService.Epsilon) {
     try {
       if (typeof func !== "function") throw new TypeError("func must be a function");
       for(let i = 0; i < maxIterations; i++) {
@@ -948,6 +1009,51 @@ class StatisticsService {
   }
 
   /**
+   * When combining two lists of values with known means, you do not have to recompute the mean of the combined lists in linear time. 
+   * Instead, use this function to compute the combined mean by providing the mean & number of values of the first list and the mean & number of values of the second list.
+   *
+   * @param {number} mean1 mean of the first list
+   * @param {number} n1 number of items in the first list
+   * @param {number} mean2 mean of the second list
+   * @param {number} n2 number of items in the second list
+   * @returns {number} the combined mean
+   *
+   * @example
+   * combineMeans(5, 3, 4, 3); // => 4.5
+   */
+  static Combine_Means(mean1 = 1, n1 = 10, mean2 = 1, n2 = 10) {
+    return (mean1 * n1 + mean2 * n2) / (n1 + n2);
+  }
+
+  /**
+   * When combining two lists of values for which one already knows the variances,
+   * one does not have to necessary recompute the variance of the combined lists
+   * in linear time. They can instead use this function to compute the combined
+   * variance by providing the variance, mean & number of values of the first list
+   * and the variance, mean & number of values of the second list.
+   *
+   * @since 3.0.0
+   * @param {number} variance1 variance of the first list
+   * @param {number} mean1 mean of the first list
+   * @param {number} n1 number of items in the first list
+   * @param {number} variance2 variance of the second list
+   * @param {number} mean2 mean of the second list
+   * @param {number} n2 number of items in the second list
+   * @returns {number} the combined mean
+   *
+   * @example
+   * combineVariances(14 / 3, 5, 3, 8 / 3, 4, 3); // => 47 / 12
+   */
+  static Combine_Variances(variance1 = 1, mean1 = 1, n1 = 10, variance2 = 1, mean2 = 1, n2 = 10) {
+    const newMean = StatisticsService.Combine_Means(mean1, n1, mean2, n2);
+    return (
+      (n1 * (variance1 + Math.pow(mean1 - newMean, 2)) +
+       n2 * (variance2 + Math.pow(mean2 - newMean, 2))) /
+      (n1 + n2)
+    );
+  }
+
+  /**
    * Combinations are unique subsets of a collection
    * partition size of x from a collection at a time.
    * https://en.wikipedia.org/wiki/Combination
@@ -976,6 +1082,45 @@ class StatisticsService {
       console.error(`"Combinations()" failed: ${err}`);
       return 1;
     }
+  }
+
+  /**
+   * [Combinations with Replacement](https://en.wikipedia.org/wiki/Combination) with replacement
+   * Combinations are unique subsets of a collection - in this case, k x from a collection at a time.
+   * 'With replacement' means that a given element can be chosen multiple times.
+   * Unlike permutation, order doesn't matter for combinations.
+   *
+   * @param {Array} x any type of data
+   * @param {int} k the number of objects in each group (without replacement)
+   * @returns {Array<Array>} array of permutations
+   * @example
+   * CombinationsWithReplacement([1, 2], 2); // => [[1, 1], [1, 2], [2, 2]]
+   */
+  static CombinationsWithReplacement(array = [], k = 1) {
+    const combinationList = [];
+
+    for (let i = 0; i < array.length; i++) {
+      if (k === 1) {
+          // If we're requested to find only one element, we don't need to recurse: just push `array[i]` onto the list of combinations.
+          combinationList.push([array[i]]);
+      } else {
+          // Otherwise, recursively find combinations, given `k - 1`. Note that
+          // we request `k - 1`, so if you were looking for k=3 combinations, we're
+          // requesting k=2. This -1 gets reversed in the for loop right after this
+          // code, since we concatenate `array[i]` onto the selected combinations,
+          // bringing `k` back up to your requested level.
+          // This recursion may go many levels deep, since it only stops once
+          // k=1.
+          const chunk = array.slice(i, array.length);
+          const subsetCombinations = StatisticsService.CombinationsWithReplacement(chunk, k - 1);
+
+          for (let j = 0; j < subsetCombinations.length; j++) {
+            combinationList.push([ array[i]].concat(subsetCombinations[j], ));
+          }
+      }
+    }
+
+    return combinationList;
   }
 
   /**
@@ -1020,7 +1165,7 @@ class StatisticsService {
    * @returns {number} cumulative standard normal probability
    */
   static CumulativeStdNormalProbability(z) {
-    const standardNormalTable = StatisticsService.StandardNormalTable();
+    const standardNormalTable = StatisticsService.StandardNormalTable;
     const absZ = Math.abs(z);  // Calculate the position of this value.
     // Each row begins with a different significant digit: 0.5, 0.6, 0.7, and so on. 
     // Each value in the table corresponds to a range of 0.01 in the input values, so the value is
@@ -1433,13 +1578,250 @@ class StatisticsService {
    * @example
    * interquartileRange([0, 1, 2, 3]); // => 2
    */
-  // static InterquartileRange(numbers = []) {
-  //   // Interquartile range is the span between the upper quartile, at `0.75`, and lower quartile, `0.25`
-  //   const q1 = quantile(numbers, 0.75);
-  //   const q2 = quantile(numbers, 0.25);
+  static InterquartileRange(numbers = []) {
+    // Interquartile range is the span between the upper quartile, at `0.75`, and lower quartile, `0.25`
+    const q1 = StatisticsService.Quantile(numbers, 0.75);
+    const q2 = StatisticsService.Quantile(numbers, 0.25);
+    if (typeof q1 === "number" && typeof q2 === "number") return q1 - q2;
+  }
 
-  //   if (typeof q1 === "number" && typeof q2 === "number") return q1 - q2;
-  // }
+  /**
+   * **[Jenks Natural Breaks Optimization](http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization)**
+   * is an algorithm commonly used in cartography and visualization to decide upon groupings of data values that 
+   * minimize variance within themselves and maximize variation between themselves.
+   *
+   * For instance, cartographers often use jenks in order to choose which values are assigned to which colors 
+   * in a [choropleth](https://en.wikipedia.org/wiki/Choropleth_map) map.
+   *
+   * @param {Array<number>} data input data, as an array of number values
+   * @param {number} nClasses number of desired classes
+   * @returns {Array<number>} array of class break positions
+   * // split data into 3 break points
+   * jenks([1, 2, 4, 5, 7, 9, 10, 20], 3) // = [1, 7, 20, 20]
+   */
+  static Jenks(data = [], nClasses = 2) {
+    if (nClasses > data.length) return null;
+
+    // Pull Breaks Values for Jenks. the second part of the jenks recipe: take the calculated matrices and derive an array of n breaks.
+    const JenksBreaks = (data, lowerClassLimits, nClasses) => {
+      let k = data.length;
+      let kclass = [];
+      let countNum = nClasses;
+
+      // the calculation of classes will never include the upper bound, so we need to explicitly set it
+      kclass[nClasses] = data[data.length - 1];
+
+      // the lowerClassLimits matrix is used as indices into itself here: the `k` variable is reused in each iteration.
+      while (countNum > 0) {
+        kclass[countNum - 1] = data[lowerClassLimits[k][countNum] - 1];
+        k = lowerClassLimits[k][countNum] - 1;
+        countNum--;
+      }
+      return kclass;
+    }
+
+    // Compute the matrices required for Jenks breaks. These matrices can be used for any classing of data with `classes <= nClasses`
+    const JenksMatrices = (data, nClasses) => {
+      let lowerClassLimits = [];
+      let varianceCombinations = [];
+
+      let variance = 0;
+      for (let i = 0; i < data.length + 1; i++) {
+          let tmp1 = [];
+          let tmp2 = [];
+          for (let j = 0; j < nClasses + 1; j++) {
+            tmp1.push(0);
+            tmp2.push(0);
+          }
+          lowerClassLimits.push(tmp1);
+          varianceCombinations.push(tmp2);
+      }
+
+      for (let i = 1; i < nClasses + 1; i++) {
+          lowerClassLimits[1][i] = 1;
+          varianceCombinations[1][i] = 0;
+          // in the original implementation, 9999999 is used but since Javascript has `Infinity`, we use that.
+          for (let j = 2; j < data.length + 1; j++) {
+            varianceCombinations[j][i] = Number.POSITIVE_INFINITY;
+          }
+      }
+
+      for (let i = 2; i < data.length + 1; i++) {
+        let sum = 0;
+        let sumSquares = 0;
+        let w = 0;
+
+        for (let m = 1; m < i + 1; m++) {
+          const lowerClassLimit = i - m + 1;
+          const val = data[lowerClassLimit - 1];
+
+          // here we're estimating variance for each potential classing of the data, for each potential 
+          // number of classes. `w` is the number of data points considered so far.
+          w++;
+
+          // increase the current sum and sum-of-squares
+          sum += val;
+          sumSquares += val * val;
+
+          // the variance at this point in the sequence is the difference
+          // between the sum of squares and the total x 2, over the number
+          // of samples.
+          variance = sumSquares - (sum * sum) / w;
+
+          let i4 = lowerClassLimit - 1;
+
+          if (i4 !== 0) {
+            for (let j = 2; j < nClasses + 1; j++) {
+              // if adding this element to an existing class will increase its variance beyond the limit, break
+              // the class at this point, setting the `lowerClassLimit` at this point.
+              if(varianceCombinations[i][j] >= variance + varianceCombinations[i4][j - 1]) {
+                lowerClassLimits[i][j] = lowerClassLimit;
+                varianceCombinations[i][j] = variance + varianceCombinations[i4][j - 1];
+              }
+            }
+          }
+        }
+
+        lowerClassLimits[i][1] = 1;
+        varianceCombinations[i][1] = variance;
+      }
+
+      // return the two matrices. for just providing breaks, only lowerClassLimits` is needed, 
+      // but variances can be useful to evaluate goodness of fit.
+      return {
+        lowerClassLimits: lowerClassLimits,
+        varianceCombinations: varianceCombinations
+      }
+    }
+
+    // sort data in numerical order, since this is expected by the matrices function
+    data = data
+      .slice()
+      .sort((a, b) => a - b);
+
+    const matrices = JenksMatrices(data, nClasses);
+    const lowerClassLimits = matrices.lowerClassLimits;
+
+    // extract nClasses out of the computed matrices
+    const breaks = JenksBreaks(data, lowerClassLimits, nClasses);
+    return breaks;
+  }
+
+  /**
+   * [K-Means Clustering](https://en.wikipedia.org/wiki/K-means_clustering)
+   *
+   * @param {Array<Array<number>>} points N-dimensional coordinates of points to be clustered.
+   * @param {number} numCluster How many clusters to create.
+   * @param {Function} randomSource An optional entropy source that generates uniform values in [0, 1).
+   * @return {kMeansReturn} Labels (same length as data) and centroids (same length as numCluster).
+   * @throws {Error} If any centroids wind up friendless (i.e., without associated points).
+   *
+   * @example
+   * kMeansCluster([[0.0, 0.5], [1.0, 0.5]], 2); // => {labels: [0, 1], centroids: [[0.0, 0.5], [1.0 0.5]]}
+   */
+  static K_Means_Cluster(points, numCluster = 2, randomSource = Math.random) {
+
+    // Label each point according to which centroid it is closest to.
+    const LabelPoints = (points, centroids) => {
+      return points.map((p) => {
+        let minDist = Number.MAX_VALUE;
+        let label = -1;
+        for (let i = 0; i < centroids.length; i++) {
+          const dist = euclideanDistance(p, centroids[i]);
+          if (dist < minDist) {
+            minDist = dist;
+            label = i;
+          }
+        }
+        return label;
+      });
+    }
+
+    // Calculate centroids for points given labels.
+    const CalculateCentroids = (points, labels, numCluster) => {
+      let dimension = points[0].length;
+      let centroids = makeMatrix(numCluster, dimension);
+      let counts = Array(numCluster).fill(0);
+
+      // Add points to centroids' accumulators and count points per centroid.
+      let numPoints = points.length;
+      for (let i = 0; i < numPoints; i++) {
+        let point = points[i];
+        let label = labels[i];
+        let current = centroids[label];
+        for (let j = 0; j < dimension; j++) {
+          current[j] += point[j];
+        }
+        counts[label] += 1;
+      }
+
+      // Rescale centroids, checking for any that have no points.
+      for (let i = 0; i < numCluster; i++) {
+        if (counts[i] === 0) throw new Error(`Centroid ${i} has no friends`);
+        let centroid = centroids[i];
+        for (let j = 0; j < dimension; j++) {
+          centroid[j] /= counts[i];
+        }
+      }
+      return centroids;
+    }
+
+    // Calculate the difference between old centroids and new centroids.
+    const CalculateChange = (left, right) => {
+      let total = 0;
+      for (let i = 0; i < left.length; i++) {
+        total += StatisticsService.EuclideanDistance(left[i], right[i]);
+      }
+      return total;
+    }
+
+    let newCentroids = StatisticsService.Sample(points, numCluster, randomSource);
+    let labels = null;
+    let change = Number.MAX_VALUE;
+    while (change !== 0) {
+      labels = LabelPoints(points, newCentroids);
+      let oldCentroids = newCentroids;
+      newCentroids = CalculateCentroids(points, labels, numCluster);
+      change = CalculateChange(newCentroids, oldCentroids);
+    }
+    return {
+      labels : labels,
+      centroids : newCentroids,
+    }
+  }
+
+  /**
+   * [Kernel Density Estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation)
+   * is a useful tool for estimating the shape of the underlying probability distribution from a sample.
+   * @param X sample values
+   * @param kernel The kernel function to use. If a function is provided, it should return non-negative values and integrate to 1. Defaults to 'gaussian'.
+   * @param bandwidthMethod The "bandwidth selection" method to use, or a fixed bandwidth value. Defaults to "nrd", 
+   * ["Normal Reference Distribution" rule-of-thumb](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/bandwidth.nrd.html).
+   * @returns {Function} An estimated [probability density function](https://en.wikipedia.org/wiki/Probability_density_function) for the given sample. The returned function runs in `O(X.length)`.
+   * a commonly used version of [Silverman's rule-of-thumb](https://en.wikipedia.org/wiki/Kernel_density_estimation#A_rule-of-thumb_bandwidth_estimator).
+   */
+  static Kernel_Density_Estimation(array = [], estimate = 0) {
+
+    // [Well-known kernels](https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use)
+    const gaussian_kernels = (u) => Math.exp(-0.5 * u * u) / Math.sqrt(2 * Math.PI);
+    
+    // Well known bandwidth selection methods
+    const NormalReferenceDistribution = (numbers = []) => {
+      let s = StatisticsService.StandardDeviation(numbers);
+      const iqr = StatisticsService.InterquartileRange(numbers);
+      if (typeof iqr === "number") {
+        s = Math.min(s, iqr / 1.34);
+      }
+      return 1.06 * s * Math.pow(numbers.length, -0.2);
+    }
+    
+    const bandwidth = NormalReferenceDistribution(array);
+    let sum = 0;
+    for (let i = 0; i < array.length; i++) {
+      sum += gaussian_kernels((estimate - array[i]) / bandwidth);
+    }
+    return sum / bandwidth / array.length;
+  }
 
   /**
    * [Kurtosis](http://en.wikipedia.org/wiki/Kurtosis)
@@ -1652,10 +2034,7 @@ class StatisticsService {
     const medianValue = StatisticsService.ArithmeticMean(numbers);
 
     // Make a list of absolute deviations from the median
-    const medianAbsoluteDeviations = [];
-    for (let i = 0; i < numbers.length; i++) {
-      medianAbsoluteDeviations.push(Math.abs(numbers[i] - medianValue));
-    }
+    const medianAbsoluteDeviations = [...numbers.map(x => Math.abs(x - medianValue))];
 
     // Find the median value of that list
     const median = StatisticsService.ArithmeticMean(medianAbsoluteDeviations);
@@ -1787,7 +2166,7 @@ class StatisticsService {
 
     // This algorithm iterates through each potential outcome, until the `cumulativeProbability` is very close to 1, at
     // which point we've defined the vast majority of outcomes
-    while (cumulativeProbability < 1 - 0.0001) {
+    while (cumulativeProbability < 1 - StatisticsService.Epsilon) {
       cells[x] = (Math.exp(-lambda) * Math.pow(lambda, x)) / factorialX;  // [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function)
       cumulativeProbability += cells[x];
       x++;
@@ -1956,6 +2335,102 @@ class StatisticsService {
   }
 
   /**
+   * [Quantile](https://en.wikipedia.org/wiki/Quantile):
+   * this is a population quantile, since we assume to know the entire dataset in this library. 
+   * This is an implementation of the [Quantiles of a Population](http://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population)
+   * algorithm from wikipedia.
+   *
+   * Sample is a one-dimensional array of numbers, and p is either a decimal number from 0 to 1 or an array of decimal numbers from 0 to 1.
+   * In terms of a k/q quantile, p = k/q - it's just dealing with fractions or dealing with decimal values.
+   * When p is an array, the result of the function is also an array containing the appropriate quantiles in input order
+   *
+   * @param {Array<number>} x sample of one or more numbers
+   * @param {Array<number> | number} p the desired quantile, as a number between 0 and 1
+   * @returns {number} quantile
+   * @example
+   * quantile([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
+   */
+  static Quantile(numbers = [], p) {
+    const copy = numbers.slice();
+
+    const QuantileIndex = (len, p) => {
+      const idx = len * p;
+      if (p === 1) return len - 1;  // If p is 1, directly return the last index
+      else if (p === 0) return 0;  // If p is 0, directly return the first index
+      else if (idx % 1 !== 0) return Math.ceil(idx) - 1;  // If index is not integer, return the next index in array
+      else if (len % 2 === 0) return idx - 0.5; // If the list has even-length, we'll return the middle of two indices around quantile to indicate that we need an average value of the two
+      else return idx;  // Finally, in the simple case of an integer index with an odd-length list, return the index
+    }
+
+    const QuantileSelect = (arr, k, left, right) => {
+      if (k % 1 === 0) StatisticsService.QuickSelect(arr, k, left, right);
+      else {
+        k = Math.floor(k);
+        StatisticsService.QuickSelect(arr, k, left, right);
+        StatisticsService.QuickSelect(arr, k + 1, k + 1, right);
+      }
+    }
+
+    const MultiQuantileSelect = (arr, p) => {
+      let indices = [0];
+      for (let i = 0; i < p.length; i++) {
+        indices.push(QuantileIndex(arr.length, p[i]));
+      }
+      indices.push(arr.length - 1);
+      indices.sort((a, b) => a - b);
+
+      let stack = [0, indices.length - 1];
+
+      while (stack.length) {
+        const r = Math.ceil(stack.pop());
+        const l = Math.floor(stack.pop());
+        if (r - l <= 1) continue;
+
+        const m = Math.floor((l + r) / 2);
+        QuantileSelect(arr, indices[m], Math.floor(indices[l]), Math.ceil(indices[r]));
+        stack.push(l, m, m, r);
+      }
+      return stack;
+    }
+
+    if (Array.isArray(p)) {
+      // rearrange elements so that each element corresponding to a requested quantile is on a place it would be if the array was fully sorted
+      MultiQuantileSelect(copy, p);
+
+      const results = [];
+      for (let i = 0; i < p.length; i++) {
+        results[i] = StatisticsService.QuantileSorted(copy, p[i]);
+      }
+      return results;
+    } else {
+      const idx = QuantileIndex(copy.length, p);
+      QuantileSelect(copy, idx, 0, copy.length - 1);
+      return StatisticsService.QuantileSorted(copy, p);
+    }
+  }
+
+  /**
+   * Quantiles Sorted
+   * @param {Array<number>} x sample of one or more data points
+   * @param {number} p desired quantile: a number between 0 to 1, inclusive
+   * @returns {number} quantile value
+   * @throws {Error} if p ix outside of the range from 0 to 1
+   * @throws {Error} if x is empty
+   * @example
+   * quantileSorted([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
+   */
+  static QuantileSorted(numbers = [], p = 0.5) {
+    const idx = numbers.length * p;
+    if (numbers.length === 0) throw new Error("quantile requires at least one data point.");
+    else if (p < 0 || p > 1) throw new Error("quantiles must be between 0 and 1");
+    else if (p === 0) return numbers[0]; // If p is 0, directly return the first element
+    else if (p === 1) return numbers[numbers.length - 1];  // If p is 1, directly return the last element
+    else if (idx % 1 !== 0) return numbers[Math.ceil(idx) - 1];  // If p is not integer, return the next element in array
+    else if (numbers.length % 2 === 0) return (numbers[idx - 1] + numbers[idx]) / 2;  // If the list has even-length, we'll take the average of this number and the next value, if there is one
+    else return numbers[idx];  // Finally, in the simple case of an integer value with an odd-length list, return the x value at the index.
+  }
+
+  /**
    * Quartiles
    * The list is divided into two halves for computing the lower (Q1) and upper (Q3) quartiles.
    * The median of the whole distribution is computed as Q2.
@@ -1987,6 +2462,73 @@ class StatisticsService {
     } catch(err) {
       console.error(`"Quartiles()" failed: ${err}`);
       return 1;
+    }
+  }
+
+  /**
+   * Rearrange items in `arr` so that all items in `[left, k]` range are the smallest.
+   * The `k`-th element will have the `(k - left + 1)`-th smallest value in `[left, right]`.
+   *
+   * Implements Floyd-Rivest selection algorithm https://en.wikipedia.org/wiki/Floyd-Rivest_algorithm
+   *
+   * @param {Array<number>} arr input array
+   * @param {number} k pivot index
+   * @param {number} [left] left index
+   * @param {number} [right] right index
+   * @returns {void} mutates input array
+   * @example
+   * var arr = [65, 28, 59, 33, 21, 56, 22, 95, 50, 12, 90, 53, 28, 77, 39];
+   * quickselect(arr, 8);
+   * // = [39, 28, 28, 33, 21, 12, 22, 50, 53, 56, 59, 65, 90, 77, 95]
+   */
+  static QuickSelect(arr, k, left, right) {
+    left = left ? left : 0;
+    right = right ? right : arr.length - 1;
+
+    // Swap Function
+    const Swap = (arr, i, j) => {
+      let tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+
+    while (right > left) {
+      // 600 and 0.5 are arbitrary constants chosen in the original paper to minimize execution time
+      if (right - left > 600) {
+        const n = right - left + 1;
+        const m = k - left + 1;
+        const z = Math.log(n);
+        const s = 0.5 * Math.exp((2 * z) / 3);
+        let sd = 0.5 * Math.sqrt((z * s * (n - s)) / n);
+        if (m - n / 2 < 0) sd *= -1;
+        const newLeft = Math.max(left, Math.floor(k - (m * s) / n + sd));
+        const newRight = Math.min(right, Math.floor(k + ((n - m) * s) / n + sd));
+        StatisticsService.QuickSelect(arr, k, newLeft, newRight);
+      }
+
+      const t = arr[k];
+      let i = left;
+      let j = right;
+
+      Swap(arr, left, k);
+      if (arr[right] > t) Swap(arr, left, right);
+
+      while (i < j) {
+        Swap(arr, i, j);
+        i++;
+        j--;
+        while (arr[i] < t) i++;
+        while (arr[j] > t) j--;
+      }
+
+      if (arr[left] === t) Swap(arr, left, j);
+      else {
+        j++;
+        Swap(arr, j, right);
+      }
+
+      if (j <= k) left = j + 1;
+      if (k <= j) right = j - 1;
     }
   }
 
@@ -2084,6 +2626,26 @@ class StatisticsService {
       sumOfSquares += Math.pow(numbers[i], 2);
     }
     return Math.sqrt(sumOfSquares / numbers.length);
+  }
+
+  /**
+   * [Simple Random Sample](http://en.wikipedia.org/wiki/Simple_random_sample)
+   *
+   * The sampled values will be in any order, not necessarily the order they appear in the input.
+   *
+   * @param {Array<any>} x input array. can contain any type
+   * @param {number} n count of how many elements to take
+   * @param {Function} [randomSource=Math.random] an optional entropy source that
+   * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+   * @return {Array} subset of n elements in original array
+   *
+   * @example
+   * var values = [1, 2, 4, 5, 6, 7, 8, 9];
+   * sample(values, 3); // returns 3 random values, like [2, 5, 8];
+   */
+  static Sample(array = [], n = 1, randomSource = Math.random) {
+    const shuffled = StatisticsService.Shuffle(array, randomSource);
+    return shuffled.slice(0, n);
   }
 
   /**
@@ -2432,34 +2994,6 @@ class StatisticsService {
   }
 
   /**
-   * Standard Normal Table, also called the unit normal table or Z table,
-   * is a mathematical table for the values of Φ (phi), which are the values of
-   * the [cumulative distribution function](https://en.wikipedia.org/wiki/Normal_distribution#Cumulative_distribution_function)
-   * of the normal distribution. It is used to find the probability that a
-   * statistic is observed below, above, or between values on the standard
-   * normal distribution, and by extension, any normal distribution.
-   */
-  static StandardNormalTable() {
-    const cumulativeDistribution = (z) => {
-      // 15 iterations are enough for 4-digit precision
-      let sum = z;
-      for (let i = 1; i < 15; i++) {
-        let tmp = z;
-        tmp *= (z * z) / (2 * i + 1);
-        sum += tmp;
-      }
-      const SQRT_2PI = Math.sqrt(2 * Math.PI);
-      return ( Math.round((0.5 + (sum / SQRT_2PI) * Math.exp((-z * z) / 2)) * 1e4) / 1e4 );
-    }
-    const standardNormalTable = [];
-    for (let z = 0; z <= 3.09; z += 0.01) {
-      standardNormalTable.push(cumulativeDistribution(z));
-    }
-    standardNormalTable.sort((a,b) => a - b);
-    return standardNormalTable;
-  }
-
-  /**
    * When removing a value from a list, it's not have to necessary recompute the mean of the list in linear time. 
    * Use this function to compute the new mean by providing the current mean,
    * the number of elements in the list that produced it and the value to remove.
@@ -2651,7 +3185,7 @@ class StatisticsService {
 }
 
 const _test_Statistics = () => {
-  const x = StatisticsService.ChiSquaredDistributionTable;
+  const x = StatisticsService.StandardNormalTable;
   console.info(x);
 }
 
