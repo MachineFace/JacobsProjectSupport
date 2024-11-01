@@ -8,6 +8,520 @@ class StatisticsService {
   }
 
   /**
+   * ** Percentage Points of the χ2 (Chi-Squared) Distribution **
+   *
+   * The [χ2 (Chi-Squared) Distribution](http://en.wikipedia.org/wiki/Chi-squared_distribution) is used in the common
+   * chi-squared tests for goodness of fit of an observed distribution to a theoretical one, the independence of two
+   * criteria of classification of qualitative data, and in confidence interval estimation for a population standard
+   * deviation of a normal distribution from a sample standard deviation.
+   *
+   * Values from Appendix 1, Table III of William W. Hines & Douglas C. Montgomery, "Probability and Statistics in
+   * Engineering and Management Science", Wiley (1980).
+   */
+  static get ChiSquaredDistributionTable() {
+    return {
+      1: {
+        0.995: 0,
+        0.99: 0,
+        0.975: 0,
+        0.95: 0,
+        0.9: 0.02,
+        0.5: 0.45,
+        0.1: 2.71,
+        0.05: 3.84,
+        0.025: 5.02,
+        0.01: 6.63,
+        0.005: 7.88
+      },
+      2: {
+        0.995: 0.01,
+        0.99: 0.02,
+        0.975: 0.05,
+        0.95: 0.1,
+        0.9: 0.21,
+        0.5: 1.39,
+        0.1: 4.61,
+        0.05: 5.99,
+        0.025: 7.38,
+        0.01: 9.21,
+        0.005: 10.6
+      },
+      3: {
+        0.995: 0.07,
+        0.99: 0.11,
+        0.975: 0.22,
+        0.95: 0.35,
+        0.9: 0.58,
+        0.5: 2.37,
+        0.1: 6.25,
+        0.05: 7.81,
+        0.025: 9.35,
+        0.01: 11.34,
+        0.005: 12.84
+      },
+      4: {
+        0.995: 0.21,
+        0.99: 0.3,
+        0.975: 0.48,
+        0.95: 0.71,
+        0.9: 1.06,
+        0.5: 3.36,
+        0.1: 7.78,
+        0.05: 9.49,
+        0.025: 11.14,
+        0.01: 13.28,
+        0.005: 14.86
+      },
+      5: {
+        0.995: 0.41,
+        0.99: 0.55,
+        0.975: 0.83,
+        0.95: 1.15,
+        0.9: 1.61,
+        0.5: 4.35,
+        0.1: 9.24,
+        0.05: 11.07,
+        0.025: 12.83,
+        0.01: 15.09,
+        0.005: 16.75
+      },
+      6: {
+        0.995: 0.68,
+        0.99: 0.87,
+        0.975: 1.24,
+        0.95: 1.64,
+        0.9: 2.2,
+        0.5: 5.35,
+        0.1: 10.65,
+        0.05: 12.59,
+        0.025: 14.45,
+        0.01: 16.81,
+        0.005: 18.55
+      },
+      7: {
+        0.995: 0.99,
+        0.99: 1.25,
+        0.975: 1.69,
+        0.95: 2.17,
+        0.9: 2.83,
+        0.5: 6.35,
+        0.1: 12.02,
+        0.05: 14.07,
+        0.025: 16.01,
+        0.01: 18.48,
+        0.005: 20.28
+      },
+      8: {
+        0.995: 1.34,
+        0.99: 1.65,
+        0.975: 2.18,
+        0.95: 2.73,
+        0.9: 3.49,
+        0.5: 7.34,
+        0.1: 13.36,
+        0.05: 15.51,
+        0.025: 17.53,
+        0.01: 20.09,
+        0.005: 21.96
+      },
+      9: {
+        0.995: 1.73,
+        0.99: 2.09,
+        0.975: 2.7,
+        0.95: 3.33,
+        0.9: 4.17,
+        0.5: 8.34,
+        0.1: 14.68,
+        0.05: 16.92,
+        0.025: 19.02,
+        0.01: 21.67,
+        0.005: 23.59
+      },
+      10: {
+        0.995: 2.16,
+        0.99: 2.56,
+        0.975: 3.25,
+        0.95: 3.94,
+        0.9: 4.87,
+        0.5: 9.34,
+        0.1: 15.99,
+        0.05: 18.31,
+        0.025: 20.48,
+        0.01: 23.21,
+        0.005: 25.19
+      },
+      11: {
+        0.995: 2.6,
+        0.99: 3.05,
+        0.975: 3.82,
+        0.95: 4.57,
+        0.9: 5.58,
+        0.5: 10.34,
+        0.1: 17.28,
+        0.05: 19.68,
+        0.025: 21.92,
+        0.01: 24.72,
+        0.005: 26.76
+      },
+      12: {
+        0.995: 3.07,
+        0.99: 3.57,
+        0.975: 4.4,
+        0.95: 5.23,
+        0.9: 6.3,
+        0.5: 11.34,
+        0.1: 18.55,
+        0.05: 21.03,
+        0.025: 23.34,
+        0.01: 26.22,
+        0.005: 28.3
+      },
+      13: {
+        0.995: 3.57,
+        0.99: 4.11,
+        0.975: 5.01,
+        0.95: 5.89,
+        0.9: 7.04,
+        0.5: 12.34,
+        0.1: 19.81,
+        0.05: 22.36,
+        0.025: 24.74,
+        0.01: 27.69,
+        0.005: 29.82
+      },
+      14: {
+        0.995: 4.07,
+        0.99: 4.66,
+        0.975: 5.63,
+        0.95: 6.57,
+        0.9: 7.79,
+        0.5: 13.34,
+        0.1: 21.06,
+        0.05: 23.68,
+        0.025: 26.12,
+        0.01: 29.14,
+        0.005: 31.32
+      },
+      15: {
+        0.995: 4.6,
+        0.99: 5.23,
+        0.975: 6.27,
+        0.95: 7.26,
+        0.9: 8.55,
+        0.5: 14.34,
+        0.1: 22.31,
+        0.05: 25,
+        0.025: 27.49,
+        0.01: 30.58,
+        0.005: 32.8
+      },
+      16: {
+        0.995: 5.14,
+        0.99: 5.81,
+        0.975: 6.91,
+        0.95: 7.96,
+        0.9: 9.31,
+        0.5: 15.34,
+        0.1: 23.54,
+        0.05: 26.3,
+        0.025: 28.85,
+        0.01: 32,
+        0.005: 34.27
+      },
+      17: {
+        0.995: 5.7,
+        0.99: 6.41,
+        0.975: 7.56,
+        0.95: 8.67,
+        0.9: 10.09,
+        0.5: 16.34,
+        0.1: 24.77,
+        0.05: 27.59,
+        0.025: 30.19,
+        0.01: 33.41,
+        0.005: 35.72
+      },
+      18: {
+        0.995: 6.26,
+        0.99: 7.01,
+        0.975: 8.23,
+        0.95: 9.39,
+        0.9: 10.87,
+        0.5: 17.34,
+        0.1: 25.99,
+        0.05: 28.87,
+        0.025: 31.53,
+        0.01: 34.81,
+        0.005: 37.16
+      },
+      19: {
+        0.995: 6.84,
+        0.99: 7.63,
+        0.975: 8.91,
+        0.95: 10.12,
+        0.9: 11.65,
+        0.5: 18.34,
+        0.1: 27.2,
+        0.05: 30.14,
+        0.025: 32.85,
+        0.01: 36.19,
+        0.005: 38.58
+      },
+      20: {
+        0.995: 7.43,
+        0.99: 8.26,
+        0.975: 9.59,
+        0.95: 10.85,
+        0.9: 12.44,
+        0.5: 19.34,
+        0.1: 28.41,
+        0.05: 31.41,
+        0.025: 34.17,
+        0.01: 37.57,
+        0.005: 40
+      },
+      21: {
+        0.995: 8.03,
+        0.99: 8.9,
+        0.975: 10.28,
+        0.95: 11.59,
+        0.9: 13.24,
+        0.5: 20.34,
+        0.1: 29.62,
+        0.05: 32.67,
+        0.025: 35.48,
+        0.01: 38.93,
+        0.005: 41.4
+      },
+      22: {
+        0.995: 8.64,
+        0.99: 9.54,
+        0.975: 10.98,
+        0.95: 12.34,
+        0.9: 14.04,
+        0.5: 21.34,
+        0.1: 30.81,
+        0.05: 33.92,
+        0.025: 36.78,
+        0.01: 40.29,
+        0.005: 42.8
+      },
+      23: {
+        0.995: 9.26,
+        0.99: 10.2,
+        0.975: 11.69,
+        0.95: 13.09,
+        0.9: 14.85,
+        0.5: 22.34,
+        0.1: 32.01,
+        0.05: 35.17,
+        0.025: 38.08,
+        0.01: 41.64,
+        0.005: 44.18
+      },
+      24: {
+        0.995: 9.89,
+        0.99: 10.86,
+        0.975: 12.4,
+        0.95: 13.85,
+        0.9: 15.66,
+        0.5: 23.34,
+        0.1: 33.2,
+        0.05: 36.42,
+        0.025: 39.36,
+        0.01: 42.98,
+        0.005: 45.56
+      },
+      25: {
+        0.995: 10.52,
+        0.99: 11.52,
+        0.975: 13.12,
+        0.95: 14.61,
+        0.9: 16.47,
+        0.5: 24.34,
+        0.1: 34.28,
+        0.05: 37.65,
+        0.025: 40.65,
+        0.01: 44.31,
+        0.005: 46.93
+      },
+      26: {
+        0.995: 11.16,
+        0.99: 12.2,
+        0.975: 13.84,
+        0.95: 15.38,
+        0.9: 17.29,
+        0.5: 25.34,
+        0.1: 35.56,
+        0.05: 38.89,
+        0.025: 41.92,
+        0.01: 45.64,
+        0.005: 48.29
+      },
+      27: {
+        0.995: 11.81,
+        0.99: 12.88,
+        0.975: 14.57,
+        0.95: 16.15,
+        0.9: 18.11,
+        0.5: 26.34,
+        0.1: 36.74,
+        0.05: 40.11,
+        0.025: 43.19,
+        0.01: 46.96,
+        0.005: 49.65
+      },
+      28: {
+        0.995: 12.46,
+        0.99: 13.57,
+        0.975: 15.31,
+        0.95: 16.93,
+        0.9: 18.94,
+        0.5: 27.34,
+        0.1: 37.92,
+        0.05: 41.34,
+        0.025: 44.46,
+        0.01: 48.28,
+        0.005: 50.99
+      },
+      29: {
+        0.995: 13.12,
+        0.99: 14.26,
+        0.975: 16.05,
+        0.95: 17.71,
+        0.9: 19.77,
+        0.5: 28.34,
+        0.1: 39.09,
+        0.05: 42.56,
+        0.025: 45.72,
+        0.01: 49.59,
+        0.005: 52.34
+      },
+      30: {
+        0.995: 13.79,
+        0.99: 14.95,
+        0.975: 16.79,
+        0.95: 18.49,
+        0.9: 20.6,
+        0.5: 29.34,
+        0.1: 40.26,
+        0.05: 43.77,
+        0.025: 46.98,
+        0.01: 50.89,
+        0.005: 53.67
+      },
+      40: {
+        0.995: 20.71,
+        0.99: 22.16,
+        0.975: 24.43,
+        0.95: 26.51,
+        0.9: 29.05,
+        0.5: 39.34,
+        0.1: 51.81,
+        0.05: 55.76,
+        0.025: 59.34,
+        0.01: 63.69,
+        0.005: 66.77
+      },
+      50: {
+        0.995: 27.99,
+        0.99: 29.71,
+        0.975: 32.36,
+        0.95: 34.76,
+        0.9: 37.69,
+        0.5: 49.33,
+        0.1: 63.17,
+        0.05: 67.5,
+        0.025: 71.42,
+        0.01: 76.15,
+        0.005: 79.49
+      },
+      60: {
+        0.995: 35.53,
+        0.99: 37.48,
+        0.975: 40.48,
+        0.95: 43.19,
+        0.9: 46.46,
+        0.5: 59.33,
+        0.1: 74.4,
+        0.05: 79.08,
+        0.025: 83.3,
+        0.01: 88.38,
+        0.005: 91.95
+      },
+      70: {
+        0.995: 43.28,
+        0.99: 45.44,
+        0.975: 48.76,
+        0.95: 51.74,
+        0.9: 55.33,
+        0.5: 69.33,
+        0.1: 85.53,
+        0.05: 90.53,
+        0.025: 95.02,
+        0.01: 100.42,
+        0.005: 104.22
+      },
+      80: {
+        0.995: 51.17,
+        0.99: 53.54,
+        0.975: 57.15,
+        0.95: 60.39,
+        0.9: 64.28,
+        0.5: 79.33,
+        0.1: 96.58,
+        0.05: 101.88,
+        0.025: 106.63,
+        0.01: 112.33,
+        0.005: 116.32
+      },
+      90: {
+        0.995: 59.2,
+        0.99: 61.75,
+        0.975: 65.65,
+        0.95: 69.13,
+        0.9: 73.29,
+        0.5: 89.33,
+        0.1: 107.57,
+        0.05: 113.14,
+        0.025: 118.14,
+        0.01: 124.12,
+        0.005: 128.3
+      },
+      100: {
+        0.995: 67.33,
+        0.99: 70.06,
+        0.975: 74.22,
+        0.95: 77.93,
+        0.9: 82.36,
+        0.5: 99.33,
+        0.1: 118.5,
+        0.05: 124.34,
+        0.025: 129.56,
+        0.01: 135.81,
+        0.005: 140.17
+      }
+    }
+  }
+
+  /**
+   * When adding a new value to a list, one does not have to necessary recompute the mean of the list in linear time. 
+   * Use this function to compute the new mean by providing the current mean, the number of elements 
+   * in the list that produced it and the new value to add.
+   *
+   * @param {number} mean current mean
+   * @param {number} n number of items in the list
+   * @param {number} newValue the added value
+   * @returns {number} the new mean
+   *
+   * @example
+   * addToMean(14, 5, 53); // => 20.5
+   */
+  static AddToMean(mean = 0, n = 1, newValue = 0) {
+    return mean + (newValue - mean) / (n + 1);
+  }
+
+  /**
    * Approximate Equality.
    *
    * @param {number} actual The value to be tested.
@@ -125,7 +639,7 @@ class StatisticsService {
       for(let i = 0; i < maxIterations; i++) {
         const output = (start + end) / 2;
         if (func(output) === 0 || Math.abs((end - start) / 2) < errorTolerance) return output;
-        if (sign(func(output)) === sign(func(start))) start = output;
+        if (StatisticsService.SignFunction(func(output)) === StatisticsService.SignFunction(func(start))) start = output;
         else end = output;
       }
       throw new Error("maximum number of iterations exceeded");
@@ -238,6 +752,184 @@ class StatisticsService {
       output.push(array.slice(start, start + chunkSize));
     }
     return output;
+  }
+
+  /**
+   * [Ckmeans Clustering](https://en.wikipedia.org/wiki/K-means_clustering) 
+   * is an improvement on heuristic-based clustering approaches like Jenks. The algorithm was developed in
+   * [Haizhou Wang and Mingzhou Song](http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Wang+Song.pdf)
+   * as a [dynamic programming](https://en.wikipedia.org/wiki/Dynamic_programming) approach
+   * to the problem of clustering numeric data into groups with the least
+   * within-group sum-of-squared-deviations.
+   *
+   * Minimizing the difference within groups - what Wang & Song refer to as
+   * `withinss`, or within sum-of-squares, means that groups are optimally
+   * homogenous within and the data is split into representative groups.
+   * This is very useful for visualization, where you may want to represent
+   * a continuous variable in discrete color or style groups. This function
+   * can provide groups that emphasize differences between data.
+   *
+   * Being a dynamic approach, this algorithm is based on two matrices that
+   * store incrementally-computed values for squared deviations and backtracking
+   * indexes.
+   *
+   * This implementation is based on Ckmeans 3.4.6, which introduced a new divide
+   * and conquer approach that improved runtime from O(kn^2) to O(kn log(n)).
+   *
+   * Unlike the [original implementation](https://cran.r-project.org/web/packages/Ckmeans.1d.dp/index.html),
+   * this implementation does not include any code to automatically determine
+   * the optimal number of clusters: this information needs to be explicitly
+   * provided.
+   *
+   * ### References
+   * _Ckmeans.1d.dp: Optimal k-means Clustering in One Dimension by Dynamic
+   * Programming_ Haizhou Wang and Mingzhou Song ISSN 2073-4859
+   *
+   * from The R Journal Vol. 3/2, December 2011
+   * @param {Array<number>} x input data, as an array of number values
+   * @param {number} nClusters number of desired classes. This cannot be
+   * greater than the number of values in the data array.
+   * @returns {Array<Array<number>>} clustered input
+   * @throws {Error} if the number of requested clusters is higher than the size of the data
+   * @example
+   * ckmeans([-1, 2, -1, 2, 4, 5, 6, -1, 2, -1], 3);
+   * // The input, clustered into groups of similar numbers.
+   * //= [[-1, -1, -1, -1], [2, 2, 2], [4, 5, 6]]);
+   */
+  static CK_Means(numbers = [], nClusters = 2) {
+    if (nClusters > numbers.length) throw new Error(`Cannot generate more classes than there are data values`);
+
+    // Function that generates incrementally computed values based on the sums and sums of squares for the data array
+    const ssq = (j, i, sums, sumsOfSquares) => {
+      let sji; // s(j, i)
+      if (j > 0) {
+        const muji = (sums[i] - sums[j - 1]) / (i - j + 1); // mu(j, i)
+        sji = sumsOfSquares[i] - sumsOfSquares[j - 1] - (i - j + 1) * muji * muji;
+      } else {
+        sji = sumsOfSquares[i] - (sums[i] * sums[i]) / (i + 1);
+      }
+      if (sji < 0) return 0;
+      return sji;
+    }
+    // Function that recursively divides and conquers computations for cluster j
+    const fillMatrixColumn = (iMin, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares) => {
+      if (iMin > iMax) return;
+      
+      const i = Math.floor((iMin + iMax) / 2); // Start at midpoint between iMin and iMax
+
+      matrix[cluster][i] = matrix[cluster - 1][i - 1];
+      backtrackMatrix[cluster][i] = i;
+
+      let jlow = cluster; // the lower end for j
+
+      if (iMin > cluster) jlow = Math.max(jlow, backtrackMatrix[cluster][iMin - 1] || 0);
+      jlow = Math.max(jlow, backtrackMatrix[cluster - 1][i] || 0);
+
+      let jhigh = i - 1; // the upper end for j
+      if (iMax < matrix[0].length - 1) jhigh = Math.min(jhigh, backtrackMatrix[cluster][iMax + 1] || 0);
+
+      for (let j = jhigh; j >= jlow; --j) {
+        let sji = ssq(j, i, sums, sumsOfSquares);
+        if (sji + matrix[cluster - 1][jlow - 1] >= matrix[cluster][i]) break;
+
+        // Examine the lower bound of the cluster border
+        let sjlowi = ssq(jlow, i, sums, sumsOfSquares);
+        let ssqjlow = sjlowi + matrix[cluster - 1][jlow - 1];
+
+        if (ssqjlow < matrix[cluster][i]) {
+          // Shrink the lower bound
+          matrix[cluster][i] = ssqjlow;
+          backtrackMatrix[cluster][i] = jlow;
+        }
+        jlow++;
+
+        let ssqj = sji + matrix[cluster - 1][j - 1];
+        if (ssqj < matrix[cluster][i]) {
+          matrix[cluster][i] = ssqj;
+          backtrackMatrix[cluster][i] = j;
+        }
+      }
+
+      fillMatrixColumn(iMin, i - 1, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
+      fillMatrixColumn(i + 1, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
+    }
+    // Initializes the main matrices used in Ckmeans and kicks off the divide and conquer cluster computation strategy
+    const fillMatrices = (data, matrix, backtrackMatrix) => {
+      const nValues = matrix[0].length;
+      const shift = data[Math.floor(nValues / 2)];  // Shift values by the median to improve numeric stability
+
+
+      const sums = [];
+      const sumsOfSquares = [];
+
+      // Initialize first column in matrix & backtrackMatrix
+      for (let i = 0, shiftedValue; i < nValues; ++i) {
+        shiftedValue = data[i] - shift;
+        if (i === 0) {
+          sums.push(shiftedValue);
+          sumsOfSquares.push(shiftedValue * shiftedValue);
+        } else {
+          sums.push(sums[i - 1] + shiftedValue);
+          sumsOfSquares.push(sumsOfSquares[i - 1] + shiftedValue * shiftedValue);
+        }
+
+        // Initialize for cluster = 0
+        matrix[0][i] = ssq(0, i, sums, sumsOfSquares);
+        backtrackMatrix[0][i] = 0;
+      }
+
+      // Initialize the rest of the columns
+      let iMin;
+      for (let cluster = 1; cluster < matrix.length; ++cluster) {
+        if (cluster < matrix.length - 1) iMin = cluster;
+        else iMin = nValues - 1;  // No need to compute matrix[K-1][0] ... matrix[K-1][N-2]
+
+        fillMatrixColumn(
+          iMin,
+          nValues - 1,
+          cluster,
+          matrix,
+          backtrackMatrix,
+          sums,
+          sumsOfSquares,
+        );
+      }
+    }
+
+    const sorted = StatisticsService.NumericSort(numbers);
+    const uniqueCount = StatisticsService.CountUnique(sorted);
+    if (uniqueCount === 1) return [sorted];  // if all of the input values are identical, there's one cluster with all of the input in it.
+
+    const matrix = StatisticsService.Matrix(nClusters, sorted.length);
+    const backtrackMatrix = StatisticsService.Matrix(nClusters, sorted.length);
+
+    // This is a dynamic programming way to solve the problem of minimizing
+    // within-cluster sum of squares. It's similar to linear regression
+    // in this way, and this calculation incrementally computes the
+    // sum of squares that are later read.
+    fillMatrices(sorted, matrix, backtrackMatrix);
+
+    // The real work of Ckmeans clustering happens in the matrix generation:
+    // the generated matrices encode all possible clustering combinations, and
+    // once they're generated we can solve for the best clustering groups
+    // very quickly.
+    let clusters = [];
+    let clusterRight = backtrackMatrix[0].length - 1;
+
+    // Backtrack the clusters from the dynamic programming matrix. This
+    // starts at the bottom-right corner of the matrix (if the top-left is 0, 0),
+    // and moves the cluster target with the loop.
+    for (let cluster = backtrackMatrix.length - 1; cluster >= 0; cluster--) {
+      const clusterLeft = backtrackMatrix[cluster][clusterRight];
+
+      // fill the cluster from the sorted input by taking a slice of the
+      // array. the backtrack matrix makes this easy - it stores the
+      // indexes where the cluster should start and end.
+      clusters[cluster] = sorted.slice(clusterLeft, clusterRight + 1);
+
+      if (cluster > 0) clusterRight = clusterLeft - 1;
+    }
+    return clusters;
   }
 
   /**
@@ -750,9 +1442,10 @@ class StatisticsService {
   // }
 
   /**
-   * Kurtosis
-   * Measures the "tailedness" of the data distribution.
-   * High kurtosis means more outliers; Low kurtosis means fewer outliers.
+   * [Kurtosis](http://en.wikipedia.org/wiki/Kurtosis)
+   * A measure of the heaviness of a distribution's tails relative to its variance. 
+   * The kurtosis value can be positive or negative, or even undefined.
+   * 
    * @param {Array} distribution [[key, value], [key, value], ... ]
    * @param {number} standard deviation
    * @returns {number} Kurtosis Number
@@ -1558,6 +2251,77 @@ class StatisticsService {
   }
 
   /**
+   * [Sample t-test](https://en.wikipedia.org/wiki/Student%27s_t-test#One-sample_t-test)
+   * comparing the mean of a sample to a known value, x.
+   *
+   * Determines whether the population mean is equal to a known value `x`.
+   * Usually the results here are used to look up a [p-value](http://en.wikipedia.org/wiki/P-value), which, for
+   * a certain level of significance, will let you determine that the null hypothesis can or cannot be rejected.
+   *
+   * @param {Array<number>} x sample of one or more numbers
+   * @param {number} expectedValue expected value of the population mean
+   * @returns {number} value
+   * @example
+   * tTest([1, 2, 3, 4, 5, 6], 3.385).toFixed(2); // => '0.16'
+   */
+  static Sample_T_Test(numbers = [], expectedValue = 1.0) {
+    try {
+      const sampleMean = StatisticsService.ArithmeticMean(numbers);
+      const sd = StatisticsService.StandardDeviation(numbers);
+      const rootN = Math.sqrt(numbers.length);  // Square root the length of the sample
+      return (sampleMean - expectedValue) / (sd / rootN);
+    } catch(err) {
+      console.error(`"Sample_T_Test()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * [Two-Sample T-Test](http://en.wikipedia.org/wiki/Student's_t-test).
+   * Tests whether "mean(X) - mean(Y) = difference", (in the most common case, we often have `difference == 0` to test if two samples
+   * are likely to be taken from populations with the same mean value) with no prior knowledge on standard deviations of both samples
+   * other than the fact that they have the same standard deviation.
+   *
+   * Usually the results here are used to look up a [p-value](http://en.wikipedia.org/wiki/P-value), which, for
+   * a certain level of significance, will let you determine that the null hypothesis can or cannot be rejected.
+   * 
+   * `diff` can be omitted if it equals 0.
+   *
+   * [This is used to reject](https://en.wikipedia.org/wiki/Exclusion_of_the_null_hypothesis)
+   * a null hypothesis that the two populations that have been sampled into
+   * `sampleX` and `sampleY` are equal to each other.
+   *
+   * @param {Array<number>} sampleX a sample as an array of numbers
+   * @param {Array<number>} sampleY a sample as an array of numbers
+   * @param {number} [difference=0]
+   * @returns {number|null} test result
+   *
+   * @example
+   * tTestTwoSample([1, 2, 3, 4], [3, 4, 5, 6], 0); // => -2.1908902300206643
+   */
+  static Sample_T_Test_TwoSample(sampleX = [], sampleY = [], difference = 0) {
+    const n = sampleX.length;
+    const m = sampleY.length;
+
+    if (!n || !m) return null;  // If either sample is empty return `null`.
+
+    const meanX = mean(sampleX);
+    const meanY = mean(sampleY);
+    const sampleVarianceX = sampleVariance(sampleX);
+    const sampleVarianceY = sampleVariance(sampleY);
+
+    if (typeof meanX === "number" && typeof meanY === "number" &&
+      typeof sampleVarianceX === "number" && typeof sampleVarianceY === "number"
+    ) {
+        const weightedVariance = ((n - 1) * sampleVarianceX + (m - 1) * sampleVarianceY) / (n + m - 2);
+        return (
+          (meanX - meanY - difference) /
+          Math.sqrt(weightedVariance * (1 / n + 1 / m))
+        );
+    }
+  }
+
+  /**
    * [Fisher-Yates Shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
    * in-place - which means that it **will change the order of the original array by reference**.
    * This generates a random [permutation](https://en.wikipedia.org/wiki/Permutation) of a set.
@@ -1676,7 +2440,6 @@ class StatisticsService {
    * normal distribution, and by extension, any normal distribution.
    */
   static StandardNormalTable() {
-    const SQRT_2PI = Math.sqrt(2 * Math.PI);
     const cumulativeDistribution = (z) => {
       // 15 iterations are enough for 4-digit precision
       let sum = z;
@@ -1685,13 +2448,43 @@ class StatisticsService {
         tmp *= (z * z) / (2 * i + 1);
         sum += tmp;
       }
+      const SQRT_2PI = Math.sqrt(2 * Math.PI);
       return ( Math.round((0.5 + (sum / SQRT_2PI) * Math.exp((-z * z) / 2)) * 1e4) / 1e4 );
     }
     const standardNormalTable = [];
     for (let z = 0; z <= 3.09; z += 0.01) {
       standardNormalTable.push(cumulativeDistribution(z));
     }
+    standardNormalTable.sort((a,b) => a - b);
     return standardNormalTable;
+  }
+
+  /**
+   * When removing a value from a list, it's not have to necessary recompute the mean of the list in linear time. 
+   * Use this function to compute the new mean by providing the current mean,
+   * the number of elements in the list that produced it and the value to remove.
+   *
+   * @param {number} mean current mean
+   * @param {number} n number of items in the list
+   * @param {number} value the value to remove
+   * @returns {number} the new mean
+   *
+   * @example
+   * subtractFromMean(20.5, 6, 53); // => 14
+   */
+  static SubtractFromMean(mean = 20.0, n = 10, value = 0) {
+    return (mean * n - value) / (n - 1);
+  }
+
+  /**
+   * Sum Numbers
+   * @param {Array} numbers
+   * @returns {number} sum
+   */
+  static Sum(numbers = []) {
+    if(numbers.length < 1) return 0;
+    if(numbers.length == 1) return numbers[0];
+    return Number(numbers.reduce((a, b) => Number(a) + Number(b), 0)).toFixed(2);
   }
 
   /**
@@ -1709,13 +2502,13 @@ class StatisticsService {
    * // deviations, we can calculate that with sumNthPowerDeviations:
    * sumNthPowerDeviations(input, 2) / input.length;
    */
-  static SumNthPowerDeviations(numbers, n) {
+  static SumNthPowerDeviations(numbers = [], n = 2) {
     const meanValue = StatisticsService.ArithmeticMean(numbers);
-    let sum = 0;
 
     // This is an optimization: when n is 2 (we're computing a number squared),
     // multiplying the number by itself is significantly faster than using
     // the Math.pow method.
+    let sum = 0;
     if (n === 2) {
       for (let i = 0; i < numbers.length; i++) {
         let tempValue = numbers[i] - meanValue;
@@ -1729,7 +2522,32 @@ class StatisticsService {
     return sum;
   }
 
+  /**
+   * [Variance](http://en.wikipedia.org/wiki/Variance)
+   * Sum of squared deviations from the mean.
+   *
+   * This is an implementation of variance, not sample variance:
+   * see the `sampleVariance` method if you want a sample measure.
+   *
+   * @param {Array<number>} x a population of one or more data points
+   * @returns {number} variance: a value greater than or equal to zero.
+   * zero indicates that all values are identical.
+   * @throws {Error} if x's length is 0
+   * @example
+   * variance([1, 2, 3, 4, 5, 6]); // => 2.9166666666666665
+   */
+  static Variance(numbers = []) {
+    try {
+      if (numbers.length === 0) throw new Error("variance requires at least one data point");
 
+      // Find the mean of squared deviations between the mean value and each value.
+      const variance = StatisticsService.SumNthPowerDeviations(numbers, 2) / x.length;
+      return variance;
+    } catch(err) {
+      console.error(`"Variance()" failed: ${err}`);
+      return 1;
+    }
+  }
 
   /**
    * The Wilcoxon rank sum test is a non-parametric alternative to the t-test which is equivalent to the
@@ -1832,505 +2650,14 @@ class StatisticsService {
 
 }
 
-
+const _test_Statistics = () => {
+  const x = StatisticsService.ChiSquaredDistributionTable;
+  console.info(x);
+}
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
-/**
- * ** Percentage Points of the χ2 (Chi-Squared) Distribution **
- *
- * The [χ2 (Chi-Squared) Distribution](http://en.wikipedia.org/wiki/Chi-squared_distribution) is used in the common
- * chi-squared tests for goodness of fit of an observed distribution to a theoretical one, the independence of two
- * criteria of classification of qualitative data, and in confidence interval estimation for a population standard
- * deviation of a normal distribution from a sample standard deviation.
- *
- * Values from Appendix 1, Table III of William W. Hines & Douglas C. Montgomery, "Probability and Statistics in
- * Engineering and Management Science", Wiley (1980).
- */
-const ChiSquaredDistributionTable = {
-  1: {
-    0.995: 0,
-    0.99: 0,
-    0.975: 0,
-    0.95: 0,
-    0.9: 0.02,
-    0.5: 0.45,
-    0.1: 2.71,
-    0.05: 3.84,
-    0.025: 5.02,
-    0.01: 6.63,
-    0.005: 7.88
-  },
-  2: {
-    0.995: 0.01,
-    0.99: 0.02,
-    0.975: 0.05,
-    0.95: 0.1,
-    0.9: 0.21,
-    0.5: 1.39,
-    0.1: 4.61,
-    0.05: 5.99,
-    0.025: 7.38,
-    0.01: 9.21,
-    0.005: 10.6
-  },
-  3: {
-    0.995: 0.07,
-    0.99: 0.11,
-    0.975: 0.22,
-    0.95: 0.35,
-    0.9: 0.58,
-    0.5: 2.37,
-    0.1: 6.25,
-    0.05: 7.81,
-    0.025: 9.35,
-    0.01: 11.34,
-    0.005: 12.84
-  },
-  4: {
-    0.995: 0.21,
-    0.99: 0.3,
-    0.975: 0.48,
-    0.95: 0.71,
-    0.9: 1.06,
-    0.5: 3.36,
-    0.1: 7.78,
-    0.05: 9.49,
-    0.025: 11.14,
-    0.01: 13.28,
-    0.005: 14.86
-  },
-  5: {
-    0.995: 0.41,
-    0.99: 0.55,
-    0.975: 0.83,
-    0.95: 1.15,
-    0.9: 1.61,
-    0.5: 4.35,
-    0.1: 9.24,
-    0.05: 11.07,
-    0.025: 12.83,
-    0.01: 15.09,
-    0.005: 16.75
-  },
-  6: {
-    0.995: 0.68,
-    0.99: 0.87,
-    0.975: 1.24,
-    0.95: 1.64,
-    0.9: 2.2,
-    0.5: 5.35,
-    0.1: 10.65,
-    0.05: 12.59,
-    0.025: 14.45,
-    0.01: 16.81,
-    0.005: 18.55
-  },
-  7: {
-    0.995: 0.99,
-    0.99: 1.25,
-    0.975: 1.69,
-    0.95: 2.17,
-    0.9: 2.83,
-    0.5: 6.35,
-    0.1: 12.02,
-    0.05: 14.07,
-    0.025: 16.01,
-    0.01: 18.48,
-    0.005: 20.28
-  },
-  8: {
-    0.995: 1.34,
-    0.99: 1.65,
-    0.975: 2.18,
-    0.95: 2.73,
-    0.9: 3.49,
-    0.5: 7.34,
-    0.1: 13.36,
-    0.05: 15.51,
-    0.025: 17.53,
-    0.01: 20.09,
-    0.005: 21.96
-  },
-  9: {
-    0.995: 1.73,
-    0.99: 2.09,
-    0.975: 2.7,
-    0.95: 3.33,
-    0.9: 4.17,
-    0.5: 8.34,
-    0.1: 14.68,
-    0.05: 16.92,
-    0.025: 19.02,
-    0.01: 21.67,
-    0.005: 23.59
-  },
-  10: {
-    0.995: 2.16,
-    0.99: 2.56,
-    0.975: 3.25,
-    0.95: 3.94,
-    0.9: 4.87,
-    0.5: 9.34,
-    0.1: 15.99,
-    0.05: 18.31,
-    0.025: 20.48,
-    0.01: 23.21,
-    0.005: 25.19
-  },
-  11: {
-    0.995: 2.6,
-    0.99: 3.05,
-    0.975: 3.82,
-    0.95: 4.57,
-    0.9: 5.58,
-    0.5: 10.34,
-    0.1: 17.28,
-    0.05: 19.68,
-    0.025: 21.92,
-    0.01: 24.72,
-    0.005: 26.76
-  },
-  12: {
-    0.995: 3.07,
-    0.99: 3.57,
-    0.975: 4.4,
-    0.95: 5.23,
-    0.9: 6.3,
-    0.5: 11.34,
-    0.1: 18.55,
-    0.05: 21.03,
-    0.025: 23.34,
-    0.01: 26.22,
-    0.005: 28.3
-  },
-  13: {
-    0.995: 3.57,
-    0.99: 4.11,
-    0.975: 5.01,
-    0.95: 5.89,
-    0.9: 7.04,
-    0.5: 12.34,
-    0.1: 19.81,
-    0.05: 22.36,
-    0.025: 24.74,
-    0.01: 27.69,
-    0.005: 29.82
-  },
-  14: {
-    0.995: 4.07,
-    0.99: 4.66,
-    0.975: 5.63,
-    0.95: 6.57,
-    0.9: 7.79,
-    0.5: 13.34,
-    0.1: 21.06,
-    0.05: 23.68,
-    0.025: 26.12,
-    0.01: 29.14,
-    0.005: 31.32
-  },
-  15: {
-    0.995: 4.6,
-    0.99: 5.23,
-    0.975: 6.27,
-    0.95: 7.26,
-    0.9: 8.55,
-    0.5: 14.34,
-    0.1: 22.31,
-    0.05: 25,
-    0.025: 27.49,
-    0.01: 30.58,
-    0.005: 32.8
-  },
-  16: {
-    0.995: 5.14,
-    0.99: 5.81,
-    0.975: 6.91,
-    0.95: 7.96,
-    0.9: 9.31,
-    0.5: 15.34,
-    0.1: 23.54,
-    0.05: 26.3,
-    0.025: 28.85,
-    0.01: 32,
-    0.005: 34.27
-  },
-  17: {
-    0.995: 5.7,
-    0.99: 6.41,
-    0.975: 7.56,
-    0.95: 8.67,
-    0.9: 10.09,
-    0.5: 16.34,
-    0.1: 24.77,
-    0.05: 27.59,
-    0.025: 30.19,
-    0.01: 33.41,
-    0.005: 35.72
-  },
-  18: {
-    0.995: 6.26,
-    0.99: 7.01,
-    0.975: 8.23,
-    0.95: 9.39,
-    0.9: 10.87,
-    0.5: 17.34,
-    0.1: 25.99,
-    0.05: 28.87,
-    0.025: 31.53,
-    0.01: 34.81,
-    0.005: 37.16
-  },
-  19: {
-    0.995: 6.84,
-    0.99: 7.63,
-    0.975: 8.91,
-    0.95: 10.12,
-    0.9: 11.65,
-    0.5: 18.34,
-    0.1: 27.2,
-    0.05: 30.14,
-    0.025: 32.85,
-    0.01: 36.19,
-    0.005: 38.58
-  },
-  20: {
-    0.995: 7.43,
-    0.99: 8.26,
-    0.975: 9.59,
-    0.95: 10.85,
-    0.9: 12.44,
-    0.5: 19.34,
-    0.1: 28.41,
-    0.05: 31.41,
-    0.025: 34.17,
-    0.01: 37.57,
-    0.005: 40
-  },
-  21: {
-    0.995: 8.03,
-    0.99: 8.9,
-    0.975: 10.28,
-    0.95: 11.59,
-    0.9: 13.24,
-    0.5: 20.34,
-    0.1: 29.62,
-    0.05: 32.67,
-    0.025: 35.48,
-    0.01: 38.93,
-    0.005: 41.4
-  },
-  22: {
-    0.995: 8.64,
-    0.99: 9.54,
-    0.975: 10.98,
-    0.95: 12.34,
-    0.9: 14.04,
-    0.5: 21.34,
-    0.1: 30.81,
-    0.05: 33.92,
-    0.025: 36.78,
-    0.01: 40.29,
-    0.005: 42.8
-  },
-  23: {
-    0.995: 9.26,
-    0.99: 10.2,
-    0.975: 11.69,
-    0.95: 13.09,
-    0.9: 14.85,
-    0.5: 22.34,
-    0.1: 32.01,
-    0.05: 35.17,
-    0.025: 38.08,
-    0.01: 41.64,
-    0.005: 44.18
-  },
-  24: {
-    0.995: 9.89,
-    0.99: 10.86,
-    0.975: 12.4,
-    0.95: 13.85,
-    0.9: 15.66,
-    0.5: 23.34,
-    0.1: 33.2,
-    0.05: 36.42,
-    0.025: 39.36,
-    0.01: 42.98,
-    0.005: 45.56
-  },
-  25: {
-    0.995: 10.52,
-    0.99: 11.52,
-    0.975: 13.12,
-    0.95: 14.61,
-    0.9: 16.47,
-    0.5: 24.34,
-    0.1: 34.28,
-    0.05: 37.65,
-    0.025: 40.65,
-    0.01: 44.31,
-    0.005: 46.93
-  },
-  26: {
-    0.995: 11.16,
-    0.99: 12.2,
-    0.975: 13.84,
-    0.95: 15.38,
-    0.9: 17.29,
-    0.5: 25.34,
-    0.1: 35.56,
-    0.05: 38.89,
-    0.025: 41.92,
-    0.01: 45.64,
-    0.005: 48.29
-  },
-  27: {
-    0.995: 11.81,
-    0.99: 12.88,
-    0.975: 14.57,
-    0.95: 16.15,
-    0.9: 18.11,
-    0.5: 26.34,
-    0.1: 36.74,
-    0.05: 40.11,
-    0.025: 43.19,
-    0.01: 46.96,
-    0.005: 49.65
-  },
-  28: {
-    0.995: 12.46,
-    0.99: 13.57,
-    0.975: 15.31,
-    0.95: 16.93,
-    0.9: 18.94,
-    0.5: 27.34,
-    0.1: 37.92,
-    0.05: 41.34,
-    0.025: 44.46,
-    0.01: 48.28,
-    0.005: 50.99
-  },
-  29: {
-    0.995: 13.12,
-    0.99: 14.26,
-    0.975: 16.05,
-    0.95: 17.71,
-    0.9: 19.77,
-    0.5: 28.34,
-    0.1: 39.09,
-    0.05: 42.56,
-    0.025: 45.72,
-    0.01: 49.59,
-    0.005: 52.34
-  },
-  30: {
-    0.995: 13.79,
-    0.99: 14.95,
-    0.975: 16.79,
-    0.95: 18.49,
-    0.9: 20.6,
-    0.5: 29.34,
-    0.1: 40.26,
-    0.05: 43.77,
-    0.025: 46.98,
-    0.01: 50.89,
-    0.005: 53.67
-  },
-  40: {
-    0.995: 20.71,
-    0.99: 22.16,
-    0.975: 24.43,
-    0.95: 26.51,
-    0.9: 29.05,
-    0.5: 39.34,
-    0.1: 51.81,
-    0.05: 55.76,
-    0.025: 59.34,
-    0.01: 63.69,
-    0.005: 66.77
-  },
-  50: {
-    0.995: 27.99,
-    0.99: 29.71,
-    0.975: 32.36,
-    0.95: 34.76,
-    0.9: 37.69,
-    0.5: 49.33,
-    0.1: 63.17,
-    0.05: 67.5,
-    0.025: 71.42,
-    0.01: 76.15,
-    0.005: 79.49
-  },
-  60: {
-    0.995: 35.53,
-    0.99: 37.48,
-    0.975: 40.48,
-    0.95: 43.19,
-    0.9: 46.46,
-    0.5: 59.33,
-    0.1: 74.4,
-    0.05: 79.08,
-    0.025: 83.3,
-    0.01: 88.38,
-    0.005: 91.95
-  },
-  70: {
-    0.995: 43.28,
-    0.99: 45.44,
-    0.975: 48.76,
-    0.95: 51.74,
-    0.9: 55.33,
-    0.5: 69.33,
-    0.1: 85.53,
-    0.05: 90.53,
-    0.025: 95.02,
-    0.01: 100.42,
-    0.005: 104.22
-  },
-  80: {
-    0.995: 51.17,
-    0.99: 53.54,
-    0.975: 57.15,
-    0.95: 60.39,
-    0.9: 64.28,
-    0.5: 79.33,
-    0.1: 96.58,
-    0.05: 101.88,
-    0.025: 106.63,
-    0.01: 112.33,
-    0.005: 116.32
-  },
-  90: {
-    0.995: 59.2,
-    0.99: 61.75,
-    0.975: 65.65,
-    0.95: 69.13,
-    0.9: 73.29,
-    0.5: 89.33,
-    0.1: 107.57,
-    0.05: 113.14,
-    0.025: 118.14,
-    0.01: 124.12,
-    0.005: 128.3
-  },
-  100: {
-    0.995: 67.33,
-    0.99: 70.06,
-    0.975: 74.22,
-    0.95: 77.93,
-    0.9: 82.36,
-    0.5: 99.33,
-    0.1: 118.5,
-    0.05: 124.34,
-    0.025: 129.56,
-    0.01: 135.81,
-    0.005: 140.17
-  }
-}
 
 
 /**
