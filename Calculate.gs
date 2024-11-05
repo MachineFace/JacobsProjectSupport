@@ -456,7 +456,8 @@ const _testDist = () => {
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
-  Calculate.PrintStatistics();
+  // Calculate.PrintStatistics();
+  Calculate.CreateTopTen();
 
 }
 

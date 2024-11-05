@@ -579,7 +579,17 @@ class StatisticsService {
    * addToMean(14, 5, 53); // => 20.5
    */
   static AddToMean(mean = 0, n = 1, newValue = 0) {
-    return mean + (newValue - mean) / (n + 1);
+    try {
+      mean = mean ? Number(mean) : 0;
+      n = n ? Number(n) : 1;
+      newValue = newValue ? Number(newValue) : 0;
+      const newMean = mean + (newValue - mean) / (n + 1);
+      if(newMean == undefined) throw new Error(`Borked calc.`);
+      return newMean;
+    } catch(err) {
+      console.error(`"AddToMean()" failed : ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -607,7 +617,7 @@ class StatisticsService {
   static ArithmeticMean(distribution = []) {
     try {
       const n = distribution.length;
-      if(n == 0) throw new Error(`Distribution is empty: ${n}`);
+      if(n == 0) return 0;
 
       let values = [];
       if (Array.isArray(distribution[0])) values = distribution.map(item => item[1]);
@@ -664,7 +674,7 @@ class StatisticsService {
       // variance. We iterate until the `cumulativeProbability_of_x` is within `epsilon` of 1.0.
       let x = 0;  // the random variable,
       let cumulativeProbability = 0;  // an accumulator for the cumulative distribution function to 0. `distribution_functions`
-      const cells = [];
+      let cells = [];
       let binomialCoefficient = 1;
 
       // This algorithm iterates through each potential outcome, until the `cumulativeProbability` is very close to 1, at which point we've defined the vast majority of outcomes
@@ -787,7 +797,7 @@ class StatisticsService {
     // Degrees of freedom, calculated as (number of class intervals -
     // number of hypothesized distribution parameters estimated - 1)
     const degreesOfFreedom = observedFrequencies.length - c - 1;
-    return ( ChiSquaredDistributionTable[degreesOfFreedom][significance] < chiSquared );
+    return ( StatisticsService.ChiSquaredDistributionTable[degreesOfFreedom][significance] < chiSquared );
   }
 
   /**
@@ -805,14 +815,20 @@ class StatisticsService {
    * // => [[1, 2], [3, 4], [5, 6]]
    */
   static Chunk(array = [], chunkSize = 2) {
-    if (Math.floor(chunkSize) !== chunkSize) throw new Error("chunk size must be an integer");
-    chunkSize = chunkSize >= 2 ? chunkSize : 2;
+    try {
+      if(array.length < 2) throw new Error(`Array must be n >= 2`)
+      if (Math.floor(chunkSize) !== chunkSize && chunkSize < 1) throw new Error("Chunk size must be a positive integer");
 
-    const output = [];
-    for(let start = 0; start < array.length; start += chunkSize) {
-      output.push(array.slice(start, start + chunkSize));
+      let output = new Array();
+      for(let i = 0; i < array.length; i += chunkSize) {
+        let chunk = array.slice(i, i + chunkSize);
+        output.push(chunk);
+      }
+      return output;
+    } catch(err) {
+      console.error(`"Chunk()" failed: ${err}`);
+      return 1;
     }
-    return output;
   }
 
   /**
@@ -858,139 +874,144 @@ class StatisticsService {
    * //= [[-1, -1, -1, -1], [2, 2, 2], [4, 5, 6]]);
    */
   static CK_Means(numbers = [], nClusters = 2) {
-    if (nClusters > numbers.length) throw new Error(`Cannot generate more classes than there are data values`);
+    try {
+      if (nClusters > numbers.length) throw new Error(`Cannot generate more classes than there are data values`);
 
-    // Function that generates incrementally computed values based on the sums and sums of squares for the data array
-    const ssq = (j, i, sums, sumsOfSquares) => {
-      let sji; // s(j, i)
-      if (j > 0) {
-        const muji = (sums[i] - sums[j - 1]) / (i - j + 1); // mu(j, i)
-        sji = sumsOfSquares[i] - sumsOfSquares[j - 1] - (i - j + 1) * muji * muji;
-      } else {
-        sji = sumsOfSquares[i] - (sums[i] * sums[i]) / (i + 1);
-      }
-      if (sji < 0) return 0;
-      return sji;
-    }
-    // Function that recursively divides and conquers computations for cluster j
-    const fillMatrixColumn = (iMin, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares) => {
-      if (iMin > iMax) return;
-      
-      const i = Math.floor((iMin + iMax) / 2); // Start at midpoint between iMin and iMax
-
-      matrix[cluster][i] = matrix[cluster - 1][i - 1];
-      backtrackMatrix[cluster][i] = i;
-
-      let jlow = cluster; // the lower end for j
-
-      if (iMin > cluster) jlow = Math.max(jlow, backtrackMatrix[cluster][iMin - 1] || 0);
-      jlow = Math.max(jlow, backtrackMatrix[cluster - 1][i] || 0);
-
-      let jhigh = i - 1; // the upper end for j
-      if (iMax < matrix[0].length - 1) jhigh = Math.min(jhigh, backtrackMatrix[cluster][iMax + 1] || 0);
-
-      for (let j = jhigh; j >= jlow; --j) {
-        let sji = ssq(j, i, sums, sumsOfSquares);
-        if (sji + matrix[cluster - 1][jlow - 1] >= matrix[cluster][i]) break;
-
-        // Examine the lower bound of the cluster border
-        let sjlowi = ssq(jlow, i, sums, sumsOfSquares);
-        let ssqjlow = sjlowi + matrix[cluster - 1][jlow - 1];
-
-        if (ssqjlow < matrix[cluster][i]) {
-          // Shrink the lower bound
-          matrix[cluster][i] = ssqjlow;
-          backtrackMatrix[cluster][i] = jlow;
-        }
-        jlow++;
-
-        let ssqj = sji + matrix[cluster - 1][j - 1];
-        if (ssqj < matrix[cluster][i]) {
-          matrix[cluster][i] = ssqj;
-          backtrackMatrix[cluster][i] = j;
-        }
-      }
-
-      fillMatrixColumn(iMin, i - 1, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
-      fillMatrixColumn(i + 1, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
-    }
-    // Initializes the main matrices used in Ckmeans and kicks off the divide and conquer cluster computation strategy
-    const fillMatrices = (data, matrix, backtrackMatrix) => {
-      const nValues = matrix[0].length;
-      const shift = data[Math.floor(nValues / 2)];  // Shift values by the median to improve numeric stability
-
-
-      const sums = [];
-      const sumsOfSquares = [];
-
-      // Initialize first column in matrix & backtrackMatrix
-      for (let i = 0, shiftedValue; i < nValues; ++i) {
-        shiftedValue = data[i] - shift;
-        if (i === 0) {
-          sums.push(shiftedValue);
-          sumsOfSquares.push(shiftedValue * shiftedValue);
+      // Function that generates incrementally computed values based on the sums and sums of squares for the data array
+      const ssq = (j, i, sums, sumsOfSquares) => {
+        let sji; // s(j, i)
+        if (j > 0) {
+          const muji = (sums[i] - sums[j - 1]) / (i - j + 1); // mu(j, i)
+          sji = sumsOfSquares[i] - sumsOfSquares[j - 1] - (i - j + 1) * muji * muji;
         } else {
-          sums.push(sums[i - 1] + shiftedValue);
-          sumsOfSquares.push(sumsOfSquares[i - 1] + shiftedValue * shiftedValue);
+          sji = sumsOfSquares[i] - (sums[i] * sums[i]) / (i + 1);
+        }
+        if (sji < 0) return 0;
+        return sji;
+      }
+      // Function that recursively divides and conquers computations for cluster j
+      const fillMatrixColumn = (iMin, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares) => {
+        if (iMin > iMax) return;
+        
+        const i = Math.floor((iMin + iMax) / 2); // Start at midpoint between iMin and iMax
+
+        matrix[cluster][i] = matrix[cluster - 1][i - 1];
+        backtrackMatrix[cluster][i] = i;
+
+        let jlow = cluster; // the lower end for j
+
+        if (iMin > cluster) jlow = Math.max(jlow, backtrackMatrix[cluster][iMin - 1] || 0);
+        jlow = Math.max(jlow, backtrackMatrix[cluster - 1][i] || 0);
+
+        let jhigh = i - 1; // the upper end for j
+        if (iMax < matrix[0].length - 1) jhigh = Math.min(jhigh, backtrackMatrix[cluster][iMax + 1] || 0);
+
+        for (let j = jhigh; j >= jlow; --j) {
+          let sji = ssq(j, i, sums, sumsOfSquares);
+          if (sji + matrix[cluster - 1][jlow - 1] >= matrix[cluster][i]) break;
+
+          // Examine the lower bound of the cluster border
+          let sjlowi = ssq(jlow, i, sums, sumsOfSquares);
+          let ssqjlow = sjlowi + matrix[cluster - 1][jlow - 1];
+
+          if (ssqjlow < matrix[cluster][i]) {
+            // Shrink the lower bound
+            matrix[cluster][i] = ssqjlow;
+            backtrackMatrix[cluster][i] = jlow;
+          }
+          jlow++;
+
+          let ssqj = sji + matrix[cluster - 1][j - 1];
+          if (ssqj < matrix[cluster][i]) {
+            matrix[cluster][i] = ssqj;
+            backtrackMatrix[cluster][i] = j;
+          }
         }
 
-        // Initialize for cluster = 0
-        matrix[0][i] = ssq(0, i, sums, sumsOfSquares);
-        backtrackMatrix[0][i] = 0;
+        fillMatrixColumn(iMin, i - 1, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
+        fillMatrixColumn(i + 1, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
+      }
+      // Initializes the main matrices used in Ckmeans and kicks off the divide and conquer cluster computation strategy
+      const fillMatrices = (data, matrix, backtrackMatrix) => {
+        const nValues = matrix[0].length;
+        const shift = data[Math.floor(nValues / 2)];  // Shift values by the median to improve numeric stability
+
+
+        const sums = [];
+        const sumsOfSquares = [];
+
+        // Initialize first column in matrix & backtrackMatrix
+        for (let i = 0, shiftedValue; i < nValues; ++i) {
+          shiftedValue = data[i] - shift;
+          if (i === 0) {
+            sums.push(shiftedValue);
+            sumsOfSquares.push(shiftedValue * shiftedValue);
+          } else {
+            sums.push(sums[i - 1] + shiftedValue);
+            sumsOfSquares.push(sumsOfSquares[i - 1] + shiftedValue * shiftedValue);
+          }
+
+          // Initialize for cluster = 0
+          matrix[0][i] = ssq(0, i, sums, sumsOfSquares);
+          backtrackMatrix[0][i] = 0;
+        }
+
+        // Initialize the rest of the columns
+        let iMin;
+        for (let cluster = 1; cluster < matrix.length; ++cluster) {
+          if (cluster < matrix.length - 1) iMin = cluster;
+          else iMin = nValues - 1;  // No need to compute matrix[K-1][0] ... matrix[K-1][N-2]
+
+          fillMatrixColumn(
+            iMin,
+            nValues - 1,
+            cluster,
+            matrix,
+            backtrackMatrix,
+            sums,
+            sumsOfSquares,
+          );
+        }
       }
 
-      // Initialize the rest of the columns
-      let iMin;
-      for (let cluster = 1; cluster < matrix.length; ++cluster) {
-        if (cluster < matrix.length - 1) iMin = cluster;
-        else iMin = nValues - 1;  // No need to compute matrix[K-1][0] ... matrix[K-1][N-2]
+      const sorted = StatisticsService.NumericSort(numbers);
+      const uniqueCount = StatisticsService.CountUnique(sorted);
+      if (uniqueCount === 1) return [sorted];  // if all of the input values are identical, there's one cluster with all of the input in it.
 
-        fillMatrixColumn(
-          iMin,
-          nValues - 1,
-          cluster,
-          matrix,
-          backtrackMatrix,
-          sums,
-          sumsOfSquares,
-        );
+      const matrix = StatisticsService.Matrix(nClusters, sorted.length);
+      const backtrackMatrix = StatisticsService.Matrix(nClusters, sorted.length);
+
+      // This is a dynamic programming way to solve the problem of minimizing
+      // within-cluster sum of squares. It's similar to linear regression
+      // in this way, and this calculation incrementally computes the
+      // sum of squares that are later read.
+      fillMatrices(sorted, matrix, backtrackMatrix);
+
+      // The real work of Ckmeans clustering happens in the matrix generation:
+      // the generated matrices encode all possible clustering combinations, and
+      // once they're generated we can solve for the best clustering groups
+      // very quickly.
+      let clusters = [];
+      let clusterRight = backtrackMatrix[0].length - 1;
+
+      // Backtrack the clusters from the dynamic programming matrix. This
+      // starts at the bottom-right corner of the matrix (if the top-left is 0, 0),
+      // and moves the cluster target with the loop.
+      for (let cluster = backtrackMatrix.length - 1; cluster >= 0; cluster--) {
+        const clusterLeft = backtrackMatrix[cluster][clusterRight];
+
+        // fill the cluster from the sorted input by taking a slice of the
+        // array. the backtrack matrix makes this easy - it stores the
+        // indexes where the cluster should start and end.
+        clusters[cluster] = sorted.slice(clusterLeft, clusterRight + 1);
+
+        if (cluster > 0) clusterRight = clusterLeft - 1;
       }
+      return clusters;
+    } catch(err) {
+      console.error(`"CK_Means()" failed: ${err}`);
+      return 1;
     }
-
-    const sorted = StatisticsService.NumericSort(numbers);
-    const uniqueCount = StatisticsService.CountUnique(sorted);
-    if (uniqueCount === 1) return [sorted];  // if all of the input values are identical, there's one cluster with all of the input in it.
-
-    const matrix = StatisticsService.Matrix(nClusters, sorted.length);
-    const backtrackMatrix = StatisticsService.Matrix(nClusters, sorted.length);
-
-    // This is a dynamic programming way to solve the problem of minimizing
-    // within-cluster sum of squares. It's similar to linear regression
-    // in this way, and this calculation incrementally computes the
-    // sum of squares that are later read.
-    fillMatrices(sorted, matrix, backtrackMatrix);
-
-    // The real work of Ckmeans clustering happens in the matrix generation:
-    // the generated matrices encode all possible clustering combinations, and
-    // once they're generated we can solve for the best clustering groups
-    // very quickly.
-    let clusters = [];
-    let clusterRight = backtrackMatrix[0].length - 1;
-
-    // Backtrack the clusters from the dynamic programming matrix. This
-    // starts at the bottom-right corner of the matrix (if the top-left is 0, 0),
-    // and moves the cluster target with the loop.
-    for (let cluster = backtrackMatrix.length - 1; cluster >= 0; cluster--) {
-      const clusterLeft = backtrackMatrix[cluster][clusterRight];
-
-      // fill the cluster from the sorted input by taking a slice of the
-      // array. the backtrack matrix makes this easy - it stores the
-      // indexes where the cluster should start and end.
-      clusters[cluster] = sorted.slice(clusterLeft, clusterRight + 1);
-
-      if (cluster > 0) clusterRight = clusterLeft - 1;
-    }
-    return clusters;
   }
 
   /**
@@ -1005,7 +1026,14 @@ class StatisticsService {
    * coefficientOfVariation([-1, 0, 1, 2, 3, 4]).toFixed(3); // => 1.247
    */
   static CoefficientOfVariation(array = []) {
-    return StatisticsService.StandardDeviation(array) / StatisticsService.ArithmeticMean(array);
+    try {
+      const stdDev = StatisticsService.StandardDeviation(array);
+      const mean = StatisticsService.ArithmeticMean(array);
+      return stdDev / mean;
+    } catch(err) {
+      console.error(`"CoefficientOfVariation()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1022,7 +1050,16 @@ class StatisticsService {
    * combineMeans(5, 3, 4, 3); // => 4.5
    */
   static Combine_Means(mean1 = 1, n1 = 10, mean2 = 1, n2 = 10) {
-    return (mean1 * n1 + mean2 * n2) / (n1 + n2);
+    try {
+      mean1 = mean1 ? Number(mean1) : 1;
+      n1 = n1 ? Number(n1) : 10;
+      mean2 = mean2 ? Number(mean2) : 1;
+      n2 = n2 ? Number(n2) : 10;
+      return (mean1 * n1 + mean2 * n2) / (n1 + n2);
+    } catch(err) {
+      console.error(`"Combine_Means()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1065,18 +1102,20 @@ class StatisticsService {
    */
   static Combinations(numbers = [], partitionSize = 2) {
     try {
-      const combinationList = [];
-      for(let i = 0; i < numbers.length; i++) {
+      const length = numbers.length;
+      let combinationList = [];
+      for(let i = 0; i < length; i++) {
         if(partitionSize === 1) combinationList.push([numbers[i]]);
         else {
-          let subsetCombinations = combinations(numbers.slice(i + 1, numbers.length), partitionSize - 1);
-          for(let subI = 0; subI < subsetCombinations.length; subI++) {
-            let next = subsetCombinations[subI];
+          let subsetCombinations = StatisticsService.Combinations(numbers.slice(i + 1, length), partitionSize - 1);
+          for(let j = 0; j < subsetCombinations.length; j++) {
+            let next = subsetCombinations[j];
             next.unshift(numbers[i]);
             combinationList.push(next);
           }
         }
       }
+      // console.info(`Combinations: ${combinationList}`);
       return combinationList;
     } catch(err) {
       console.error(`"Combinations()" failed: ${err}`);
@@ -1097,30 +1136,32 @@ class StatisticsService {
    * CombinationsWithReplacement([1, 2], 2); // => [[1, 1], [1, 2], [2, 2]]
    */
   static CombinationsWithReplacement(array = [], k = 1) {
-    const combinationList = [];
+    try {
+      const combinationList = [];
 
-    for (let i = 0; i < array.length; i++) {
-      if (k === 1) {
-          // If we're requested to find only one element, we don't need to recurse: just push `array[i]` onto the list of combinations.
-          combinationList.push([array[i]]);
-      } else {
-          // Otherwise, recursively find combinations, given `k - 1`. Note that
-          // we request `k - 1`, so if you were looking for k=3 combinations, we're
-          // requesting k=2. This -1 gets reversed in the for loop right after this
-          // code, since we concatenate `array[i]` onto the selected combinations,
-          // bringing `k` back up to your requested level.
-          // This recursion may go many levels deep, since it only stops once
-          // k=1.
-          const chunk = array.slice(i, array.length);
-          const subsetCombinations = StatisticsService.CombinationsWithReplacement(chunk, k - 1);
+      for (let i = 0; i < array.length; i++) {
+        if (k === 1) {
+            // If we're requested to find only one element, we don't need to recurse: just push `array[i]` onto the list of combinations.
+            combinationList.push([array[i]]);
+        } else {
+            // Otherwise, recursively find combinations, given `k - 1`. Note that we request `k - 1`, so if you were looking for k = 3 combinations, we're
+            // requesting k=2. This -1 gets reversed in the for loop right after this code, since we concatenate `array[i]` onto the selected combinations,
+            // bringing `k` back up to your requested level.
+            // This recursion may go many levels deep, since it only stops once k = 1.
+            const chunk = array.slice(i, array.length);
+            const subsetCombinations = StatisticsService.CombinationsWithReplacement(chunk, k - 1);
 
-          for (let j = 0; j < subsetCombinations.length; j++) {
-            combinationList.push([ array[i]].concat(subsetCombinations[j], ));
-          }
+            for (let j = 0; j < subsetCombinations.length; j++) {
+              combinationList.push([ array[i]].concat(subsetCombinations[j], ));
+            }
+        }
       }
+      // console.info(`Combinations: ${combinationList}`);
+      return combinationList;
+    } catch(err) {
+      console.error(`"CombinationsWithReplacement()" failed: ${err}`);
+      return 1;
     }
-
-    return combinationList;
   }
 
   /**
@@ -1164,23 +1205,27 @@ class StatisticsService {
    * @param {number} z
    * @returns {number} cumulative standard normal probability
    */
-  static CumulativeStdNormalProbability(z) {
-    const standardNormalTable = StatisticsService.StandardNormalTable;
-    const absZ = Math.abs(z);  // Calculate the position of this value.
-    // Each row begins with a different significant digit: 0.5, 0.6, 0.7, and so on. 
-    // Each value in the table corresponds to a range of 0.01 in the input values, so the value is
-    // multiplied by 100.
-    const index = StatisticsService.Min( Math.round(absZ * 100), standardNormalTable.length - 1 );
+  static CumulativeStdNormalProbability(z = 0.5) {
+    try {
+      const standardNormalTable = [...StatisticsService.StandardNormalTable];
+      const absZ = Math.abs(z);  // Calculate the position of this value.
+      // Each row begins with a different significant digit: 0.5, 0.6, 0.7, and so on. 
+      // Each value in the table corresponds to a range of 0.01 in the input values, so the value is multiplied by 100.
+      const index = Math.min(Math.round(absZ * 100), standardNormalTable.length - 1);
 
-    // The index we calculate must be in the table as a positive value,
-    // but we still pay attention to whether the input is positive
-    // or negative, and flip the output value as a last step.
-    if (z >= 0) return standardNormalTable[index];
+      // The index we calculate must be in the table as a positive value, but we still pay attention to 
+      // whether the input is positive or negative, and flip the output value as a last step.
+      if (z >= 0) return standardNormalTable[index];
 
-    // due to floating-point arithmetic, values in the table with
-    // 4 significant figures can nevertheless end up as repeating
-    // fractions when they're computed here.
-    return Math.round((1 - standardNormalTable[index]) * 1e4) / 1e4;
+      // due to floating-point arithmetic, values in the table with 4 significant figures 
+      // can nevertheless end up as repeating fractions when they're computed here.
+      const cumulative = Math.round((1 - standardNormalTable[index]) * 1e4) / 1e4;
+      console.info(`Cumulative Standard Normal Probability: ${cumulative}`);
+      return cumulative;
+    } catch(err) {
+      console.error(`"CumulativeStdNormalProbability()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1413,22 +1458,21 @@ class StatisticsService {
 
       n--;  // Decrement n, because approximation is defined for n - 1
       if (n < 0) {
-          // Use Euler's reflection formula for negative inputs
-          // see:  https://en.wikipedia.org/wiki/Gamma_function#Properties
-          return Math.PI / (Math.sin(Math.PI * -n) * StatisticsService.Gamma(-n));
+        // Use Euler's reflection formula for negative inputs see:  https://en.wikipedia.org/wiki/Gamma_function#Properties
+        return Math.PI / (Math.sin(Math.PI * -n) * StatisticsService.Gamma(-n));
       } 
       // Nemes' expansion approximation
       const seriesCoefficient = Math.pow(n / Math.E, n) * Math.sqrt(2 * Math.PI * (n + 1 / 6));
 
       const seriesDenom = n + 1 / 4;
       const seriesExpansion =
-          1 +
-          1 / 144 / Math.pow(seriesDenom, 2) -
-          1 / 12960 / Math.pow(seriesDenom, 3) -
-          257 / 207360 / Math.pow(seriesDenom, 4) -
-          52 / 2612736 / Math.pow(seriesDenom, 5) +
-          5741173 / 9405849600 / Math.pow(seriesDenom, 6) +
-          37529 / 18811699200 / Math.pow(seriesDenom, 7);
+        1 +
+        1 / 144 / Math.pow(seriesDenom, 2) -
+        1 / 12960 / Math.pow(seriesDenom, 3) -
+        257 / 207360 / Math.pow(seriesDenom, 4) -
+        52 / 2612736 / Math.pow(seriesDenom, 5) +
+        5741173 / 9405849600 / Math.pow(seriesDenom, 6) +
+        37529 / 18811699200 / Math.pow(seriesDenom, 7);
 
       return seriesCoefficient * seriesExpansion;
     } catch(err) {
@@ -1498,7 +1542,7 @@ class StatisticsService {
    */
   static GeometricMean(numbers = []) {
     try {
-      if(numbers.length < 1) throw new Error(`Distribution is empty: ${numbers.length}`);
+      if(numbers.length < 1) return 0;
 
       let values = [];
       if (Array.isArray(numbers[0])) values = numbers.map(item => Number(item[1]));
@@ -1551,7 +1595,8 @@ class StatisticsService {
    */
   static HarmonicMean(numbers = []) {
     try {
-      if(numbers.length < 2) throw new Error(`Distribution is empty: ${numbers.length}`);
+      if(numbers.length < 1) return 0;
+      if(numbers.length == 1) return numbers[0];
       
       let values = [];
       if (Array.isArray(numbers[0])) values = numbers.map(item => item[1]);
@@ -1720,14 +1765,14 @@ class StatisticsService {
    * kMeansCluster([[0.0, 0.5], [1.0, 0.5]], 2); // => {labels: [0, 1], centroids: [[0.0, 0.5], [1.0 0.5]]}
    */
   static K_Means_Cluster(points, numCluster = 2, randomSource = Math.random) {
-
+    // const nonRNG = () => 1.0 - StatisticsService.Epsilon;
     // Label each point according to which centroid it is closest to.
     const LabelPoints = (points, centroids) => {
       return points.map((p) => {
         let minDist = Number.MAX_VALUE;
         let label = -1;
         for (let i = 0; i < centroids.length; i++) {
-          const dist = euclideanDistance(p, centroids[i]);
+          const dist = StatisticsService.EuclideanDistance(p, centroids[i]);
           if (dist < minDist) {
             minDist = dist;
             label = i;
@@ -1740,7 +1785,7 @@ class StatisticsService {
     // Calculate centroids for points given labels.
     const CalculateCentroids = (points, labels, numCluster) => {
       let dimension = points[0].length;
-      let centroids = makeMatrix(numCluster, dimension);
+      let centroids = StatisticsService.Matrix(numCluster, dimension);
       let counts = Array(numCluster).fill(0);
 
       // Add points to centroids' accumulators and count points per centroid.
@@ -1774,19 +1819,24 @@ class StatisticsService {
       }
       return total;
     }
-
-    let newCentroids = StatisticsService.Sample(points, numCluster, randomSource);
-    let labels = null;
-    let change = Number.MAX_VALUE;
-    while (change !== 0) {
-      labels = LabelPoints(points, newCentroids);
-      let oldCentroids = newCentroids;
-      newCentroids = CalculateCentroids(points, labels, numCluster);
-      change = CalculateChange(newCentroids, oldCentroids);
-    }
-    return {
-      labels : labels,
-      centroids : newCentroids,
+    
+    try {
+      let newCentroids = StatisticsService.Sample(points, numCluster, randomSource);
+      let labels = null;
+      let change = Number.MAX_VALUE;
+      while (change !== 0) {
+        labels = LabelPoints(points, newCentroids);
+        let oldCentroids = newCentroids;
+        newCentroids = CalculateCentroids(points, labels, numCluster);
+        change = CalculateChange(newCentroids, oldCentroids);
+      }
+      return {
+        labels : labels,
+        centroids : newCentroids,
+      }
+    } catch(err) {
+      console.error(`"K_Means_Cluster()" failed: ${err}`);
+      return 1;
     }
   }
 
@@ -2000,7 +2050,8 @@ class StatisticsService {
    */
   static Median(numbers = []) {
     try {
-      if(numbers.length < 2) throw new Error(`Input less than 2: ${numbers.length}`);
+      if(numbers.length < 1) return 0;
+      if(numbers.length == 1) return numbers[0];
 
       let values = [];
       if (Array.isArray(numbers[0])) values = numbers.map(item => item[1]);
@@ -2177,6 +2228,30 @@ class StatisticsService {
   }
 
   /**
+   * [Probit](http://en.wikipedia.org/wiki/Probit)
+   * is the inverse of CumulativeStdNormalProbability(),
+   * and is also known as the normal quantile function.
+   *
+   * It returns the number of standard deviations from the mean where the p'th quantile 
+   * of values can be found in a normal distribution.
+   * So, for example, probit(0.5 + 0.6827/2) ≈ 1 because 68.27% of values are
+   * normally found within 1 standard deviation above or below the mean.
+   *
+   * @param {number} p
+   * @returns {number} probit
+   */
+  static Probit(p = 1) {
+    try {
+      if (p <= 0) p = StatisticsService.Epsilon;
+      else if (p >= 1) p = 1 - StatisticsService.Epsilon;
+      return Math.sqrt(2) * StatisticsService.InverseErrorFunction(2 * p - 1);
+    } catch(err) {
+      console.error(`"Probit()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
    * [Product](https://en.wikipedia.org/wiki/Product_(mathematics)) of an array
    * is the result of multiplying all numbers together, starting using one as the multiplicative identity.
    *
@@ -2283,7 +2358,7 @@ class StatisticsService {
    * @param {Array} elements any type of data
    * @returns {Array<Array>} array of permutations
    */
-  static PermutationsHeap(elements = []) {
+  static Permutations_Heap(elements = []) {
     const indexes = new Array(elements.length);
     const permutations = [elements.slice()];
 
@@ -2319,7 +2394,8 @@ class StatisticsService {
    */
   static QuadraticMean(numbers = []) {
     try {
-      if(numbers.length < 2) throw new Error(`Distribution is empty: ${numbers.length}`);
+      if(numbers.length < 1) return 0;
+      if(numbers.length == 1) return numbers[0];
 
       let values = [];
       if (Array.isArray(numbers[0])) values = numbers.map(item => item[1]);
@@ -2940,6 +3016,103 @@ class StatisticsService {
   }
 
   /**
+   * [Silhouette values](https://en.wikipedia.org/wiki/Silhouette_(clustering))
+   * for clustered data.
+   *
+   * @param {Array<Array<number>>} points N-dimensional coordinates of points.
+   * @param {Array<number>} labels Labels of points. This must be the same length as `points`,
+   * and values must lie in [0..G-1], where G is the number of groups.
+   * @return {Array<number>} The silhouette value for each point.
+   *
+   * @example
+   * silhouette([[0.25], [0.75]], [0, 0]); // => [1.0, 1.0]
+   */
+  static Silhouette(points, labels) {
+    if (points.length !== labels.length) throw new Error("must have exactly as many labels as points");
+
+    // Create a lookup table mapping group IDs to point IDs.
+    const CreateGroups = (labels) => {
+      const numGroups = 1 + max(labels);
+      const result = Array(numGroups);
+      for (let i = 0; i < labels.length; i++) {
+        const label = labels[i];
+        if (result[label] === undefined) {
+          result[label] = [];
+        }
+        result[label].push(i);
+      }
+      return result;
+    }
+
+    // Create a lookup table of all inter-point distances.
+    const CalculateAllDistances = (points) => {
+      const numPoints = points.length;
+      const result = StatisticsService.Matrix(numPoints, numPoints);
+      for (let i = 0; i < numPoints; i++) {
+        for (let j = 0; j < i; j++) {
+          result[i][j] = StatisticsService.EuclideanDistance(points[i], points[j]);
+          result[j][i] = result[i][j];
+        }
+      }
+      return result;
+    }
+
+    // Calculate the mean distance between a point and all the points in a group (possibly its own).
+    const MeanDistanceFromPointToGroup = (which, group, distances) => {
+      let total = 0;
+      for (let i = 0; i < group.length; i++) {
+        total += distances[which][group[i]];
+      }
+      return total / group.length;
+    }
+
+    // Calculate the mean distance between this point and all the points in the nearest group (as determined by which point in another group is closest).
+    const MeanDistanceToNearestGroup = (which, labels, groupings, distances) => {
+      const label = labels[which];
+      let result = Number.MAX_VALUE;
+      for (let i = 0; i < groupings.length; i++) {
+        if (i !== label) {
+          const d = MeanDistanceFromPointToGroup(which, groupings[i], distances);
+          if (d < result) result = d;
+        }
+      }
+      return result;
+    }
+
+    
+    const groupings = CreateGroups(labels);
+    const distances = CalculateAllDistances(points);
+    const result = [];
+    for (let i = 0; i < points.length; i++) {
+      let s = 0;
+      if (groupings[labels[i]].length > 1) {
+        const a = MeanDistanceFromPointToGroup(i, groupings[labels[i]], distances);
+        const b = MeanDistanceToNearestGroup(i, labels, groupings, distances);
+        s = (b - a) / Math.max(a, b);
+      }
+      result.push(s);
+    }
+    return result;
+  }
+
+  /**
+   * [Silhouette Metric](https://en.wikipedia.org/wiki/Silhouette_(clustering))
+   * for a set of N-dimensional points arranged in groups. The metric is the largest individual silhouette value for the data.
+   *
+   * @param {Array<Array<number>>} points N-dimensional coordinates of points.
+   * @param {Array<number>} labels Labels of points. This must be the same length as `points`,
+   * and values must lie in [0..G-1], where G is the number of groups.
+   * @return {number} The silhouette metric for the groupings.
+   *
+   * @example
+   * silhouetteMetric([[0.25], [0.75]], [0, 0]); // => 1.0
+   */
+  static SilhouetteMetric(points, labels) {
+    const values = StatisticsService.Silhouette(points, labels);
+    return StatisticsService.Max(values);
+  }
+
+  /**
    * Skewness
    * Measures the asymmetry of the data distribution.
    * Positive skew means a long right tail; Negative skew means a long left tail.
@@ -3072,10 +3245,10 @@ class StatisticsService {
    */
   static Variance(numbers = []) {
     try {
-      if (numbers.length === 0) throw new Error("variance requires at least one data point");
+      if (numbers.length < 1) throw new Error("variance requires at least one data point");
 
       // Find the mean of squared deviations between the mean value and each value.
-      const variance = StatisticsService.SumNthPowerDeviations(numbers, 2) / x.length;
+      const variance = StatisticsService.SumNthPowerDeviations(numbers, 2) / numbers.length;
       return variance;
     } catch(err) {
       console.error(`"Variance()" failed: ${err}`);

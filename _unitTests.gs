@@ -649,6 +649,618 @@ const _gasTEmailTesting = async () => {
   if (test?.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
+/**
+ * Test Email Service with GasT
+ */
+const _gasT_Statistics_Testing = async () => {
+  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch(gasT_URL).getContentText());
+  }
+  const test = new GasTap();
+
+  await test(`Add To Mean`, (t) => {
+    const values = [13, 14, 15, 8, 20];
+    const mean = StatisticsService.ArithmeticMean(values);
+    const newMean = StatisticsService.AddToMean(mean, values.length, 53);
+    const manualMean = StatisticsService.ArithmeticMean(values.concat(53));
+    t.equal(newMean, 20.5, `X SHOULD Equal: 20.5, Actual: ${newMean}`);
+    t.equal(newMean, manualMean, `X SHOULD Equal: ${manualMean}, Actual: ${newMean}`);
+    t.notThrow(() => newMean, `AddToMean SHOULD NOT throw error`);
+  });
+
+  await test(`Approximate Strict Equality`, (t) => {
+    const x = StatisticsService.ApproxEqual(14.5, 14.5);
+    t.notThrow(() => x, `Approximate Strict Equality SHOULD NOT throw error`);
+    t.equal(x, true, `X SHOULD Equal: true, Actual: ${x}`);
+
+    const y = StatisticsService.ApproxEqual(1, 1 + (StatisticsService.Epsilon / 2));
+    t.equal(y, true, `Y SHOULD Equal: true, Actual: ${y} (separated by less than epsilon)`);
+
+    const z = StatisticsService.ApproxEqual(1, 1 + (StatisticsService.Epsilon * 2));
+    t.equal(z, false, `Z SHOULD Equal: false, Actual: ${z} (separated by more than epsilon)`);
+
+    const a = StatisticsService.ApproxEqual(100, 100 + (99 * StatisticsService.Epsilon));
+    t.equal(a, true, `A SHOULD Equal: true, Actual: ${a} (separated by relatively less than epsilon)`);
+
+    const b = StatisticsService.ApproxEqual(100, 100 + (101 * StatisticsService.Epsilon));
+    t.equal(b, false, `A SHOULD Equal: false, Actual: ${b} (separated by relatively more than epsilon)`);
+
+    // Negatives
+    t.ok(StatisticsService.ApproxEqual(-10, -10), `-10 = -10`);
+    t.ok(StatisticsService.ApproxEqual(-10 - StatisticsService.Epsilon, -10), `Small Negative Values` );
+    t.ok(!StatisticsService.ApproxEqual(-10 - 11 * StatisticsService.Epsilon, -10), `Larger Negative Values`);
+    t.ok(!StatisticsService.ApproxEqual(-10, 10), `Negative =/= Positive`);
+
+    // Tolerances
+    t.ok(!StatisticsService.ApproxEqual(1, 2), `Tolerance for Integers`);
+    t.ok(StatisticsService.ApproxEqual(1, 2, 1.5), `Tolerance for Floats`);
+
+    // Near Zero
+    t.ok(!StatisticsService.ApproxEqual(1, 0), `1 =/= 0`);
+    t.ok(!StatisticsService.ApproxEqual(0, 1), `0 =/= 1`);
+  });
+
+  await test(`Bernoulli Distribution`, (t) => {
+    t.ok(Array.isArray(StatisticsService.BernoulliDistribution(0.3)), `Ok`);
+    const x = StatisticsService.BernoulliDistribution(0.3);
+    t.equal(x[0], 0.7, `Expected: ${0.7}, Actual: ${x[0]} or < ${StatisticsService.Epsilon}`);
+    t.equal(x[1], 0.3, `Expected: ${0.3}, Actual: ${x[1]} or < ${StatisticsService.Epsilon}`);
+    t.throws(StatisticsService.BernoulliDistribution(-0.01), `SHOULD throw error when p is not valid probability: (0 < x < 1)`);
+    t.throws(StatisticsService.BernoulliDistribution(1.5), `SHOULD throw error when p is not valid probability: (0 < x < 1)`);
+  });
+
+  await test(`Binomial Distribution`, (t) => {
+    const rnd = (n) => Number.parseFloat(n.toFixed(4));
+
+    const a = StatisticsService.BinomialDistribution(6, 0.3);
+    t.equal(typeof a, "object", `SHOULD return object: Actual: ${typeof a}`);
+
+    t.equal(rnd(a[0]), 0.1176, `Expected: ${0.1176}, Actual: ${rnd(a[0])}`);
+    t.equal(rnd(a[1]), 0.3025, `Expected: ${0.3025}, Actual: ${rnd(a[1])}`);
+    t.equal(rnd(a[2]), 0.3241, `Expected: ${0.3241}, Actual: ${rnd(a[2])}`);
+    t.equal(rnd(a[3]), 0.1852, `Expected: ${0.1852}, Actual: ${rnd(a[3])}`);
+    t.equal(rnd(a[4]), 0.0595, `Expected: ${0.0595}, Actual: ${rnd(a[4])}`);
+    t.equal(rnd(a[5]), 0.0102, `Expected: ${0.0102}, Actual: ${rnd(a[5])}`);
+    t.equal(rnd(a[6]), 0.0007, `Expected: ${0.0007}, Actual: ${rnd(a[6])}`);
+
+    const b = StatisticsService.BinomialDistribution(0, 0.5);
+    t.throws(b, `n should be strictly positive`);
+
+    const c = StatisticsService.BinomialDistribution(1.5, 0.5);
+    t.throws(c, `n should be an integer`);
+
+    const d = StatisticsService.BinomialDistribution(2, -0.01);
+    t.throws(d, `p should be greater than 0.0`);
+
+    const e = StatisticsService.BinomialDistribution(2, 1.5);
+    t.throws(d, `p should be less than 1.0`);
+  });
+
+  await test(`Bisect`, (t) => {
+    const a = Number(StatisticsService.Bisect(Math.sin, 1, 4, 100, 0.003)).toFixed(4);
+    t.equal(a, 3.1416, `Expected: ${3.1416}, Actual: ${a}`);
+
+    const b = Number(StatisticsService.Bisect(Math.cos, 0, 4, 100, 0.003)).toFixed(4);
+    t.equal(b, 1.5723, `Expected: ${1.5723}, Actual: ${b}`);
+
+    const c = Number(StatisticsService.Bisect(Math.cos, 0, 4, 1, 0.003)).toFixed(4);
+    t.throws(t.equal(c, 1.0), `Throws if it exceeds the number of iterations allowed`);
+
+    const d = StatisticsService.Bisect(0);
+    t.throws(d, `Throws with syntax error f must be a function`);
+  });
+
+  await test(`Chi Squared Goodness Of Fit`, (t) => {
+    const data1019 = [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2,
+      2, 2, 2, 2, 2, 2, 3, 3, 3, 3
+    ];
+
+    const a = StatisticsService.ChiSquaredGoodnessOfFit(data1019, StatisticsService.PoissonDistribution, 0.5);
+    t.equal(a, true, `Can reject the null hypothesis with level of confidence specified at 0.05, Actual: ${a}`);
+
+    const b = StatisticsService.ChiSquaredGoodnessOfFit(data1019, StatisticsService.PoissonDistribution, 0.1);
+    t.equal(b, true, `Can reject the null hypothesis with level of confidence specified at 0.01, Actual: ${b}`);
+
+    const c = StatisticsService.ChiSquaredGoodnessOfFit([0, 2, 3, 7, 7, 7, 7, 7, 7, 9, 10], StatisticsService.PoissonDistribution, 0.1);
+    t.equal(c, true, `Can tolerate gaps in distribution, Actual: ${c}`);
+
+    // t.equal(a, 3.1416, `Expected: ${3.1416}, Actual: ${a}`);
+
+    // const b = Number(StatisticsService.Bisect(Math.cos, 0, 4, 100, 0.003)).toFixed(4);
+    // t.equal(b, 1.5723, `Expected: ${1.5723}, Actual: ${b}`);
+
+    // const c = Number(StatisticsService.Bisect(Math.cos, 0, 4, 1, 0.003)).toFixed(4);
+    // t.throws(t.equal(c, 1.0), `Throws if it exceeds the number of iterations allowed`);
+
+    // const d = StatisticsService.Bisect(0);
+    // t.throws(d, `Throws with syntax error f must be a function`);
+  });
+  
+  await test(`Chunk`, (t) => {
+    // TODO: Fix this shit.
+    const a = StatisticsService.Chunk([`a`, `b`, `c`], 1);
+    t.equal(a.toString(), [[`a`], [`b`], [`c`]].toString(), `Expected: ${[[`a`], [`b`], [`c`]]}, Actual: ${a}`);
+
+    const b = StatisticsService.Chunk([1, 2, 3], 2);
+    t.equal(b.toString(), [[1, 2], [3]].toString(), `Expected: ${[[1, 2], [3]]}, Actual: ${b}`);
+
+    const c = StatisticsService.Chunk([1, 2, 3, 4], 4);
+    t.equal(c.toString(), [[1, 2, 3, 4]].toString(), `Expected: ${[[1, 2, 3, 4]]}, Actual: ${c}`);
+
+    const d = StatisticsService.Chunk([1, 2, 3, 4], 2);
+    t.equal(d.toString(), [[1, 2], [3, 4]].toString(), `Expected: ${[[1, 2], [3, 4]]}, Actual: ${d}`);
+
+    const e = StatisticsService.Chunk([1, 2, 3, 4], 3);
+    t.equal(e.toString(), [[1, 2, 3], [4]].toString(), `Expected: ${[[1, 2, 3], [4]]}, Actual: ${e}`);
+
+    const f = StatisticsService.Chunk([1, 2, 3, 4, 5, 6, 7], 2);
+    t.equal(f.toString(), [[1, 2], [3, 4], [5, 6], [7]].toString(), `Expected: ${[[1, 2], [3, 4], [5, 6], [7]]}, Actual: ${f}`);
+
+    const g = StatisticsService.Chunk([1, 2, 3, 4, 5, 6, 7], 0);
+    t.throws(g, `Throws with zero chunk size`);
+
+    const h = StatisticsService.Chunk([1, 2, 3, 4, 5, 6, 7], 1.5);
+    t.throws(h, `Throws with non-integer chunk size`);
+  });
+  
+  await test(`CK_Means`, (t) => {
+    t.ok(StatisticsService.CK_Means, "Exports fn");
+    t.throws(StatisticsService.CK_Means([], 10), `Cannot generate more values than input`);
+
+    const a = StatisticsService.CK_Means([1], 1);
+    t.equal(a, 1, `(Single-value case) Expected: ${[1]}, Actual: ${a}`);
+
+    const b = StatisticsService.CK_Means([1, 1, 1, 1], 1);
+    t.equal(b.toString(), [1, 1, 1, 1].toString(), `(Same-value case) Expected: ${[1, 1, 1, 1]}, Actual: ${b}`);
+
+    const c = StatisticsService.CK_Means([-1, 2, -1, 2, 4, 5, 6, -1, 2, -1], 3);
+    t.equal(c.toString(), [ [-1, -1, -1, -1], [2, 2, 2], [4, 5, 6] ].toString(), `Expected: ${[ [-1, -1, -1, -1], [2, 2, 2], [4, 5, 6] ]}, Actual: ${c}`);
+
+    const d = StatisticsService.CK_Means([64.64249127327881, 64.64249127328245, 57.79216426169771], 2);
+    t.equal(
+      d.toString(), 
+      [ [57.79216426169771], [64.64249127327881, 64.64249127328245] ].toString(), 
+      `(Floating point case) Expected: ${[ [57.79216426169771], [64.64249127327881, 64.64249127328245] ]}, Actual: ${d}`
+    );
+  });
+
+  await test(`Coefficient of Variation`, (t) => {
+    const rnd = (n) => Number.parseFloat(n.toFixed(4));
+    t.ok(StatisticsService.CoefficientOfVariation, "Exports fn");
+
+    const x = StatisticsService.CoefficientOfVariation([1, 2, 3, 4]);
+    t.equal(rnd(x), 0.4236, `Expected: ${0.4236}, Actual: ${rnd(x)}`);
+
+  });
+
+  await test(`Combinations`, (t) => {
+    t.ok(StatisticsService.Combinations, "Exports fn");
+
+    const x = StatisticsService.Combinations([1], 1);
+    t.equal(x, [[1]].toString(), `Expected: ${[[1]]}, Actual: ${x}`);
+
+    const y = StatisticsService.Combinations([1, 2, 3], 2);
+    t.equal(y, [[1,2], [1,3], [2,3]].toString(), `Expected: ${[[1,2], [1,3], [2,3]]}, Actual: ${y}`);
+
+    const z = StatisticsService.Combinations([`a`, `b`, `c`], 2);
+    t.equal(z, [[`a`,`b`], [`a`,`c`], [`b`,`c`]].toString(), `Expected: ${[[`a`,`b`], [`a`,`c`], [`b`,`c`]]}, Actual: ${z}`);
+  });
+
+  await test(`Combinations With Replacement`, (t) => {
+    t.ok(StatisticsService.CombinationsWithReplacement, "Exports fn");
+
+    const x = StatisticsService.CombinationsWithReplacement([1], 1);
+    t.equal(
+      x, 
+      [[1]].toString(), 
+      `Expected: ${[[1]]}, Actual: ${x}`
+    );
+
+    const y = StatisticsService.CombinationsWithReplacement([1, 2, 3], 2);
+    t.equal(
+      y, 
+      [[1,1], [1,2], [1,3], [2,2], [2,3], [3,3]].toString(), 
+      `Input: ${[1,2,3]}, Expected: ${[[1,1], [1,2], [1,3], [2,2], [2,3], [3,3]]}, Actual: ${y}`
+    );
+
+    const z = StatisticsService.CombinationsWithReplacement([`a`, `b`, `c`], 2);
+    t.equal(
+      z, 
+      [[`a`,`a`], [`a`,`b`], [`a`,`c`], [`b`,`b`], [`b`,`c`], [`c`,`c`]].toString(), 
+      `Input: ${[`a`, `b`, `c`]}, Expected: ${[[`a`,`a`], [`a`,`b`], [`a`,`c`], [`b`,`b`], [`b`,`c`], [`c`,`c`]]}, Actual: ${z}`
+    );
+  });
+  
+  await test(`Combine Means`, (t) => {
+    t.ok(StatisticsService.Combine_Means, "Exports fn");
+    const values1 = [8, 3, 4];
+    const mean1 = StatisticsService.ArithmeticMean(values1);
+    const values2 = [2, 6, 4];
+    const mean2 = StatisticsService.ArithmeticMean(values2);
+
+    const x = StatisticsService.Combine_Means(mean1, values1.length, mean2, values2.length);
+    t.equal(x, 4.5, `Expected: ${4.5}, Actual: ${x}`);
+
+    const natural = StatisticsService.ArithmeticMean([...values1, ...values2]);
+    t.equal(x, natural, `Expected: ${natural}, Actual: ${x}`);
+  });
+
+  await test(`Combine Variances`, (t) => {
+    t.ok(StatisticsService.Combine_Variances, "Exports fn");
+    const values1 = [8, 3, 4];
+    const mean1 = StatisticsService.ArithmeticMean(values1);
+    const variance1 = StatisticsService.Variance(values1);
+    const values2 = [2, 6, 4];
+    const mean2 = StatisticsService.ArithmeticMean(values2);
+    const variance2 = StatisticsService.Variance(values2);
+
+    const x = StatisticsService.Combine_Variances(variance1, mean1, values1.length, variance2, mean2, values2.length);
+    t.equal(Number(x).toFixed(5), 3.91667, `Expected: ${3.91666}, Actual: ${x}`);
+
+    const natural = StatisticsService.Variance([...values1, ...values2]);
+    t.equal(Number(x).toFixed(5), Number(natural).toFixed(5), `Expected: ${natural}, Actual: ${x}`);
+  });
+  
+  await test(`Cumulative Standard Normal Probability`, (t) => {
+    t.ok(StatisticsService.CumulativeStdNormalProbability, "Exports fn");
+
+    const x = StatisticsService.CumulativeStdNormalProbability(0.4);
+    t.equal(x, 0.656, `Expected: ${0.656}, Actual: ${x}`);
+
+    for (let i = 0; i < StatisticsService.StandardNormalTable.length; i++) {
+      let dx = StatisticsService.CumulativeStdNormalProbability(i / 100);
+      let dy = StatisticsService.CumulativeStdNormalProbability((i - 1) / 100);
+      const compare = dx >= dy;
+      t.equal(compare, true, `(Non-decreasing test) DX: ${dx} >= DY: ${dy}`);
+    }
+
+    for (let i = 1; i < StatisticsService.StandardNormalTable.length; i++) {
+      const a = StatisticsService.CumulativeStdNormalProbability(i / 100);
+      const b = 0.5 + (0.5 * StatisticsService.ErrorFunction((Math.sqrt(2) * i) / 100));
+      const diff = Math.abs(a - b);
+      const compare = diff < StatisticsService.Epsilon;
+      t.equal(compare, false, `(Matches Error Function): (${diff}) IDX: ${i}: (${StatisticsService.StandardNormalTable[i]})`)
+    }
+
+    const y = StatisticsService.CumulativeStdNormalProbability(-1);
+    const z = StatisticsService.CumulativeStdNormalProbability(1);
+    const dx = Math.abs(y - (1 - z)) < StatisticsService.Epsilon;
+    t.equal(dx, true, `(Symmetry Test) Expected: ${true}, Actual: ${dx}`);
+
+    const expected = 21 * StatisticsService.Epsilon;
+    for (let i = 0; i <= 1 + StatisticsService.Epsilon; i += 0.01) {
+      const probit = StatisticsService.Probit(i);
+      const x = Math.abs(StatisticsService.CumulativeStdNormalProbability(probit) - i);
+      t.equal(x < expected, true, `(Inverse Test) Expected: ${expected}, Actual: ${x} `);
+    }
+
+    const a = StatisticsService.CumulativeStdNormalProbability(0);
+    t.equal(a, 0.5, `(Median is Zero Test) Expected: ${0.5}, Actual: ${a}`);
+
+    for (let i = -3; i <= 3; i += 0.01) {
+      const dx = StatisticsService.CumulativeStdNormalProbability(i + StatisticsService.Epsilon);
+      const dy = StatisticsService.CumulativeStdNormalProbability(i);
+      const compare = dx <= dy;
+      t.equal(compare, true, `${i}, V1: ${dy} >> V1+Epsilon: ${dx}`);
+    }
+
+    for (let i = 0; i <= 3; i += 0.01) {
+      const dx = StatisticsService.CumulativeStdNormalProbability(i);
+      const dy = 1 - StatisticsService.CumulativeStdNormalProbability(-i);
+      const diff = Math.abs(dx - dy);
+      const compare = diff > StatisticsService.Epsilon;
+      t.equal(compare, false, `(Symmetry Test about Zero), Actual: ${diff}`);
+    }
+ 
+  });
+  
+  await test(`Equal Interval Breaks`, (t) => {
+    t.ok(StatisticsService.EqualIntervalBreaks, "Exports fn");
+
+    const a = StatisticsService.EqualIntervalBreaks([1], 4);
+    t.equal(a, [1].toString(), `1-length case. Expected ${[1]}, Actual: ${a}`);
+
+    const b = StatisticsService.EqualIntervalBreaks([1, 2, 3, 4, 5, 6], 4);
+    const b_expected = [1, 2.25, 3.5, 4.75, 6];
+    t.equal(b, b_expected.toString(), `3 Breaks Case. Expected ${b_expected}, Actual: ${b}`);
+
+    const c = StatisticsService.EqualIntervalBreaks([1, 2, 3, 4, 5, 6], 2);
+    const c_expected = [1, 3.5, 6];
+    t.equal(c, c_expected.toString(), `2 Breaks Case. Expected ${c_expected}, Actual: ${c}`);
+
+    const d = StatisticsService.EqualIntervalBreaks([1, 2, 3, 4, 5, 6], 1);
+    const d_expected = [1, 6];
+    t.equal(d, d_expected.toString(), `1 Breaks Case. Expected ${d_expected}, Actual: ${d}`);
+
+  });
+  
+  await test(`Error Function`, (t) => {
+    t.ok(StatisticsService.ErrorFunction, "Exports fn");
+
+    const a = StatisticsService.ErrorFunction(-1);
+    const b = StatisticsService.ErrorFunction(1);
+    t.equal(Math.abs(a), Math.abs(b), `Expected ${true}, Actual A: ${a}, Actual B: ${b}`);
+
+    for (let i = -1; i <= 1; i += 0.01) {
+      const x = Math.abs(StatisticsService.ErrorFunction(StatisticsService.InverseErrorFunction(i) - i));
+      const eps = 4 * StatisticsService.Epsilon;
+      t.equal(x < eps, false, `Inverse Error: Expected: ${eps}, Actual: ${x}`);
+    }
+
+  });
+
+  await test(`Factorial`, (t) => {
+    t.ok(StatisticsService.Factorial, "Exports fn");
+
+    const a = StatisticsService.Factorial(-1);
+    t.throws(a, `Less than zero check, Actual: ${a}`);
+
+    const b = StatisticsService.Factorial(0.5);
+    t.throws(b, `Floating point check, Actual: ${b}`);
+
+    const c = StatisticsService.Factorial(0);
+    t.equal(c, 1, `Zero check, Actual: ${c}`);
+
+    const d = StatisticsService.Factorial(1);
+    t.equal(d, 1, `Zero check, Actual: ${d}`);
+
+    const e = StatisticsService.Factorial(100);
+    t.equal(e, 9.33262154439441e157, `Expected: ${9.33262154439441e157}, Actual: ${e}`);
+
+  });
+  
+  await test(`Gamma`, (t) => {
+    t.ok(StatisticsService.Gamma, "Exports fn");
+
+    const a = StatisticsService.Gamma(5);
+    t.equal(a, 24, `Gamma for integer SHOULD return whole number, Expected: ${24}, Actual: ${a}`);
+
+    const b = Math.abs(StatisticsService.Gamma(11.54) - 13098426.039156161) < StatisticsService.Epsilon;
+    t.ok(b, `Gamma for positive real float should be correct, Expected: ?, Actual: ${b}`);
+
+    const c = Math.abs(StatisticsService.Gamma(-42.5) - -3.419793520724856e-52) < StatisticsService.Epsilon;
+    t.ok(c, `Gamma for negative real float should be correct`);
+
+    const d = Number.isNaN(StatisticsService.Gamma(-2));
+    t.ok(d, `Gamma for negative integer should return NaN`);
+
+    const e = Number.isNaN(StatisticsService.Gamma(0));
+    t.ok(e, `Gamma for zero should return NaN`);
+
+  });
+
+  await test(`Gamma LN`, (t) => {
+    t.ok(StatisticsService.Gamma_ln, "Exports fn");
+
+    const a = StatisticsService.Gamma_ln(11.54);
+    t.equal(a, 16.388002631263966, `Gamma_ln for positive real float SHOULD return Expected: ${16.388002631263966}, Actual: ${a}`);
+
+    const b = Math.round(StatisticsService.Gamma(8.2));
+    const b_exp = Math.round(Math.exp(StatisticsService.Gamma_ln(8.2)));
+    t.equal(b, b_exp, `exp(Gamma_ln(n)) for n should equal gamma(n), Expected: ${b_exp}, Actual: ${b}` );
+
+    const c = StatisticsService.Gamma_ln(-42.5);
+    const c_exp = Number.POSITIVE_INFINITY;
+    t.equal(c, c_exp, `Gamma_ln for negative n should be Infinity, Expected: ${c_exp}, Actual: ${c}`);
+    
+    const d = StatisticsService.Gamma_ln(0);
+    const d_exp = Number.POSITIVE_INFINITY;
+    t.equal(d, d_exp, `Gamma_ln for n === 0 should return NaN, Expected: ${d_exp}, Actual: ${d}`);
+
+  });
+
+  await test(`Geometric Mean`, (t) => {
+    t.ok(StatisticsService.GeometricMean, "Exports fn");
+    t.throws(StatisticsService.GeometricMean([]), `Cannot calculate for empty lists`);
+    t.throws(StatisticsService.GeometricMean([-1]), `Cannot calculate for lists with negative numbers`);
+    t.notOk(StatisticsService.GeometricMean([0, 1, 2]) !== 0, `Geometric mean of array containing zero is not zero`);
+
+    const a = StatisticsService.GeometricMean([2, 8]);
+    t.equal(a, 4, `Can get the mean of two numbers, Expected: ${4}, Actual: ${a}`);
+
+    const b = StatisticsService.GeometricMean([4, 1, 1 / 32]);
+    t.equal(b, 0.5, `Can get the mean of two numbers, Expected: ${0.5}, Actual: ${b}`);
+
+    const c = Math.round(StatisticsService.GeometricMean([2, 32, 1]));
+    t.equal(c, 4, `Can get the mean of two numbers, Expected: ${4}, Actual: ${c}`);
+
+  });
+  
+  await test(`Harmonic Mean`, (t) => {
+    t.ok(StatisticsService.HarmonicMean, "Exports fn");
+    t.throws(StatisticsService.HarmonicMean([]), `Cannot calculate for empty lists`);
+    t.throws(StatisticsService.HarmonicMean([-1]), `Cannot calculate for lists with negative numbers`);
+    t.notOk(StatisticsService.HarmonicMean([0, 1, 2]) !== 0, `Harmonic mean of array containing zero is not zero`);
+
+    const a = Number(StatisticsService.HarmonicMean([2, 3])).toFixed(1);
+    t.equal(a, 2.4, `Can get the mean of two numbers, Expected: ${2.4}, Actual: ${a}`);
+
+    const b = StatisticsService.HarmonicMean([1, 1]);
+    t.equal(b, 1, `Can get the mean of two numbers, Expected: ${1}, Actual: ${b}`);
+
+    const c = StatisticsService.HarmonicMean([1, 2, 4]);
+    t.equal(c, 12 / 7, `Can get the mean of two numbers, Expected: ${12 / 7}, Actual: ${c}`);
+
+  });
+
+  await test(`Interquartile Range (iqr)`, (t) => {
+    t.ok(StatisticsService.InterquartileRange, "Exports fn");
+    t.throws(StatisticsService.InterquartileRange([]), `An iqr of a zero-length list cannot be calculated`);
+
+    const even = [3, 6, 7, 8, 8, 10, 13, 15, 16, 20];
+    const a = StatisticsService.InterquartileRange(even);
+    const a_exp = StatisticsService.Quantile(even, 0.75) - StatisticsService.Quantile(even, 0.25)
+    t.equal(a, a_exp, `Can get proper iqr of an even-length list, Expected: ${a_exp}, Actual: ${a}`);
+
+    const odd = [3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20];
+    const b = StatisticsService.InterquartileRange(odd);
+    const b_exp = StatisticsService.Quantile(odd, 0.75) - StatisticsService.Quantile(odd, 0.25)
+    t.equal(b, b_exp, `Can get proper iqr of an odd-length list, Expected: ${b_exp}, Actual: ${b}`);
+
+  });
+
+  await test(`Jenks Test`, (t) => {
+    t.ok(StatisticsService.Jenks, "Exports fn");
+    t.throws(StatisticsService.Jenks([]), `An iqr of a zero-length list cannot be calculated`);
+
+    const a = StatisticsService.Jenks([1, 2], 3);
+    t.equal(a, null, `Will not try to assign more classes than datapoints, Expected: ${null}, Actual: ${a}`);
+
+    const b = StatisticsService.Jenks([1, 2, 4, 5, 7, 9, 10, 20], 3);
+    const b_exp = [1, 7, 20, 20];
+    t.equal(b.toString(), b_exp.toString(), `Assigns correct breaks (small gaps between classes), Expected: ${b_exp}, Actual: ${b}`);
+
+    const c = StatisticsService.Jenks([2, 32, 33, 34, 100], 3);
+    const c_exp = [2, 32, 100, 100];
+    t.equal(c.toString(), c_exp.toString(), `Assigns correct breaks (large gaps between classes), Expected: ${c_exp}, Actual: ${c}`);
+
+    const d = StatisticsService.Jenks([9, 10, 11, 12, 13], 5);
+    const d_exp = [9, 10, 11, 12, 13, 13];
+    t.equal(d.toString(), d_exp.toString(), `Assigns correct breaks (breaking N points into N classes), Expected: ${d_exp}, Actual: ${d}`);
+
+  });
+
+  await test(`K Means Cluster`, (t) => {
+    const nonRNG = () => 1.0 - StatisticsService.Epsilon;
+
+    t.ok(StatisticsService.K_Means_Cluster, "Exports fn");
+    t.throws(StatisticsService.K_Means_Cluster([1], 2, nonRNG), `Base case of one value`);
+    
+    let points = [[0.5]];
+    const a = StatisticsService.K_Means_Cluster(points, 1, nonRNG);
+    t.equal(a.labels.toString(), [0].toString(), `Single cluster of one point contains only that point`);
+    t.equal(a.centroids.toString(), [[0.5]].toString(), `Single cluster of one point contains only that point`);
+
+    const b = StatisticsService.K_Means_Cluster(points, 1);
+    t.equal(b.labels.length, 1, `Clustering with default Math.random`);
+    t.equal(b.centroids.length, 1, `Clustering with default Math.random`);
+
+    points = [[0.0], [1.0]];
+    const c = StatisticsService.K_Means_Cluster(points, 1, nonRNG);
+    t.equal(c.labels, [0, 0].toString(), `Single cluster of two points contains both points`);
+    t.equal(c.centroids, [[0.5]].toString(), `Single cluster of two points contains both points`);
+
+    points = [[0.0], [1.0]];
+    const d = StatisticsService.K_Means_Cluster(points, 2, nonRNG);
+    t.equal(d.labels, [0, 1].toString(), `Two clusters of two points puts each point in its own cluster`);
+    t.equal(d.centroids, [[0.0], [1.0]].toString(), `Two clusters of two points puts each point in its own cluster`);
+
+    points = [[0.0], [1.0], [0.0], [1.0]];
+    const e = StatisticsService.K_Means_Cluster(points, 2, nonRNG);
+    t.equal(e.labels, [0, 1, 0, 1].toString(), `Two clusters of four paired points puts each pair in a cluster`);
+    t.equal(e.centroids, [[0.0], [1.0]].toString(), `Two clusters of four paired points puts each pair in a cluster`);
+
+    points = [ [0.0, 0.5], [1.0, 0.5] ];
+    const f = StatisticsService.K_Means_Cluster(points, 2, nonRNG);
+    t.equal(f.labels, [0, 1].toString(), `Two clusters of two 2D points puts each point in its own cluster`);
+    t.equal(f.centroids, [ [0.0, 0.5], [1.0, 0.5] ].toString(), `Two clusters of two 2D points puts each point in its own cluster`);
+
+    points = [ [0.0, 0.5], [1.0, 0.5], [0.1, 0.0] ];
+    const g = StatisticsService.K_Means_Cluster(points, 2, nonRNG);
+    t.equal(g.labels, [0, 1, 0].toString(), `Two clusters of three 2D points puts two points in one cluster and one in the other`);
+    t.equal(g.centroids, [ [0.05, 0.25], [1.0, 0.5] ].toString(), `Two clusters of three 2D points puts two points in one cluster and one in the other`);
+
+  });
+
+  await test(`Kernel Density Estimation`, (t) => {
+    t.ok(StatisticsService.Kernel_Density_Estimation, "Exports fn");
+    const SQRT_2PI = Math.sqrt(2 * Math.PI);
+    const normallyDistributed = {
+      sample: [
+        -1.85884822191703, 0.602520739129486, 0.888077007699802,
+        -0.196371268020604, -0.261434475360111, -0.555806535734196,
+        -0.535685767427025, -0.805785306288279, -0.0542408941260752,
+        -1.99949822804059, -1.31781357407021, 0.551938395645566,
+        -0.243919697027738, -0.39133049951603, -0.0197245301228612,
+        -0.448827587584495, -1.28606487855844, 1.52470482345308,
+        -1.92242657930281, 1.50862845897339, 0.756698701211952,
+        1.03637617724389, 1.2724121144235, 0.227137867400568, 0.614194690129868,
+        2.03223772207173, -1.29814099266873, -0.474986717342843,
+        -0.153962343622878, -0.730739393654425, -1.12457125027309,
+        -0.444103197987559, 0.459771149889531, 0.445498717584673,
+        0.0736304465553301, 0.340392907537276, 0.807820303672019,
+        -0.0478512608947293, -0.485938052839795, -0.249702764311268,
+        0.847717867319239, -0.631380378496465, -1.23218376426349,
+        1.8274052037247, 0.303031661057796, 0.940686211521394,
+        -0.565932683487323, -0.793791866093677, -0.950742000255766,
+        -2.05768339176415
+      ],
+      density: [
+        [-3, 0.00622253574711248],
+        [-2, 0.0955008985482363],
+        [-1, 0.26278412857974],
+        [0, 0.35334369527338],
+        [1, 0.214348469979353],
+        [2, 0.0652701909587952],
+        [3, 0.00303679902517155]
+      ]
+    }
+
+    t.throws(StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample, "bz"), `Invalid Kernel`);
+    t.throws(StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample, "gaussian", "bz"), `Invalid Kernel`);
+
+    for (let i = 0; i < normallyDistributed.density.length; i++) {
+      const x = normallyDistributed.density[i][0];
+      const expected = normallyDistributed.density[i][1];
+      const actual = StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample, x);
+      const compare = Math.abs(actual - expected) / expected < 0.1;
+      t.ok(compare, `density(${x}) = ${actual} != ${expected}`, `default kernel and bandwidth`);
+    }
+
+    const a = StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample);
+    const a_exp = StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample, "gaussian", "nrd");
+    t.equal(a, a_exp, `Gaussian Default Kernel, Expected: ${a_exp}, Actual: ${a}`);
+
+    const b = StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample);
+    const b_exp = StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample, (u) => Math.exp(-0.5 * u * u) / SQRT_2PI)
+    t.equal(b, b_exp, `Gaussian Default Kernel, Expected: ${b_exp}, Actual: ${b}`);
+
+    const c = StatisticsService.Kernel_Density_Estimation(normallyDistributed.sample, "gaussian", 1);
+    const c_exp = 0.2806999313061038;
+    t.equal(c, c_exp, `Custom Kernel Value, Expected: ${c_exp}, Actual: ${c}`);
+
+  });
+
+  await test(`Linear Regression`, (t) => {
+    t.ok(StatisticsService.LinearRegression, "Exports fn");
+
+    const a = StatisticsService.LinearRegression([ [0, 0], [1, 1] ]);
+    const a_l = StatisticsService.LinearRegressionLine(a);
+    t.equal(a_l(0), 0, `Correctly generates a line for a (0, 0) to (1, 1) dataset: Expected: ${0}, Actual: ${a_l(0)}`);
+    t.equal(a_l(0.5), 0.5, `Correctly generates a line for a (0, 0) to (1, 1) dataset: Expected: ${0.5}, Actual: ${a_l(0.5)}`);
+    t.equal(a_l(1), 1, `Correctly generates a line for a (0, 0) to (1, 1) dataset: Expected: ${1}, Actual: ${a_l(1)}`);
+
+    const b = StatisticsService.LinearRegression([ [0, 0], [1, 0] ]);
+    const b_l = StatisticsService.LinearRegressionLine(b);
+    t.equal(b_l(0), 0, `Correctly generates a line for a (0, 0) to (1, 1) dataset: Expected: ${0}, Actual: ${b_l(0)}`);
+    t.equal(b_l(0.5), 0, `Correctly generates a line for a (0, 0) to (1, 1) dataset: Expected: ${0}, Actual: ${b_l(0.5)}`);
+    t.equal(b_l(1), 0, `Correctly generates a line for a (0, 0) to (1, 1) dataset: Expected: ${0}, Actual: ${b_l(1)}`);
+
+    const c = StatisticsService.LinearRegression([[0, 0]]);
+    const c_l = StatisticsService.LinearRegressionLine(c);
+    t.equal(c_l(10), 0, `Handles a single-point sample, Expected: ${0}, Actual: ${c_l(10)}`);
+
+    const d = StatisticsService.LinearRegression([ [0, 0], [1, 0] ]);
+    const d_exp = { m: 0, b: 0 }
+    t.equal(d.toString(), d_exp.toString(), `A straight line will have a slope of 0, Expected: ${d_exp}, Actual: ${d}`);
+
+    const e = StatisticsService.LinearRegression([ [0, 0], [1, 0.5] ]);
+    const e_exp = { m: 0.5, b: 0 }
+    t.equal(e.toString(), e_exp.toString(), `A line at 50% grade, Expected: ${e_exp}, Actual: ${e}`);
+
+    const f = StatisticsService.LinearRegression([ [0, 20], [1, 10] ]);
+    const f_exp = { m: -10, b: 20 }
+    t.equal(f.toString(), f_exp.toString(), `A line with a high y-intercept, Expected: ${f_exp}, Actual: ${f}`);
+
+  });
+
+
+  await test.finish();
+  if (test?.totalFailed() > 0) throw "Some test(s) failed!";
+}
 
 /**
  * Test All with GasT
@@ -665,6 +1277,7 @@ const _gasTTestAll = async () => {
     await _gasTShopifyTesting(),
     await _gasTTicketTesting(),
     await _gasTEmailTesting(),
+    // await _gasT_Statistics_Testing(),
   ])
   .then(console.info('Test Success.'))
   .catch(err => {

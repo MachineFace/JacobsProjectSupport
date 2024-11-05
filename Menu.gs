@@ -357,6 +357,14 @@ const PopupCreateTicket = async () => {
  * Builds HTML file for the modal pop-up from the help list.
  */
 const BuildHTMLHELP = () => {
+  let warning = [ 
+    `ACHTUNG!`,
+    `--------`,
+    `Das machine is nicht fur gerfingerpoken und mittengrabben.`,
+    `Ist easy schnappen der Sprinngwerk, blowenfusen und poppencorken mit spitzensparken.`,
+    `Ist nicht fur gewerken by das Dummkopfen.  Das rubbernecken sightseeren keepen hands in das Pockets.`,
+	  `Relaxen und watch das blinkenlights...`,
+  ];
   let items = [
     `New Project comes into a sheet and status will automatically be set to 'Received'.`,
     `Assign yourself as the DS / SS and fill in the materials as best you can.`,
@@ -371,14 +379,18 @@ const BuildHTMLHELP = () => {
     `If the student needs to be waitlisted for more information or space, choose 'Waitlisted'. `,
     `'Missing Access' will be set automatically, and you should not choose this as an option.`,
   ];
-  let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`
-  + `<h3 style="font-family:Roboto">How to Use ${SERVICE_NAME} : </h3>`
-  + `<hr>`
-  + `<p>Note : All status changes trigger an email to the student except for 'CLOSED' status</p>`
-  + `<ol style="font-family:Roboto font-size:10">`;
+  let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`;
+  html += `<h3 style="font-family:Roboto">How to Use ${SERVICE_NAME} : </h3>`;
+  html += `<hr>`;
+  html += `<p>Note : All status changes trigger an email to the student except for 'CLOSED' status</p>`;
+  html += `<ol style="font-family:Roboto font-size:10">`;
   items.forEach(item => html += `<li>${item}</li>`);
   html += `</ol>`;
   html += `<p>See Cody or Chris for additional help / protips.</p>`;
+  html += `<br/>`;
+  html += `<p><b>`;
+  warning.forEach(line => html += `${line}<br/>`);
+  html += `</p></b>`;
 
   console.info(html);
   return html;
