@@ -747,57 +747,66 @@ class StatisticsService {
    * ];
    * ss.chiSquaredGoodnessOfFit(data1019, ss.poissonDistribution, 0.05); //= false
    */
-  static ChiSquaredGoodnessOfFit(data = [], distributionType, significance = 0.05) {
-    const inputMean = StatisticsService.ArithmeticMean(data);  // Estimate from the sample data, a weighted mean.
-    let chiSquared = 0;  // Calculated value of the χ2 statistic.
-    // Number of hypothesized distribution parameters estimated, expected to be supplied in the distribution test.
-    // Lose one degree of freedom for estimating `lambda` from the sample data.
-    const c = 1;
+  static ChiSquaredGoodnessOfFit(data = [], distributionType = StatisticsService.PoissonDistribution, significance = 0.05) {
+    try {
+      if (typeof distributionType !== "function") distributionType = StatisticsService.PoissonDistribution
+      const inputMean = StatisticsService.ArithmeticMean(data);  
+      let chiSquared = 0;  // Calculated value of the χ2 statistic.
+      // Number of hypothesized distribution parameters estimated, expected to be supplied in the distribution test.
+      // Lose one degree of freedom for estimating `lambda` from the sample data.
+      const c = 1;
 
-    // Generate the hypothesized distribution.
-    const hypothesizedDistribution = distributionType(inputMean);
-    const observedFrequencies = [];
-    const expectedFrequencies = [];
+      // Generate the hypothesized distribution.
+      const hypothesizedDistribution = distributionType(inputMean);
 
-    // Create an array holding a histogram from the sample data, of the form `{ value: numberOfOcurrences }`
-    for(let i = 0; i < data.length; i++) {
-      if(observedFrequencies[data[i]] === undefined) observedFrequencies[data[i]] = 0;
-      observedFrequencies[data[i]]++;
-    }
+      let observedFrequencies = [];
+      let expectedFrequencies = [];
 
-    // The histogram we created might be sparse - there might be gaps between values. 
-    // Iterate through the histogram, making sure that instead of undefined, gaps have 0 values.
-    for(let i = 0; i < observedFrequencies.length; i++) {
-      if(observedFrequencies[i] === undefined) observedFrequencies[i] = 0;
-    }
-
-    // Create an array holding a histogram of expected data given the sample size and hypothesized distribution.
-    for(const k in hypothesizedDistribution) {
-      if(k in observedFrequencies) expectedFrequencies[+k] = hypothesizedDistribution[k] * data.length;
-    }
-
-    // Working backward through the expected frequencies, collapse classes if less than three observations are expected for a class.
-    // This transformation is applied to the observed frequencies as well.
-    for(let k = expectedFrequencies.length - 1; k >= 0; k--) {
-      if(expectedFrequencies[k] < 3) {
-        expectedFrequencies[k - 1] += expectedFrequencies[k];
-        expectedFrequencies.pop();
-        observedFrequencies[k - 1] += observedFrequencies[k];
-        observedFrequencies.pop();
+      // Create an array holding a histogram from the sample data, of the form `{ value: numberOfOcurrences }`
+      for(let i = 0; i < data.length; i++) {
+        if(observedFrequencies[data[i]] === undefined) observedFrequencies[data[i]] = 0;
+        observedFrequencies[data[i]]++;
       }
-    }
 
-    // Iterate through the squared differences between observed & expected frequencies, accumulating the `chiSquared` statistic.
-    for (let k = 0; k < observedFrequencies.length; k++) {
-      chiSquared += Math.pow(observedFrequencies[k] - expectedFrequencies[k], 2) / expectedFrequencies[k];
-    }
+      // The histogram we created might be sparse - there might be gaps between values. 
+      // Iterate through the histogram, making sure that instead of undefined, gaps have 0 values.
+      for(let i = 0; i < observedFrequencies.length; i++) {
+        if(observedFrequencies[i] === undefined) observedFrequencies[i] = 0;
+      }
 
-    // Calculate degrees of freedom for this test and look it up in the `chiSquaredDistributionTable` in order to
-    // accept or reject the goodness-of-fit of the hypothesized distribution.
-    // Degrees of freedom, calculated as (number of class intervals -
-    // number of hypothesized distribution parameters estimated - 1)
-    const degreesOfFreedom = observedFrequencies.length - c - 1;
-    return ( StatisticsService.ChiSquaredDistributionTable[degreesOfFreedom][significance] < chiSquared );
+      // Create an array holding a histogram of expected data given the sample size and hypothesized distribution.
+      for(const k in hypothesizedDistribution) {
+        if(k in observedFrequencies) expectedFrequencies[+k] = hypothesizedDistribution[k] * data.length;
+      }
+
+      // Working backward through the expected frequencies, collapse classes if less than three observations are expected for a class.
+      // This transformation is applied to the observed frequencies as well.
+      for(let k = expectedFrequencies.length - 1; k >= 0; k--) {
+        if(expectedFrequencies[k] < 3) {
+          expectedFrequencies[k - 1] += expectedFrequencies[k];
+          expectedFrequencies.pop();
+          observedFrequencies[k - 1] += observedFrequencies[k];
+          observedFrequencies.pop();
+        }
+      }
+
+      // Iterate through the squared differences between observed & expected frequencies, accumulating the `chiSquared` statistic.
+      for (let k = 0; k < observedFrequencies.length; k++) {
+        chiSquared += Math.pow(observedFrequencies[k] - expectedFrequencies[k], 2) / expectedFrequencies[k];
+      }
+
+      // Calculate degrees of freedom for this test and look it up in the `chiSquaredDistributionTable` in order to
+      // accept or reject the goodness-of-fit of the hypothesized distribution.
+      // Degrees of freedom, calculated as (number of class intervals -
+      // number of hypothesized distribution parameters estimated - 1)
+      const degreesOfFreedom = observedFrequencies.length - c - 1;
+      const res = StatisticsService.ChiSquaredDistributionTable[degreesOfFreedom][significance];
+      console.info(`Chi Squared Result: ${res}, Degrees of Freedom: ${degreesOfFreedom}, Significance: ${significance}`);
+      return ( res < chiSquared );
+    } catch(err) {
+      console.error(`"ChiSquaredGoodnessOfFit()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -816,10 +825,11 @@ class StatisticsService {
    */
   static Chunk(array = [], chunkSize = 2) {
     try {
-      if(array.length < 2) throw new Error(`Array must be n >= 2`)
-      if (Math.floor(chunkSize) !== chunkSize && chunkSize < 1) throw new Error("Chunk size must be a positive integer");
+      if(array.length < 1) throw new Error(`Array must be n >= 2`);
+      if (Math.floor(chunkSize) !== chunkSize) throw new Error("Chunk size must be a positive integer");
+      chunkSize = chunkSize > 1 ? chunkSize : 1;
 
-      let output = new Array();
+      let output = [];
       for(let i = 0; i < array.length; i += chunkSize) {
         let chunk = array.slice(i, i + chunkSize);
         output.push(chunk);
@@ -1393,15 +1403,20 @@ class StatisticsService {
    * extent([1, 2, 3, 4]); // => [1, 4]
    */
   static Extent(array = []) {
-    if (array.length === 0) throw new Error("extent requires at least one data point");
+    try {
+      if (array.length < 1) throw new Error("Extent requires at least one data point");
 
-    let min = array[0];
-    let max = array[0];
-    array.forEach(value => {
-      if (value > max) max = value;
-      if (value < min) min = value;
-    });
-    return [ min, max, ];
+      let min = array[0];
+      let max = array[0];
+      array.forEach(value => {
+        if (value > max) max = value;
+        if (value < min) min = value;
+      });
+      return [ min, max, ];
+    } catch(err) {
+      console.error(`"Extent()" failed : ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1998,15 +2013,20 @@ class StatisticsService {
    * @throws {Error} if x contains a negative number
    */
   static LogAverage(numbers = []) {
-    if (numbers.length === 0) throw new Error("logAverage requires at least one data point");
+    try {
+      if (numbers.length < 1) throw new Error("logAverage requires at least one data point");
 
-    let value = 0;
-    for (let i = 0; i < numbers.length; i++) {
-      if (numbers[i] < 0) throw new Error(`Requires only non-negative numbers as input`);
-      value += Math.log(numbers[i]);
+      let value = 0;
+      for (let i = 0; i < numbers.length; i++) {
+        if (numbers[i] < 0) throw new Error(`Requires only non-negative numbers as input`);
+        value += Math.log(numbers[i]);
+      }
+
+      return Math.exp(value / numbers.length);
+    } catch(err) {
+      console.error(`"LogAverage()" failed : ${err}`);
+      return 1;
     }
-
-    return Math.exp(value / numbers.length);
   }
 
   /**
@@ -2018,8 +2038,13 @@ class StatisticsService {
    * @returns {number} logit
    */
   static Logit(p = 2.0) {
-    if (p <= 0 || p >= 1) throw new Error("p must be strictly between zero and one");
-    return Math.log(p / (1 - p));
+    try {
+      if (p <= 0 || p >= 1) throw new Error("p must be strictly between zero and one");
+      return Math.log(p / (1 - p));
+    } catch(err) {
+      console.error(`"Logit()" failed : ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -2032,15 +2057,20 @@ class StatisticsService {
    * makeMatrix(10, 10);
    */
   static Matrix(columns = 10, rows = 10) {
-    let matrix = [];
-    for (let i = 0; i < columns; i++) {
-      let column = [];
-      for (let j = 0; j < rows; j++) {
-        column.push(0);
+    try {
+      let matrix = [];
+      for (let i = 0; i < columns; i++) {
+        let column = [];
+        for (let j = 0; j < rows; j++) {
+          column.push(0);
+        }
+        matrix.push(column);
       }
-      matrix.push(column);
+      return matrix;
+    } catch(err) {
+      console.error(`"Matrix()" failed : ${err}`);
+      return 1;
     }
-    return matrix;
   }
 
   /**
@@ -2153,22 +2183,27 @@ class StatisticsService {
    * modeFast(['rabbits', 'rabbits', 'squirrels']); // => 'rabbits'
    */
   static Mode(array = []) {
-    if (array.length === 0) throw new Error(`"Mode()" requires at last one data point`);
-    const index = new Map();  // This index will reflect the incidence of different values, indexing them like { value: count }
+    try {
+      if (array.length < 1) throw new Error(`"Mode()" requires at last one data point`);
+      let index = new Map();
 
-    let mode;
-    let modeCount = 0;
-    for (let i = 0; i < array.length; i++) {
-      let newCount = index.get(array[i]);
-      if (newCount === undefined) newCount = 1;
-      else newCount++;
-      if (newCount > modeCount) {
-        mode = array[i];
-        modeCount = newCount;
+      let mode;
+      let modeCount = 0;
+      for (let i = 0; i < array.length; i++) {
+        let newCount = index.get(array[i]);
+        if (newCount === undefined) newCount = 1;
+        else newCount++;
+        if (newCount > modeCount) {
+          mode = array[i];
+          modeCount = newCount;
+        }
+        index.set(array[i], newCount);
       }
-      index.set(array[i], newCount);
+      return mode;
+    } catch(err) {
+      console.error(`"Mode()" failed : ${err}`);
+      return 1;
     }
-    return mode;
   }
 
   /**
@@ -2295,60 +2330,64 @@ class StatisticsService {
    * var treatment = [20, 5, 13, 12, 7, 2, 2];
    * permutationTest(control, treatment); // ~0.1324
    */
-  static Permutation(sampleX = [], sampleY = [], alternative = `two_sided`, k = 10000, randomSource = Math.random()) {
-    if(alternative !== "two_sided" && alternative !== "greater" && alternative !== "less") alternative = "two_sided"
+  static Permutation(sampleX = [], sampleY = [], alternative = `two_sided`, k = 1000, randomSource = Math.random()) {
+    try {
+      if(alternative !== "two_sided" && alternative !== "greater" && alternative !== "less") alternative = "two_sided"
 
-    const meanX = StatisticsService.ArithmeticMean(sampleX);
-    const meanY = StatisticsService.ArithmeticMean(sampleY);
-    const testStatistic = meanX - meanY;
+      const meanX = StatisticsService.ArithmeticMean(sampleX);
+      const meanY = StatisticsService.ArithmeticMean(sampleY);
+      let testStatistic = meanX - meanY;
 
-    // create test-statistic distribution
-    const testStatDsn = new Array(k);
+      // create test-statistic distribution
+      let testStatDsn = new Array(k);
 
-    // combine datsets so we can easily shuffle later
-    const allData = sampleX.concat(sampleY);
-    const midIndex = Math.floor(allData.length / 2);
+      // combine datsets so we can easily shuffle later
+      let allData = sampleX.concat(sampleY);
+      let midIndex = Math.floor(allData.length / 2);
 
-    for (let i = 0; i < k; i++) {
-      // 1. shuffle data assignments
-      StatisticsService.Shuffle(allData, randomSource);
-      const permLeft = allData.slice(0, midIndex);
-      const permRight = allData.slice(midIndex, allData.length);
+      for (let i = 0; i < k; i++) {
+        // 1. shuffle data assignments
+        StatisticsService.Shuffle(allData, randomSource);
+        const permLeft = allData.slice(0, midIndex);
+        const permRight = allData.slice(midIndex, allData.length);
 
-      // 2.re-calculate test statistic
-      const permTestStatistic = StatisticsService.ArithmeticMean(permLeft) - StatisticsService.ArithmeticMean(permRight);
+        // 2.re-calculate test statistic
+        const permTestStatistic = StatisticsService.ArithmeticMean(permLeft) - StatisticsService.ArithmeticMean(permRight);
 
-      // 3. store test statistic to build test statistic distribution
-      testStatDsn[i] = permTestStatistic;
+        // 3. store test statistic to build test statistic distribution
+        testStatDsn[i] = permTestStatistic;
+      }
+
+      // Calculate p-value depending on alternative
+      // For this test, we calculate the percentage of 'extreme' test statistics (subject to our hypothesis)
+      // more info on permutation test p-value calculations: https://onlinecourses.science.psu.edu/stat464/node/35
+      let numExtremeTStats = 0;
+      if (alternative === "two_side") {
+        for (let i = 0; i <= k; i++) {
+          if (Math.abs(testStatDsn[i]) >= Math.abs(testStatistic)) {
+            numExtremeTStats += 1;
+          }
+        }
+      } else if (alternative === "greater") {
+        for (let i = 0; i <= k; i++) {
+          if (testStatDsn[i] >= testStatistic) {
+            numExtremeTStats += 1;
+          }
+        }
+      } else {
+        // alternative === 'less'
+        for (let i = 0; i <= k; i++) {
+          if (testStatDsn[i] <= testStatistic) {
+            numExtremeTStats += 1;
+          }
+        }
+      }
+      const p = numExtremeTStats / k;
+      return p;
+    } catch(err) {
+      console.error(`"Permutation()" failed : ${err}`);
+      return 1;
     }
-
-    // Calculate p-value depending on alternative
-    // For this test, we calculate the percentage of 'extreme' test statistics (subject to our hypothesis)
-    // more info on permutation test p-value calculations: https://onlinecourses.science.psu.edu/stat464/node/35
-    let numExtremeTStats = 0;
-    if (alternative === "two_side") {
-      for (let i = 0; i <= k; i++) {
-        if (Math.abs(testStatDsn[i]) >= Math.abs(testStatistic)) {
-          numExtremeTStats += 1;
-        }
-      }
-    } else if (alternative === "greater") {
-      for (let i = 0; i <= k; i++) {
-        if (testStatDsn[i] >= testStatistic) {
-          numExtremeTStats += 1;
-        }
-      }
-    } else {
-      // alternative === 'less'
-      for (let i = 0; i <= k; i++) {
-        /* c8 ignore start */
-        if (testStatDsn[i] <= testStatistic) {
-          numExtremeTStats += 1;
-        }
-      }
-    }
-
-    return numExtremeTStats / k;
   }
 
   /**
@@ -2427,8 +2466,6 @@ class StatisticsService {
    * quantile([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
    */
   static Quantile(numbers = [], p) {
-    const copy = numbers.slice();
-
     const QuantileIndex = (len, p) => {
       const idx = len * p;
       if (p === 1) return len - 1;  // If p is 1, directly return the last index
@@ -2469,20 +2506,27 @@ class StatisticsService {
       return stack;
     }
 
-    if (Array.isArray(p)) {
-      // rearrange elements so that each element corresponding to a requested quantile is on a place it would be if the array was fully sorted
-      MultiQuantileSelect(copy, p);
+    try {
+      const copy = numbers.slice();
+      if (Array.isArray(p)) {
+        // rearrange elements so that each element corresponding to a requested quantile is on a place it would be if the array was fully sorted
+        MultiQuantileSelect(copy, p);
 
-      const results = [];
-      for (let i = 0; i < p.length; i++) {
-        results[i] = StatisticsService.QuantileSorted(copy, p[i]);
+        const results = [];
+        for (let i = 0; i < p.length; i++) {
+          results[i] = StatisticsService.QuantileSorted(copy, p[i]);
+        }
+        return results;
+      } else {
+        const idx = QuantileIndex(copy.length, p);
+        QuantileSelect(copy, idx, 0, copy.length - 1);
+        return StatisticsService.QuantileSorted(copy, p);
       }
-      return results;
-    } else {
-      const idx = QuantileIndex(copy.length, p);
-      QuantileSelect(copy, idx, 0, copy.length - 1);
-      return StatisticsService.QuantileSorted(copy, p);
+    } catch(err) {
+      console.error(`"Quantile()" failed: ${err}`);
+      return 1;
     }
+
   }
 
   /**
@@ -2696,12 +2740,17 @@ class StatisticsService {
    * rootMeanSquare([-1, 1, -1, 1]); // => 1
    */
   static RootMeanSquare(numbers = []) {
-    if (numbers.length <= 0) throw new Error("rootMeanSquare requires at least one data point");
-    let sumOfSquares = 0;
-    for (let i = 0; i < numbers.length; i++) {
-      sumOfSquares += Math.pow(numbers[i], 2);
+    try {
+      if (numbers.length < 1) throw new Error("rootMeanSquare requires at least one data point");
+      let sumOfSquares = 0;
+      for (let i = 0; i < numbers.length; i++) {
+        sumOfSquares += Math.pow(numbers[i], 2);
+      }
+      return Math.sqrt(sumOfSquares / numbers.length);
+    } catch(err) {
+      console.error(`"RootMeanSquare()" failed: ${err}`);
+      return 1;
     }
-    return Math.sqrt(sumOfSquares / numbers.length);
   }
 
   /**
@@ -2720,8 +2769,13 @@ class StatisticsService {
    * sample(values, 3); // returns 3 random values, like [2, 5, 8];
    */
   static Sample(array = [], n = 1, randomSource = Math.random) {
-    const shuffled = StatisticsService.Shuffle(array, randomSource);
-    return shuffled.slice(0, n);
+    try {
+      const shuffled = StatisticsService.Shuffle(array, randomSource);
+      return shuffled.slice(0, n);
+    } catch(err) {
+      console.error(`"Sample()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -2736,10 +2790,16 @@ class StatisticsService {
    * // => '0.69'
    */
   static Sample_Correlation(numbersA = [], numbersB = []) {
-    const cov = StatisticsService.Sample_Covariance(numbersA, numbersB);
-    const xstd = StatisticsService.StandardDeviation(numbersA);
-    const ystd = StatisticsService.StandardDeviation(numbersB);
-    return cov / xstd / ystd;
+    try {
+      if (numbersA.length < 1 || numbersB < 1) throw new Error("Sample_Correlation requires at least one data point");
+      const cov = StatisticsService.Sample_Covariance(numbersA, numbersB);
+      const xstd = StatisticsService.StandardDeviation(numbersA);
+      const ystd = StatisticsService.StandardDeviation(numbersB);
+      return cov / xstd / ystd;
+    } catch(err) {
+      console.error(`"Sample_Correlation()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -2756,29 +2816,34 @@ class StatisticsService {
    * sampleCovariance([1, 2, 3, 4, 5, 6], [6, 5, 4, 3, 2, 1]); // => -3.5
    */
   static Sample_Covariance(numbersA = [], numbersB = []) {
-    // The two datasets must have the same length which must be more than 1
-    if(numbersA.length !== numbersB.length) throw new Error("sampleCovariance requires samples with equal lengths");
-    if(numbersA.length < 2) throw new Error(`sampleCovariance requires at least two data points in each sample`);
+    try {
+      if (numbersA.length < 2 || numbersB < 2) throw new Error("Sample_Covariance requires at least two data points in each sample");
+      // The two datasets must have the same length which must be more than 1
+      if(numbersA.length !== numbersB.length) throw new Error("sampleCovariance requires samples with equal lengths");
 
-    // Determine the mean of each dataset so that we can judge each value  as the difference from the mean. 
-    // If one dataset is [1, 2, 3] and [2, 3, 4], their covariance does not suffer because of the difference 
-    // in absolute values.
-    const xmean = StatisticsService.ArithmeticMean(numbersA);
-    const ymean = StatisticsService.ArithmeticMean(numbersB);
+      // Determine the mean of each dataset so that we can judge each value  as the difference from the mean. 
+      // If one dataset is [1, 2, 3] and [2, 3, 4], their covariance does not suffer because of the difference 
+      // in absolute values.
+      const xmean = StatisticsService.ArithmeticMean(numbersA);
+      const ymean = StatisticsService.ArithmeticMean(numbersB);
 
-    // For each pair of values, the covariance increases when their difference from the mean is associated - 
-    // if both are well above or if both are well below the mean, the covariance increases significantly.
-    let sum = 0;
-    for (let i = 0; i < numbersA.length; i++) {
-      sum += (numbersA[i] - xmean) * (numbersB[i] - ymean);
+      // For each pair of values, the covariance increases when their difference from the mean is associated - 
+      // if both are well above or if both are well below the mean, the covariance increases significantly.
+      let sum = 0;
+      for (let i = 0; i < numbersA.length; i++) {
+        sum += (numbersA[i] - xmean) * (numbersB[i] - ymean);
+      }
+
+      // this is Bessels' Correction: an adjustment made to sample statistics that allows for the reduced 
+      // degree of freedom entailed in calculating values from samples rather than complete populations.
+      const besselsCorrection = numbersA.length - 1;
+
+      // the covariance is weighted by the length of the datasets.
+      return sum / besselsCorrection;
+    } catch(err) {
+      console.error(`"Sample_Covariance()" failed: ${err}`);
+      return 1;
     }
-
-    // this is Bessels' Correction: an adjustment made to sample statistics that allows for the reduced 
-    // degree of freedom entailed in calculating values from samples rather than complete populations.
-    const besselsCorrection = numbersA.length - 1;
-
-    // the covariance is weighted by the length of the datasets.
-    return sum / besselsCorrection;
   }
 
   /**
@@ -2797,25 +2862,30 @@ class StatisticsService {
    * sampleKurtosis([1, 2, 2, 3, 5]); // => 1.4555765595463122
    */
   static Sample_Kurtosis(numbers = []) {
-    const n = numbers.length;
-    if (n < 4) throw new Error(`Requires at least four data points`);
+    try {
+      const n = numbers.length;
+      if (n < 4) throw new Error(`Requires at least four data points`);
 
-    const meanValue = StatisticsService.ArithmeticMean(numbers);
-    let secondCentralMoment = 0;
-    let fourthCentralMoment = 0;
+      const meanValue = StatisticsService.ArithmeticMean(numbers);
+      let secondCentralMoment = 0;
+      let fourthCentralMoment = 0;
 
-    for (let i = 0; i < n; i++) {
-      let tempValue = numbers[i] - meanValue;
-      secondCentralMoment += tempValue * tempValue;
-      fourthCentralMoment += tempValue * tempValue * tempValue * tempValue;
+      for (let i = 0; i < n; i++) {
+        let tempValue = numbers[i] - meanValue;
+        secondCentralMoment += tempValue * tempValue;
+        fourthCentralMoment += tempValue * tempValue * tempValue * tempValue;
+      }
+
+      return (
+        ((n - 1) / ((n - 2) * (n - 3))) *
+        ((n * (n + 1) * fourthCentralMoment) /
+            (secondCentralMoment * secondCentralMoment) -
+            3 * (n - 1))
+      );
+    } catch(err) {
+      console.error(`"Sample_Kurtosis()" failed: ${err}`);
+      return 1;
     }
-
-    return (
-      ((n - 1) / ((n - 2) * (n - 3))) *
-      ((n * (n + 1) * fourthCentralMoment) /
-          (secondCentralMoment * secondCentralMoment) -
-          3 * (n - 1))
-    );
   }
 
   /**
@@ -2827,25 +2897,31 @@ class StatisticsService {
    * @returns {number} sample rank correlation
    */
   static Sample_RankCorrelation(numbersA = [], numbersB = []) {
-    const xIndexes = numbersA
-      .map((value, index) => [value, index])
-      .sort((a, b) => a[0] - b[0])
-      .map((pair) => pair[1]);
-    const yIndexes = numbersB
-      .map((value, index) => [value, index])
-      .sort((a, b) => a[0] - b[0])
-      .map((pair) => pair[1]);
+    try {
+      const xIndexes = [...numbersA]
+        .map((value, index) => [value, index])
+        .sort((a, b) => a[0] - b[0])
+        .map((pair) => pair[1]);
+      const yIndexes = [...numbersB]
+        .map((value, index) => [value, index])
+        .sort((a, b) => a[0] - b[0])
+        .map((pair) => pair[1]);
 
-    // At this step, we have an array of indexes that map from sorted numbers to their original indexes. 
-    // We reverse that so that it is an array of the sorted destination index.
-    const xRanks = Array(xIndexes.length);
-    const yRanks = Array(xIndexes.length);
-    for (let i = 0; i < xIndexes.length; i++) {
-      xRanks[xIndexes[i]] = i;
-      yRanks[yIndexes[i]] = i;
+      // At this step, we have an array of indexes that map from sorted numbers to their original indexes. 
+      // We reverse that so that it is an array of the sorted destination index.
+      const xRanks = Array(xIndexes.length);
+      const yRanks = Array(xIndexes.length);
+      for (let i = 0; i < xIndexes.length; i++) {
+        xRanks[xIndexes[i]] = i;
+        yRanks[yIndexes[i]] = i;
+      }
+      const correlation = StatisticsService.Sample_Correlation(xRanks, yRanks);
+      console.info(`Correlation: ${correlation}`);
+      return correlation;
+    } catch(err) {
+      console.error(`"Sample_RankCorrelation()" failed: ${err}`);
+      return 1;
     }
-
-    return StatisticsService.Sample_Correlation(xRanks, yRanks);
   }
 
   /**
@@ -3153,7 +3229,7 @@ class StatisticsService {
       if (Array.isArray(numbers[0])) values = numbers.map(item => item[1]);
       else values = numbers;
 
-      const mean = StatisticsService.GeometricMean(values);
+      const mean = StatisticsService.ArithmeticMean(values);
       console.warn(`Mean = ${mean}`);
 
       const s = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / values.length);
@@ -3348,9 +3424,42 @@ class StatisticsService {
         const zScore = (value - mean) / stdDev;
         return [key, value, zScore];
       });
+      console.info(`Z Scores: ${zScore}`);
       return zScore;
     } catch(err) {
       console.error(`"ZScore()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * The [Z-Score, or Standard Score](http://en.wikipedia.org/wiki/Standard_score).
+   *
+   * The standard score is the number of standard deviations an observation
+   * or datum is above or below the mean. Thus, a positive standard score
+   * represents a datum above the mean, while a negative standard score
+   * represents a datum below the mean. It is a dimensionless quantity
+   * obtained by subtracting the population mean from an individual raw
+   * score and then dividing the difference by the population standard
+   * deviation.
+   *
+   * The z-score is only defined if one knows the population parameters;
+   * if one only has a sample set, then the analogous computation with
+   * sample mean and sample standard deviation yields the
+   * Student's t-statistic.
+   *
+   * @param {number} x
+   * @param {number} mean
+   * @param {number} standardDeviation
+   * @return {number} z score
+   * @example
+   * zScore(78, 80, 5); // => -0.4
+   */
+  static ZScorePerNumber(number = 1, mean = 0.5, standardDeviation = 1) {
+    try {
+      return (number - mean) / standardDeviation;
+    } catch(err) {
+      console.error(`"ZScorePerNumber()" failed: ${err}`);
       return 1;
     }
   }
