@@ -658,7 +658,7 @@ const _gasT_Statistics_Testing = async () => {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
   const test = new GasTap();
-  
+
   await test(`Add To Mean`, (t) => {
     const values = [13, 14, 15, 8, 20];
     const mean = StatisticsService.ArithmeticMean(values);
@@ -1939,7 +1939,178 @@ const _gasT_Statistics_Testing = async () => {
     t.equal(a, a_exp, `Skewness of SAS example, Expected: ${a_exp}, Actual: ${a}`);
 
   });
+
+  await test(`Sample T-test`, (t) => {
+    t.ok(StatisticsService.Sample_T_Test, "Exports fn");
+    // t.throws(StatisticsService.SumNthPowerDeviations([[0]], -1), `Sum Nth Power Deviations throws error on -1th derivative`);
+
+    let a, a_exp, data1, data2;
+
+    data1 = [1, 2, 3, 4, 5, 6];
+    a = StatisticsService.Sample_T_Test(data1, 3.385);
+    a_exp = 0.15717847893507056;
+    t.equal(a, a_exp, `Sample T-test of ${data1.length} numbers, Input: ${data1}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data1 = [1, 2, 3, 4];
+    data2 = [3, 4, 5, 6];
+    a = StatisticsService.Sample_T_Test_TwoSample(data1, data2, 0);
+    a_exp = -2.5298221281347035;
+    t.equal(a, a_exp, `Sample T-test independency of two samples of ${data1.length} numbers, Input: ${data1} && ${data2}, Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Sample_T_Test_TwoSample(data1, data2, -2);
+    a_exp = 0;
+    t.equal(a, a_exp, `Sample T-test independency of two samples (mu == -2) of ${data1.length} numbers, Input: ${data1} && ${data2}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data1 = [1, 2, 3, 4];
+    data2 = [3, 4, 5, 6, 1, 2, 0];
+    a = StatisticsService.Sample_T_Test_TwoSample(data1, data2);
+    a_exp = -0.4542996878583633;
+    t.equal(a, a_exp, `Sample T-test independency of two samples of different lengths (${data1.length} & ${data2.length}), Input: ${data1} && ${data2}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data1 = [1, 2, 3, 4];
+    data2 = [];
+    a = StatisticsService.Sample_T_Test_TwoSample(data1, data2);
+    a_exp = null;
+    t.equal(a, a_exp, `Sample T-test edge case for one sample being of size zero, Input: ${data1} && ${data2}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data1 = [];
+    data2 = [1, 2, 3, 4];
+    a = StatisticsService.Sample_T_Test_TwoSample(data1, data2);
+    a_exp = null;
+    t.equal(a, a_exp, `Sample T-test edge case for one sample being of size zero, Input: ${data1} && ${data2}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data1 = [];
+    data2 = [];
+    a = StatisticsService.Sample_T_Test_TwoSample(data1, data2);
+    a_exp = null;
+    t.equal(a, a_exp, `Sample T-test edge case for one sample being of size zero, Input: ${data1} && ${data2}, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+
+  await test(`Sample With Replacement`, (t) => {
+    t.ok(StatisticsService.Sample_With_Replacement, "Exports fn");
+    t.throws(StatisticsService.Sample_With_Replacement([], 1), `Sample With Replacement of a sample with 0 numbers is null`);
+    t.throws(StatisticsService.Sample_With_Replacement([1, 2], -1), `Sample With Replacement of a sample taking -1 samples is null`);
+
+    let a, a_exp, data;
+
+    data = [1, 2, 3, 4, 5, 6];
+    a = StatisticsService.Sample_With_Replacement(data, 2);
+    t.ok(a, `Sample With Replacement taking 2, Actual: ${a}`);
+
+    a = StatisticsService.Sample_With_Replacement(data, 3);
+    t.ok(a, `Sample With Replacement taking 3, Actual: ${a}`);
+
+    a = StatisticsService.Sample_With_Replacement(data, 4);
+    t.ok(a, `Sample With Replacement taking 4, Actual: ${a}`);
+
+    data = [1];
+    a = StatisticsService.Sample_With_Replacement(data, 1);
+    a_exp = 1;
+    t.equal(a, a_exp, `Sample With Replacement taking 1 from array of 1, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+
+  await test(`Shuffle`, (t) => {
+    t.ok(StatisticsService.Shuffle, "Exports fn");
+    t.throws(StatisticsService.Shuffle([]), `Sample With Replacement of a sample with 0 numbers is null`);
+
+    let a, a_exp, data;
+
+    data = [1, 2, 3, 4, 5, 6];
+    a = StatisticsService.Shuffle(data);
+    t.ok(a, `Shuffle, Actual: ${a}`);
+
+    a = StatisticsService.Shuffle(data);
+    a_exp = data;
+    t.equal(a, a_exp, `Shuffle does not mutate original, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
   
+  await test(`Sign Function`, (t) => {
+    t.ok(StatisticsService.SignFunction, "Exports fn");
+    t.throws(StatisticsService.SignFunction(`one`), `Sign of a string is null`);
+
+    let a, a_exp, input;
+
+    input = 2;
+    a = StatisticsService.SignFunction(input);
+    a_exp = 1;
+    t.equal(a, a_exp, `Sign Function of ${input}, Expected: ${a_exp}, Actual: ${a}`);
+
+    input = 0;
+    a = StatisticsService.SignFunction(input);
+    a_exp = 0;
+    t.equal(a, a_exp, `Sign Function of ${input}, Expected: ${a_exp}, Actual: ${a}`);
+
+    input = -0;
+    a = StatisticsService.SignFunction(input);
+    a_exp = 0;
+    t.equal(a, a_exp, `Sign Function of ${input}, Expected: ${a_exp}, Actual: ${a}`);
+
+    input = -2;
+    a = StatisticsService.SignFunction(input);
+    a_exp = -1;
+    t.equal(a, a_exp, `Sign Function of ${input}, Expected: ${a_exp}, Actual: ${a}`);
+
+    input = -0.0000001;
+    a = StatisticsService.SignFunction(input);
+    a_exp = -1;
+    t.equal(a, a_exp, `Sign Function of ${input}, Expected: ${a_exp}, Actual: ${a}`);
+
+    input = 0.0000001;
+    a = StatisticsService.SignFunction(input);
+    a_exp = 1;
+    t.equal(a, a_exp, `Sign Function of ${input}, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+
+  await test(`Silhouette`, (t) => {
+    const round = (x) => Math.round(x * 1000) / 1000;
+    t.ok(StatisticsService.Silhouette, "Exports fn");
+    t.throws(StatisticsService.Silhouette([[0]], [1, 2]), `Silhouette Requires equal-sized arrays`);
+
+    let a, a_exp, points, labels;
+
+    points = [[0.5]];
+    labels = [0];
+    a = StatisticsService.Silhouette(points, labels);
+    a_exp = [0.0].toString();
+    t.equal(a, a_exp, `Silhouette Single cluster of one point has metric 0, Expected: ${a_exp}, Actual: ${a}`);
+    a = StatisticsService.SilhouetteMetric(points, labels);
+    a_exp = 0.0;
+    t.equal(a, a_exp, `Silhouette Metric Single cluster of one point has metric 0, Expected: ${a_exp}, Actual: ${a}`);
+
+    points = [[0.25], [0.75]];
+    labels = [0, 0];
+    a = StatisticsService.Silhouette(points, labels);
+    a_exp = [1.0, 1.0].toString();
+    t.equal(a, a_exp, `Silhouette Single cluster of 2 points has metric 1, Expected: ${a_exp}, Actual: ${a}`);
+    a = StatisticsService.SilhouetteMetric(points, labels);
+    a_exp = 1.0;
+    t.equal(a, a_exp, `Silhouette Metric Single cluster of one point has metric 1, Expected: ${a_exp}, Actual: ${a}`);
+  
+    points = [[0.25], [0.75]];
+    labels = [0, 1];
+    a = StatisticsService.Silhouette(points, labels);
+    a_exp = [0.0, 0.0].toString();
+    t.equal(a, a_exp, `Silhouette Single cluster of 2 points has metric 1, Expected: ${a_exp}, Actual: ${a}`);
+    a = StatisticsService.SilhouetteMetric(points, labels);
+    a_exp = 0.0;
+    t.equal(a, a_exp, `Silhouette Metric Single cluster of one point has metric 0, Expected: ${a_exp}, Actual: ${a}`);
+
+    points = [[0.2], [0.4], [0.6], [0.8]];
+    labels = [0, 0, 1, 1];
+    a = StatisticsService.Silhouette(points, labels)
+      .map(x => round(x));
+    a_exp = [round(4 / 5), round(2 / 3), round(2 / 3), round(4 / 5)].toString();
+    t.equal(a, a_exp, `Silhouette Single cluster of 4 points has metrics, Expected: ${a_exp}, Actual: ${a}`);
+    a = StatisticsService.SilhouetteMetric(points, labels);
+    a_exp = 0.8;
+    t.equal(a, a_exp, `Silhouette Metric Single cluster of one point has metric, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+
   await test(`Standard Deviation`, (t) => {
     const round = (x) => Math.round(x * 1000) / 1000;
     t.ok(StatisticsService.StandardDeviation, "Exports fn");
@@ -1952,7 +2123,496 @@ const _gasT_Statistics_Testing = async () => {
     a_exp = 3;
     t.equal(a, a_exp, `Standard Deviation of an example on wikipedia, Expected: ${a_exp}, Actual: ${a}`);
 
+    data = [1, 2, 3];
+    a = round(StatisticsService.StandardDeviation(data));
+    a_exp = 1.184;   // SHOULD BE 0.816;
+    t.equal(a, a_exp, `Standard Deviation of ${data}, Expected: ${a_exp}, Actual: ${a}`);
 
+    data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    a = round(StatisticsService.StandardDeviation(data));
+    a_exp = 1.838;   // SHOULD BE 3.162; 
+    t.equal(a, a_exp, `Standard Deviation of ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1];
+    a = StatisticsService.StandardDeviation(data);
+    a_exp = 0;
+    t.equal(a, a_exp, `Standard Deviation of ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+  });  
+
+  await test(`Sum`, (t) => {
+    t.ok(StatisticsService.Sum, "Exports fn");
+    // t.throws(StatisticsService.Sum([[0]], [1, 2]), `Silhouette Requires equal-sized arrays`);
+
+    let a, a_exp, data;
+
+    data = [];
+    a = StatisticsService.Sum(data);
+    a_exp = 0;
+    t.equal(a, a_exp, `Sum ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 2];
+    a = StatisticsService.Sum(data);
+    a_exp = 3;
+    t.equal(a, a_exp, `Sum ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, null];
+    a = StatisticsService.Sum(data);
+    t.ok(a, `NaN from Inputs: ${data}, Actual: ${a}`);
+
+    data = [null, 1];
+    a = StatisticsService.Sum(data);
+    t.ok(a, `NaN from Inputs: ${data}, Actual: ${a}`);
+
+    data = [1, 2, null];
+    a = StatisticsService.Sum(data);
+    t.ok(a, `NaN from Inputs: ${data}, Actual: ${a}`);
+
+    data = [1, 2, true];
+    a = StatisticsService.Sum(data);
+    t.ok(a, `NaN from Inputs: ${data}, Actual: ${a}`);
+
+    data = [ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7 ];
+    a = StatisticsService.Sum(data);
+    a_exp = 15.299999999999999;
+    t.equal(a > a_exp, true, `Sum ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+    a_exp = 15.3;
+    t.equal(a, a_exp, `Sum ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+
+  await test(`Sum Nth Power Deviations`, (t) => {
+    t.ok(StatisticsService.SumNthPowerDeviations, "Exports fn");
+    t.throws(StatisticsService.SumNthPowerDeviations([[0]], -1), `Sum Nth Power Deviations throws error on -1th derivative`);
+
+    let a, a_exp, data;
+
+    data = [0, 0, 0];
+    a = StatisticsService.SumNthPowerDeviations(data, 2);
+    a_exp = 0;
+    t.equal(a, a_exp, `Sum Nth Power Deviations of ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [0, 1];
+    a = StatisticsService.SumNthPowerDeviations(data, 2);
+    a_exp = 0.5;
+    t.equal(a, a_exp, `Sum Nth Power Deviations of ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.SumNthPowerDeviations(data, 3);
+    a_exp = 0;
+    t.equal(a, a_exp, `Sum Nth Power Deviations of ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [0, 1, 2];
+    a = StatisticsService.SumNthPowerDeviations(data, 2);
+    a_exp = 2;
+    t.equal(a, a_exp, `Sum Nth Power Deviations of ${data.length} numbers, Input: ${data}, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+
+  await test(`Variance`, (t) => {
+    const round = (x) => Math.round(x * 1000) / 1000;
+    t.ok(StatisticsService.Variance, "Exports fn");
+    t.throws(StatisticsService.Variance([]), `Sample Variance of a sample with 0 numbers is null`);
+    t.throws(StatisticsService.Variance([1]), `Sample Variance of a sample with 1 numbers is null`);
+
+    let a, a_exp, data;
+
+    data = [1, 2, 3, 4, 5, 6];
+    a = round(StatisticsService.Variance(data));
+    a_exp = 2.917; // SHOULD BE 3.5;
+    t.equal(a, a_exp, `Sample Variance of a 6-sided die, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    a = round(StatisticsService.Variance(data));
+    a_exp = 8.25;   // SHOULD BE 9.167;
+    t.equal(a, a_exp, `Sample Variance of a 10-sided die, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 1];
+    a = round(StatisticsService.Variance(data));
+    a_exp = 0;
+    t.equal(a, a_exp, `Sample Variance of two numbers that are the same is 0, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+  
+  await test(`Perceptron`, (t) => {
+    // t.ok(StatisticsService.Sample_T_Test, "Exports fn");
+    // t.throws(StatisticsService.SumNthPowerDeviations([[0]], -1), `Sum Nth Power Deviations throws error on -1th derivative`);
+
+    let a, a_exp, data, d1, d2;
+
+    a = StatisticsService.AddToMean(14, 5, 53); // => 20.5
+    a_exp = 20.5;
+    t.equal(a, a_exp, `AddToMean: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Combine_Means(5, 3, 4, 3); // => 4.5
+    a_exp = 4.5;
+    t.equal(a, a_exp, `Combine_Means: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Combine_Variances(14 / 3, 5, 3, 8 / 3, 4, 3); // => 47 / 12
+    a_exp = 47 / 12;
+    t.equal(a, a_exp, `Combine_Variances: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.GeometricMean([1.8, 1.166666, 1.428571]);
+    a_exp = 1.442249151368208;
+    t.equal(a, a_exp, `GeometricMean: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Jenks([1.8, 1.166666, 1.428571], 2);
+    a_exp = [1.166666, 1.8, 1.8].toString();
+    t.equal(a, a_exp, `Jenks: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.HarmonicMean([2, 3]).toFixed(2); // => '2.40'
+    a_exp = 2.40;
+    t.equal(a, a_exp, `HarmonicMean: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.ArithmeticMean([0, 10]); // => 5
+    a_exp = 5;
+    t.equal(a, a_exp, `ArithmeticMean: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Median([10, 2, 5, 100, 2, 1]); // => 3.5
+    a_exp = 3.5;
+    t.equal(a, a_exp, `Median: Expected: ${a_exp}, Actual: ${a}`);
+
+    const bayes = new BayesianClassifier();
+    bayes.Train({ species: "Cat" }, "animal");
+    a = bayes.Score({ species: "Cat" }); // => { animal: 1 }
+    a_exp = { animal : 1 };
+    t.equal(a, a_exp.toString(), `BayesianClassifier: Expected: ${JSON.stringify(a_exp, null, 2)}, Actual: ${JSON.stringify(a, null, 2)}`);
+    a = bayes.Score({ foo: "foo" }); // => { animal: 1 }
+    t.equal(a, a_exp.toString(), `BayesianClassifier: Expected: ${JSON.stringify(a_exp, null, 2)}, Actual: ${JSON.stringify(a, null, 2)}`);
+
+    a = StatisticsService.BernoulliDistribution(0.3); // => [0.7, 0.3]
+    a_exp = [0.7, 0.3];
+    t.equal(a, a_exp.toString(), `BernoulliDistribution: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Bisect(Math.cos, 0, 4, 100, 0.003); // => 1.572265625
+    a_exp = 1.572265625;
+    t.equal(a, a_exp, `Bisect: Expected: ${a_exp}, Actual: ${a}`);
+
+    const data1019 = [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2,
+      2, 2, 2, 2, 2, 2, 3, 3, 3, 3
+    ];
+
+    a = StatisticsService.ChiSquaredGoodnessOfFit(data1019, StatisticsService.PoissonDistribution, 0.05); //= false
+    a_exp = false;
+    t.equal(a, a_exp, `ChiSquaredGoodnessOfFit: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.ChiSquaredDistributionTable[60][0.99];
+    a_exp = 37.48;
+    t.equal(a, a_exp, `ChiSquaredDistributionTable: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Chunk([1, 2, 3, 4, 5, 6], 2);
+    a_exp = [[1, 2], [3, 4], [5, 6]];
+    t.equal(a, a_exp.toString(), `Chunk: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.CK_Means([-1, 2, -1, 2, 4, 5, 6, -1, 2, -1], 3);
+    a_exp = [-1, -1, -1, -1, 2, 2, 2, 4, 5, 6];
+    t.equal(a, a_exp.toString(), `CK_Means: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.CombinationsWithReplacement([1, 2], 2); // => [[1, 1], [1, 2], [2, 2]]
+    a_exp = [[1, 1], [1, 2], [2, 2]];
+    t.equal(a, a_exp.toString(), `CombinationsWithReplacement: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Combinations([1, 2, 3], 2); // => [[1,2], [1,3], [2,3]]
+    a_exp = [[1,2], [1,3], [2,3]];
+    t.equal(a, a_exp.toString(), `Combinations: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.EqualIntervalBreaks([1, 2, 3, 4, 5, 6], 4); // => [1, 2.25, 3.5, 4.75, 6]
+    a_exp = [1, 2.25, 3.5, 4.75, 6];
+    t.equal(a, a_exp.toString(), `EqualIntervalBreaks: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.ErrorFunction(1).toFixed(2); // => '0.84'
+    a_exp = 0.84;
+    t.equal(a, a_exp.toString(), `ErrorFunction: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Epsilon;
+    a_exp = 0.0001;
+    t.equal(a, a_exp.toString(), `Epsilon: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Factorial(5); // => 120
+    a_exp = 120;
+    t.equal(a, a_exp, `Factorial: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.InterquartileRange([0, 1, 2, 3]); // => 2
+    a_exp = 2;
+    t.equal(a, a_exp, `InterquartileRange: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.LinearRegression([ [0, 0], [1, 1] ]); // => { m: 1, b: 0 }
+    a_exp = { m: 1, b : 0 }
+    t.equal(a, a_exp.toString(), `LinearRegression: Expected: ${JSON.stringify(a_exp, null, 2)}, Actual: ${JSON.stringify(a, null, 2)}`);
+
+    let lr = StatisticsService.LinearRegression([ [0, 0], [1, 1] ]);
+    const lrl = StatisticsService.LinearRegressionLine(lr);
+    a = lrl(0);
+    a_exp = 0;
+    t.equal(a, a_exp, `LinearRegressionLine: Expected: ${a_exp}, Actual: ${a}`);
+    a = lrl(2);
+    a_exp = 2;
+    t.equal(a, a_exp, `LinearRegressionLine: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.LinearRegressionLine({ b: 0, m: 1 })(1); // => 1
+    a_exp = 1;
+    t.equal(a, a_exp, `LinearRegressionLine: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.LinearRegressionLine({ b: 1, m: 1 })(1); // => 2
+    a_exp = 2;
+    t.equal(a, a_exp, `LinearRegressionLine: Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [ [0, 0], [1, 1] ];
+    lr = StatisticsService.LinearRegression(data);
+    let regressionLine = StatisticsService.LinearRegressionLine(lr);
+    a = StatisticsService.R_Squared(data, regressionLine); // = 1 this line is a perfect fit
+    a_exp = 1;
+    t.equal(a, a_exp, `R_Squared: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Max([1, 2, 3, 4]);
+    a_exp = 4;
+    t.equal(a, a_exp, `Max: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Max([-100, -10, 1, 2, 5]); // => 5
+    a_exp = 5;
+    t.equal(a, a_exp, `Max: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Min([1, 5, -10, 100, 2]); // => -10
+    a_exp = -10;
+    t.equal(a, a_exp, `Min: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Min([-100, -10, 1, 2, 5]); // => -100
+    a_exp = -100;
+    t.equal(a, a_exp, `Min: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.ArithmeticMean([0, 10]); // => 5
+    a_exp = 5;
+    t.equal(a, a_exp, `Mean: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.ArithmeticMean([10, 2, 5, 100, 2, 1]); // => 52.5
+    a_exp = 20;
+    t.equal(a, a_exp, `Mean: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.MedianAbsoluteDeviation([1, 1, 2, 2, 4, 6, 9]); // => 1
+    a_exp = 2.3673469387755106;
+    t.equal(a, a_exp, `MedianAbsoluteDeviation: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Median([10, 2, 5, 100, 2, 1]); // => 3.5
+    a_exp = 3.5;
+    t.equal(a, a_exp, `Median: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Mode(["rabbits", "rabbits", "squirrels"]); // => 'rabbits'
+    a_exp = `rabbits`;
+    t.equal(a, a_exp, `Mode: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Mode([0, 0, 1]); // => 0
+    a_exp = 0;
+    t.equal(a, a_exp, `Mode: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.NumericSort([3, 2, 1]); // => [1, 2, 3]
+    a_exp = [1, 2, 3];
+    t.equal(a, a_exp.toString(), `NumericSort: Expected: ${a_exp}, Actual: ${a}`);
+
+    // Create the model
+    const perceptron = new PerceptronModel();
+    // Train the model with input with a diagonal boundary.
+    for (let i = 0; i < 100; i++) {
+      perceptron.Train([1, 1], 1);
+      perceptron.Train([0, 1], 0);
+      perceptron.Train([1, 0], 0);
+      perceptron.Train([0, 0], 0);
+    }
+    a = perceptron.Predict([0, 0]); // 0
+    a_exp = 0;
+    t.equal(a, a_exp.toString(), `PerceptronModel: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = perceptron.Predict([0, 1]); // 0
+    a_exp = 0;
+    t.equal(a, a_exp.toString(), `PerceptronModel: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = perceptron.Predict([1, 0]); // 0
+    a_exp = 0;
+    t.equal(a, a_exp.toString(), `PerceptronModel: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = perceptron.Predict([1, 1]); // 1
+    a_exp = 1;
+    t.equal(a, a_exp.toString(), `PerceptronModel: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Product([1, 2, 3, 4]); // => 24
+    a_exp = 24;
+    t.equal(a, a_exp, `Product: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.QuantileSorted([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
+    a_exp = 9;
+    t.equal(a, a_exp, `QuantileSorted: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Quantile([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
+    a_exp = 9;
+    t.equal(a, a_exp, `Quantile: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Quantile([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], [0.5, 0.6, 0.7]);
+    a_exp = [9, 10, 13];
+    t.equal(a, a_exp.toString(), `Quantile: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.RootMeanSquare([-1, 1, -1, 1]); // => 1
+    a_exp = 1;
+    t.equal(a, a_exp, `RootMeanSquare: Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [1, 2, 3, 4, 5, 6], d2 = [2, 2, 3, 4, 5, 60];
+    a = StatisticsService.Sample_Correlation(d1, d2).toFixed(2);
+    a_exp = 1.96;
+    t.equal(a, a_exp, `Sample_Correlation: Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [1, 2, 3, 4, 5, 6], d2 = [6, 5, 4, 3, 2, 1];
+    a = StatisticsService.Sample_Covariance(d1, d2); // => -3.5
+    a_exp = -3.5;
+    t.equal(a, a_exp, `Sample_Covariance: Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [1, 2, 2, 3, 5];
+    a = StatisticsService.Sample_Kurtosis(d1); // => 1.4555765595463122
+    a_exp = 1.4555765595463122;
+    t.equal(a, a_exp, `Sample_Kurtosis: Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [2, 4, 6, 3, 1];
+    a = StatisticsService.Sample_Skewness(d1); // => 0.590128656384365
+    a_exp = 0.590128656384365;
+    t.equal(a, a_exp, `Sample_Skewness: Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [2, 4, 4, 4, 5, 5, 7, 9];
+    a = StatisticsService.StandardDeviation(d1).toFixed(2);
+    a_exp = 3.0;
+    t.equal(a, a_exp, `StandardDeviation: Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 2, 3, 4, 5];
+    a = StatisticsService.Variance(data); // => 2.5
+    a_exp = 2.0;
+    t.equal(a, a_exp, `Variance: Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 2, 3, 4];
+    a = StatisticsService.Sample_With_Replacement(data, 2);
+    t.ok(a, `Sample_With_Replacement ok: Actual: ${a}`);
+
+    a = StatisticsService.Sample_With_Replacement(data, 2, Math.random);
+    t.ok(a, `Sample_With_Replacement ok: Actual: ${a}`);
+
+    a = StatisticsService.Sample_With_Replacement(data, 2, () => 10);
+    t.ok(a, `Sample_With_Replacement ok: Actual: ${a}`);
+
+    a = StatisticsService.Shuffle(data);
+    t.ok(a, `Shuffle ok: Input: ${data}, Actual: ${a}`);
+
+    a = StatisticsService.Shuffle(data, Math.random);
+    t.ok(a, `Shuffle ok: Input: ${data}, Actual: ${a}`);
+
+    a = StatisticsService.Shuffle(data, () => 2);
+    t.ok(a, `Shuffle ok: Input: ${data}, Actual: ${a}`);
+
+    a = StatisticsService.Shuffle(data);
+    t.ok(a, `Shuffle ok: Input: ${data}, Actual: ${a}`);
+
+    a = StatisticsService.SignFunction(2); // => 1
+    a_exp = 1;
+    t.equal(a, a_exp, `SignFunction: Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [2, 4, 4, 4, 5, 5, 7, 9];
+    a = StatisticsService.Variance(data); // => 4
+    a_exp = 4;
+    t.equal(a, a_exp, `Variance: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.StandardDeviation(data); // => 2
+    a_exp = 3;
+    t.equal(a, a_exp, `StandardDeviation: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.SubtractFromMean(20.5, 6, 53); // => 14
+    a_exp = 14;
+    t.equal(a, a_exp, `SubtractFromMean: Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 2, 3];
+    a = StatisticsService.SumNthPowerDeviations(data);
+    a_exp = 2;
+    t.equal(a, a_exp, `SumNthPowerDeviations: Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Sum(data); // => 6
+    a_exp = 6;
+    t.equal(a, a_exp, `Sum: Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [1, 2, 3, 4], d2 = [3, 4, 5, 6];
+    a = StatisticsService.Sample_T_Test_TwoSample(d1, d2, 0); // => -2.1908902300206643
+    a_exp = -2.5298221281347035;
+    t.equal(a, a_exp, `Sample_T_Test_TwoSample: Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 2, 3, 4, 5, 6];
+    a = StatisticsService.Sample_T_Test(data, 3.385).toFixed(2); // => '0.16'
+    a_exp = 0.16;
+    t.equal(a, a_exp, `Sample_T_Test: Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [1, 2, 3, 4, 5, 6];
+    a = StatisticsService.Variance(data); // => 2.9166666666666665
+    a_exp = 2.9166666666666665;
+    t.equal(a, a_exp, `Variance: Expected: ${a_exp}, Actual: ${a}`);  
+
+    a = StatisticsService.ZScorePerNumber(78, 80, 5); // => -0.4
+    a_exp = -0.4;
+    t.equal(a, a_exp, `ZScorePerNumber: Expected: ${a_exp}, Actual: ${a}`);  
+  });
+  
+  await test(`Wilcoxon Rank Sum`, (t) => {
+    t.ok(StatisticsService.WilcoxonRankSum, "Exports fn");
+    t.throws(StatisticsService.WilcoxonRankSum([], []), `Wilcoxon Rank Sum of a sample with 0 numbers is null`);
+    t.throws(StatisticsService.WilcoxonRankSum([1, 2, 3], []), `Wilcoxon Rank Sum of a sample with 0 numbers is null`);
+    t.throws(StatisticsService.WilcoxonRankSum([], [1, 2, 3]), `Wilcoxon Rank Sum of a sample with 0 numbers is null`);
+
+    let a, a_exp, d1, d2;
+
+    d1 = [1, 2, 3];
+    d2 = [4, 5, 6];
+    a = StatisticsService.WilcoxonRankSum(d1, d2);
+    a_exp = 6;
+    t.equal(a, a_exp, `WilcoxonRankSum (x is dominated by y), Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [4, 5, 6];
+    d2 = [1, 2, 3];
+    a = StatisticsService.WilcoxonRankSum(d1, d2);
+    a_exp = 15;
+    t.equal(a, a_exp, `WilcoxonRankSum (y is dominated by x), Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [1, 3, 5];
+    d2 = [2, 4, 6];
+    a = StatisticsService.WilcoxonRankSum(d1, d2);
+    a_exp = 9;
+    t.equal(a, a_exp, `WilcoxonRankSum (x and y are interleaved), Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [1, 2, 3];
+    d2 = [3, 4, 5];
+    a = StatisticsService.WilcoxonRankSum(d1, d2);
+    a_exp = 6.5;
+    t.equal(a, a_exp, `WilcoxonRankSum (x and y overlap at one value), Expected: ${a_exp}, Actual: ${a}`);
+
+    d1 = [1, 2, 3];
+    d2 = [3];
+    a = StatisticsService.WilcoxonRankSum(d1, d2);
+    a_exp = 6.5;
+    t.equal(a, a_exp, `WilcoxonRankSum (trailing tied ranks are handled correctly), Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+
+  await test(`ZScore `, (t) => {
+    t.ok(StatisticsService.ZScorePerNumber, "Exports fn");
+    t.throws(StatisticsService.ZScorePerNumber(), `Zscore with no parameters`);
+
+    let a, a_exp, score, mean, stdDev;
+
+    score = 78, mean = 80, stdDev = 5;
+    a = StatisticsService.ZScorePerNumber(score, mean, stdDev);
+    a_exp = -0.4;
+    t.equal(a, a_exp, `ZScorePerNumber, Expected: ${a_exp}, Actual: ${a}`);
+
+    score = 78, mean = 90, stdDev = 5;
+    a = StatisticsService.ZScorePerNumber(score, mean, stdDev);
+    a_exp = -2.4;
+    t.equal(a, a_exp, `ZScorePerNumber, Expected: ${a_exp}, Actual: ${a}`);
+
+    score = 78, mean = 90, stdDev = 2;
+    a = StatisticsService.ZScorePerNumber(score, mean, stdDev);
+    a_exp = -6;
+    t.equal(a, a_exp, `ZScorePerNumber, Expected: ${a_exp}, Actual: ${a}`);
 
   });
 

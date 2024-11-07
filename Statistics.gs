@@ -601,7 +601,12 @@ class StatisticsService {
    * @return {boolean} Whether numbers are within tolerance.
    */
   static ApproxEqual(actual = 3.0, expected = 5.0, tolerance = StatisticsService.Epsilon) {
-    return StatisticsService.RelativeError(actual, expected) <= tolerance;
+    try {
+      return StatisticsService.RelativeError(actual, expected) <= tolerance;
+    } catch(err) {
+      console.error(`"ApproxEqual()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -617,7 +622,8 @@ class StatisticsService {
   static ArithmeticMean(distribution = []) {
     try {
       const n = distribution.length;
-      if(n == 0) return 0;
+      if(n < 1) return 0;
+      if(n == 1) return distribution[0];
 
       let values = [];
       if (Array.isArray(distribution[0])) values = distribution.map(item => item[1]);
@@ -625,7 +631,7 @@ class StatisticsService {
 
       const mean = values.reduce((a, b) => a + b) / n;
       console.warn(`ARITHMETIC MEAN: ${mean}`);
-      return mean.toFixed(3);
+      return mean;
     } catch(err) {
       console.error(`"ArithmeticMean()" failed : ${err}`);
       return 1;
@@ -1092,12 +1098,17 @@ class StatisticsService {
    * combineVariances(14 / 3, 5, 3, 8 / 3, 4, 3); // => 47 / 12
    */
   static Combine_Variances(variance1 = 1, mean1 = 1, n1 = 10, variance2 = 1, mean2 = 1, n2 = 10) {
-    const newMean = StatisticsService.Combine_Means(mean1, n1, mean2, n2);
-    return (
-      (n1 * (variance1 + Math.pow(mean1 - newMean, 2)) +
-       n2 * (variance2 + Math.pow(mean2 - newMean, 2))) /
-      (n1 + n2)
-    );
+    try {
+      const newMean = StatisticsService.Combine_Means(mean1, n1, mean2, n2);
+      return (
+        (n1 * (variance1 + Math.pow(mean1 - newMean, 2)) +
+        n2 * (variance2 + Math.pow(mean2 - newMean, 2))) /
+        (n1 + n2)
+      );
+    } catch(err) {
+      console.error(`"Combine_Variances()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1345,12 +1356,17 @@ class StatisticsService {
    * errorFunction(1).toFixed(2); // => '0.84'
    */
   static ErrorFunction(x = 2.500) {
-    const t = 1 / (1 + 0.5 * Math.abs(x));
-    const tau = t * Math.exp(
-        -x * x + ((((((((0.17087277 * t - 0.82215223) * t + 1.48851587) * t - 1.13520398) * t + 0.27886807) * t - 0.18628806) * t + 0.09678418) * t + 0.37409196) * t + 1.00002368) * t - 1.26551223
-    );
-    if (x >= 0) return 1 - tau;
-    else return tau - 1;
+    try {
+      const t = 1 / (1 + 0.5 * Math.abs(x));
+      const tau = t * Math.exp(
+          -x * x + ((((((((0.17087277 * t - 0.82215223) * t + 1.48851587) * t - 1.13520398) * t + 0.27886807) * t - 0.18628806) * t + 0.09678418) * t + 0.37409196) * t + 1.00002368) * t - 1.26551223
+      );
+      if (x >= 0) return 1 - tau;
+      else return tau - 1;
+    } catch(err) {
+      console.error(`"ErrorFunction()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1383,12 +1399,17 @@ class StatisticsService {
    * @returns {number} Distance.
    */
   static EuclideanDistance(left = [], right = []) {
-    let sum = 0;
-    for(let i = 0; i < left.length; i++) {
-      const diff = left[i] - right[i];
-      sum += diff * diff;
+    try {
+      let sum = 0;
+      for(let i = 0; i < left.length; i++) {
+        const diff = left[i] - right[i];
+        sum += diff * diff;
+      }
+      return Math.sqrt(sum);
+    } catch(err) {
+      console.error(`"EuclideanDistance()" failed: ${err}`);
+      return 1;
     }
-    return Math.sqrt(sum);
   }
 
   /**
@@ -1510,30 +1531,35 @@ class StatisticsService {
    * gammaln(2.4); // 0.21685932244884043
    */
   static Gamma_ln(n = 500) {
-    if (n <= 0) return Number.POSITIVE_INFINITY;  // Return infinity if value not in domain
-    const COEFFICIENTS = [
-      0.99999999999999709182, 57.156235665862923517, -59.597960355475491248,
-      14.136097974741747174, -0.49191381609762019978, 0.33994649984811888699e-4,
-      0.46523628927048575665e-4, -0.98374475304879564677e-4,
-      0.15808870322491248884e-3, -0.21026444172410488319e-3,
-      0.2174396181152126432e-3, -0.16431810653676389022e-3,
-      0.84418223983852743293e-4, -0.2619083840158140867e-4,
-      0.36899182659531622704e-5,
-    ];
+    try {
+      if (n <= 0) return Number.POSITIVE_INFINITY;  // Return infinity if value not in domain
+      const COEFFICIENTS = [
+        0.99999999999999709182, 57.156235665862923517, -59.597960355475491248,
+        14.136097974741747174, -0.49191381609762019978, 0.33994649984811888699e-4,
+        0.46523628927048575665e-4, -0.98374475304879564677e-4,
+        0.15808870322491248884e-3, -0.21026444172410488319e-3,
+        0.2174396181152126432e-3, -0.16431810653676389022e-3,
+        0.84418223983852743293e-4, -0.2619083840158140867e-4,
+        0.36899182659531622704e-5,
+      ];
 
-    n--;  // Decrement n, because approximation is defined for n - 1
+      n--;  // Decrement n, because approximation is defined for n - 1
 
-    let a = COEFFICIENTS[0];
-    for (let i = 1; i < 15; i++) {
-      a += COEFFICIENTS[i] / (n + i);
+      let a = COEFFICIENTS[0];
+      for (let i = 1; i < 15; i++) {
+        a += COEFFICIENTS[i] / (n + i);
+      }
+
+      const g = 607 / 128;
+      const tmp = g + 0.5 + n;
+
+      // Return natural logarithm of gamma(n)
+      const LOGSQRT2PI = Math.log(Math.sqrt(2 * Math.PI));
+      return LOGSQRT2PI + Math.log(a) - tmp + (n + 0.5) * Math.log(tmp);
+    } catch(err) {
+      console.error(`"Gamma_ln()" failed: ${err}`);
+      return 1;
     }
-
-    const g = 607 / 128;
-    const tmp = g + 0.5 + n;
-
-    // Return natural logarithm of gamma(n)
-    const LOGSQRT2PI = Math.log(Math.sqrt(2 * Math.PI));
-    return LOGSQRT2PI + Math.log(a) - tmp + (n + 0.5) * Math.log(tmp);
   }
 
   /**
@@ -1590,8 +1616,13 @@ class StatisticsService {
    * sample(values, 3); // returns 3 random values, like [2, 5, 8];
    */
   static GetRandomSample(array = [], n = 1, randomSource = Math.random) {
-    const shuffled = StatisticsService.Shuffle(array, randomSource);
-    return shuffled.slice(0, n);
+    try {
+      const shuffled = StatisticsService.Shuffle(array, randomSource);
+      return shuffled.slice(0, n);
+    } catch(err) {
+      console.error(`"GetRandomSample()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1639,10 +1670,15 @@ class StatisticsService {
    * interquartileRange([0, 1, 2, 3]); // => 2
    */
   static InterquartileRange(numbers = []) {
-    // Interquartile range is the span between the upper quartile, at `0.75`, and lower quartile, `0.25`
-    const q1 = StatisticsService.Quantile(numbers, 0.75);
-    const q2 = StatisticsService.Quantile(numbers, 0.25);
-    if (typeof q1 === "number" && typeof q2 === "number") return q1 - q2;
+    try {
+      // Interquartile range is the span between the upper quartile, at `0.75`, and lower quartile, `0.25`
+      const q1 = StatisticsService.Quantile(numbers, 0.75);
+      const q2 = StatisticsService.Quantile(numbers, 0.25);
+      if (typeof q1 === "number" && typeof q2 === "number") return q1 - q2;
+    } catch(err) {
+      console.error(`"InterquartileRange()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -1660,111 +1696,116 @@ class StatisticsService {
    * jenks([1, 2, 4, 5, 7, 9, 10, 20], 3) // = [1, 7, 20, 20]
    */
   static Jenks(data = [], nClasses = 2) {
-    if (nClasses > data.length) return null;
+    try {
+      if (nClasses > data.length) return null;
 
-    // Pull Breaks Values for Jenks. the second part of the jenks recipe: take the calculated matrices and derive an array of n breaks.
-    const JenksBreaks = (data, lowerClassLimits, nClasses) => {
-      let k = data.length;
-      let kclass = [];
-      let countNum = nClasses;
+      // Pull Breaks Values for Jenks. the second part of the jenks recipe: take the calculated matrices and derive an array of n breaks.
+      const JenksBreaks = (data, lowerClassLimits, nClasses) => {
+        let k = data.length;
+        let kclass = [];
+        let countNum = nClasses;
 
-      // the calculation of classes will never include the upper bound, so we need to explicitly set it
-      kclass[nClasses] = data[data.length - 1];
+        // the calculation of classes will never include the upper bound, so we need to explicitly set it
+        kclass[nClasses] = data[data.length - 1];
 
-      // the lowerClassLimits matrix is used as indices into itself here: the `k` variable is reused in each iteration.
-      while (countNum > 0) {
-        kclass[countNum - 1] = data[lowerClassLimits[k][countNum] - 1];
-        k = lowerClassLimits[k][countNum] - 1;
-        countNum--;
-      }
-      return kclass;
-    }
-
-    // Compute the matrices required for Jenks breaks. These matrices can be used for any classing of data with `classes <= nClasses`
-    const JenksMatrices = (data, nClasses) => {
-      let lowerClassLimits = [];
-      let varianceCombinations = [];
-
-      let variance = 0;
-      for (let i = 0; i < data.length + 1; i++) {
-          let tmp1 = [];
-          let tmp2 = [];
-          for (let j = 0; j < nClasses + 1; j++) {
-            tmp1.push(0);
-            tmp2.push(0);
-          }
-          lowerClassLimits.push(tmp1);
-          varianceCombinations.push(tmp2);
+        // the lowerClassLimits matrix is used as indices into itself here: the `k` variable is reused in each iteration.
+        while (countNum > 0) {
+          kclass[countNum - 1] = data[lowerClassLimits[k][countNum] - 1];
+          k = lowerClassLimits[k][countNum] - 1;
+          countNum--;
+        }
+        return kclass;
       }
 
-      for (let i = 1; i < nClasses + 1; i++) {
-          lowerClassLimits[1][i] = 1;
-          varianceCombinations[1][i] = 0;
-          // in the original implementation, 9999999 is used but since Javascript has `Infinity`, we use that.
-          for (let j = 2; j < data.length + 1; j++) {
-            varianceCombinations[j][i] = Number.POSITIVE_INFINITY;
-          }
-      }
+      // Compute the matrices required for Jenks breaks. These matrices can be used for any classing of data with `classes <= nClasses`
+      const JenksMatrices = (data, nClasses) => {
+        let lowerClassLimits = [];
+        let varianceCombinations = [];
 
-      for (let i = 2; i < data.length + 1; i++) {
-        let sum = 0;
-        let sumSquares = 0;
-        let w = 0;
+        let variance = 0;
+        for (let i = 0; i < data.length + 1; i++) {
+            let tmp1 = [];
+            let tmp2 = [];
+            for (let j = 0; j < nClasses + 1; j++) {
+              tmp1.push(0);
+              tmp2.push(0);
+            }
+            lowerClassLimits.push(tmp1);
+            varianceCombinations.push(tmp2);
+        }
 
-        for (let m = 1; m < i + 1; m++) {
-          const lowerClassLimit = i - m + 1;
-          const val = data[lowerClassLimit - 1];
+        for (let i = 1; i < nClasses + 1; i++) {
+            lowerClassLimits[1][i] = 1;
+            varianceCombinations[1][i] = 0;
+            // in the original implementation, 9999999 is used but since Javascript has `Infinity`, we use that.
+            for (let j = 2; j < data.length + 1; j++) {
+              varianceCombinations[j][i] = Number.POSITIVE_INFINITY;
+            }
+        }
 
-          // here we're estimating variance for each potential classing of the data, for each potential 
-          // number of classes. `w` is the number of data points considered so far.
-          w++;
+        for (let i = 2; i < data.length + 1; i++) {
+          let sum = 0;
+          let sumSquares = 0;
+          let w = 0;
 
-          // increase the current sum and sum-of-squares
-          sum += val;
-          sumSquares += val * val;
+          for (let m = 1; m < i + 1; m++) {
+            const lowerClassLimit = i - m + 1;
+            const val = data[lowerClassLimit - 1];
 
-          // the variance at this point in the sequence is the difference
-          // between the sum of squares and the total x 2, over the number
-          // of samples.
-          variance = sumSquares - (sum * sum) / w;
+            // here we're estimating variance for each potential classing of the data, for each potential 
+            // number of classes. `w` is the number of data points considered so far.
+            w++;
 
-          let i4 = lowerClassLimit - 1;
+            // increase the current sum and sum-of-squares
+            sum += val;
+            sumSquares += val * val;
 
-          if (i4 !== 0) {
-            for (let j = 2; j < nClasses + 1; j++) {
-              // if adding this element to an existing class will increase its variance beyond the limit, break
-              // the class at this point, setting the `lowerClassLimit` at this point.
-              if(varianceCombinations[i][j] >= variance + varianceCombinations[i4][j - 1]) {
-                lowerClassLimits[i][j] = lowerClassLimit;
-                varianceCombinations[i][j] = variance + varianceCombinations[i4][j - 1];
+            // the variance at this point in the sequence is the difference
+            // between the sum of squares and the total x 2, over the number
+            // of samples.
+            variance = sumSquares - (sum * sum) / w;
+
+            let i4 = lowerClassLimit - 1;
+
+            if (i4 !== 0) {
+              for (let j = 2; j < nClasses + 1; j++) {
+                // if adding this element to an existing class will increase its variance beyond the limit, break
+                // the class at this point, setting the `lowerClassLimit` at this point.
+                if(varianceCombinations[i][j] >= variance + varianceCombinations[i4][j - 1]) {
+                  lowerClassLimits[i][j] = lowerClassLimit;
+                  varianceCombinations[i][j] = variance + varianceCombinations[i4][j - 1];
+                }
               }
             }
           }
+
+          lowerClassLimits[i][1] = 1;
+          varianceCombinations[i][1] = variance;
         }
 
-        lowerClassLimits[i][1] = 1;
-        varianceCombinations[i][1] = variance;
+        // return the two matrices. for just providing breaks, only lowerClassLimits` is needed, 
+        // but variances can be useful to evaluate goodness of fit.
+        return {
+          lowerClassLimits: lowerClassLimits,
+          varianceCombinations: varianceCombinations
+        }
       }
 
-      // return the two matrices. for just providing breaks, only lowerClassLimits` is needed, 
-      // but variances can be useful to evaluate goodness of fit.
-      return {
-        lowerClassLimits: lowerClassLimits,
-        varianceCombinations: varianceCombinations
-      }
+      // sort data in numerical order, since this is expected by the matrices function
+      data = data
+        .slice()
+        .sort((a, b) => a - b);
+
+      const matrices = JenksMatrices(data, nClasses);
+      const lowerClassLimits = matrices.lowerClassLimits;
+
+      // extract nClasses out of the computed matrices
+      const breaks = JenksBreaks(data, lowerClassLimits, nClasses);
+      return breaks;
+    } catch(err) {
+      console.error(`"Jenks()" failed: ${err}`);
+      return 1;
     }
-
-    // sort data in numerical order, since this is expected by the matrices function
-    data = data
-      .slice()
-      .sort((a, b) => a - b);
-
-    const matrices = JenksMatrices(data, nClasses);
-    const lowerClassLimits = matrices.lowerClassLimits;
-
-    // extract nClasses out of the computed matrices
-    const breaks = JenksBreaks(data, lowerClassLimits, nClasses);
-    return breaks;
   }
 
   /**
@@ -1866,26 +1907,28 @@ class StatisticsService {
    * a commonly used version of [Silverman's rule-of-thumb](https://en.wikipedia.org/wiki/Kernel_density_estimation#A_rule-of-thumb_bandwidth_estimator).
    */
   static Kernel_Density_Estimation(array = [], estimate = 0) {
-
     // [Well-known kernels](https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use)
     const gaussian_kernels = (u) => Math.exp(-0.5 * u * u) / Math.sqrt(2 * Math.PI);
     
     // Well known bandwidth selection methods
     const NormalReferenceDistribution = (numbers = []) => {
       let s = StatisticsService.StandardDeviation(numbers);
-      const iqr = StatisticsService.InterquartileRange(numbers);
-      if (typeof iqr === "number") {
-        s = Math.min(s, iqr / 1.34);
+      let iqr = StatisticsService.InterquartileRange(numbers);
+      let ds = Math.min(s, iqr / 1.34);
+      return 1.06 * ds * Math.pow(numbers.length, -0.2);
+    }
+      
+    try {
+      const bandwidth = NormalReferenceDistribution(array);
+      let sum = 0;
+      for (let i = 0; i < array.length; i++) {
+        sum += gaussian_kernels((estimate - array[i]) / bandwidth);
       }
-      return 1.06 * s * Math.pow(numbers.length, -0.2);
+      return sum / bandwidth / array.length;
+    } catch(err) {
+      console.error(`"Kernel_Density_Estimation()" failed: ${err}`);
+      return 1;
     }
-    
-    const bandwidth = NormalReferenceDistribution(array);
-    let sum = 0;
-    for (let i = 0; i < array.length; i++) {
-      sum += gaussian_kernels((estimate - array[i]) / bandwidth);
-    }
-    return sum / bandwidth / array.length;
   }
 
   /**
@@ -1935,18 +1978,23 @@ class StatisticsService {
    * linearRegression([[0, 0], [1, 1]]); // => { m: 1, b: 0 }
    */
   static LinearRegression(data = []) {
-    let m;
-    let b;
+    try {
+      let m;
+      let b;
+      
+      let regression = {}
+      // Store data length in a local variable to reduce repeated object property lookups
+      let dataLength = data.length;
 
-    // Store data length in a local variable to reduce repeated object property lookups
-    const dataLength = data.length;
+      if (dataLength === 1) {
+        // If there's only one point, arbitrarily choose a slope of 0 and a y-intercept of whatever the y of the initial point is
+        regression = {
+          m : 0,
+          b : data[0][1],
+        }
+        return regression;
+      }
 
-    // If there's only one point, arbitrarily choose a slope of 0 and a y-intercept of whatever the y of the initial point is
-    if (dataLength === 1) {
-        m = 0;
-        b = data[0][1];
-    } else {
-      // Initialize our sums and scope the `m` and `b` variables that define the line.
       let sumX = 0;
       let sumY = 0;
       let sumXX = 0;
@@ -1970,12 +2018,17 @@ class StatisticsService {
 
       // `b` is the y-intercept of the line.
       b = sumY / dataLength - (m * sumX) / dataLength;
-    }
+      
 
-    // Return both values as an object.
-    return {
-      m: m,
-      b: b
+      // Return both values as an object.
+      regression = {
+        m: m,
+        b: b
+      }
+      return regression;
+    } catch(err) {
+      console.error(`"LinearRegression()" failed: ${err}`);
+      return 1;
     }
   }
 
@@ -1996,9 +2049,7 @@ class StatisticsService {
    */
   static LinearRegressionLine(mb /*: { b: number, m: number }*/) {
     // Return a function that computes a `y` value for each x value it is given, based on the values of `b` and `a` that we just computed.
-    return function (x) {
-      return mb.b + mb.m * x;
-    }
+    return (x) => mb.b + mb.m * x;
   }
 
   /**
@@ -2112,14 +2163,19 @@ class StatisticsService {
    * medianAbsoluteDeviation([1, 1, 2, 2, 4, 6, 9]); // => 1
    */
   static MedianAbsoluteDeviation(numbers = []) {
-    const medianValue = StatisticsService.ArithmeticMean(numbers);
+    try {
+      const medianValue = StatisticsService.ArithmeticMean(numbers);
 
-    // Make a list of absolute deviations from the median
-    const medianAbsoluteDeviations = [...numbers.map(x => Math.abs(x - medianValue))];
+      // Make a list of absolute deviations from the median
+      const medianAbsoluteDeviations = [...numbers.map(x => Math.abs(x - medianValue))];
 
-    // Find the median value of that list
-    const median = StatisticsService.ArithmeticMean(medianAbsoluteDeviations);
-    return median;
+      // Find the median value of that list
+      const median = StatisticsService.ArithmeticMean(medianAbsoluteDeviations);
+      return median;
+    } catch(err) {
+      console.error(`"MedianAbsoluteDeviation()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -2223,9 +2279,14 @@ class StatisticsService {
    * numericSort([3, 2, 1]) // => [1, 2, 3]
    */
   static NumericSort(numbers = []) {
-    return numbers
-      .slice()
-      .sort((a, b) => Number(a) - Number(b));
+    try {
+      return numbers
+        .slice()
+        .sort((a, b) => Number(a) - Number(b));
+    } catch(err) {
+      console.error(`"NumericSort()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -2241,25 +2302,30 @@ class StatisticsService {
    * @param {number} lambda location poisson distribution
    * @returns {number[]} values of poisson distribution at that point
    */
-  static PoissonDistribution(lambda = 2.0) /*: ?number[] */ {  
-    if (lambda <= 0) return undefined; // Check that lambda is strictly positive
+  static PoissonDistribution(lambda = 2.0) /*: ?number[] */ { 
+    try {
+      if (lambda <= 0) return undefined; // Check that lambda is strictly positive
 
-    let x = 0;
-    let cumulativeProbability = 0;  // and we keep track of the current cumulative probability, in order to know when to stop calculating chances.
-    
-    const cells = []; // the calculated cells to be returned
-    let factorialX = 1;
+      let x = 0;
+      let cumulativeProbability = 0;  // and we keep track of the current cumulative probability, in order to know when to stop calculating chances.
+      
+      let cells = []; // the calculated cells to be returned
+      let factorialX = 1;
 
-    // This algorithm iterates through each potential outcome, until the `cumulativeProbability` is very close to 1, at
-    // which point we've defined the vast majority of outcomes
-    while (cumulativeProbability < 1 - StatisticsService.Epsilon) {
-      cells[x] = (Math.exp(-lambda) * Math.pow(lambda, x)) / factorialX;  // [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function)
-      cumulativeProbability += cells[x];
-      x++;
-      factorialX *= x;  // when the cumulativeProbability is nearly 1, we've calculated the useful range of this distribution
+      // This algorithm iterates through each potential outcome, until the `cumulativeProbability` is very close to 1, at
+      // which point we've defined the vast majority of outcomes
+      while (cumulativeProbability < 1 - StatisticsService.Epsilon) {
+        cells[x] = (Math.exp(-lambda) * Math.pow(lambda, x)) / factorialX;  // [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function)
+        cumulativeProbability += cells[x];
+        x++;
+        factorialX *= x;  // when the cumulativeProbability is nearly 1, we've calculated the useful range of this distribution
+      }
+
+      return cells;
+    } catch(err) {
+      console.error(`"PoissonDistribution()" failed: ${err}`);
+      return 1;
     }
-
-    return cells;
   }
 
   /**
@@ -2398,8 +2464,8 @@ class StatisticsService {
    * @returns {Array<Array>} array of permutations
    */
   static Permutations_Heap(elements = []) {
-    const indexes = new Array(elements.length);
-    const permutations = [elements.slice()];
+    let indexes = new Array(elements.length);
+    let permutations = [elements.slice()];
 
     for (let i = 0; i < elements.length; i++) {
       indexes[i] = 0;
@@ -2411,7 +2477,7 @@ class StatisticsService {
         if (i % 2 !== 0) swapFrom = indexes[i];
 
         // swap between swapFrom and i, using a temporary variable as storage.
-        const temp = elements[swapFrom];
+        let temp = elements[swapFrom];
         elements[swapFrom] = elements[i];
         elements[i] = temp;
         permutations.push(elements.slice());
@@ -2517,11 +2583,10 @@ class StatisticsService {
           results[i] = StatisticsService.QuantileSorted(copy, p[i]);
         }
         return results;
-      } else {
-        const idx = QuantileIndex(copy.length, p);
-        QuantileSelect(copy, idx, 0, copy.length - 1);
-        return StatisticsService.QuantileSorted(copy, p);
-      }
+      } 
+      const idx = QuantileIndex(copy.length, p);
+      QuantileSelect(copy, idx, 0, copy.length - 1);
+      return StatisticsService.QuantileSorted(copy, p);
     } catch(err) {
       console.error(`"Quantile()" failed: ${err}`);
       return 1;
@@ -2540,14 +2605,19 @@ class StatisticsService {
    * quantileSorted([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
    */
   static QuantileSorted(numbers = [], p = 0.5) {
-    const idx = numbers.length * p;
-    if (numbers.length === 0) throw new Error("quantile requires at least one data point.");
-    else if (p < 0 || p > 1) throw new Error("quantiles must be between 0 and 1");
-    else if (p === 0) return numbers[0]; // If p is 0, directly return the first element
-    else if (p === 1) return numbers[numbers.length - 1];  // If p is 1, directly return the last element
-    else if (idx % 1 !== 0) return numbers[Math.ceil(idx) - 1];  // If p is not integer, return the next element in array
-    else if (numbers.length % 2 === 0) return (numbers[idx - 1] + numbers[idx]) / 2;  // If the list has even-length, we'll take the average of this number and the next value, if there is one
-    else return numbers[idx];  // Finally, in the simple case of an integer value with an odd-length list, return the x value at the index.
+    try {
+      const idx = numbers.length * p;
+      if (numbers.length === 0) throw new Error("quantile requires at least one data point.");
+      else if (p < 0 || p > 1) throw new Error("quantiles must be between 0 and 1");
+      else if (p === 0) return numbers[0]; // If p is 0, directly return the first element
+      else if (p === 1) return numbers[numbers.length - 1];  // If p is 1, directly return the last element
+      else if (idx % 1 !== 0) return numbers[Math.ceil(idx) - 1];  // If p is not integer, return the next element in array
+      else if (numbers.length % 2 === 0) return (numbers[idx - 1] + numbers[idx]) / 2;  // If the list has even-length, we'll take the average of this number and the next value, if there is one
+      else return numbers[idx];  // Finally, in the simple case of an integer value with an odd-length list, return the x value at the index.
+    } catch(err) {
+      console.error(`"QuantileSorted()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -2667,29 +2737,34 @@ class StatisticsService {
    * rSquared(samples, regressionLine); // = 1 this line is a perfect fit
    */
   static R_Squared(array = [], func = StatisticsService.LinearRegressionLine) {
-    if (array.length < 2) return 1;
+    try {
+      if (array.length < 2) return 1;
 
-    // Compute the average y value for the actual data set in order to compute the
-    let sum = 0;
-    for (let i = 0; i < array.length; i++) {
-      sum += array[i][1];
+      // Compute the average y value for the actual data set in order to compute the
+      let sum = 0;
+      for (let i = 0; i < array.length; i++) {
+        sum += array[i][1];
+      }
+      const average = sum / array.length;
+
+      // Compute the total sum of squares - the squared difference between each point and the average of all points.
+      let sumOfSquares = 0;
+      for (let j = 0; j < array.length; j++) {
+        sumOfSquares += Math.pow(average - array[j][1], 2);
+      }
+
+      // Finally estimate the error: the squared difference between the estimate and the actual data value at each point.
+      let err = 0;
+      for (let k = 0; k < array.length; k++) {
+        err += Math.pow(array[k][1] - func(array[k][0]), 2);
+      }
+
+      // As the error grows larger, its ratio to the sum of squares increases and the r squared value grows lower.
+      return 1 - err / sumOfSquares;
+    } catch(err) {
+      console.error(`"R_Squared()" failed: ${err}`);
+      return 1;
     }
-    const average = sum / array.length;
-
-    // Compute the total sum of squares - the squared difference between each point and the average of all points.
-    let sumOfSquares = 0;
-    for (let j = 0; j < array.length; j++) {
-      sumOfSquares += Math.pow(average - array[j][1], 2);
-    }
-
-    // Finally estimate the error: the squared difference between the estimate and the actual data value at each point.
-    let err = 0;
-    for (let k = 0; k < array.length; k++) {
-      err += Math.pow(array[k][1] - func(array[k][0]), 2);
-    }
-
-    // As the error grows larger, its ratio to the sum of squares increases and the r squared value grows lower.
-    return 1 - err / sumOfSquares;
   }
 
   /**
@@ -2724,8 +2799,13 @@ class StatisticsService {
    * @return {number} The relative error.
    */
   static RelativeError(actual = 3.0, expected = 5.0) {
-    if (actual === 0 && expected === 0) return 0;
-    return Math.abs((actual - expected) / expected);
+    try {
+      if (actual === 0 && expected === 0) return 0;
+      return Math.abs((actual - expected) / expected);
+    } catch(err) {
+      console.error(`"RelativeError()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -3019,24 +3099,55 @@ class StatisticsService {
    * tTestTwoSample([1, 2, 3, 4], [3, 4, 5, 6], 0); // => -2.1908902300206643
    */
   static Sample_T_Test_TwoSample(sampleX = [], sampleY = [], difference = 0) {
-    const n = sampleX.length;
-    const m = sampleY.length;
+    try {
+      const n = sampleX.length;
+      const m = sampleY.length;
 
-    if (!n || !m) return null;  // If either sample is empty return `null`.
+      if (!n || !m) return null;  // If either sample is empty return `null`.
 
-    const meanX = mean(sampleX);
-    const meanY = mean(sampleY);
-    const sampleVarianceX = sampleVariance(sampleX);
-    const sampleVarianceY = sampleVariance(sampleY);
+      const meanX = StatisticsService.ArithmeticMean(sampleX);
+      const meanY = StatisticsService.ArithmeticMean(sampleY);
+      const sampleVarianceX = StatisticsService.Variance(sampleX);
+      const sampleVarianceY = StatisticsService.Variance(sampleY);
 
-    if (typeof meanX === "number" && typeof meanY === "number" &&
-      typeof sampleVarianceX === "number" && typeof sampleVarianceY === "number"
-    ) {
-        const weightedVariance = ((n - 1) * sampleVarianceX + (m - 1) * sampleVarianceY) / (n + m - 2);
-        return (
-          (meanX - meanY - difference) /
-          Math.sqrt(weightedVariance * (1 / n + 1 / m))
-        );
+      if (typeof meanX != "number" && typeof meanY != "number" && typeof sampleVarianceX != "number" && typeof sampleVarianceY != "number") {
+        throw new Error(`Bad Inputs to function`);
+      }
+      const weightedVariance = ((n - 1) * sampleVarianceX + (m - 1) * sampleVarianceY) / (n + m - 2);
+      const t_test_two = (meanX - meanY - difference) / (Math.sqrt(weightedVariance * (1 / n + 1 / m)));
+      return t_test_two;
+    } catch(err) {
+      console.error(`"Sample_T_Test_TwoSample()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * Sampling with replacement is a type of sampling that allows the same item to be picked out of a population more than once.
+   *
+   * @param {Array<*>} x an array of any kind of value
+   * @param {number} n count of how many elements to take
+   * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+   * @return {Array} n sampled items from the population
+   * @example
+   * var values = [1, 2, 3, 4];
+   * sampleWithReplacement(values, 2); // returns 2 random values, like [2, 4];
+   */
+  static Sample_With_Replacement(array = [], n = 1) {
+    try {
+      if (Math.floor(n) !== n && n < 0) throw new Error("Chunk size must be a positive integer");
+      const length = array.length;
+      if (length < 1) return [];
+
+      let sample = [];
+      for (let i = 0; i < n; i++) {
+        const index = Math.floor(Math.random() * length);
+        sample.push(array[index]);
+      }
+      return sample;
+    } catch(err) {
+      console.error(`"Sample_With_Replacement()" failed: ${err}`);
+      return 1;
     }
   }
 
@@ -3055,21 +3166,26 @@ class StatisticsService {
    * // x is shuffled to a value like [2, 1, 4, 3]
    */
   static Shuffle(numbers = [], randomSource = Math.random) {
-    // store the current length of the x to determine when no elements remain to shuffle.
-    let length = numbers.length;
+    try {
+      let length = numbers.length;  // store the current length of the x to determine when no elements remain to shuffle.
+      if(length < 1) return [];
 
-    // While there are still items to shuffle
-    while(length > 0) {
-        // choose a random index within the subset of the array that is not yet shuffled
-        let index = Math.floor(randomSource() * length--);
-        let temporary = numbers[length];
+      // While there are still items to shuffle
+      while(length > 0) {
+          // choose a random index within the subset of the array that is not yet shuffled
+          let index = Math.floor(randomSource() * length--);
+          let temporary = numbers[length];
 
-        // swap the value at `x[length]` with `x[index]`
-        numbers[length] = numbers[index];
-        numbers[index] = temporary;
+          // swap the value at `x[length]` with `x[index]`
+          numbers[length] = numbers[index];
+          numbers[index] = temporary;
+      }
+
+      return numbers;
+    } catch(err) {
+      console.error(`"Shuffle()" failed: ${err}`);
+      return 1;
     }
-
-    return numbers;
   }
 
   /**
@@ -3109,11 +3225,10 @@ class StatisticsService {
    * silhouette([[0.25], [0.75]], [0, 0]); // => [1.0, 1.0]
    */
   static Silhouette(points, labels) {
-    if (points.length !== labels.length) throw new Error("must have exactly as many labels as points");
 
     // Create a lookup table mapping group IDs to point IDs.
     const CreateGroups = (labels) => {
-      const numGroups = 1 + max(labels);
+      const numGroups = 1 + StatisticsService.Max(labels);
       const result = Array(numGroups);
       for (let i = 0; i < labels.length; i++) {
         const label = labels[i];
@@ -3160,20 +3275,25 @@ class StatisticsService {
       return result;
     }
 
-    
-    const groupings = CreateGroups(labels);
-    const distances = CalculateAllDistances(points);
-    const result = [];
-    for (let i = 0; i < points.length; i++) {
-      let s = 0;
-      if (groupings[labels[i]].length > 1) {
-        const a = MeanDistanceFromPointToGroup(i, groupings[labels[i]], distances);
-        const b = MeanDistanceToNearestGroup(i, labels, groupings, distances);
-        s = (b - a) / Math.max(a, b);
+    try {
+      if (points.length !== labels.length) throw new Error("must have exactly as many labels as points");
+      const groupings = CreateGroups(labels);
+      const distances = CalculateAllDistances(points);
+      const result = [];
+      for (let i = 0; i < points.length; i++) {
+        let s = 0;
+        if (groupings[labels[i]].length > 1) {
+          const a = MeanDistanceFromPointToGroup(i, groupings[labels[i]], distances);
+          const b = MeanDistanceToNearestGroup(i, labels, groupings, distances);
+          s = (b - a) / Math.max(a, b);
+        }
+        result.push(s);
       }
-      result.push(s);
+      return result;
+    } catch(err) {
+      console.error(`"Silhouette()" failed: ${err}`);
+      return 1;
     }
-    return result;
   }
 
   /**
@@ -3189,8 +3309,13 @@ class StatisticsService {
    * silhouetteMetric([[0.25], [0.75]], [0, 0]); // => 1.0
    */
   static SilhouetteMetric(points, labels) {
-    const values = StatisticsService.Silhouette(points, labels);
-    return StatisticsService.Max(values);
+    try {
+      const values = StatisticsService.Silhouette(points, labels);
+      return StatisticsService.Max(values);
+    } catch(err) {
+      console.error(`"SilhouetteMetric()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -3228,17 +3353,16 @@ class StatisticsService {
    */
   static StandardDeviation(numbers = []) {
     try {
-      if(numbers.length < 2) throw new Error(`List is empty: ${numbers.length}`);
-
+      if(numbers.length < 1) throw new Error(`List is empty: ${numbers.length}`);
+      if(numbers.length === 1) return 0;
       let values = [];
       if (Array.isArray(numbers[0])) values = numbers.map(item => item[1]);
       else values = numbers;
 
       const mean = StatisticsService.ArithmeticMean(values);
-      console.warn(`Mean = ${mean}`);
 
       const s = Math.sqrt(values.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / values.length);
-      const standardDeviation = Math.abs(Number(s - mean).toFixed(3)) || 0;
+      const standardDeviation = Math.abs(s - mean) || 0;
       console.warn(`Standard Deviation: +/-${standardDeviation}`);
       return standardDeviation;
     } catch(err) {
@@ -3261,7 +3385,12 @@ class StatisticsService {
    * subtractFromMean(20.5, 6, 53); // => 14
    */
   static SubtractFromMean(mean = 20.0, n = 10, value = 0) {
-    return (mean * n - value) / (n - 1);
+    try {
+      return (mean * n - value) / (n - 1);
+    } catch(err) {
+      console.error(`"SubtractFromMean()" failed: ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -3270,9 +3399,13 @@ class StatisticsService {
    * @returns {number} sum
    */
   static Sum(numbers = []) {
-    if(numbers.length < 1) return 0;
-    if(numbers.length == 1) return numbers[0];
-    return Number(numbers.reduce((a, b) => Number(a) + Number(b), 0)).toFixed(2);
+    try {
+      if(numbers.length < 1) return 0;
+      if(numbers.length == 1) return numbers[0];
+      return Number(numbers.reduce((a, b) => Number(a) + Number(b), 0)).toFixed(2);
+    } catch(err) {
+      console.error(`"Sum()" failed: ${err}`);
+    }
   }
 
   /**
@@ -3291,23 +3424,27 @@ class StatisticsService {
    * sumNthPowerDeviations(input, 2) / input.length;
    */
   static SumNthPowerDeviations(numbers = [], n = 2) {
-    const meanValue = StatisticsService.ArithmeticMean(numbers);
+    try {
+      const meanValue = StatisticsService.ArithmeticMean(numbers);
 
-    // This is an optimization: when n is 2 (we're computing a number squared),
-    // multiplying the number by itself is significantly faster than using
-    // the Math.pow method.
-    let sum = 0;
-    if (n === 2) {
-      for (let i = 0; i < numbers.length; i++) {
-        let tempValue = numbers[i] - meanValue;
-        sum += tempValue * tempValue;
+      // This is an optimization: when n is 2 (we're computing a number squared), multiplying the number by itself 
+      // is significantly faster than using the Math.pow method.
+      let sum = 0;
+      if (n === 2) {
+        for (let i = 0; i < numbers.length; i++) {
+          let tempValue = numbers[i] - meanValue;
+          sum += tempValue * tempValue;
+        }
+      } else {
+        for (let i = 0; i < numbers.length; i++) {
+          sum += Math.pow(numbers[i] - meanValue, n);
+        }
       }
-    } else {
-      for (let i = 0; i < numbers.length; i++) {
-        sum += Math.pow(numbers[i] - meanValue, n);
-      }
+      return sum;
+    } catch(err) {
+      console.error(`"SumNthPowerDeviations()" failed: ${err}`);
+      return 1;
     }
-    return sum;
   }
 
   /**
@@ -3600,6 +3737,7 @@ class PerceptronModel {
     // multiplied by one.
     this.bias = 0;
   }
+
   /**
    * **Predict**: Use an array of features with the weight array and bias
    * to predict whether an example is labeled 0 or 1.
@@ -3608,19 +3746,21 @@ class PerceptronModel {
    * @returns {number} 1 if the score is over 0, otherwise 0
    */
   Predict(features = []) {
-    // Only predict if previously trained on the same size feature array(s).
-    if (features.length !== this.weights.length) return null;
+    try {
+      if (features.length !== this.weights.length) return null;  // Only predict if previously trained on the same size feature array(s).
+      
+      let score = 0;  // Calculate the sum of features times weights, with the bias added (implicitly times one).
+      for (let i = 0; i < this.weights.length; i++) {
+        score += this.weights[i] * features[i];
+      }
+      score += this.bias;
 
-    // Calculate the sum of features times weights, with the bias added (implicitly times one).
-    let score = 0;
-    for (let i = 0; i < this.weights.length; i++) {
-      score += this.weights[i] * features[i];
+      if (score > 0) return 1;  // Classify as 1 if the score is over 0, otherwise 0.
+      return 0;
+    } catch(err) {
+      console.error(`Predict() failed: ${err}`);
+      return 1;
     }
-    score += this.bias;
-
-    // Classify as 1 if the score is over 0, otherwise 0.
-    if (score > 0) return 1;
-    else return 0;
   }
 
   /**
@@ -3631,26 +3771,31 @@ class PerceptronModel {
    * @returns {PerceptronModel} this
    */
   Train(features = [], label = 0) {
-    if (label !== 0 && label !== 1) return null;  // Require that only labels of 0 or 1 are considered.
+    try {
+      if (label !== 0 && label !== 1) return null;  // Require that only labels of 0 or 1 are considered.
 
-    // The length of the feature array determines the length of the weight array.
-    // The perceptron will continue learning as long as it keeps seeing feature arrays of the same length.
-    // When it sees a new data shape, it initializes.
-    if (features.length !== this.weights.length) {
-      this.weights = features;
-      this.bias = 1;
-    }
-    // Make a prediction based on current weights.
-    const prediction = this.Predict(features);
-    // Update the weights if the prediction is wrong.
-    if (typeof prediction === "number" && prediction !== label) {
-      const gradient = label - prediction;
-      for (let i = 0; i < this.weights.length; i++) {
-        this.weights[i] += gradient * features[i];
+      // The length of the feature array determines the length of the weight array.
+      // The perceptron will continue learning as long as it keeps seeing feature arrays of the same length.
+      if (features.length !== this.weights.length) {
+        this.weights = features;
+        this.bias = 1;
       }
-      this.bias += gradient;
+      
+      const prediction = this.Predict(features);  // Make a prediction based on current weights.
+
+      // Update the weights if the prediction is wrong.
+      if (typeof prediction === "number" && prediction !== label) {
+        const gradient = label - prediction;
+        for (let i = 0; i < this.weights.length; i++) {
+          this.weights[i] += gradient * features[i];
+        }
+        this.bias += gradient;
+      }
+      return this;
+    } catch(err) {
+      console.error(`Train() failed: ${err}`);
+      return 1;
     }
-    return this;
   }
 }
 
