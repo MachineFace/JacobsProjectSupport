@@ -2938,30 +2938,35 @@ class StatisticsService {
    * sampleSkewness([2, 4, 6, 3, 1]); // => 0.590128656384365
    */
   static Sample_Skewness(numbers = []) {
-    if (numbers.length < 3) throw new Error(`Requires at least three data points`);
+    try {
+      if (numbers.length < 3) throw new Error(`Requires at least three data points`);
 
-    const meanValue = StatisticsService.ArithmeticMean(numbers);
+      const meanValue = StatisticsService.ArithmeticMean(numbers);
 
-    let sumSquaredDeviations = 0;
-    let sumCubedDeviations = 0;
-    for (let i = 0; i < numbers.length; i++) {
-      let tempValue = numbers[i] - meanValue;
-      sumSquaredDeviations += tempValue * tempValue;
-      sumCubedDeviations += tempValue * tempValue * tempValue;
+      let sumSquaredDeviations = 0;
+      let sumCubedDeviations = 0;
+      for (let i = 0; i < numbers.length; i++) {
+        let tempValue = numbers[i] - meanValue;
+        sumSquaredDeviations += tempValue * tempValue;
+        sumCubedDeviations += tempValue * tempValue * tempValue;
+      }
+
+      // this is Bessels' Correction: an adjustment made to sample statistics that allows for the 
+      // reduced degree of freedom entailed in calculating values from samples rather than complete populations.
+      const besselsCorrection = numbers.length - 1;
+
+      // Find the mean value of that list
+      const theSampleStandardDeviation = Math.sqrt(sumSquaredDeviations / besselsCorrection);
+
+      const cubedS = Math.pow(theSampleStandardDeviation, 3);
+      const n = numbers.length;
+      const skewness = (n * sumCubedDeviations) / ((n - 1) * (n - 2) * cubedS);
+      console.info(`Skewness: ${skewness}`);
+      return skewness;
+    } catch(err) {
+      console.error(`"Sample_Skewness()" failed: ${err}`);
+      return 1;
     }
-
-    // this is Bessels' Correction: an adjustment made to sample statistics
-    // that allows for the reduced degree of freedom entailed in calculating
-    // values from samples rather than complete populations.
-    const besselsCorrection = numbers.length - 1;
-
-    // Find the mean value of that list
-    const theSampleStandardDeviation = Math.sqrt(sumSquaredDeviations / besselsCorrection);
-
-    const n = numbers.length;
-    const cubedS = Math.pow(theSampleStandardDeviation, 3);
-
-    return (n * sumCubedDeviations) / ((n - 1) * (n - 2) * cubedS);
   }
 
   /**

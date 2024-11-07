@@ -658,7 +658,7 @@ const _gasT_Statistics_Testing = async () => {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
   const test = new GasTap();
-  /** 
+  
   await test(`Add To Mean`, (t) => {
     const values = [13, 14, 15, 8, 20];
     const mean = StatisticsService.ArithmeticMean(values);
@@ -724,7 +724,7 @@ const _gasT_Statistics_Testing = async () => {
     let a = StatisticsService.BernoulliDistribution(0.3);
     let a_exp = 0.7;
     t.equal(a[0], a_exp, `Expected: ${a_exp}, Actual: ${a[0]} or < ${StatisticsService.Epsilon}`);
-    t.equal(a[1], 0.3, `Expected: ${0.3}, Actual: ${x[1]} or < ${StatisticsService.Epsilon}`);
+    t.equal(a[1], 0.3, `Expected: ${0.3}, Actual: ${a[1]} or < ${StatisticsService.Epsilon}`);
     t.throws(StatisticsService.BernoulliDistribution(-0.01), `SHOULD throw error when p is not valid probability: (0 < x < 1)`);
     t.throws(StatisticsService.BernoulliDistribution(1.5), `SHOULD throw error when p is not valid probability: (0 < x < 1)`);
   });
@@ -1855,7 +1855,106 @@ const _gasT_Statistics_Testing = async () => {
     t.equal(a > StatisticsService.Epsilon, a_exp, `Rank correlation is incorrect for sample data, Expected: ${a_exp}, Actual: ${a}`);
 
   });
-  */
+  
+  await test(`Sample Corvariance`, (t) => {
+    t.ok(StatisticsService.Sample_Covariance, "Exports fn");
+    t.throws(StatisticsService.Sample_Covariance([], []), `returns null for empty lists`);
+    t.throws(StatisticsService.Sample_Covariance([1], []), `returns null for empty lists`);
+    let a, a_exp;
+
+    let data1 = [1, 2, 3, 4, 5, 6];
+    let data2 = [6, 5, 4, 3, 2, 1];
+    a = StatisticsService.Sample_Covariance(data1, data2);
+    a_exp = -3.5;
+    t.equal(a, a_exp, `Sample perfect negative covariance of identical arrays, Expected: ${a_exp}, Actual: ${a}`);
+
+    a = StatisticsService.Sample_Covariance(data1, data1);
+    a_exp = 3.5;
+    t.equal(a, a_exp, `Sample perfect covariance of identical arrays, Expected: ${a_exp}, Actual: ${a}`);
+
+    data1 = [1, 2, 3, 4, 5, 6];
+    data2 = [1, 1, 2, 2, 1, 1];
+    a = StatisticsService.Sample_Covariance(data1, data2);
+    a_exp = 0;
+    t.equal(a, a_exp, `Sample covariance is zero for sets with no correlation, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+  
+  await test(`Sample Kurtosis`, (t) => {
+    t.ok(StatisticsService.Sample_Kurtosis, "Exports fn");
+    t.throws(StatisticsService.Sample_Kurtosis([]), `Kurtosis of an sample with 0 numbers is null`);
+    t.throws(StatisticsService.Sample_Kurtosis([1]), `Kurtosis of an sample with 1 numbers is null`);
+    t.throws(StatisticsService.Sample_Kurtosis([1, 2]), `Kurtosis of an sample with 2 numbers is null`);
+    t.throws(StatisticsService.Sample_Kurtosis([1, 2, 3]), `Kurtosis of an sample with 3 numbers is null`);
+
+    let a, a_exp, data;
+
+    // Data and answer taken from KURTOSIS function documentation at
+    // https://support.sas.com/documentation/cdl/en/lrdict/64316/HTML/default/viewer.htm#a000245906.htm
+    data = [5, 9, 3, 6];
+    a = +StatisticsService.Sample_Kurtosis(data).toPrecision(10);
+    a_exp = 0.928;
+    t.equal(a, a_exp, `Kurtosis of SAS example, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [5, 8, 9, 6];
+    a = +StatisticsService.Sample_Kurtosis(data).toPrecision(10);
+    a_exp = -3.3;
+    t.equal(a, a_exp, `Kurtosis of SAS example, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [5, 8, 6, 1];
+    a = +StatisticsService.Sample_Kurtosis(data).toPrecision(10);
+    a_exp = 1.5;
+    t.equal(a, a_exp, `Kurtosis of SAS example, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [8, 1, 6, 1];
+    a = +StatisticsService.Sample_Kurtosis(data).toPrecision(10);
+    a_exp = -4.483379501;
+    t.equal(a, a_exp, `Kurtosis of SAS example, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+  
+  await test(`Sample Skewness`, (t) => {
+    t.ok(StatisticsService.Sample_Skewness, "Exports fn");
+    t.throws(StatisticsService.Sample_Skewness([]), `Skewness of an sample with 0 numbers is null`);
+    t.throws(StatisticsService.Sample_Skewness([1]), `Skewness of an sample with 1 numbers is null`);
+    t.throws(StatisticsService.Sample_Skewness([1, 2]), `Skewness of an sample with 2 numbers is null`);
+
+    let a, a_exp, data;
+
+    // Data and answer taken from SKEWNESS function documentation at
+    // http://support.sas.com/documentation/c../lrdict/64316/HTML/default/viewer.htm#a000245947.htm
+    data = [0, 1, 1];
+    a = +StatisticsService.Sample_Skewness(data).toPrecision(10);
+    a_exp = -1.737245658;
+    t.equal(a, a_exp, `Skewness of SAS example, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [2, 4, 6, 3, 1];
+    a = +StatisticsService.Sample_Skewness(data).toPrecision(10);
+    a_exp = 0.5901286564;
+    t.equal(a, a_exp, `Skewness of SAS example, Expected: ${a_exp}, Actual: ${a}`);
+
+    data = [2, 0, 0];
+    a = +StatisticsService.Sample_Skewness(data).toPrecision(10);
+    a_exp = 1.729452407;
+    t.equal(a, a_exp, `Skewness of SAS example, Expected: ${a_exp}, Actual: ${a}`);
+
+  });
+  
+  await test(`Standard Deviation`, (t) => {
+    const round = (x) => Math.round(x * 1000) / 1000;
+    t.ok(StatisticsService.StandardDeviation, "Exports fn");
+    t.throws(StatisticsService.StandardDeviation([]), `Standard Deviation of an sample with 0 numbers is null`);
+
+    let a, a_exp, data;
+
+    data = [2, 4, 4, 4, 5, 5, 7, 9];
+    a = +StatisticsService.StandardDeviation(data).toPrecision(10);
+    a_exp = 3;
+    t.equal(a, a_exp, `Standard Deviation of an example on wikipedia, Expected: ${a_exp}, Actual: ${a}`);
+
+
+
+  });
 
   await test.finish();
   if (test?.totalFailed() > 0) throw "Some test(s) failed!";
