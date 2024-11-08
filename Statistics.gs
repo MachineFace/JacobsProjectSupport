@@ -2809,6 +2809,24 @@ class StatisticsService {
   }
 
   /**
+   * Remaps a value from source to target numerical domains.
+   * @param {number} val
+   * @param {number} minimum (old)
+   * @param {number} maximum (old)
+   * @param {number} new minimum
+   * @param {number} new maximum
+   * @returns {number} new value mapped to the new domain
+   */
+  static Remap(val = 1.0, min = 0, max = 100, newMin = 0, newMax = 1) {
+    try {
+      return newMin + (val - min) * (newMax - newMin) / (max - min);
+    } catch(err) {
+      console.error(`"Remap()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
    * The Root Mean Square (RMS) is a mean function used as a measure of the magnitude of a set of numbers, regardless of their sign.
    * This is the square root of the mean of the squares of the input numbers.
    * This runs in `O(n)`, linear time, with respect to the length of the array.
@@ -3635,13 +3653,9 @@ const _test_Statistics = () => {
  * // }
  */
 class BayesianClassifier {
-  /*:: totalCount: number */
-  /*:: data: Object */
   constructor() {
-    // The number of items that are currently
-    // classified in the model
+    /** @private */
     this.totalCount = 0;
-    // Every item classified in the model
     this.data = {};
   }
 
@@ -3675,7 +3689,7 @@ class BayesianClassifier {
    * @returns {Object} of probabilities that this item belongs to a given category.
    */
   Score(item) {
-    const odds = {};
+    let odds = {};
     let category;
     for(const k in item) {
       const v = item[k];
@@ -3693,7 +3707,7 @@ class BayesianClassifier {
     }
 
     // Tally all of the odds for each category-combination pair - the non-existence of a category does not add anything to the score.
-    const oddsSums = {};
+    let oddsSums = {};
     for(category in odds) {
       oddsSums[category] = 0;
       for (const combination in odds[category]) {
@@ -3729,12 +3743,9 @@ class PerceptronModel {
   /*:: bias: number */
   /*:: weights: Array<number> */
   constructor() {
-    // The weights, or coefficients of the model;
-    // weights are only populated when training with data.
+    // The weights, or coefficients of the model; weights are only populated when training with data.
     this.weights = [];
-    // The bias term, or intercept; it is also a weight but
-    // it's stored separately for convenience as it is always
-    // multiplied by one.
+    // The bias term, or intercept; it is also a weight but it's stored separately for convenience as it is always multiplied by one.
     this.bias = 0;
   }
 

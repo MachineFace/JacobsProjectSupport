@@ -1750,6 +1750,30 @@ const _gasT_Statistics_Testing = async () => {
     t.equal(a, a_exp, `Correct handling of zero, Expected: ${a_exp}, Actual: ${a}`);
 
   });
+
+  await test(`Remap `, (t) => {
+    t.ok(StatisticsService.Remap, "Exports fn");
+    t.throws(StatisticsService.Remap(), `Remap with no parameters`);
+    t.throws(StatisticsService.Remap(`one`, `zero`, `ten`, `zero`, `five`), `Remap with string parameters`);
+
+    let a, a_exp, n, min, max, newMin, newMax;
+
+    n = 5, min = 0, max = 10, newMin = 50, newMax = 100;
+    a = StatisticsService.Remap(n, min, max, newMin, newMax);
+    a_exp = 75;
+    t.equal(a, a_exp, `Remap (positive integers), Expected: ${a_exp}, Actual: ${a}`);
+
+    n = -5, min = -10, max = 0, newMin = -100, newMax = -50;
+    a = StatisticsService.Remap(n, min, max, newMin, newMax);
+    a_exp = -75;
+    t.equal(a, a_exp, `Remap (negative integers), Expected: ${a_exp}, Actual: ${a}`);
+
+    n = -527.65456, min = 0.0001, max = -6, newMin = -100, newMax = 100;
+    a = StatisticsService.Remap(n, min, max, newMin, newMax);
+    a_exp = 17488.195530074496;
+    t.equal(a, a_exp, `Remap (numbers out of domain), Expected: ${a_exp}, Actual: ${a}`);
+
+  });
   
   await test(`Root Mean Square`, (t) => {
     t.ok(StatisticsService.RootMeanSquare, "Exports fn");
