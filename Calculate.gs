@@ -22,7 +22,7 @@ class Calculate {
           totals.push(t);
         });
 
-      const average = totals && StatisticsService.GeometricMean(totals);  // Average the totals (a list of times in millis)
+      const average = totals && StatisticsService.ArithmeticMean(totals);  // Average the totals (a list of times in millis)
       const averageString = TimeService.MillisecondsToTimerString(average) || 0;
       return averageString;
     }
@@ -427,24 +427,28 @@ class Calculate {
  * Used to Calculate Average Turnaround times and write to 'Data/Metrics' sheet
  */
 const Metrics = () => {
-  console.time(`Metrics Timer `)
   try {
-    console.info(`Calculating Metrics .....`);
-    Calculate.CountActiveUsers();
-    Calculate.PrintTotalSubmissions();
-    Calculate.PrintTiers();
-    Calculate.PrintStatusCounts();
-    Calculate.PrintStatistics();
-    Calculate.CountTypes();
-    Calculate.CountEachSubmission();
-    Calculate.PrintTurnaroundTimes();
-    Calculate.CountFunding();
-    Calculate.CreateTopTen();
-    console.info(`Recalculated Metrics`);
+    const startTime = new Date().getTime();
+    const timeout = 5.9 * 60 * 1000;
+    while (new Date().getTime() - startTime < timeout) {
+      console.time(`Metrics Timer `)
+      console.info(`Calculating Metrics .....`);
+      Calculate.CountActiveUsers();
+      Calculate.PrintTotalSubmissions();
+      Calculate.PrintTiers();
+      Calculate.PrintStatusCounts();
+      Calculate.PrintStatistics();
+      Calculate.CountTypes();
+      Calculate.CountEachSubmission();
+      Calculate.PrintTurnaroundTimes();
+      Calculate.CountFunding();
+      Calculate.CreateTopTen();
+      console.info(`Recalculated Metrics`);
+      console.timeEnd(`Metrics Timer `);
+    }
   } catch (err) {
     console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
   }
-  console.timeEnd(`Metrics Timer `)
 }
 
 
