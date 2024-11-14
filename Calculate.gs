@@ -4,7 +4,10 @@
  */
 class Calculate {
   constructor() {
-
+    /** @private */
+    this.userDistribution = this.GetUserDistribution();
+    /** @private */
+    this.statuses = this.CountStatuses();
   }
 
   /**
@@ -12,7 +15,7 @@ class Calculate {
    * @param {sheet} sheet
    * @returns {string} formatted average time
    */
-  static GetAverageTurnaround(sheet = SHEETS.Laser) {
+  GetAverageTurnaround(sheet = SHEETS.Laser) {
     let totals = [];
     try {
       [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.elapsedTime)]
@@ -35,13 +38,13 @@ class Calculate {
   /**
    * Print Turnaround Times
    */
-  static PrintTurnaroundTimes() {
+  PrintTurnaroundTimes() {
     try {
       let data = [
         [`Turnaround Times`, `Days`],
       ];
       Object.values(SHEETS).forEach(sheet => {
-        let days = Calculate.GetAverageTurnaround(sheet).split(`,`)[0];
+        let days = this.GetAverageTurnaround(sheet).split(`,`)[0];
         data.push([`${sheet.getName()} Turnaround`, days]);
       });
       OTHERSHEETS.Data.getRange(1, 13, data.length, 2).setValues(data);
@@ -56,7 +59,7 @@ class Calculate {
    * Count Active Users
    * @returns {number} unique users
    */
-  static CountActiveUsers() {
+  CountActiveUsers() {
     let persons = [];
     try {
       Object.values(SHEETS).forEach(sheet => {
@@ -92,10 +95,10 @@ class Calculate {
    * Count Each Submission
    * @returns {object} counts per sheet
    */
-  static CountEachSubmission() {
+  CountEachSubmission() {
     try {
       let data = [];
-      let x = [...Calculate.CountStatuses()]
+      let x = [...this.statuses]
         .map(item => item[1])
         .reduce((a, b) => a + b)
       const total = x || 0;
@@ -124,7 +127,7 @@ class Calculate {
   /**
    * Print All Submissions
    */
-  static PrintTotalSubmissions() {
+  PrintTotalSubmissions() {
     let projects = [];
     Object.values(SHEETS).forEach(sheet => {
       const projectnames = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.projectName)]
@@ -148,7 +151,7 @@ class Calculate {
    * @param {string} name
    * @returns {string} email
    */
-  static _FindEmail(name) {
+  _FindEmail(name) {
     if (name) name.toString().replace(/\s+/g, "");
     let email = ``;
     Object.values(SHEETS).forEach(sheet => {
@@ -164,17 +167,16 @@ class Calculate {
   /**
    * Create Top Ten List of Users
    */
-  static CreateTopTen() {
+  CreateTopTen() {
     try {
-      const distribution = Calculate.GetUserDistribution();
       let values = [
         [ `Place`, `Top 10 Power Users - Most Submissions`, `Number of Submissions`, `Email`, ],
       ];
       
-      distribution
+      this.userDistribution
         .slice(0, 11)
         .forEach(([ user, count ], idx) => {
-          let email = Calculate._FindEmail(user) ? Calculate._FindEmail(user) : `Email not found`;
+          let email = this._FindEmail(user) ? this._FindEmail(user) : `Email not found`;
           const entry = [ idx + 1, user, count, email ];
           values.push(entry);
         });
@@ -189,7 +191,7 @@ class Calculate {
    * Count User Types
    * @returns {[]} types, count
    */
-  static CountTypes() {
+  CountTypes() {
     try {
       let typeList = [];
       Object.values(SHEETS).forEach(sheet => {
@@ -229,7 +231,7 @@ class Calculate {
    * Calculate Distribution
    * @returns {[string, number]} sorted list of users
    */
-  static GetUserDistribution() {
+  GetUserDistribution() {
     try {
       let userList = [];
       let staff = SheetService.GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
@@ -256,10 +258,9 @@ class Calculate {
    * Calculate Standard Deviation
    * @returns {number} Standard Deviation
    */
-  static GetUserSubmissionStandardDeviation() {
+  GetUserSubmissionStandardDeviation() {
     try {
-      const distribution = Calculate.GetUserDistribution();
-      const standardDeviation = StatisticsService.StandardDeviation(distribution);
+      const standardDeviation = StatisticsService.StandardDeviation(this.userDistribution);
       console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
       return standardDeviation;
     } catch(err) {
@@ -272,10 +273,9 @@ class Calculate {
    * Calculate Arithmetic Mean
    * @returns {number} arithmetic mean
    */
-  static GetUserSubmissionArithmeticMean() {
+  GetUserSubmissionArithmeticMean() {
     try {
-      const distribution = Calculate.GetUserDistribution();
-      const mean = StatisticsService.ArithmeticMean(distribution);
+      const mean = StatisticsService.ArithmeticMean(this.userDistribution);
       return mean;
     } catch(err) {
       console.error(`"GetUserSubmissionArithmeticMean()" failed : ${err}`);
@@ -286,15 +286,14 @@ class Calculate {
   /**
    * Print Statistics
    */
-  static PrintStatistics() {
-    const distribution = Calculate.GetUserDistribution();
-    const am = Number(StatisticsService.ArithmeticMean(distribution)).toFixed(3) || 0;
-    const gm = Number(StatisticsService.GeometricMean(distribution)).toFixed(3) || 0;
-    const hm = Number(StatisticsService.HarmonicMean(distribution)).toFixed(3) || 0;
-    const qm = Number(StatisticsService.QuadraticMean(distribution)).toFixed(3) || 0;
-    const stdDev = StatisticsService.StandardDeviation(distribution);
-    const kurtosis = Number(StatisticsService.Kurtosis(distribution, stdDev)).toFixed(3) || 0;
-    const skewness = Number(StatisticsService.Skewness(distribution, stdDev)).toFixed(3) || 0;
+  PrintStatistics() {
+    const am = Number(StatisticsService.ArithmeticMean(this.userDistribution)).toFixed(3) || 0;
+    const gm = Number(StatisticsService.GeometricMean(this.userDistribution)).toFixed(3) || 0;
+    const hm = Number(StatisticsService.HarmonicMean(this.userDistribution)).toFixed(3) || 0;
+    const qm = Number(StatisticsService.QuadraticMean(this.userDistribution)).toFixed(3) || 0;
+    const stdDev = StatisticsService.StandardDeviation(this.userDistribution);
+    const kurtosis = Number(StatisticsService.Kurtosis(this.userDistribution, stdDev)).toFixed(3) || 0;
+    const skewness = Number(StatisticsService.Skewness(this.userDistribution, stdDev)).toFixed(3) || 0;
     const values = [
       [ `Statistics`, `Count`, ],
       [ `Average # of Project Submissions Per User`, am ],
@@ -312,7 +311,7 @@ class Calculate {
    * Count User Tiers
    * @returns {[]} tiers
    */
-  static CountTiers() {
+  CountTiers() {
     let tiers = [...SheetService.GetColumnDataByHeader(OTHERSHEETS.Approved, `Tier`)]
       .filter(Boolean);
     const distribution = StatisticsService.Distribution(tiers);
@@ -330,11 +329,11 @@ class Calculate {
   /**
    * Print User Tiers
    */
-  static PrintTiers() {
+  PrintTiers() {
     let tiers = [
       [ `Applicant Tier`, `Count`],
     ];
-    [...Calculate.CountTiers()]
+    [...this.CountTiers()]
       .forEach(( [ tier, count ], idx) => {
         tiers.push([ `Tier ${tier} Users`, count ]);
       });
@@ -346,7 +345,7 @@ class Calculate {
    * Count Project Statuses
    * @returns {[]} statuses
    */
-  static CountStatuses() {
+  CountStatuses() {
     let statuses = [];
     Object.values(SHEETS).forEach(sheet => {
       SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.status)
@@ -363,13 +362,12 @@ class Calculate {
   /**
    * Print Statuses
    */
-  static PrintStatusCounts() {
-    let data = Calculate.CountStatuses();
-    const total = data
+  PrintStatusCounts() {
+    const total = this.statuses
       .map(x => x[1])
       .reduce((a, b) => a + b);
 
-    let stats = data.map(tuple => {
+    let stats = this.statuses.map(tuple => {
       let percent = Number((Number(tuple[1]) / Number(total)) * 100).toFixed(2) || 0;
       let percentString = `${percent}%`;
       return [ TitleCase(tuple[0]), tuple[1], percentString ];
@@ -386,7 +384,7 @@ class Calculate {
    * Count Funding
    * @returns {number} funding
    */
-  static CountFunding() {
+  CountFunding() {
     try {
       let subtotals = [];
       Object.values(SHEETS).forEach(sheet => {
@@ -428,21 +426,22 @@ class Calculate {
  */
 const Metrics = () => {
   try {
+    const c = new Calculate();
     const startTime = new Date().getTime();
     const timeout = 5.9 * 60 * 1000;
     while (new Date().getTime() - startTime < timeout) {
       console.time(`Metrics Timer `)
       console.info(`Calculating Metrics .....`);
-      Calculate.CountActiveUsers();
-      Calculate.PrintTotalSubmissions();
-      Calculate.PrintTiers();
-      Calculate.PrintStatusCounts();
-      Calculate.PrintStatistics();
-      Calculate.CountTypes();
-      Calculate.CountEachSubmission();
-      Calculate.PrintTurnaroundTimes();
-      Calculate.CountFunding();
-      Calculate.CreateTopTen();
+      c.CountActiveUsers();
+      c.PrintTotalSubmissions();
+      c.PrintTiers();
+      c.PrintStatusCounts();
+      c.PrintStatistics();
+      c.CountTypes();
+      c.CountEachSubmission();
+      c.PrintTurnaroundTimes();
+      c.CountFunding();
+      c.CreateTopTen();
       console.info(`Recalculated Metrics`);
       console.timeEnd(`Metrics Timer `);
     }
@@ -453,15 +452,21 @@ const Metrics = () => {
 
 
 const _testDist = () => {
+  const c = new Calculate();
   // c.GetAverageTurnaround(SHEETS.Advancedlab);
-  // c.CountActiveUsers();
-  // Calculate.GetUserDistribution();
-  // Calculate.CountFunding();
+  c.CountActiveUsers();
+  // this.userDistribution;
+  // c.CountFunding();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
-  // Calculate.PrintStatistics();
-  Calculate.CreateTopTen();
+  // c.PrintStatistics();
+  // c.CountActiveUsers();
+  const x = 5 * 5
+  console.info(`X: ${x}`);
+  // const id = PropertiesService.getScriptProperties().getProperty(`SPREADSHEET_ID`);
+  // const y = SpreadsheetApp.openById(id).getSheetByName(`Laser Cutter`);
+  // console.info(`SHEET: ${y.getSheetName()}`);
 
 }
 

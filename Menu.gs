@@ -89,7 +89,8 @@ const PopUpMarkAsPickedUp = async () => {
  */
 const PopupCountUsers = () => {
   const ui = SpreadsheetApp.getUi();
-  const count = Calculate.CountActiveUsers();
+  const c = new Calculate();
+  const count = c.CountActiveUsers();
   ui.alert(
     SERVICE_NAME,
     `JPS User Count: ${count}`,
@@ -444,8 +445,8 @@ const BarMenu = () => {
       .addToUi();
 }
 
-const RunStandardDeviation = () => Calculate.GetUserSubmissionStandardDeviation();
-const RunTopTen = () => Calculate.CreateTopTen();
+const RunStandardDeviation = () => new Calculate().GetUserSubmissionStandardDeviation();
+const RunTopTen = () => new Calculate().CreateTopTen();
 
 
 

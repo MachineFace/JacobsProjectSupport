@@ -6,6 +6,9 @@
 const SERVICE_EMAIL = `jacobs-project-support@berkeley.edu`;
 const SERVICE_NAME = `Jacobs Project Support`;
 
+/** @private */
+const THIS_SPREADSHEET = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty(`SPREADSHEET_ID`));
+
 const DaysRetentionNumber = 15; //How many days to hold a file
 const RETENTION_PERIOD = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
 const PICKUP_HOURS = `Monday - Friday: 11am - 1pm.`  //`Monday - Friday: 11am - 1pm & 4pm - 6pm.`
@@ -233,26 +236,26 @@ const PRIORITY = Object.freeze({
  * Example: Calling 'SHEETS.laser' returns value sheet.
  */
 const SHEETS = Object.freeze({
-  Laser : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Laser Cutter`), // Laser Sheet
-  Fablight : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Fablight`), // Fablight Sheet
-  Waterjet : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Waterjet`), // Waterjet Sheet
-  Advancedlab : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Advanced Lab`), // Advanced Lab Sheet
-  Shopbot : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Shopbot`), // Shopbot Sheet
-  Vinyl : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Vinyl Cutter`), // Vinyl Sheet
-  Othertools : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Other Tools`), // Other Sheet
-  Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Canon Plotter`), // Plotter Sheet
-  GSI_Plotter : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`GSI - Canon Plotter`), // GSI Submission Form
+  Laser :       THIS_SPREADSHEET.getSheetByName(`Laser Cutter`), // Laser Sheet
+  Fablight :    THIS_SPREADSHEET.getSheetByName(`Fablight`), // Fablight Sheet
+  Waterjet :    THIS_SPREADSHEET.getSheetByName(`Waterjet`), // Waterjet Sheet
+  Advancedlab : THIS_SPREADSHEET.getSheetByName(`Advanced Lab`), // Advanced Lab Sheet
+  Shopbot :     THIS_SPREADSHEET.getSheetByName(`Shopbot`), // Shopbot Sheet
+  Vinyl :       THIS_SPREADSHEET.getSheetByName(`Vinyl Cutter`), // Vinyl Sheet
+  Othertools :  THIS_SPREADSHEET.getSheetByName(`Other Tools`), // Other Sheet
+  Plotter :     THIS_SPREADSHEET.getSheetByName(`Canon Plotter`), // Plotter Sheet
+  GSI_Plotter : THIS_SPREADSHEET.getSheetByName(`GSI - Canon Plotter`), // GSI Submission Form
 });
 
 /**
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const OTHERSHEETS = Object.freeze({
-  Summary : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Summary`),
-  Staff : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Staff List`),
-  Logger : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Logger`),
-  Approved : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Student List DONOTDELETE`),
-  Data : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Data Metrics`),
+  Summary :   THIS_SPREADSHEET.getSheetByName(`Summary`),
+  Staff :     THIS_SPREADSHEET.getSheetByName(`Staff List`),
+  Logger :    THIS_SPREADSHEET.getSheetByName(`Logger`),
+  Approved :  THIS_SPREADSHEET.getSheetByName(`Student List DONOTDELETE`),
+  Data :      THIS_SPREADSHEET.getSheetByName(`Data Metrics`),
 });
 
 
@@ -260,14 +263,14 @@ const OTHERSHEETS = Object.freeze({
  * Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const STORESHEETS = Object.freeze({
-  AdvLabStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('AdvLabStoreItems'),
-  UltimakerStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UltimakerStoreItems'),
-  FablightStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FablightStoreItems'),
-  ShopbotStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ShopbotStoreItems'),
-  WaterjetStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('WaterjetStoreItems'),
-  VinylCutterStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('VinylCutterStoreItems'),
-  LaserStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('LaserStoreItems'),
-  OthermillStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OthermillStoreItems'),
+  AdvLabStoreItems :      THIS_SPREADSHEET.getSheetByName('AdvLabStoreItems'),
+  UltimakerStoreItems :   THIS_SPREADSHEET.getSheetByName('UltimakerStoreItems'),
+  FablightStoreItems :    THIS_SPREADSHEET.getSheetByName('FablightStoreItems'),
+  ShopbotStoreItems :     THIS_SPREADSHEET.getSheetByName('ShopbotStoreItems'),
+  WaterjetStoreItems :    THIS_SPREADSHEET.getSheetByName('WaterjetStoreItems'),
+  VinylCutterStoreItems : THIS_SPREADSHEET.getSheetByName('VinylCutterStoreItems'),
+  LaserStoreItems :       THIS_SPREADSHEET.getSheetByName('LaserStoreItems'),
+  OthermillStoreItems :   THIS_SPREADSHEET.getSheetByName('OthermillStoreItems'),
 });
 
 /**
@@ -278,10 +281,10 @@ const DEFUNCT = Object.freeze({
   Haas : `1oS0UbirwjcRdTWzavZ11zO-xa7YiZNVfhMS2AxRwPEk`,  // Haas Form
   Othermill : `1YVmZ0H5Uy3AiBiDTUpKQONUyVRqAByju0zrm5s4vrwI`, // Othermill Form
   Creaform : `1Ifg49JzunXI54NZxrfYcJg-p6-k2MkY5IqStISKMXqc`,  // Creaform Form
-  Haas : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Haas & Tormach`), // Haas Sheet
-  Othermill : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Othermill`), // Othermill Sheet
-  Creaform : SpreadsheetApp.getActiveSpreadsheet().getSheetByName(`Creaform`), // Creaform Sheet
-  HaasTormachStoreItems : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('HaasTormachStoreItems'),
+  Haas : THIS_SPREADSHEET.getSheetByName(`Haas & Tormach`), // Haas Sheet
+  Othermill : THIS_SPREADSHEET.getSheetByName(`Othermill`), // Othermill Sheet
+  Creaform : THIS_SPREADSHEET.getSheetByName(`Creaform`), // Creaform Sheet
+  HaasTormachStoreItems : THIS_SPREADSHEET.getSheetByName('HaasTormachStoreItems'),
 });
 
 const NONITERABLESHEETS = Object.freeze({ ...OTHERSHEETS, ...STORESHEETS, });
