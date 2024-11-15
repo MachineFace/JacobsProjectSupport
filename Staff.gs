@@ -2,6 +2,72 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
+ * Class for Creating an Employee
+ */
+class Employee {
+  constructor({
+    name : name = `FirstName`, 
+    fullname : fullname = `FirstName LastName`, 
+    email : email = SERVICE_EMAIL,
+    areas : areas = [],
+  }) {
+    this.id = IDService.createId();
+    this.name = name;
+    this.fullname = fullname;
+    this.email = email;
+    this.areas = areas;
+    this.link = `<a href = "${this.email}">${this.email}</a>`;
+    this.type = `Employee`;
+    this.isAdmin = false;
+    this.shortCode = `EM`;
+    this.SetAreas();
+  }
+  
+  get() {
+    return {
+      id : this.id,
+      name : this.name,
+      fullname : this.fullname,
+      email : this.email,
+      link : this.link,
+      type : this.type,
+      isAdmin : this.isAdmin,
+      shortCode : this.shortCode,
+      areas : this.areas,
+    }
+  }
+
+  /** @private */
+  SetAreas () {
+    switch (this.name) {
+      case "Chris":
+        this.areas = [ SHEETS.Advancedlab.getSheetName(), ];
+        break;
+      case "ChrisMyers":
+        this.areas = [ SHEETS.Shopbot.getSheetName(), ];
+        break;
+      case "Cody":
+        this.areas = [ SHEETS.Plotter.getSheetName(), SHEETS.GSI_Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Vinyl.getSheetName(), ];
+        break;
+      case "Gary":
+        this.areas = [ SHEETS.Waterjet.getSheetName(), SHEETS.Othertools.getSheetName(), ];
+        break;
+      case "Nicole":
+        break;
+      case "Staff":
+        this.areas = [ SHEETS.Laser.getSheetName(), ];
+        break;
+      default:
+      case undefined:
+        this.areas = [];
+        break;
+    }
+  }
+
+}
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Design Specialist Employee
  */
 class DesignSpecialist {
@@ -148,6 +214,8 @@ class Manager extends DesignSpecialist {
   }
   
 }
+
+
 
 
 /**

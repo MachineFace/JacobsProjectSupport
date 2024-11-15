@@ -287,13 +287,13 @@ class Calculate {
    * Print Statistics
    */
   PrintStatistics() {
-    const am = Number(StatisticsService.ArithmeticMean(this.userDistribution)).toFixed(3) || 0;
-    const gm = Number(StatisticsService.GeometricMean(this.userDistribution)).toFixed(3) || 0;
-    const hm = Number(StatisticsService.HarmonicMean(this.userDistribution)).toFixed(3) || 0;
-    const qm = Number(StatisticsService.QuadraticMean(this.userDistribution)).toFixed(3) || 0;
-    const stdDev = StatisticsService.StandardDeviation(this.userDistribution);
-    const kurtosis = Number(StatisticsService.Kurtosis(this.userDistribution, stdDev)).toFixed(3) || 0;
-    const skewness = Number(StatisticsService.Skewness(this.userDistribution, stdDev)).toFixed(3) || 0;
+    const am = Number(StatisticsService.ArithmeticMean(this.userDistribution)).toFixed(4) || 0;
+    const gm = Number(StatisticsService.GeometricMean(this.userDistribution)).toFixed(4) || 0;
+    const hm = Number(StatisticsService.HarmonicMean(this.userDistribution)).toFixed(4) || 0;
+    const qm = Number(StatisticsService.QuadraticMean(this.userDistribution)).toFixed(4) || 0;
+    const stdDev = Number(StatisticsService.StandardDeviation(this.userDistribution)).toFixed(4) || 0;
+    const kurtosis = Number(StatisticsService.Kurtosis(this.userDistribution, stdDev)).toFixed(4) || 0;
+    const skewness = Number(StatisticsService.Skewness(this.userDistribution, stdDev)).toFixed(4) || 0;
     const values = [
       [ `Statistics`, `Count`, ],
       [ `Average # of Project Submissions Per User`, am ],
@@ -306,6 +306,94 @@ class Calculate {
     ];
     OTHERSHEETS.Data.getRange(1, 29, values.length, 2).setValues(values);
   }
+
+  /**
+   * User Submissions Z Scores
+   * @return {number} standard deviation
+   */
+  UserSubmissionsZScores() {
+    try {
+      const standardDeviation = StatisticsService.StandardDeviation(this.userDistribution);
+      const zScore = StatisticsService.ZScore(this.userDistribution, standardDeviation);
+      const values = [
+        [ `User`, `Submission Count`, `Z-Score`  ], 
+        ...zScore,
+      ];
+      console.info(values);
+      OTHERSHEETS.Data.getRange(1, 32, values.length, 3).setValues(values);
+      return zScore;
+    } catch(err) {
+      console.error(`"UserSubmissionsZScores()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * User Submissions Chi Squared Goodness of Fit Test
+   * @returns {object} 
+   */
+  UserSubmissionChiSquaredFit() {
+    try {
+      let data = this.userDistribution.map(x => x[1]);
+      let res = StatisticsService.ChiSquaredGoodnessOfFit(data);
+      const { result, degrees_of_freedom, significance, conforming } = res;
+      const values = [
+        [ `Chi Squared Result`, `Degrees of Freedom`, `Significance`, `Data Conforms to (Chi^2)`, ], 
+        [ result, degrees_of_freedom, significance, conforming, ],
+      ];
+      OTHERSHEETS.Data.getRange(1, 37, values.length, 4).setValues(values);
+      return res;
+    } catch(err) {
+      console.error(`"UserSubmissionChiSquaredFit()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * User Submissions Quartiles
+   * @return {number} quartiles
+   */
+  UserSubmissionsQuartiles() {
+    try {
+      const quartiles = StatisticsService.Quartiles(this.userDistribution);
+      const values = [
+        [ `Quartile`, `Value`, ], 
+        ...Object.entries(quartiles),
+      ];
+      console.info(values);
+      OTHERSHEETS.Data.getRange(1, 42, values.length, 2).setValues(values);
+      return quartiles;
+    } catch(err) {
+      console.error(`"UserSubmissionsQuartiles()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  /**
+   * User Submissions Cumulative Std Normal Probability
+   */
+  UserSubmissionsCumulativeStdNormalProbability() {
+    try {
+      let cspList = []
+      this.userDistribution.forEach(([name, submissionCount], idx) => {
+        const csp = StatisticsService.CumulativeStdNormalProbability(submissionCount);
+        console.info(`Name: ${name}, Count: ${submissionCount}, CSP: ${csp}`);
+        cspList.push([csp]);
+      });
+      const values = [
+        [ `Cumulative Standard Normal Probability`  ], 
+        ...cspList,
+      ];
+      console.info(values);
+      OTHERSHEETS.Data.getRange(1, 35, values.length, 1).setValues(values);
+      return cspList;
+    } catch(err) {
+      console.error(`"UserSubmissionsCumulativeStdNormalProbability()" failed : ${err}`);
+      return 1;
+    }
+  }
+
+  
 
   /**
    * Count User Tiers
@@ -339,7 +427,6 @@ class Calculate {
       });
     OTHERSHEETS.Data.getRange(1, 16, tiers.length, 2,).setValues(tiers);
   }
-
 
   /**
    * Count Project Statuses
@@ -437,6 +524,10 @@ const Metrics = () => {
       c.PrintTiers();
       c.PrintStatusCounts();
       c.PrintStatistics();
+      c.UserSubmissionsZScores();
+      c.UserSubmissionsCumulativeStdNormalProbability();
+      c.UserSubmissionChiSquaredFit();
+      c.UserSubmissionsQuartiles();
       c.CountTypes();
       c.CountEachSubmission();
       c.PrintTurnaroundTimes();
@@ -454,16 +545,15 @@ const Metrics = () => {
 const _testDist = () => {
   const c = new Calculate();
   // c.GetAverageTurnaround(SHEETS.Advancedlab);
-  c.CountActiveUsers();
-  // this.userDistribution;
-  // c.CountFunding();
+  c.UserSubmissionsZScores();
+  // c.UserSubmissionsQuartiles();
+  // c.UserSubmissionChiSquaredFit();
+  c.UserSubmissionsCumulativeStdNormalProbability();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);
   // c.PrintStatistics();
   // c.CountActiveUsers();
-  const x = 5 * 5
-  console.info(`X: ${x}`);
   // const id = PropertiesService.getScriptProperties().getProperty(`SPREADSHEET_ID`);
   // const y = SpreadsheetApp.openById(id).getSheetByName(`Laser Cutter`);
   // console.info(`SHEET: ${y.getSheetName()}`);

@@ -807,8 +807,15 @@ class StatisticsService {
       // number of hypothesized distribution parameters estimated - 1)
       const degreesOfFreedom = observedFrequencies.length - c - 1;
       const res = StatisticsService.ChiSquaredDistributionTable[degreesOfFreedom][significance];
-      console.info(`Chi Squared Result: ${res}, Degrees of Freedom: ${degreesOfFreedom}, Significance: ${significance}`);
-      return ( res < chiSquared );
+      const conforming = ( res < chiSquared );
+      const output = {
+        result : res,
+        degrees_of_freedom : degreesOfFreedom,
+        significance : significance,
+        conforming : conforming,
+      }
+      console.info(`Chi Squared: ${JSON.stringify(output)}`);
+      return output;
     } catch(err) {
       console.error(`"ChiSquaredGoodnessOfFit()" failed: ${err}`);
       return 1;
@@ -890,105 +897,105 @@ class StatisticsService {
    * //= [[-1, -1, -1, -1], [2, 2, 2], [4, 5, 6]]);
    */
   static CK_Means(numbers = [], nClusters = 2) {
+    // Function that generates incrementally computed values based on the sums and sums of squares for the data array
+    const ssq = (j, i, sums, sumsOfSquares) => {
+      let sji; // s(j, i)
+      if (j > 0) {
+        const muji = (sums[i] - sums[j - 1]) / (i - j + 1); // mu(j, i)
+        sji = sumsOfSquares[i] - sumsOfSquares[j - 1] - (i - j + 1) * muji * muji;
+      } else {
+        sji = sumsOfSquares[i] - (sums[i] * sums[i]) / (i + 1);
+      }
+      if (sji < 0) return 0;
+      return sji;
+    }
+    // Function that recursively divides and conquers computations for cluster j
+    const fillMatrixColumn = (iMin, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares) => {
+      if (iMin > iMax) return;
+      
+      const i = Math.floor((iMin + iMax) / 2); // Start at midpoint between iMin and iMax
+
+      matrix[cluster][i] = matrix[cluster - 1][i - 1];
+      backtrackMatrix[cluster][i] = i;
+
+      let jlow = cluster; // the lower end for j
+
+      if (iMin > cluster) jlow = Math.max(jlow, backtrackMatrix[cluster][iMin - 1] || 0);
+      jlow = Math.max(jlow, backtrackMatrix[cluster - 1][i] || 0);
+
+      let jhigh = i - 1; // the upper end for j
+      if (iMax < matrix[0].length - 1) jhigh = Math.min(jhigh, backtrackMatrix[cluster][iMax + 1] || 0);
+
+      for (let j = jhigh; j >= jlow; --j) {
+        let sji = ssq(j, i, sums, sumsOfSquares);
+        if (sji + matrix[cluster - 1][jlow - 1] >= matrix[cluster][i]) break;
+
+        // Examine the lower bound of the cluster border
+        let sjlowi = ssq(jlow, i, sums, sumsOfSquares);
+        let ssqjlow = sjlowi + matrix[cluster - 1][jlow - 1];
+
+        if (ssqjlow < matrix[cluster][i]) {
+          // Shrink the lower bound
+          matrix[cluster][i] = ssqjlow;
+          backtrackMatrix[cluster][i] = jlow;
+        }
+        jlow++;
+
+        let ssqj = sji + matrix[cluster - 1][j - 1];
+        if (ssqj < matrix[cluster][i]) {
+          matrix[cluster][i] = ssqj;
+          backtrackMatrix[cluster][i] = j;
+        }
+      }
+
+      fillMatrixColumn(iMin, i - 1, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
+      fillMatrixColumn(i + 1, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
+    }
+    // Initializes the main matrices used in Ckmeans and kicks off the divide and conquer cluster computation strategy
+    const fillMatrices = (data, matrix, backtrackMatrix) => {
+      const nValues = matrix[0].length;
+      const shift = data[Math.floor(nValues / 2)];  // Shift values by the median to improve numeric stability
+
+
+      const sums = [];
+      const sumsOfSquares = [];
+
+      // Initialize first column in matrix & backtrackMatrix
+      for (let i = 0, shiftedValue; i < nValues; ++i) {
+        shiftedValue = data[i] - shift;
+        if (i === 0) {
+          sums.push(shiftedValue);
+          sumsOfSquares.push(shiftedValue * shiftedValue);
+        } else {
+          sums.push(sums[i - 1] + shiftedValue);
+          sumsOfSquares.push(sumsOfSquares[i - 1] + shiftedValue * shiftedValue);
+        }
+
+        // Initialize for cluster = 0
+        matrix[0][i] = ssq(0, i, sums, sumsOfSquares);
+        backtrackMatrix[0][i] = 0;
+      }
+
+      // Initialize the rest of the columns
+      let iMin;
+      for (let cluster = 1; cluster < matrix.length; ++cluster) {
+        if (cluster < matrix.length - 1) iMin = cluster;
+        else iMin = nValues - 1;  // No need to compute matrix[K-1][0] ... matrix[K-1][N-2]
+
+        fillMatrixColumn(
+          iMin,
+          nValues - 1,
+          cluster,
+          matrix,
+          backtrackMatrix,
+          sums,
+          sumsOfSquares,
+        );
+      }
+    }
+
     try {
       if (nClusters > numbers.length) throw new Error(`Cannot generate more classes than there are data values`);
-
-      // Function that generates incrementally computed values based on the sums and sums of squares for the data array
-      const ssq = (j, i, sums, sumsOfSquares) => {
-        let sji; // s(j, i)
-        if (j > 0) {
-          const muji = (sums[i] - sums[j - 1]) / (i - j + 1); // mu(j, i)
-          sji = sumsOfSquares[i] - sumsOfSquares[j - 1] - (i - j + 1) * muji * muji;
-        } else {
-          sji = sumsOfSquares[i] - (sums[i] * sums[i]) / (i + 1);
-        }
-        if (sji < 0) return 0;
-        return sji;
-      }
-      // Function that recursively divides and conquers computations for cluster j
-      const fillMatrixColumn = (iMin, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares) => {
-        if (iMin > iMax) return;
-        
-        const i = Math.floor((iMin + iMax) / 2); // Start at midpoint between iMin and iMax
-
-        matrix[cluster][i] = matrix[cluster - 1][i - 1];
-        backtrackMatrix[cluster][i] = i;
-
-        let jlow = cluster; // the lower end for j
-
-        if (iMin > cluster) jlow = Math.max(jlow, backtrackMatrix[cluster][iMin - 1] || 0);
-        jlow = Math.max(jlow, backtrackMatrix[cluster - 1][i] || 0);
-
-        let jhigh = i - 1; // the upper end for j
-        if (iMax < matrix[0].length - 1) jhigh = Math.min(jhigh, backtrackMatrix[cluster][iMax + 1] || 0);
-
-        for (let j = jhigh; j >= jlow; --j) {
-          let sji = ssq(j, i, sums, sumsOfSquares);
-          if (sji + matrix[cluster - 1][jlow - 1] >= matrix[cluster][i]) break;
-
-          // Examine the lower bound of the cluster border
-          let sjlowi = ssq(jlow, i, sums, sumsOfSquares);
-          let ssqjlow = sjlowi + matrix[cluster - 1][jlow - 1];
-
-          if (ssqjlow < matrix[cluster][i]) {
-            // Shrink the lower bound
-            matrix[cluster][i] = ssqjlow;
-            backtrackMatrix[cluster][i] = jlow;
-          }
-          jlow++;
-
-          let ssqj = sji + matrix[cluster - 1][j - 1];
-          if (ssqj < matrix[cluster][i]) {
-            matrix[cluster][i] = ssqj;
-            backtrackMatrix[cluster][i] = j;
-          }
-        }
-
-        fillMatrixColumn(iMin, i - 1, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
-        fillMatrixColumn(i + 1, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
-      }
-      // Initializes the main matrices used in Ckmeans and kicks off the divide and conquer cluster computation strategy
-      const fillMatrices = (data, matrix, backtrackMatrix) => {
-        const nValues = matrix[0].length;
-        const shift = data[Math.floor(nValues / 2)];  // Shift values by the median to improve numeric stability
-
-
-        const sums = [];
-        const sumsOfSquares = [];
-
-        // Initialize first column in matrix & backtrackMatrix
-        for (let i = 0, shiftedValue; i < nValues; ++i) {
-          shiftedValue = data[i] - shift;
-          if (i === 0) {
-            sums.push(shiftedValue);
-            sumsOfSquares.push(shiftedValue * shiftedValue);
-          } else {
-            sums.push(sums[i - 1] + shiftedValue);
-            sumsOfSquares.push(sumsOfSquares[i - 1] + shiftedValue * shiftedValue);
-          }
-
-          // Initialize for cluster = 0
-          matrix[0][i] = ssq(0, i, sums, sumsOfSquares);
-          backtrackMatrix[0][i] = 0;
-        }
-
-        // Initialize the rest of the columns
-        let iMin;
-        for (let cluster = 1; cluster < matrix.length; ++cluster) {
-          if (cluster < matrix.length - 1) iMin = cluster;
-          else iMin = nValues - 1;  // No need to compute matrix[K-1][0] ... matrix[K-1][N-2]
-
-          fillMatrixColumn(
-            iMin,
-            nValues - 1,
-            cluster,
-            matrix,
-            backtrackMatrix,
-            sums,
-            sumsOfSquares,
-          );
-        }
-      }
 
       const sorted = StatisticsService.NumericSort(numbers);
       const uniqueCount = StatisticsService.CountUnique(sorted);
@@ -1023,6 +1030,7 @@ class StatisticsService {
 
         if (cluster > 0) clusterRight = clusterLeft - 1;
       }
+      console.info(`Clusters: ${clusters}`);
       return clusters;
     } catch(err) {
       console.error(`"CK_Means()" failed: ${err}`);
@@ -1696,100 +1704,101 @@ class StatisticsService {
    * jenks([1, 2, 4, 5, 7, 9, 10, 20], 3) // = [1, 7, 20, 20]
    */
   static Jenks(data = [], nClasses = 2) {
-    try {
-      if (nClasses > data.length) return null;
 
-      // Pull Breaks Values for Jenks. the second part of the jenks recipe: take the calculated matrices and derive an array of n breaks.
-      const JenksBreaks = (data, lowerClassLimits, nClasses) => {
-        let k = data.length;
-        let kclass = [];
-        let countNum = nClasses;
+    // Pull Breaks Values for Jenks. the second part of the jenks recipe: take the calculated matrices and derive an array of n breaks.
+    const JenksBreaks = (data, lowerClassLimits, nClasses) => {
+      let k = data.length;
+      let kclass = [];
+      let countNum = nClasses;
 
-        // the calculation of classes will never include the upper bound, so we need to explicitly set it
-        kclass[nClasses] = data[data.length - 1];
+      // the calculation of classes will never include the upper bound, so we need to explicitly set it
+      kclass[nClasses] = data[data.length - 1];
 
-        // the lowerClassLimits matrix is used as indices into itself here: the `k` variable is reused in each iteration.
-        while (countNum > 0) {
-          kclass[countNum - 1] = data[lowerClassLimits[k][countNum] - 1];
-          k = lowerClassLimits[k][countNum] - 1;
-          countNum--;
-        }
-        return kclass;
+      // the lowerClassLimits matrix is used as indices into itself here: the `k` variable is reused in each iteration.
+      while (countNum > 0) {
+        kclass[countNum - 1] = data[lowerClassLimits[k][countNum] - 1];
+        k = lowerClassLimits[k][countNum] - 1;
+        countNum--;
+      }
+      return kclass;
+    }
+
+    // Compute the matrices required for Jenks breaks. These matrices can be used for any classing of data with `classes <= nClasses`
+    const JenksMatrices = (data, nClasses) => {
+      let lowerClassLimits = [];
+      let varianceCombinations = [];
+
+      let variance = 0;
+      for (let i = 0; i < data.length + 1; i++) {
+          let tmp1 = [];
+          let tmp2 = [];
+          for (let j = 0; j < nClasses + 1; j++) {
+            tmp1.push(0);
+            tmp2.push(0);
+          }
+          lowerClassLimits.push(tmp1);
+          varianceCombinations.push(tmp2);
       }
 
-      // Compute the matrices required for Jenks breaks. These matrices can be used for any classing of data with `classes <= nClasses`
-      const JenksMatrices = (data, nClasses) => {
-        let lowerClassLimits = [];
-        let varianceCombinations = [];
+      for (let i = 1; i < nClasses + 1; i++) {
+          lowerClassLimits[1][i] = 1;
+          varianceCombinations[1][i] = 0;
+          // in the original implementation, 9999999 is used but since Javascript has `Infinity`, we use that.
+          for (let j = 2; j < data.length + 1; j++) {
+            varianceCombinations[j][i] = Number.POSITIVE_INFINITY;
+          }
+      }
 
-        let variance = 0;
-        for (let i = 0; i < data.length + 1; i++) {
-            let tmp1 = [];
-            let tmp2 = [];
-            for (let j = 0; j < nClasses + 1; j++) {
-              tmp1.push(0);
-              tmp2.push(0);
-            }
-            lowerClassLimits.push(tmp1);
-            varianceCombinations.push(tmp2);
-        }
+      for (let i = 2; i < data.length + 1; i++) {
+        let sum = 0;
+        let sumSquares = 0;
+        let w = 0;
 
-        for (let i = 1; i < nClasses + 1; i++) {
-            lowerClassLimits[1][i] = 1;
-            varianceCombinations[1][i] = 0;
-            // in the original implementation, 9999999 is used but since Javascript has `Infinity`, we use that.
-            for (let j = 2; j < data.length + 1; j++) {
-              varianceCombinations[j][i] = Number.POSITIVE_INFINITY;
-            }
-        }
+        for (let m = 1; m < i + 1; m++) {
+          const lowerClassLimit = i - m + 1;
+          const val = data[lowerClassLimit - 1];
 
-        for (let i = 2; i < data.length + 1; i++) {
-          let sum = 0;
-          let sumSquares = 0;
-          let w = 0;
+          // here we're estimating variance for each potential classing of the data, for each potential 
+          // number of classes. `w` is the number of data points considered so far.
+          w++;
 
-          for (let m = 1; m < i + 1; m++) {
-            const lowerClassLimit = i - m + 1;
-            const val = data[lowerClassLimit - 1];
+          // increase the current sum and sum-of-squares
+          sum += val;
+          sumSquares += val * val;
 
-            // here we're estimating variance for each potential classing of the data, for each potential 
-            // number of classes. `w` is the number of data points considered so far.
-            w++;
+          // the variance at this point in the sequence is the difference
+          // between the sum of squares and the total x 2, over the number
+          // of samples.
+          variance = sumSquares - (sum * sum) / w;
 
-            // increase the current sum and sum-of-squares
-            sum += val;
-            sumSquares += val * val;
+          let i4 = lowerClassLimit - 1;
 
-            // the variance at this point in the sequence is the difference
-            // between the sum of squares and the total x 2, over the number
-            // of samples.
-            variance = sumSquares - (sum * sum) / w;
-
-            let i4 = lowerClassLimit - 1;
-
-            if (i4 !== 0) {
-              for (let j = 2; j < nClasses + 1; j++) {
-                // if adding this element to an existing class will increase its variance beyond the limit, break
-                // the class at this point, setting the `lowerClassLimit` at this point.
-                if(varianceCombinations[i][j] >= variance + varianceCombinations[i4][j - 1]) {
-                  lowerClassLimits[i][j] = lowerClassLimit;
-                  varianceCombinations[i][j] = variance + varianceCombinations[i4][j - 1];
-                }
+          if (i4 !== 0) {
+            for (let j = 2; j < nClasses + 1; j++) {
+              // if adding this element to an existing class will increase its variance beyond the limit, break
+              // the class at this point, setting the `lowerClassLimit` at this point.
+              if(varianceCombinations[i][j] >= variance + varianceCombinations[i4][j - 1]) {
+                lowerClassLimits[i][j] = lowerClassLimit;
+                varianceCombinations[i][j] = variance + varianceCombinations[i4][j - 1];
               }
             }
           }
-
-          lowerClassLimits[i][1] = 1;
-          varianceCombinations[i][1] = variance;
         }
 
-        // return the two matrices. for just providing breaks, only lowerClassLimits` is needed, 
-        // but variances can be useful to evaluate goodness of fit.
-        return {
-          lowerClassLimits: lowerClassLimits,
-          varianceCombinations: varianceCombinations
-        }
+        lowerClassLimits[i][1] = 1;
+        varianceCombinations[i][1] = variance;
       }
+
+      // return the two matrices. for just providing breaks, only lowerClassLimits` is needed, 
+      // but variances can be useful to evaluate goodness of fit.
+      return {
+        lowerClassLimits: lowerClassLimits,
+        varianceCombinations: varianceCombinations
+      }
+    }
+    
+    try {
+      if (nClasses > data.length) return null;
 
       // sort data in numerical order, since this is expected by the matrices function
       data = data
@@ -1822,6 +1831,7 @@ class StatisticsService {
    */
   static K_Means_Cluster(points, numCluster = 2, randomSource = Math.random) {
     // const nonRNG = () => 1.0 - StatisticsService.Epsilon;
+
     // Label each point according to which centroid it is closest to.
     const LabelPoints = (points, centroids) => {
       return points.map((p) => {
@@ -2724,9 +2734,7 @@ class StatisticsService {
 
   /**
    * [R Squared](http://en.wikipedia.org/wiki/Coefficient_of_determination)
-   * value of data compared with a function `f`
-   * is the sum of the squared differences between the prediction
-   * and the actual value.
+   * value of data compared with a function `f` is the sum of the squared differences between the prediction and the actual value.
    *
    * @param {Array<Array<number>>} x input data: this should be doubly-nested
    * @param {Function} func function called on `[i][0]` values within the dataset
