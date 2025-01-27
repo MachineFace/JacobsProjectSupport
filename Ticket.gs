@@ -44,7 +44,7 @@ class Ticket {
    * Create Ticket
    */
   async CreateTicket() {
-    const barcode = await BarcodeGenerator.GenerateBarCodeForTicketHeader(this.id);
+    const barcode = await BarcodeService.GenerateBarCodeForTicketHeader(this.id);
 
     const folder = DriveApp.getFolderById(DRIVEFOLDERS.tickets); // Set the correct folder
     this.doc = await DocumentApp.create(`JPS-Ticket-${this.id}`); // Make Document
@@ -64,7 +64,7 @@ class Ticket {
       printColor, printSize, printCount, 
       otherNotes, layerThickness, density, fortusLayerThickness, densityInfill, finish, roughDimensions, 
       markforgedDensity, buildParameters, otherJobNotes, dateCompleted, 
-      elapsedTime, estimate, price1, price2, price3, price4, sheet, row 
+      elapsedTime, estimate, unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, sheet, row 
     } = this.rowData;
 
 

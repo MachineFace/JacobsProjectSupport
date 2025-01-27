@@ -34,23 +34,6 @@ const FindMissingElementsInArrays = (array1 = [], array2 = []) => {
 }
 
 
-
-/**
- * Look up Item's Info in Store Sheet
- * @param {sheet} sheet
- * @param {material} material
- * @param {object} row data
- */
-const GetStoreInfo = (sheet, material) => {
-  sheet = sheet ? sheet : SHEETS.Laser;
-  material = material ? material : SheetService.GetByHeader(sheet, HEADERNAMES.mat1, 2);
-
-  const storesheet = GetStoreSheet(sheet);
-  const row = SheetService.SearchSpecificSheet(storesheet, material);
-  const data = SheetService.GetRowData(storesheet, row);
-  return data;
-}
-
 /**
  * Get All Project Names
  * @returns {object} { sheetname : [...projectnames] }
@@ -69,8 +52,27 @@ const GetAllProjectNames = () => {
   return names;
 }
 
+
+/**
+ * Look up Item's Info in Store Sheet
+ * @param {sheet} sheet
+ * @param {material} material
+ * @param {object} row data
+ */
+const GetStoreInfo = (sheet, material) => {
+  sheet = sheet ? sheet : SHEETS.Laser;
+  material = material ? material : SheetService.GetByHeader(sheet, HEADERNAMES.mat1, 2);
+
+  const storesheet = GetStoreSheet(sheet);
+  const row = SheetService.SearchSpecificSheet(storesheet, material);
+  const data = SheetService.GetRowData(storesheet, row);
+  return data;
+}
+
+
 /**
  * Build Estimate
+ * [Replaces: =IFERROR(ARRAYFORMULA(TO_DOLLARS(((AQ2:AQ * P2:P)) * O2:O)),"")]
  */
 const BuildEstimate = (sheet, row = 2) => {
   try {
@@ -78,30 +80,34 @@ const BuildEstimate = (sheet, row = 2) => {
     if(!SheetService.IsValidSheet(sheet)) throw new Error(`Forbidden Sheet....`);
 
     const rowData = SheetService.GetRowData(sheet, row);
-    let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
-      mat1quantity, mat1, mat2quantity, mat2, 
-      mat3quantity, mat3, mat4quantity, mat4, 
-      mat5quantity, mat5, affiliation, elapsedTime, estimate, 
-      price1, price2, printColor, printSize, printCount, sheetName, } = rowData;
+    let { mat1quantity, mat1, mat2quantity, mat2, mat3quantity, mat3, mat4quantity, mat4, mat5quantity, mat5,
+      unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, 
+      estimate, sheetName, } = rowData;
 
     let productPrices = [];
-    const materials = [ mat1, mat2, mat3, mat4, mat5 ];
-    const quantities = [ mat1quantity, mat2quantity, mat3quantity, mat4quantity, mat5quantity ];
+    let materials = [ mat1, mat2, mat3, mat4, mat5, ];
+    let quantities = [ mat1quantity, mat2quantity, mat3quantity, mat4quantity, mat5quantity, ];
+    let unit_costs = [ unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, ];
     materials.forEach( (material, index) => {
-      if(material) {
-        Object.values(STORESHEETS).forEach(materialSheet => {
-          const idx = SheetService.SearchSpecificSheet(materialSheet, material);
-          if(idx) {
-            const price = materialSheet.getRange(idx, 6, 1, 1).getValue();
-            let subtotal = price * quantities[index];
-            productPrices.push(subtotal);
-          }
-        });
-      }
+      if(!material) return;
+      let storeData = GetStoreInfo(sheet, material);
+      let unit_price = storeData.Price > 0 ? storeData.Price : 0.0;
+      unit_costs[index] = unit_price;
+      let subtotal = unit_price * quantities[index];
+      productPrices.push(subtotal);      
     });
-    console.info(`Sheet Info: ${productPrices}`);
-    estimate = productPrices ? productPrices.reduce((a,b) => a + b) : 0.0;
-    console.info(`Final Estimate = $${estimate}`);
+
+    // Write Unit costs to sheet
+    SheetService.SetByHeader(sheet, HEADERNAMES.unit_cost1, row, unit_costs[0]);
+    SheetService.SetByHeader(sheet, HEADERNAMES.unit_cost2, row, unit_costs[1]);
+    SheetService.SetByHeader(sheet, HEADERNAMES.unit_cost3, row, unit_costs[2]);
+    SheetService.SetByHeader(sheet, HEADERNAMES.unit_cost4, row, unit_costs[3]);
+    SheetService.SetByHeader(sheet, HEADERNAMES.unit_cost5, row, unit_costs[4]);
+
+    // Estimate Total
+    console.info(`Product Subtotals: [${productPrices}]`);
+    estimate = productPrices.length > 0 ? productPrices.reduce((a,b) => a + b) : 0.0;
+    console.info(`Estimate: $${estimate}`);
     SheetService.SetByHeader(sheet, HEADERNAMES.estimate, row, estimate);
     return estimate;
   } catch(err) {
@@ -112,11 +118,11 @@ const BuildEstimate = (sheet, row = 2) => {
 
 /**
  * 
- *
+ */
 const _testEstimate = () => {
-  BuildEstimate(SHEETS.Advancedlab, 10);
+  BuildEstimate(SHEETS.Laser, 2);
 }
-*/
+
 
 /**
  * Helper Method for TitleCasing Names

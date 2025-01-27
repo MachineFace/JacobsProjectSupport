@@ -61,6 +61,9 @@ const onSubmission = async (e) => {
   let priority = new PriorityService({ email : email, sid : sid }).Priority;
   SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);
 
+  // Create Messages
+  const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, id : id });
+
   try {
     if (priority == PRIORITY.None) {
       // Set access to Missing Access
@@ -76,9 +79,6 @@ const onSubmission = async (e) => {
   } catch(err) {
     console.error(`${err} : Couldn't determine student access`);
   }
-
-  // Create Messages
-  const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, id : id });
 
   // Get DS-Specific Message
   let dsMessage = message.dsMessage;
@@ -177,17 +177,18 @@ const onChange = async (e) => {
 
   // Fetch Data from Sheets
   const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // const thisSheetName = e.range.getSheet().getSheetName();
+  const thisSheetName = thisSheet.getSheetName();
 
   // Fetch Columns and rows and check validity
   const thisCol = e.range.getColumn();
   const thisRow = e.range.getRow();
+  console.info(`SHEET: ${thisSheetName}, ROW: ${thisRow}, COL: ${thisCol}`);
 
-  // Skip the first 2 rows of data.
+  // Skip the first row of data.
   if (thisRow <= 1) return;
 
   // Add link to DS List on Staff Sheet
-  if(thisSheet.getSheetName() == OTHERSHEETS.Staff.getSheetName() && thisRow >= 2) {
+  if(thisSheetName == OTHERSHEETS.Staff.getSheetName()) {
     const sLink = SheetService.GetByHeader(OTHERSHEETS.Staff, `EMAIL LINK`, thisRow);
     const staffEmail = SheetService.GetByHeader(OTHERSHEETS.Staff, `EMAIL`, thisRow);
     if ( sLink == undefined || sLink == null || (sLink == `` && staffEmail != ``) ) {
@@ -208,7 +209,7 @@ const onChange = async (e) => {
     mat1quantity, mat1, mat2quantity, mat2, 
     mat3quantity, mat3, mat4quantity, mat4, 
     mat5quantity, mat5, affiliation, elapsedTime, estimate, 
-    price1, price2, printColor, printSize, printCount, sheetName, row, } = rowData;
+    unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
 
   // Check Priority
   try {
@@ -217,7 +218,7 @@ const onChange = async (e) => {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
-    } else if(thisSheet.getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
+    } else if(thisSheetName == SHEETS.GSI_Plotter.getSheetName() || thisSheetName == SHEETS.Plotter.getSheetName()) {
       priority = PRIORITY.Tier1;
       SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     }
@@ -248,11 +249,7 @@ const onChange = async (e) => {
   }
   
   // Fix Casing on the name field
-  try {
-    if(name) SheetService.SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
-  } catch (err) {
-    console.error(`Fixing Name casing on ${name}: ${err}`);
-  }
+  if(name) SheetService.SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
 
   // Calculate Turnaround Time only when cell is empty
   try {
@@ -326,7 +323,6 @@ const onChange = async (e) => {
 
   // Generate an estimate
   if(mat1 && mat1quantity) {
-    // const { Link } = GetStoreInfo(thisSheet, mat1);
     BuildEstimate(thisSheet, thisRow);
   }
 

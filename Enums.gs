@@ -385,10 +385,11 @@ const HEADERNAMES = Object.freeze({
   dateCompleted : `Date Completed`,	
   elapsedTime : `Elapsed Time`,	
   estimate : `Estimate`,	
-  price1 : `Price 1`,	
-  price2 : `Price 2`,	
-  price3 : `Price 3`,	
-  price4 : `Price 4`,
+  unit_cost1 : `Unit Cost 1`,	
+  unit_cost2 : `Unit Cost 2`,	
+  unit_cost3 : `Unit Cost 3`,	
+  unit_cost4 : `Unit Cost 4`,
+  unit_cost5 : `Unit Cost 5`,
 });
 
 /**

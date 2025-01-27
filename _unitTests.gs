@@ -63,11 +63,11 @@ const _gasTMainTesting = async () => {
   */
 
   await test(`Generate Barcode: `, async (t) => {
-    const x = await BarcodeGenerator.GenerateBarCodeForTicketHeader(20230119105523);
+    const x = await BarcodeService.GenerateBarCodeForTicketHeader(20230119105523);
     t.notEqual(x, undefined || null, `Barcode SHOULD NOT be undefined or null : ${x}`);
-    const y = await BarcodeGenerator.GenerateBarCodeForTicketHeader(`alskdfjalsdkfj`);
+    const y = await BarcodeService.GenerateBarCodeForTicketHeader(`alskdfjalsdkfj`);
     t.notEqual(y, undefined || null, `Barcode SHOULD NOT be undefined or null : ${y}`);
-    const z = await BarcodeGenerator.GenerateBarCodeForTicketHeader({});
+    const z = await BarcodeService.GenerateBarCodeForTicketHeader({});
     t.notEqual(z, undefined || null, `Barcode SHOULD NOT be undefined or null : ${z}`);
   });
 

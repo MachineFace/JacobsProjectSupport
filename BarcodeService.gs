@@ -1,7 +1,7 @@
 /**
  * Class for Creating a Barcode
  */
-class BarcodeGenerator {
+class BarcodeService {
   constructor() {
 
   }
@@ -112,7 +112,7 @@ class BarcodeGenerator {
             mat1quantity, mat1, mat2quantity, mat2, 
             mat3quantity, mat3, mat4quantity, mat4, 
             mat5quantity, mat5, affiliation, elapsedTime, estimate, 
-            price1, price2, sheetName, row, } = rowData;
+            unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, sheetName, row, } = rowData;
 
           const message = new MessageService({
             name : name,
@@ -146,7 +146,7 @@ class BarcodeGenerator {
 
 const _testBarcode = () => {
   const id = IDService.createId();
-  const b = BarcodeGenerator.GenerateBarCodeForTicketHeader(id);
+  const b = BarcodeService.GenerateBarCodeForTicketHeader(id);
 }
 
 
