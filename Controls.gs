@@ -36,27 +36,28 @@ const CreateTimeDrivenTrigger = () => {
       .create();
     ScriptApp.newTrigger(`SetSummaryPageRowHeight`)
       .timeBased()
-      .everyMinutes(10)
+      .everyHours(2)
       .create();
     ScriptApp.newTrigger(`Metrics`)
       .timeBased()
-      .everyMinutes(30)
+      .everyHours(2)
       .create();
     ScriptApp.newTrigger(`GenerateMissingTickets`)
       .timeBased()
-      .everyMinutes(30)
+      .everyHours(6)
       .create();
     ScriptApp.newTrigger(`SetConditionalFormatting`)
       .timeBased()
-      .everyHours(1)
+      .everyHours(6)
       .create();
     ScriptApp.newTrigger(`SetStatusDropdowns`)
       .timeBased()
-      .everyHours(1)
+      .everyHours(6)
       .create();
     ScriptApp.newTrigger(`SetSummaryPageRowHeight`)
       .timeBased()
       .everyDays(1)
+      .atHour(5)
       .create();
     ScriptApp.newTrigger(`BuildSummaryEquation`)
       .timeBased()
@@ -68,7 +69,7 @@ const CreateTimeDrivenTrigger = () => {
       .timeBased()
       .everyWeeks(1)
       .onWeekDay(ScriptApp.WeekDay.MONDAY)
-      .atHour(2)
+      .atHour(5)
       .create();
     return 0;
   } catch (err) {
@@ -96,41 +97,42 @@ const RemoveTimedTriggers = () => {
         ScriptApp.deleteTrigger(trigger);
       }
     })
-    ScriptApp.newTrigger(`Metrics`)
-      .timeBased()
-      .everyMinutes(30)
-      .create();
-    ScriptApp.newTrigger(`SetConditionalFormatting`)
-      .timeBased()
-      .everyHours(1)
-      .create();
-    ScriptApp.newTrigger(`SetStatusDropdowns`)
-      .timeBased()
-      .everyHours(1)
-      .create();
-    ScriptApp.newTrigger(`SetSummaryPageRowHeight`)
-      .timeBased()
-      .everyDays(1)
-      .create();
-    ScriptApp.newTrigger(`BuildSummaryEquation`)
-      .timeBased()
-      .everyWeeks(1)
-      .onWeekDay(ScriptApp.WeekDay.MONDAY)
-      .atHour(2)
-      .create();
-    ScriptApp.newTrigger(`AuxillaryEquations`)
-      .timeBased()
-      .everyWeeks(1)
-      .onWeekDay(ScriptApp.WeekDay.MONDAY)
-      .atHour(2)
-      .create();
+    // ScriptApp.newTrigger(`Metrics`)
+    //   .timeBased()
+    //   .everyHours(6)
+    //   .create();
+    // ScriptApp.newTrigger(`SetConditionalFormatting`)
+    //   .timeBased()
+    //   .everyHours(6)
+    //   .create();
+    // ScriptApp.newTrigger(`SetStatusDropdowns`)
+    //   .timeBased()
+    //   .everyHours(6)
+    //   .create();
+    // ScriptApp.newTrigger(`SetSummaryPageRowHeight`)
+    //   .timeBased()
+    //   .everyDays(1)
+    //   .atHour(5)
+    //   .create();
+    // ScriptApp.newTrigger(`BuildSummaryEquation`)
+    //   .timeBased()
+    //   .everyWeeks(1)
+    //   .onWeekDay(ScriptApp.WeekDay.MONDAY)
+    //   .atHour(5)
+    //   .create();
+    // ScriptApp.newTrigger(`AuxillaryEquations`)
+    //   .timeBased()
+    //   .everyWeeks(1)
+    //   .onWeekDay(ScriptApp.WeekDay.MONDAY)
+    //   .atHour(5)
+    //   .create();
     console.info(`Removed Triggers for Summary Emails`);
     return 0;
   } catch (err) {
     console.error(`"RemoveTimedTriggers()" failed : ${err}`);
     return 1;
   }
-};
+}
 
 
 /**
@@ -438,4 +440,19 @@ const AuxillaryEquations = () => {
     return 1;
   }
 }
+
+const _test_triggers = () => {
+  let func_names = [];
+  let triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach( trigger => {
+    const func = trigger.getHandlerFunction();
+    func_names.push(func);
+    // console.info(`Name: ${func}, Match: ${func.match(`Metrics`)}`);
+  });
+  console.info(`Names: ${func_names}`);
+
+}
+
+
+
 

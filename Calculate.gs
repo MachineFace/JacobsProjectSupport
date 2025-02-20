@@ -513,31 +513,29 @@ class Calculate {
  */
 const Metrics = () => {
   try {
+    console.time(`Metrics Timer `)
+    console.info(`Calculating Metrics .....`);
     const c = new Calculate();
-    const startTime = new Date().getTime();
-    const timeout = 5.9 * 60 * 1000;
-    while (new Date().getTime() - startTime < timeout) {
-      console.time(`Metrics Timer `)
-      console.info(`Calculating Metrics .....`);
-      c.CountActiveUsers();
-      c.PrintTotalSubmissions();
-      c.PrintTiers();
-      c.PrintStatusCounts();
-      c.PrintStatistics();
-      c.UserSubmissionsZScores();
-      c.UserSubmissionsCumulativeStdNormalProbability();
-      c.UserSubmissionChiSquaredFit();
-      c.UserSubmissionsQuartiles();
-      c.CountTypes();
-      c.CountEachSubmission();
-      c.PrintTurnaroundTimes();
-      c.CountFunding();
-      c.CreateTopTen();
-      console.info(`Recalculated Metrics`);
-      console.timeEnd(`Metrics Timer `);
-    }
+    c.CountActiveUsers();
+    c.PrintTotalSubmissions();
+    c.PrintTiers();
+    c.PrintStatusCounts();
+    c.PrintStatistics();
+    c.UserSubmissionsZScores();
+    c.UserSubmissionsCumulativeStdNormalProbability();
+    c.UserSubmissionChiSquaredFit();
+    c.UserSubmissionsQuartiles();
+    c.CountTypes();
+    c.CountEachSubmission();
+    c.PrintTurnaroundTimes();
+    c.CountFunding();
+    c.CreateTopTen();
+    console.info(`Recalculated Metrics`);
+    console.timeEnd(`Metrics Timer `);
+    return 0;
   } catch (err) {
     console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
+    return 1;
   }
 }
 
@@ -545,10 +543,13 @@ const Metrics = () => {
 const _testDist = () => {
   const c = new Calculate();
   // c.GetAverageTurnaround(SHEETS.Advancedlab);
-  c.UserSubmissionsZScores();
+  // c.UserSubmissionsZScores();
   // c.UserSubmissionsQuartiles();
   // c.UserSubmissionChiSquaredFit();
-  c.UserSubmissionsCumulativeStdNormalProbability();
+  // c.UserSubmissionsCumulativeStdNormalProbability();
+  // c.CreateTopTen();
+
+  c.CountFunding();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);

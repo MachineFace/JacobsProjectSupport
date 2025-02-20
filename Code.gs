@@ -28,9 +28,8 @@
  */
 const onSubmission = async (e) => {
 
-  const staff = new MakeStaff().Staff;
+  const staff = new StaffService().Staff;
 
-  // Set status to RECEIVED on new submission
   const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const thisSheetName = e.range.getSheet().getSheetName();
 
@@ -41,15 +40,16 @@ const onSubmission = async (e) => {
   console.info(`This Row: ${lastRow}`);
 
   // Parse variables
-  let name = e.namedValues[HEADERNAMES.name][0] ? TitleCase(e.namedValues[HEADERNAMES.name][0]) : undefined;
-  SheetService.SetByHeader(thisSheet, HEADERNAMES.name, lastRow, name);
-  let email = e.namedValues[HEADERNAMES.email][0] ? e.namedValues[HEADERNAMES.email][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.email, lastRow);
-  let sid = e.namedValues[HEADERNAMES.sid][0] ? e.namedValues[HEADERNAMES.sid][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.sid, lastRow);
-  let studentType = e.namedValues[HEADERNAMES.affiliation][0] ? e.namedValues[HEADERNAMES.affiliation][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.affiliation, lastRow);
-  let projectname = e.namedValues[HEADERNAMES.projectName][0] ? e.namedValues[HEADERNAMES.projectName][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.projectName, lastRow);
-  let timestamp = e.namedValues[HEADERNAMES.timestamp][0];
-
   let values = e.namedValues;
+  let name = values[HEADERNAMES.name][0] ? TitleCase(values[HEADERNAMES.name][0]) : undefined;
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.name, lastRow, name);
+  let email = values[HEADERNAMES.email][0] ? values[HEADERNAMES.email][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.email, lastRow);
+  let sid = values[HEADERNAMES.sid][0] ? values[HEADERNAMES.sid][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.sid, lastRow);
+  let studentType = values[HEADERNAMES.affiliation][0] ? values[HEADERNAMES.affiliation][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.affiliation, lastRow);
+  let projectname = values[HEADERNAMES.projectName][0] ? values[HEADERNAMES.projectName][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.projectName, lastRow);
+  let timestamp = values[HEADERNAMES.timestamp][0];
+
+  // Set status to RECEIVED on new submission
   console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
   console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
@@ -237,33 +237,28 @@ const onChange = async (e) => {
   if(status == STATUS.closed) return;
 
   // Fix ID if it's missing
-  try {
-    console.info(`Trying to fix ID : ${id}`);
-    if (status == STATUS.received || status == STATUS.inProgress) {
-      id = IDService.isValid(id) ? id : IDService.createId();
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
-      console.warn(`ID was missing: fixed it. Submission by ${email}`);
-    }
-  } catch (err) {
-    console.error(`${err} : ID failed onSubmit, and has now failed onEdit`);
+  if (status == STATUS.received || status == STATUS.inProgress) {
+    console.info(`ID is broken: ${id}`);
+    id = IDService.isValid(id) ? id : IDService.createId();
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
+    console.warn(`ID was cured for ${email}`);
+  }
+
+  // Generate an estimate
+  if(mat1 && mat1quantity) {
+    BuildEstimate(thisSheet, thisRow);
   }
   
   // Fix Casing on the name field
   if(name) SheetService.SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
 
   // Calculate Turnaround Time only when cell is empty
-  try {
-    console.info(`Attempting to Calculate turnaround times`);
-    if (!elapsedTime) {
-      if (status == STATUS.completed || status == STATUS.billed) {
-        let endTime = new Date();
-        let time = TimeService.Duration(new Date(timestamp), endTime);
-        SheetService.SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
-        SheetService.SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
-      }
-    }
-  } catch (err) {
-    console.error( `Turnaround time and completion time calc has failed: ${err}`);
+  if (!elapsedTime && (status == STATUS.completed || status == STATUS.billed)) {
+    console.info(`Calculating turnaround times`);
+    let endTime = new Date();
+    let time = TimeService.Duration(new Date(timestamp), endTime);
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.elapsedTime, thisRow, time.toString());
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.dateCompleted, thisRow, endTime.toString());
   }
 
   // Generating a "Ticket"
@@ -320,11 +315,6 @@ const onChange = async (e) => {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     }
   } else if (!priority && status == STATUS.closed) return;
-
-  // Generate an estimate
-  if(mat1 && mat1quantity) {
-    BuildEstimate(thisSheet, thisRow);
-  }
 
 
 }

@@ -95,7 +95,7 @@ const _gasTMainTesting = async () => {
   });
   
   await test(`Make Staff`, (t) => {
-    const staff = new MakeStaff().Staff;
+    const staff = new StaffService().Staff;
     t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
   });
   

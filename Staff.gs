@@ -20,10 +20,9 @@ class Employee {
     this.type = `Employee`;
     this.isAdmin = false;
     this.shortCode = `EM`;
-    this.SetAreas();
   }
   
-  get() {
+  ToString() {
     return {
       id : this.id,
       name : this.name,
@@ -37,32 +36,16 @@ class Employee {
     }
   }
 
-  /** @private */
-  SetAreas () {
-    switch (this.name) {
-      case "Chris":
-        this.areas = [ SHEETS.Advancedlab.getSheetName(), ];
-        break;
-      case "ChrisMyers":
-        this.areas = [ SHEETS.Shopbot.getSheetName(), ];
-        break;
-      case "Cody":
-        this.areas = [ SHEETS.Plotter.getSheetName(), SHEETS.GSI_Plotter.getSheetName(), SHEETS.Fablight.getSheetName(), SHEETS.Vinyl.getSheetName(), ];
-        break;
-      case "Gary":
-        this.areas = [ SHEETS.Waterjet.getSheetName(), SHEETS.Othertools.getSheetName(), ];
-        break;
-      case "Nicole":
-        break;
-      case "Staff":
-        this.areas = [ SHEETS.Laser.getSheetName(), ];
-        break;
-      default:
-      case undefined:
-        this.areas = [];
-        break;
-    }
-  }
+}
+
+const _testEmployee = () => {
+  const e = new Employee({ 
+    name : `Fucking`, 
+    fullname : `Fucking Dickwad`, 
+    email : `fuckyou@fuckyou.com`,
+    areas : [ `Backyard`, `Frontyard`, `Basement`, ],
+  });
+  console.info(`Employee: ${JSON.stringify(e.ToString(), null, 3)}`)
 
 }
 
@@ -219,14 +202,14 @@ class Manager extends DesignSpecialist {
 
 
 /**
- * @NOTIMPLEMENTED
+ * Staff Service
  */
-class MakeStaff {
+class StaffService {
   constructor() {
     
   }
 
-  get Staff () {
+  get Staff() {
     let staff = {};
     let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
     let culled = range.filter(Boolean);

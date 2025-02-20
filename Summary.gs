@@ -16,13 +16,12 @@ class SummaryBuilder {
    * @param {dataRange} dataRange
    * @returns {html} htmlBody
    */
-  _GetEmailHtml(dataRange) {
+  static _GetEmailHtml(dataRange) {
     let htmlTemplate = HtmlService.createTemplateFromFile("TableTemplate.html");
     htmlTemplate.items = dataRange;
     const htmlBody = htmlTemplate.evaluate().getContent();
     return htmlBody;
   }
-
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
@@ -32,39 +31,32 @@ class SummaryBuilder {
    * @param {any} values
    * @returns {[any]} list
    */
-  _GetData(values) {
-    values.shift(); // remove headers
-    let items = [];
-    values.forEach( (value) => {
-      const item = {
-        status : value[0],
-        ds : value[1],
-        approved : value[2],
-        files : value[3],
-        ticket : value[4],
-        id : value[5],
-        studentApproved : value[6],
-        timestamp : value[7],
-        email : value[8],
-        name : value[9],
-        sid : value[10],
-        project : value[11],
-        mat1num : value[12],
-        mat1type : value[13],
-        mat1url : value[14],
-        mat2num : value[15],
-        mat2type : value[16],
-        mat2url : value[17],
-        affiliation : value[18],
-        partcount : value[19],
-        quality : value[20],
-      };
-      items.push(item);
-    })
-    return items;
+  static _GetData(values) {
+    try {
+      // Validate input: must be an array with at least one header row and one data row.
+      if (!Array.isArray(values) || values.length < 2) throw new Error(`Values input is null or less than 1.`);
+
+      // Define the expected keys based on column order.
+      const keys = [
+        "status", "ds", "approved", "files", "ticket", "id", "studentApproved",
+        "timestamp", "email", "name", "sid", "project", "mat1num", "mat1type",
+        "mat1url", "mat2num", "mat2type", "mat2url", "affiliation", "partcount", "quality"
+      ];
+      
+      // Slice off the header row and map each row to an object.
+      const formattedObject =  values.slice(1).map(row => {
+        // Use reduce to build the object, assigning an empty string if a cell is missing.
+        return keys.reduce((obj, key, i) => {
+          obj[key] = row[i] !== undefined ? row[i] : "";
+          return obj;
+        }, {});
+      });
+      return formattedObject;
+    } catch(err) {
+      console.error(`"_GetData()" failed: ${err}`);
+      return 1;
+    }
   }
-
-
 
   /**
    * ----------------------------------------------------------------------------------------------------------------
@@ -73,7 +65,7 @@ class SummaryBuilder {
    * @param {string} docId
    * @return {string} text 
    */
-  async _DocToHtml(docId) {
+  static async _DocToHtml(docId) {
     let url = `https://docs.google.com/feeds/download/documents/export/Export?id=${docId}&exportFormat=html`;
     let param = {
       method: 'GET',
@@ -89,11 +81,12 @@ class SummaryBuilder {
    * Summary Text
    * @private
    */
-  _SummaryText() {
+  static _SummaryText() {
     let text = `<p>Hello!</p> `;
       text += `<p>`;
       text += `Here is a summary of all the recent submissions.<br/><br/>`;
-      text += `<a href="https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ"><b> ** GO TO SHEET NOW ** </b></a><br/><br/>`;
+      text += `<a href="https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ"><b> ** GO TO SHEET NOW ** </b></a>`;
+      text += `<br/><br/>`;
       text += `If you have questions or need assistance please slack Chris and/or Cody, or email <a href="mailto:${SERVICE_EMAIL}">${SERVICE_EMAIL}</a>.`;
       text += `</p>`;
       text += `<p>Best,<br/>${SERVICE_NAME}</p>`;
@@ -114,20 +107,22 @@ class SummaryBuilder {
       console.warn(`Building Email...`)
       let dataRange = OTHERSHEETS.Summary.getRange(1, 1, OTHERSHEETS.Summary.getLastRow(), 22).getValues();
 
-      let items = await this._GetData(dataRange);
-      let htmlBodyText = await this._GetEmailHtml(items);
+      let items = await SummaryBuilder._GetData(dataRange);
+      let htmlBodyText = await SummaryBuilder._GetEmailHtml(items);
 
       // Email DS
       MailApp.sendEmail(SERVICE_EMAIL, `JPS: SUMMARY EMAIL`, ``, {
-        htmlBody: this._SummaryText() + htmlBodyText,
+        htmlBody: SummaryBuilder._SummaryText() + htmlBodyText,
         from : SERVICE_EMAIL,
         cc : StaffEmailAsString(),
         bcc : `cparsell@berkeley.edu, codyglen@berkeley.edu`,
         name: `JPS DAILY SUMMARY`,
       });
       console.warn(`DS Team Emailed with Summary for the day.`);
+      return 0;
     } catch(err) {
-      console.error(`"SendEmail()" failed : ${err}`);
+      console.error(`"SendEmail()" failed: ${err}`);
+      return 1;
     }
   }
 }

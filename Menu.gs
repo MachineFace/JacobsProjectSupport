@@ -206,15 +206,6 @@ const BillFromSelected = async () => {
   const ui = SpreadsheetApp.getUi();
   const shopify = await new ShopifyAPI(); 
   let thisSheet = SpreadsheetApp.getActiveSheet();
-  let thisRow = thisSheet.getActiveRange().getRow();
-  let response;
-
-  const rowData = SheetService.GetRowData(thisSheet, thisRow);
-  let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
-    mat1quantity, mat1, mat2quantity, mat2, 
-    mat3quantity, mat3, mat4quantity, mat4, 
-    mat5quantity, mat5, affiliation, elapsedTime, estimate, 
-    unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
 
   if(!SheetService.IsValidSheet(thisSheet)) {
     const a = ui.alert(
@@ -225,10 +216,27 @@ const BillFromSelected = async () => {
     if(a === ui.Button.OK) return;
   } 
 
+  let thisRow = thisSheet.getActiveRange().getRow();
+  let response;
+
+  const rowData = SheetService.GetRowData(thisSheet, thisRow);
+  let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
+    mat1quantity, mat1, mat2quantity, mat2, 
+    mat3quantity, mat3, mat4quantity, mat4, 
+    mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+    unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
+
+  
+
   // TODO: Fix this messy shit.
   if(thisSheet == SHEETS.Plotter || thisSheet == SHEETS.GSI_Plotter) {
     mat1 = rowData.material;
     mat1quantity = rowData.printSize;
+  }
+
+  // Generate an estimate
+  if(mat1 && mat1quantity) {
+    BuildEstimate(thisSheet, thisRow);
   }
 
   let quantityTotal = mat1quantity + mat2quantity + mat3quantity + mat4quantity + mat5quantity;
@@ -308,6 +316,57 @@ const BillFromSelected = async () => {
     }
   } catch (err) {
     console.error(`"BillFromSelected()" failed : ${err}`);
+    return 1;
+  } 
+}
+
+/**
+ * Build Estimate
+ */
+const PopupBuildEstimate = () => {
+  const ui = SpreadsheetApp.getUi();
+  let thisSheet = SpreadsheetApp.getActiveSheet();
+
+  try {
+
+    if(!SheetService.IsValidSheet(thisSheet)) {
+      const a = ui.alert(
+        `${SERVICE_NAME}: Incorrect Sheet!`,
+        `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+        Browser.Buttons.OK,
+      );
+      if(a === ui.Button.OK) return;
+    } 
+
+    let thisRow = thisSheet.getActiveRange().getRow();
+
+    const rowData = SheetService.GetRowData(thisSheet, thisRow);
+    let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
+      mat1quantity, mat1, mat2quantity, mat2, 
+      mat3quantity, mat3, mat4quantity, mat4, 
+      mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+      unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
+
+    // TODO: Fix this messy shit.
+    if(thisSheet == SHEETS.Plotter || thisSheet == SHEETS.GSI_Plotter) {
+      mat1 = rowData.material;
+      mat1quantity = rowData.printSize;
+    }
+
+    // Generate an estimate
+    if(mat1 && mat1quantity) {
+      BuildEstimate(thisSheet, thisRow);
+    }
+
+    response = ui.alert(
+      `${SERVICE_NAME}: Estimate Generated!`,
+      `Unit costs and estimates have be regenerated`,
+      Browser.Buttons.OK
+    );
+    if (response === ui.Button.OK) return;
+    return 0;
+  } catch (err) {
+    console.error(`"PopupBuildEstimate()" failed : ${err}`);
     return 1;
   } 
 }
@@ -414,6 +473,7 @@ const PopupHelp = async () => {
 const BarMenu = () => {
   SpreadsheetApp.getUi()
     .createMenu(`JPS Menu`)
+      .addItem(`Estimate for Billing for SELECTED User`, `PopupBuildEstimate`)
       .addItem(`Bill SELECTED User`, `BillFromSelected`)
       .addItem(`Create a New ID for SELECTED User`, `PopupCreateNewID`)
       .addItem(`Create a Ticket for SELECTED User`, `PopupCreateTicket`)

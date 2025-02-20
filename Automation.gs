@@ -5,8 +5,7 @@
  */
 class HackyStoreAutomation {
   constructor() {
-    // this.UpdateProductID();
-    this.UpdatePriceUsingShopifyAPI();
+
   }
 
 
@@ -15,7 +14,7 @@ class HackyStoreAutomation {
    * Used in "UpdatePriced()" function
    * @private
    */
-  _WritePrice (sheet) {
+  static _Write_Unit_Cost(sheet) {
     try {
       [...SheetService.GetColumnDataByHeader(sheet, "Link")]
         .filter(Boolean)
@@ -25,7 +24,7 @@ class HackyStoreAutomation {
         });
       return 0;
     } catch(err) {
-      console.error(`"_WritePrice()" failed : ${err}`);
+      console.error(`"_Write_Unit_Cost()" failed : ${err}`);
       return 1;
     }
 
@@ -39,7 +38,7 @@ class HackyStoreAutomation {
    * @param {string} url
    * @return {float} price
    */
-  async _GetPriceFromStore(url) {
+  static async _Get_Unit_Cost_From_Store(url = ``) {
     try {
       let price;
       // let meta = '<meta property="og:price:amount" content="0.17">';
@@ -52,7 +51,7 @@ class HackyStoreAutomation {
 
       const response = await UrlFetchApp.fetch(url, param);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
       const content = response.getContentText();
 
       const searchstring = 'og:price:amount';
@@ -73,14 +72,14 @@ class HackyStoreAutomation {
 
   /**
    * AUTOMATION : Get Price From Shopify
-   * Used in "UpdatePricePerSheet()" function
+   * Used in "Update_Unit_Costs_Per_Sheet()" function
    * @param {string} none
    * @return {float} none
    */
-  async UpdatePriceUsingShopifyAPI () {
+  static async Update_All_Unit_Costs_With_ShopifyAPI() {
     Object.values(STORESHEETS).forEach(sheet => {
-      // console.info(sheet)
-      this.UpdatePricePerSheet(sheet);
+      console.info(`Updating (${sheet.getSheetName()}) Unit Costs`);
+      HackyStoreAutomation.Update_Unit_Costs_Per_Sheet(sheet);
       Utilities.sleep(1000);
     });
   }
@@ -90,14 +89,14 @@ class HackyStoreAutomation {
    * @param {sheet} sheet
    * @return {bool} true
    */
-  UpdatePricePerSheet (sheet) {
+  static Update_Unit_Costs_Per_Sheet(sheet) {
     const shopify = new ShopifyAPI();
-    const ids = SheetService.GetColumnDataByHeader(sheet, "Product ID (Shopify)")
+    const ids = [...SheetService.GetColumnDataByHeader(sheet, "Product ID (Shopify)")]
       .filter(Boolean);
-    console.info(ids.toString())
+    console.info(ids.toString());
     ids.forEach( async (id, index) => {
       let info = await shopify.GetProductByID(id);
-      console.info(info)
+      console.info(info);
       let price = info?.variants[0]?.price;
       console.info(`Price : $${price}`);
       SheetService.SetByHeader(sheet, "Price", index + 2, price);
@@ -106,17 +105,17 @@ class HackyStoreAutomation {
   }
 
   /**
-   * AUTOMATION : Update Each Sheet with Product IDs : Uses FetchProductIDInProductURL()
+   * AUTOMATION : Update Each Sheet with Product IDs : Uses Get_Product_ID_From_URL()
    */
-  UpdateProductID () {    
+  static Update_Product_IDs() {    
     try {
-      for(const [key, sheet] of Object.entries(STORESHEETS)) {
-        this.FetchProductIDInProductURL(sheet);
-      }
+      Object.values(STORESHEETS).forEach(sheet => {
+        HackyStoreAutomation.Get_Product_ID_From_URL(sheet);
+      });
       console.info('Product IDs have been updated and written to each Store Sheet');
       return 0;
     } catch(err) {
-      console.error(`"UpdateProductID()" failed ${err}`);
+      console.error(`"Update_Product_IDs()" failed ${err}`);
       return 1;
     }
 
@@ -126,7 +125,7 @@ class HackyStoreAutomation {
   /**
    * AUTOMATION : Parses html to find the Product ID. (NOT USING SHOPIFY API)
    */
-  async FetchProductIDInProductURL (sheet) {
+  async Get_Product_ID_From_URL(sheet) {
     const start = `"product":{"id":`;
     const end = `,"gid":"gid:`;
 
@@ -156,14 +155,14 @@ class HackyStoreAutomation {
         });
       return 0;
     } catch(err) {
-      console.error(`"FetchProductIDInProductURL()" failed : ${err}`);
+      console.error(`"Get_Product_ID_From_URL()" failed : ${err}`);
       return 1;
     }
   }
 
 }
 
-const RunHackySheetUpdater = () => new HackyStoreAutomation();
+const RunHackySheetUpdater = () => HackyStoreAutomation.Update_All_Unit_Costs_With_ShopifyAPI();
 
 
 /**
