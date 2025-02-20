@@ -320,6 +320,7 @@ const BillFromSelected = async () => {
   } 
 }
 
+
 /**
  * Build Estimate
  */
@@ -355,15 +356,15 @@ const PopupBuildEstimate = () => {
 
     // Generate an estimate
     if(mat1 && mat1quantity) {
-      BuildEstimate(thisSheet, thisRow);
+      const estimate = BuildEstimate(thisSheet, thisRow);
+      response = ui.alert(
+        `${SERVICE_NAME}: Estimate Generated!`,
+        `Amount to be billed: $${estimate}`,
+        Browser.Buttons.OK
+      );
+      if (response === ui.Button.OK) return;
     }
 
-    response = ui.alert(
-      `${SERVICE_NAME}: Estimate Generated!`,
-      `Unit costs and estimates have be regenerated`,
-      Browser.Buttons.OK
-    );
-    if (response === ui.Button.OK) return;
     return 0;
   } catch (err) {
     console.error(`"PopupBuildEstimate()" failed : ${err}`);

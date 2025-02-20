@@ -182,7 +182,7 @@ const onChange = async (e) => {
   // Fetch Columns and rows and check validity
   const thisCol = e.range.getColumn();
   const thisRow = e.range.getRow();
-  console.info(`SHEET: ${thisSheetName}, ROW: ${thisRow}, COL: ${thisCol}`);
+  // console.info(`SHEET: ${thisSheetName}, ROW: ${thisRow}, COL: ${thisCol}`);
 
   // Skip the first row of data.
   if (thisRow <= 1) return;
@@ -212,32 +212,27 @@ const onChange = async (e) => {
     unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
 
   // Check Priority
-  try {
-    if(!priority) {
-      priority = await new PriorityService({ email : email, sid : sid }).Priority;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
-    } else if(thisSheetName == SHEETS.GSI_Plotter.getSheetName() || thisSheetName == SHEETS.Plotter.getSheetName()) {
-      priority = PRIORITY.Tier1;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
-    }
-  } catch (err) {
-    console.error(`Setting priority failed: ${err}`);
+  if(!priority) {
+    priority = new PriorityService({ email : email, sid : sid }).Priority;
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+  } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
+  } else if(thisSheetName == SHEETS.GSI_Plotter.getSheetName() || thisSheetName == SHEETS.Plotter.getSheetName()) {
+    priority = PRIORITY.Tier1;
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
   }
+
 
   ds = ds ? ds : `a Design Specialist`;
   id = IDService.isValid(id) ? id : IDService.createId();
   projectName = projectName ? projectName : `Your Project`;
 
   // Log submission info to sheet
-  console.info(`Submission Time: ${timestamp}, Name: ${name}, Email: ${email}, Project: ${projectName}`);
+  Log.Info(`Submission Time: ${timestamp}, Name: ${name}, Email: ${email}, Project: ${projectName}`);
 
   // Ignore
-  if(status == STATUS.closed) return;
-
-  // Fix ID if it's missing
-  if (status == STATUS.received || status == STATUS.inProgress) {
+  if(status == STATUS.closed || status == STATUS.billed) return;
+  else if (status == STATUS.received || status == STATUS.inProgress) {
     console.info(`ID is broken: ${id}`);
     id = IDService.isValid(id) ? id : IDService.createId();
     SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
@@ -245,9 +240,7 @@ const onChange = async (e) => {
   }
 
   // Generate an estimate
-  if(mat1 && mat1quantity) {
-    BuildEstimate(thisSheet, thisRow);
-  }
+  if(mat1 && mat1quantity) BuildEstimate(thisSheet, thisRow);
   
   // Fix Casing on the name field
   if(name) SheetService.SetByHeader(thisSheet, HEADERNAMES.name, thisRow, TitleCase(name));
@@ -315,7 +308,6 @@ const onChange = async (e) => {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
     }
   } else if (!priority && status == STATUS.closed) return;
-
 
 }
 
