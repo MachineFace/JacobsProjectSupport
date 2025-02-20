@@ -363,6 +363,13 @@ const PopupBuildEstimate = () => {
         Browser.Buttons.OK
       );
       if (response === ui.Button.OK) return;
+    } else {
+      response = ui.alert(
+        `${SERVICE_NAME}`,
+        `Please fill in the materials and amounts before estimating.`,
+        Browser.Buttons.OK
+      );
+      if (response === ui.Button.OK) return;
     }
 
     return 0;
