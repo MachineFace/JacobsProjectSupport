@@ -6,8 +6,6 @@ class Calculate {
   constructor() {
     /** @private */
     this.userDistribution = this.GetUserDistribution();
-    /** @private */
-    this.statuses = this.CountStatuses();
   }
 
   /**
@@ -98,7 +96,7 @@ class Calculate {
   CountEachSubmission() {
     try {
       let data = [];
-      let x = [...this.statuses]
+      let x = [...this.CountStatuses()]
         .map(item => item[1])
         .reduce((a, b) => a + b)
       const total = x || 0;
@@ -435,26 +433,36 @@ class Calculate {
   CountStatuses() {
     let statuses = [];
     Object.values(SHEETS).forEach(sheet => {
-      SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.status)
-        .filter(Boolean)
-        .forEach(status => {
-          let key = Object.keys(STATUS).find(x => STATUS[x] === status);
-          statuses.push(key);
-        });
-    })
-    const occurrences = StatisticsService.Distribution(statuses);
-    return occurrences; 
+      const stats = SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.status)
+        .filter(Boolean);
+      statuses.push(...stats);
+    });
+
+    const distribution = StatisticsService.Distribution(statuses);
+    const distSet = new Set(distribution.map(([key, _]) => key));
+
+    // Add Back missing types with a 0
+    let list = Object.values(STATUS);
+    list.forEach(key => {
+      if (!distSet.has(key)) {
+        distribution.push([key, 0]);
+      }
+    });
+
+    console.info(distribution)
+    return distribution; 
   }
 
   /**
    * Print Statuses
    */
   PrintStatusCounts() {
-    const total = this.statuses
+    const statuses = this.CountStatuses();
+    const total = statuses
       .map(x => x[1])
       .reduce((a, b) => a + b);
 
-    let stats = this.statuses.map(tuple => {
+    let stats = statuses.map(tuple => {
       let percent = Number((Number(tuple[1]) / Number(total)) * 100).toFixed(2) || 0;
       let percentString = `${percent}%`;
       return [ TitleCase(tuple[0]), tuple[1], percentString ];
@@ -549,7 +557,7 @@ const _testDist = () => {
   // c.UserSubmissionsCumulativeStdNormalProbability();
   // c.CreateTopTen();
 
-  c.CountFunding();
+  c.CountStatuses();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);

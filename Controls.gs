@@ -185,11 +185,12 @@ const EnableJPS = () => {
  */
 const SetStatusDropdowns = () => {
   try {
+    const start_row = 2;
     Object.values(SHEETS).forEach(sheet => {
       const rule = SpreadsheetApp
         .newDataValidation()
         .requireValueInList(Object.values(STATUS));
-      sheet.getRange(2, 1, sheet.getLastRow(), 1).setDataValidation(rule);
+      sheet.getRange(start_row, 1, sheet.getLastRow(), 1).setDataValidation(rule);
     });
     return 0;
   } catch(err) {
@@ -206,93 +207,39 @@ const SetStatusDropdowns = () => {
  */
 const SetConditionalFormatting = () => {
   try {
+    const start_row = 2;
+    // Mapping status values to their formatting options
+    const format_mapping = {
+      [STATUS.received]:     { bg: COLORS.green_light,      font: COLORS.green_dark_2 },
+      [STATUS.inProgress]:   { bg: COLORS.yellow_light,     font: COLORS.yellow_dark_2 },
+      [STATUS.missingAccess]:{ bg: COLORS.orange_light,     font: COLORS.orange_bright },
+      [STATUS.cancelled]:    { bg: COLORS.purle_light,      font: COLORS.purple },
+      [STATUS.completed]:    { bg: COLORS.green_light,      font: COLORS.grey },
+      [STATUS.closed]:       { bg: COLORS.grey_light,       font: COLORS.grey },
+      [STATUS.billed]:       { bg: COLORS.grey_light,       font: COLORS.grey },
+      [STATUS.failed]:       { bg: COLORS.red_light,        font: COLORS.red },
+      [STATUS.pickedUp]:     { bg: COLORS.grey_light,       font: COLORS.grey },
+      [STATUS.abandoned]:    { bg: COLORS.red_light,        font: COLORS.red_dark_berry_2 },
+      [STATUS.waitlist]:     { bg: COLORS.orange,           font: COLORS.orange_dark_2 }
+    };
+
     Object.values(SHEETS).forEach(sheet => {
-      const lastRow = sheet.getLastRow();
-      const lastColumn = sheet.getLastColumn();
       if(sheet.getSheetName() == SHEETS.Advancedlab.getSheetName()) return;
-      console.warn(`Changing sheet: ${sheet.getSheetName()}'s conditional formatting rules....`);
-      let rules = [
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.received}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.green_light)
-          .setFontColor(COLORS.green_dark_2)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.inProgress}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.yellow_light)
-          .setFontColor(COLORS.yellow_dark_2)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.missingAccess}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.orange_light)
-          .setFontColor(COLORS.orange_bright)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.cancelled}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.purle_light)
-          .setFontColor(COLORS.purple)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.completed}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.green_light)
-          .setFontColor(COLORS.grey)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.closed}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.grey_light)
-          .setFontColor(COLORS.grey)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.billed}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.grey_light)
-          .setFontColor(COLORS.grey)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.failed}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.red_light)
-          .setFontColor(COLORS.red)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.pickedUp}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.grey_light)
-          .setFontColor(COLORS.grey)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.abandoned}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.red_light)
-          .setFontColor(COLORS.red_dark_berry_2)
-          .build()
-        ,
-        SpreadsheetApp.newConditionalFormatRule()
-          .whenFormulaSatisfied(`=$A2="${STATUS.waitlist}"`)
-          .setRanges([sheet.getRange(2, 1, lastRow, lastColumn),])
-          .setBackground(COLORS.orange)
-          .setFontColor(COLORS.orange_dark_2)
-          .build()
-        ,
-      ];
-      // let existingRules = sheet.getConditionalFormatRules();
-      // console.warn(existingRules)
-      // existingRules.push(rules)
+      const last_row = sheet.getLastRow();
+      const last_column = sheet.getLastColumn();
+      const range = sheet.getRange(start_row, 1, last_row - start_row + 1, last_column);
+      console.warn(`Setting Conditional Formatting for: ${sheet.getSheetName()}`);
+
+      // Build conditional formatting rules based on the mapping.
+      const rules = Object.entries(format_mapping).map(([status, format]) => {
+        return SpreadsheetApp.newConditionalFormatRule()
+          .whenFormulaSatisfied(`=$A2="${status}"`)
+          .setRanges([range])
+          .setBackground(format.bg)
+          .setFontColor(format.font)
+          .build();
+      });
+
       sheet.setConditionalFormatRules(rules);
     });
     return 0;
@@ -310,11 +257,11 @@ const SetConditionalFormatting = () => {
 const SetSummaryPageRowHeight = () => {
   try {
     const sheet = OTHERSHEETS.Summary;
-    const maxRows = sheet.getMaxRows();
-    const maxCols = sheet.getMaxColumns();
+    const max_rows = sheet.getMaxRows();
+    const max_cols = sheet.getMaxColumns();
     const height = 21;
-    sheet.setRowHeightsForced(3, maxRows - 3, height);
-    sheet.getRange(3, 1, maxRows -1, maxCols).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+    sheet.setRowHeightsForced(3, max_rows - 3, height);
+    sheet.getRange(3, 1, max_rows -1, max_cols).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
     console.info(`Set Row Height.`);
     return 0;
   } catch(err) {
@@ -330,12 +277,13 @@ const SetSummaryPageRowHeight = () => {
 const SetRowHeight = () => {
   try {
     Object.values(SHEETS).forEach(sheet => {
-      const lastRow = sheet.getMaxRows();
-      const lastColumn = sheet.getMaxColumns();
+      const start_row = 2;
+      const last_row = sheet.getMaxRows();
+      const last_column = sheet.getMaxColumns();
       sheet
-        .setRowHeightsForced(2, lastRow, 21);
+        .setRowHeightsForced(start_row, last_row, 21);
       sheet
-        .getRange(2, 1, lastRow, lastColumn)
+        .getRange(start_row, 1, last_row, last_column)
         .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
       console.info(`Set Row Height for ${sheet.getSheetName()}`);
     });
@@ -431,9 +379,10 @@ const BuildSummaryEquation = () => {
  */
 const AuxillaryEquations = () => {
   try {
+    const start_row = 2;
     const eq1 = `=SUM(COUNTIF(A2:A, "${STATUS.received}"), COUNTIF(A2:A, "${STATUS.inProgress}"), COUNTIF(A2:A, "${STATUS.waitlist}"), COUNTIF(A2:A, "(INTERNAL) Status"), 0)`;
     const eq2 = `=IF(B2=0,"  <-- Party on Dude! Let's go to the beach!", "")`;
-    OTHERSHEETS.Summary.getRange(2, 2, 1, 2).setValues([[ eq1, eq2 ]]);
+    OTHERSHEETS.Summary.getRange(start_row, 2, 1, 2).setValues([[ eq1, eq2 ]]);
     return 0;
   } catch(err) {
     console.error(`"AuxillaryEquations()" failed: ${err}`);
