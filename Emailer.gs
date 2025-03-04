@@ -145,7 +145,7 @@ class Emailer {
         htmlBody: message,
         from: SERVICE_EMAIL,
         cc: `${ds_email}, ${SERVICE_EMAIL}`,
-        bcc: staff.Chris.email,
+        bcc: `${staff.Chris.email}, ${staff.Cody.email}`,
         name: SERVICE_NAME,
         noReply: true,
       }
@@ -261,18 +261,20 @@ class Emailer {
 
 
 const _testEmail = async() => {
-  const obj = {
-    name : `Dingus`,
-    status : STATUS.received,
-    email : `codyglen@berkeley.edu`,
-    message : new MessageService({
+  Object.values(STATUS).forEach(status => {
+    const obj = {
       name : `Dingus`,
-      id : IDService.createId(),
-      projectname : `Some Kinda Project`,
-    }),
-  }
-  console.warn(`Emailing: ${JSON.stringify(obj, null, 3)}`);
-  new Emailer(obj);
+      status : status,
+      email : `codyglen@berkeley.edu`,
+      message : new MessageService({
+        name : `Dingus`,
+        id : IDService.createId(),
+        projectname : `Some Kinda Project`,
+      }),
+    }
+    console.warn(`Emailing: ${JSON.stringify(obj, null, 3)}`);
+    new Emailer(obj);
+  });
 
   console.warn(`Email fucking sent...`);
 

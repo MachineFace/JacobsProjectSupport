@@ -37,7 +37,7 @@ class MessageService {
     this.rowData = rowData;
 
     this.designspecialist = designspecialist ? designspecialist.toString() : `Staff`;
-    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "mailto:${SERVICE_EMAIL}">${SERVICE_EMAIL}</a>`;
+    this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a>`;
     this.cost = cost ? Number(cost).toFixed(2) : 0;
     this.costFormatted = `$ ${this.cost.toString()}`;
 
@@ -52,11 +52,11 @@ class MessageService {
     /** @private */
     this.hours = `<b>Pick-Up & Drop-off Hours:<br/>${PICKUP_HOURS}</b><br/><br/>`;
     /** @private */
-    this.help = `If you have questions or need assistance please email ${this.designspecialistemaillink}.<br/>`;
+    this.help = `If you have questions or need assistance please email <a href = "mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a>.<br/>`;
     /** @private */
     this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
-    /** @private */
-    this.survey = `<p><small>Please help us improve JPS by taking a moment for a brief survey:<br/><a href="https://docs.google.com/forms/d/1fICKWXj67v8k6EznXgkYz6qgiy45V8bV-X8dlRwRPDc/viewform">Take Survey</a></small></p><br/>`;
+    // /** @private */
+    // this.survey = `<p><small>Please help us improve JPS by taking a moment for a brief survey:<br/><a href="https://docs.google.com/forms/d/1fICKWXj67v8k6EznXgkYz6qgiy45V8bV-X8dlRwRPDc/viewform">Take Survey</a></small></p><br/>`;
   }
 
   get defaultMessage() {
@@ -67,7 +67,6 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations; 
-      message += this.survey;
     return message; 
   }
   get receivedMessage() {
@@ -80,7 +79,6 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get inProgressMessage() {
@@ -95,7 +93,6 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get completedMessage() {
@@ -130,7 +127,6 @@ class MessageService {
       message += this.help;
       message += `</p>`
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get pickedUpMessage() {
@@ -142,7 +138,6 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations; 
-      message += this.survey;
     return message;
   }
   get abandonedMessage() {
@@ -158,7 +153,6 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations; 
-      message += this.survey;
     return message;
   }
   get failedMessage() {
@@ -170,7 +164,6 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get rejectedByStudentMessage() {
@@ -183,7 +176,6 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get rejectedByStaffMessage() {
@@ -197,7 +189,6 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get waitlistMessage() {
@@ -212,7 +203,6 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get billedMessage() {
@@ -239,7 +229,6 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
   get noAccessMessage() {
@@ -261,7 +250,6 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
-      message += this.survey;
     return message;
   }
 }
@@ -288,7 +276,7 @@ class CreateSubmissionMessage {
     /** @private */
     this.thanks = `Thank you for choosing ${SERVICE_NAME}.<br/>`;
     /** @private */
-    this.help = `If you have questions or need assistance please email <a href = "mailto:${SERVICE_EMAIL}">${SERVICE_EMAIL}.</a><br/>`;
+    this.help = `If you have questions or need assistance please email <a href = "mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a><br/>`;
     /** @private */
     this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
   }
@@ -300,7 +288,7 @@ class CreateSubmissionMessage {
       message += `Reminder: Only changing the status of the submission will trigger emails to you and the student.<br/>`; 
       message += `Below is a summary of the student submission.<br/>`;
       message += `</p>`;
-      message += `<p>Best,<br/>${SERVICE_NAME}</p>`;
+      message += this.salutations;
       message += `<br/>`;
       message += `<b>SUMMARY:</b>`;
       message += `<br/>`;
