@@ -144,7 +144,7 @@ class Emailer {
       const options = {
         htmlBody: message,
         from: SERVICE_EMAIL,
-        cc: `${ds_email}, ${SERVICE_EMAIL}`,
+        cc: `${ds_email}`,
         bcc: `${staff.Chris.email}, ${staff.Cody.email}`,
         name: SERVICE_NAME,
         noReply: true,

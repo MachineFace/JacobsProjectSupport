@@ -223,8 +223,11 @@ const SetConditionalFormatting = () => {
       [STATUS.waitlist]:     { bg: COLORS.orange,           font: COLORS.orange_dark_2 }
     };
 
-    Object.values(SHEETS).forEach(sheet => {
-      if(sheet.getSheetName() == SHEETS.Advancedlab.getSheetName()) return;
+    Object.entries(SHEETS).forEach(([key, sheet], idx) => {
+      if(key == `Advancedlab`) {
+        console.info(`Skipping ${SHEETS.Advancedlab.getSheetName()}`); 
+        return;
+      }
       const last_row = sheet.getLastRow();
       const last_column = sheet.getLastColumn();
       const range = sheet.getRange(start_row, 1, last_row - start_row + 1, last_column);

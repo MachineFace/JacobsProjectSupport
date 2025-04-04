@@ -55,8 +55,8 @@ class MessageService {
     this.help = `If you have questions or need assistance please email <a href = "mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a>.<br/>`;
     /** @private */
     this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
-    // /** @private */
-    // this.survey = `<p><small>Please help us improve JPS by taking a moment for a brief survey:<br/><a href="https://docs.google.com/forms/d/1fICKWXj67v8k6EznXgkYz6qgiy45V8bV-X8dlRwRPDc/viewform">Take Survey</a></small></p><br/>`;
+    /** @prvate */
+    this.not_monitored = `<br/><p style="color:grey"><small>This mailbox is not monitored. Please do not reply to this automated email.</small></p>`;
   }
 
   get defaultMessage() {
@@ -67,6 +67,7 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations; 
+      message += this.not_monitored;
     return message; 
   }
   get receivedMessage() {
@@ -79,6 +80,7 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get inProgressMessage() {
@@ -93,6 +95,7 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get completedMessage() {
@@ -127,6 +130,7 @@ class MessageService {
       message += this.help;
       message += `</p>`
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get pickedUpMessage() {
@@ -138,6 +142,7 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations; 
+      message += this.not_monitored;
     return message;
   }
   get abandonedMessage() {
@@ -153,6 +158,7 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations; 
+      message += this.not_monitored;
     return message;
   }
   get failedMessage() {
@@ -164,6 +170,7 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get rejectedByStudentMessage() {
@@ -176,6 +183,7 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get rejectedByStaffMessage() {
@@ -189,6 +197,7 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get waitlistMessage() {
@@ -203,6 +212,7 @@ class MessageService {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get billedMessage() {
@@ -229,6 +239,7 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get noAccessMessage() {
@@ -250,6 +261,7 @@ class MessageService {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
 }
@@ -279,6 +291,9 @@ class CreateSubmissionMessage {
     this.help = `If you have questions or need assistance please email <a href = "mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a><br/>`;
     /** @private */
     this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
+    /** @prvate */
+    this.not_monitored = `<br/><p style="color:grey"><small>This mailbox is not monitored. Please do not reply to this automated email.</small></p>`;
+
   }
   get dsMessage() {
     let message = `<p>Hello!</p> `;
@@ -292,6 +307,7 @@ class CreateSubmissionMessage {
       message += `<br/>`;
       message += `<b>SUMMARY:</b>`;
       message += `<br/>`;
+      message += this.not_monitored;
     return message;
   }
   get gsiPlotterMessage() {
@@ -312,6 +328,7 @@ class CreateSubmissionMessage {
       message += this.help;
       message += `</p>`;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
   get missingAccessMessage() {
@@ -334,6 +351,7 @@ class CreateSubmissionMessage {
       message += `</p>`;
       message += this.help;
       message += this.salutations;
+      message += this.not_monitored;
     return message;
   }
 }
