@@ -30,7 +30,7 @@ class ShopifyAPI {
       'headers' : { 
         "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
       },
-      'ContentType' : "application/json",
+      'contentType' : "application/json",
       'followRedirects' : true,
       'muteHttpExceptions' : true,
     };
@@ -230,7 +230,7 @@ class ShopifyAPI {
 
       let response = await UrlFetchApp.fetch(url, this.getParams);
       let responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}, ${response}`);
       let parsed = JSON.parse(response.getContentText())[`product`];
       if(!parsed) throw new Error(`Couldn't find Product!`);
 

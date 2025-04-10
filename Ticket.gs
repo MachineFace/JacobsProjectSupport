@@ -69,14 +69,14 @@ class Ticket {
 
 
     // Build Table
-    let tb = [];
-
-    tb.push([`Design Specialist`, this.designspecialist ? this.designspecialist.toString() : `Staff`]);
-    tb.push([`ID Number`, this.id.toString()]);
-    tb.push([`Student Name`, this.name?.toString()]);
-    tb.push([`Project Name`, this.projectname?.toString()]);
-    tb.push([`Status`, status ? status.toString() : STATUS.received]);
-    tb.push([`Submitted On`, timestamp ? timestamp.toString() : new Date().toDateString()]);
+    let tb = [
+      [`Design Specialist`, this.designspecialist ? this.designspecialist.toString() : `Staff`],
+      [`ID Number`, this.id.toString()],
+      [`Student Name`, this.name?.toString()],
+      [`Project Name`, this.projectname?.toString()],
+      [`Status`, status ? status.toString() : STATUS.received],
+      [`Submitted On`, timestamp ? timestamp.toString() : new Date().toDateString()],
+    ];
 
     if (numberOfParts) tb.push([`Number of Parts`, numberOfParts.toString()]);
     if (partCountFablight) tb.push([`Number of Parts`, partCountFablight.toString()]);
@@ -170,7 +170,7 @@ class Ticket {
     // console.info(JSON.stringify(this.doc));
     console.info(`DOC ----> ${this.doc.getUrl()}`);
     return this.doc;
-  };
+  }
 
   /**
    * Replace table entries with an Image blob
