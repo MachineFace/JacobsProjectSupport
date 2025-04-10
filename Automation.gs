@@ -45,7 +45,9 @@ class HackyStoreAutomation {
       const urlFixed = `${url.toString()}&exportFormat=html`;
       const param = {
         "method" : "GET",
-        "headers" : { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+        "headers" : { 
+          'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() 
+        },
         "muteHttpExceptions" : true,
       };
 
@@ -129,14 +131,15 @@ class HackyStoreAutomation {
     const start = `"product":{"id":`;
     const end = `,"gid":"gid:`;
 
-    const headers = { "Content-Type" : "application/json", "Authorization": "Basic " };
     const params = { 
-      method : "GET", 
-      headers : headers, 
-      contentType : "application/json", 
-      followRedirects : true, 
-      muteHttpExceptions : true,
-    };
+      'method' : "GET", 
+      'headers' : { 
+        "Content-Type" : "application/json", "Authorization": "Basic "
+      }, 
+      'contentType' : "application/json", 
+      'followRedirects' : true, 
+      'muteHttpExceptions' : true,
+    }
       
     try {
       [...SheetService.GetColumnDataByHeader(sheet, "Link")]
@@ -191,6 +194,7 @@ class MaterialLookup {
       return url;
     } catch(err) {
       console.error(`${err} : Whoops, failed....`);
+      return 1;
     }
   }
 }
@@ -221,13 +225,17 @@ class HackySemesterDateLookup {
    * @return {float} price
    */
   async _GetDates() {
-    const param = {
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
-      muteHttpExceptions: true,
-    };
-
     try {
+
+      const param = {
+        'method': 'GET',
+        'contentType' : "application/json", 
+        'headers': { 
+          'Authorization': 'Bearer ' + ScriptApp.getOAuthToken(),
+        },
+        'muteHttpExceptions': true,
+      }
+
       const response = await UrlFetchApp.fetch(this.url, param);
       const responseCode = response.getResponseCode();
       if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode }---> ${RESPONSECODES[responseCode]}`);

@@ -23,11 +23,14 @@ class BarcodeService {
       const url = `${root}${type}&text=${text}${scaleX}${scaleY}&includetext&parsefnc&alttext=${id}`;
 
       const params = {
-        method : "GET",
-        headers : { "Authorization" : "Basic ", "Content-Type" : "image/png" },
-        contentType : "application/json",
-        followRedirects : true,
-        muteHttpExceptions : true,
+        'method' : "GET",
+        'headers' : { 
+          "Authorization" : "Basic ", 
+          "Content-Type" : "image/png", 
+          },
+        'contentType' : "application/json",
+        'followRedirects' : true,
+        'muteHttpExceptions' : true,
       };
       const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
