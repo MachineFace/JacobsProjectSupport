@@ -203,90 +203,94 @@ const PopupCreateNewID = () => {
  * Bill from a selected line
  */
 const BillFromSelected = async () => {
-  const ui = SpreadsheetApp.getUi();
-  const shopify = await new ShopifyAPI(); 
-  let thisSheet = SpreadsheetApp.getActiveSheet();
-
-  if(!SheetService.IsValidSheet(thisSheet)) {
-    const a = ui.alert(
-      `${SERVICE_NAME}: Incorrect Sheet!`,
-      `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
-      Browser.Buttons.OK,
-    );
-    if(a === ui.Button.OK) return;
-  } 
-
-  let thisRow = thisSheet.getActiveRange().getRow();
-  let response;
-
-  const rowData = SheetService.GetRowData(thisSheet, thisRow);
-  let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
-    mat1quantity, mat1, mat2quantity, mat2, 
-    mat3quantity, mat3, mat4quantity, mat4, 
-    mat5quantity, mat5, affiliation, elapsedTime, estimate, 
-    unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
-
-  
-
-  // TODO: Fix this messy shit.
-  if(thisSheet == SHEETS.Plotter || thisSheet == SHEETS.GSI_Plotter) {
-    mat1 = rowData.material;
-    mat1quantity = rowData.printSize;
-  }
-
-  // Generate an estimate
-  if(mat1 && mat1quantity) {
-    BuildEstimate(thisSheet, thisRow);
-  }
-
-  let quantityTotal = mat1quantity + mat2quantity + mat3quantity + mat4quantity + mat5quantity;
-  
-  if (quantityTotal == 0 || quantityTotal == undefined || quantityTotal == "") {
-    console.warn(`Cannot Bill Student - No Material quantity(s) recorded...`);
-    response = ui.alert(
-      `${SERVICE_NAME}: Error!`,
-      `No quantities entered for selected submission. Maybe add some materials first before billing...`,
-      Browser.Buttons.OK
-    );
-    if (response === ui.Button.OK) return;
-  }
-  if (status == STATUS.billed || status == STATUS.closed || status == STATUS.abandoned || status == STATUS.failed) {
-    response = Browser.msgBox(
-      `${SERVICE_NAME}: Error!`,
-      `You have already Generated a bill to this Student. Project is closed.`,
-      Browser.Buttons.OK
-    );
-    if (response === ui.Button.OK) return;
-  }
-
-
-  // Fetch Customer and Products
-  const customer = await shopify.GetCustomerByEmail(email);
-  console.info(`CUSTOMER : ${JSON.stringify(customer)}`)
-  if (customer == undefined || customer == null) {
-    response = ui.alert(
-      `${SERVICE_NAME}: Error!`,
-      `The Shopify customer was not found... Check with Chris & Cody.`,
-      Browser.Buttons.OK
-    );
-    if (response === ui.Button.OK) return;
-  }
-
-  const boxTitle = `${SERVICE_NAME} : Generate Bill to Shopify`;
-  let msg = `Would you like to Generate a Bill to:\n`
-  + `${customer?.first_name} ${customer?.last_name}\n`
-  + `Email: ${email}\n`
-  + `Job Number : ${id?.toString()}\n`
-  + `Shopify ID : ${customer.id?.toString()}\n`
-  + `For Materials : \n`
-  + `----- ${mat1quantity} of ${mat1}\n`
-  if(mat2quantity) msg += `----- ${mat2quantity} of ${mat2}\n`;
-  if(mat3quantity) msg += `----- ${mat3quantity} of ${mat3}\n`;
-  if(mat4quantity) msg += `----- ${mat4quantity} of ${mat4}\n`;
-  if(mat5quantity) msg += `----- ${mat5quantity} of ${mat5}\n`;
-  msg += `Estimated Cost: $${estimate?.toString()} \n`;
-
   try {
+    const ui = SpreadsheetApp.getUi();
+    const shopify = await new ShopifyAPI(); 
+    let thisSheet = SpreadsheetApp.getActiveSheet();
+
+    if(!SheetService.IsValidSheet(thisSheet)) {
+      const a = ui.alert(
+        `${SERVICE_NAME}: Incorrect Sheet!`,
+        `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+        Browser.Buttons.OK,
+      );
+      if(a === ui.Button.OK) return;
+    } 
+
+    let thisRow = thisSheet.getActiveRange().getRow();
+    let response;
+
+    const rowData = SheetService.GetRowData(thisSheet, thisRow);
+    let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
+      mat1quantity, mat1, mat2quantity, mat2, 
+      mat3quantity, mat3, mat4quantity, mat4, 
+      mat5quantity, mat5, affiliation, elapsedTime, estimate, 
+      unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
+
+    // Exit for Status
+    if (status == STATUS.billed || status == STATUS.closed || status == STATUS.abandoned || status == STATUS.failed) {
+      response = Browser.msgBox(
+        `${SERVICE_NAME}: Error!`,
+        `You have already Generated a bill to this Student. Project status: ${status}.`,
+        Browser.Buttons.OK
+      );
+      if (response === ui.Button.OK) return;
+    }
+    
+
+    // TODO: Fix this messy shit.
+    if(sheetName == SHEETS.Plotter.getSheetName() || sheetName == SHEETS.GSI_Plotter.getSheetName()) {
+      mat1 = rowData.material;
+      mat1quantity = rowData.printSize;
+    }
+
+    // Generate an estimate
+    if(mat1 && !estimate) {
+      estimate = BuildEstimate(thisSheet, thisRow);
+    }
+
+    let quantityTotal = [ mat1quantity, mat2quantity, mat3quantity, mat4quantity, mat5quantity ]
+      .reduce((a, b) => Number(a) + Number(b));
+    
+    // Exit for No Materials
+    if (quantityTotal <= 0 || quantityTotal == undefined || quantityTotal == "") {
+      console.warn(`Cannot Bill Student - No Material quantity(s) recorded...`);
+      response = ui.alert(
+        `${SERVICE_NAME}: Error!`,
+        `No quantities entered for selected submission. Maybe add some materials first before billing...`,
+        Browser.Buttons.OK
+      );
+      if (response === ui.Button.OK) return;
+    }
+    
+
+
+    // Fetch Customer and Products
+    const customer = await shopify.GetCustomerByEmail(email);
+    console.info(`CUSTOMER : ${JSON.stringify(customer)}`)
+    if (customer == undefined || customer == null) {
+      response = ui.alert(
+        `${SERVICE_NAME}: Error!`,
+        `The Shopify customer was not found... Check with Chris & Cody.`,
+        Browser.Buttons.OK
+      );
+      if (response === ui.Button.OK) return;
+    }
+
+    const boxTitle = `Generate Bill to Shopify`;
+    let msg = `Would you like to Generate a Bill to:\n`
+    + `Name: ${customer?.first_name} ${customer?.last_name}\n`
+    + `Email: ${email}\n`
+    + `Job ID : ${id?.toString()}\n`
+    + `Shopify ID : ${customer.id?.toString()}\n`
+    + `For Materials : \n`
+    + `----- ${mat1quantity} of ${mat1}\n`
+    if(mat2quantity) msg += `----- ${mat2quantity} of ${mat2}\n`;
+    if(mat3quantity) msg += `----- ${mat3quantity} of ${mat3}\n`;
+    if(mat4quantity) msg += `----- ${mat4quantity} of ${mat4}\n`;
+    if(mat5quantity) msg += `----- ${mat5quantity} of ${mat5}\n`;
+    msg += `Estimated Cost: $${estimate?.toString()} \n`;
+
     response = ui.alert(
       boxTitle,
       msg,
@@ -296,24 +300,25 @@ const BillFromSelected = async () => {
       const order = await shopify.CreateOrder({
         id : id, 
         email : email,
-        material1Name : mat1, material1Quantity : mat1quantity,
-        material2Name : mat2, material2Quantity : mat2quantity,
-        material3Name : mat3, material3Quantity : mat3quantity,
-        material4Name : mat4, material4Quantity : mat4quantity,
-        material5Name : mat5, material5Quantity : mat5quantity, 
+        materials : [
+          { name : mat1, quantity : mat1quantity },
+          { name : mat2, quantity : mat2quantity },
+          { name : mat3, quantity : mat3quantity },
+          { name : mat4, quantity : mat4quantity },
+          { name : mat5, quantity : mat5quantity },
+        ],
       });
+      console.info(JSON.stringify(order, null, 4));
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
-      let lastOrder =  JSON.stringify(order, null, 4);
-      console.info(lastOrder);
       ui.alert(
         boxTitle,
         `Student has been successfully billed on Shopify for $${estimate?.toString()}`,
         Browser.Buttons.OK,
       );
-    } 
-    else if(response === ui.Button.NO || response === ui.Button.CANCEL) {
+    } else if(response === ui.Button.NO || response === ui.Button.CANCEL) {
       console.warn(`User clicked "No / Cancel"....\nOrder NOT Created.`);
     }
+    return 0;
   } catch (err) {
     console.error(`"BillFromSelected()" failed : ${err}`);
     return 1;

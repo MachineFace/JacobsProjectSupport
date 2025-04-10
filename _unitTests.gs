@@ -566,6 +566,28 @@ const _gasTShopifyTesting = async () => {
     t.notEqual(x, undefined || null, `GetCustomerByEmail for eli_lee@berkeley.edu should not return undefined or null: ${JSON.stringify(x)}`);
   });
 
+  await test(`Shopify Create Order`, async (t) => {
+    const id = IDService.createId();
+    
+    let materials = [
+      { name : `Fortus Red ABS-M30`,  quantity : 5, },
+      { name : `Objet Polyjet VeroMagenta RGD851`,  quantity : 10, },
+      { name : null,  quantity : 0.5, },
+      { name : `Stratasys Dimension Soluble Support Material P400SR`,  quantity : 15, },
+      { name : undefined,  quantity : 15, },
+      { name : `Fortus Red ABS-M30`,  quantity : -30.5, },
+      { name : `Fortus Red ABS-M30`,  quantity : undefined, },
+      { name : `Fortus Red ABS-M30`,  quantity : null, },
+    ];
+
+    const order = await shopify.CreateOrder({
+      id : id,
+      email : PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`),
+      materials : materials,
+    });
+    console.info(JSON.stringify(order, null, 4));
+  });
+
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
