@@ -8,48 +8,12 @@ const gasT_URL = `https://raw.githubusercontent.com/huan/gast/master/src/gas-tap
  * Test with GasT
  */
 const _gasTMainTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
   const test = new GasTap();
 
-  await test(`Priority Test`, (t) => {
-    let types = {
-      staff : {
-        email : `codyglen@berkeley.edu`,
-        sid : 91283741923,
-      },
-      goodEgoodS : {
-        email : `danielwongweihan@berkeley.edu`,
-        sid : 3034682275
-      },
-      goodEbadS : {
-        email : `danielwongweihan@berkeley.edu`,
-        sid : 12938749123,
-      },
-      badEgoodS : {
-        email : `ding@bat.edu`,
-        sid : 3034682275,
-      },
-      badEbadS : {
-        email : `ding@bat.edu`,
-        sid : 2394872349587,
-      },
-    }
-    const st = new PriorityService({email : types.staff.email, sid : types.staff.sid }).Priority;
-    t.equal(st, PRIORITY.Tier1, `DEFAULT priority for staff : Expected 1, Actual ${st}`);
-    const gg = new PriorityService({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
-    t.equal(gg, PRIORITY.Tier4, `Expected 4, Actual ${gg}`);
-    const gb = new PriorityService({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
-    t.equal(gb, PRIORITY.Tier4, `Expected 4, Actual ${gb}`);
-    const bg = new PriorityService({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
-    t.equal(bg, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${bg}`);
-    const bb = new PriorityService({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
-    t.equal(bb, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${bb}`);
-
-  });
-  
   /** 
   await test(`FormBuilder Test`, (t) => {
     const x = new ApprovalFormBuilder({
@@ -104,6 +68,75 @@ const _gasTMainTesting = async () => {
 }
 
 /**
+ * Test with GasT
+ */
+const _gasTPriorityTesting = async () => {
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch(gasT_URL).getContentText());
+  }
+  const test = new GasTap();
+
+  await test(`Priority Test`, (t) => {
+    let types = {
+      staff : {
+        email : `codyglen@berkeley.edu`,
+        sid : 91283741923,
+      },
+      goodEgoodS : {
+        email : `anukala@berkeley.edu`,
+        sid : 3034682275
+      },
+      goodEbadS : {
+        email : `anukala@berkeley.edu`,
+        sid : 12938749123,
+      },
+      badEgoodS : {
+        email : `ding@bat.edu`,
+        sid : 1919304,
+      },
+      badEbadS : {
+        email : `ding@bat.edu`,
+        sid : 2394872349587,
+      },
+      nullgoodS : {
+        email : null,
+        sid : 1919304,
+      },
+      nullCase : {
+        email : null,
+        sid : null,
+      },
+      undefCase : {
+        email : undefined,
+        sid : undefined,
+      }
+    }
+    let x;
+    x = new PriorityService({email : types.staff.email, sid : types.staff.sid }).Priority;
+    t.equal(x, PRIORITY.Tier1, `DEFAULT priority for staff : Expected 1, Actual ${x}`);
+    x = new PriorityService({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
+    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
+    x = new PriorityService({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
+    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
+    x = new PriorityService({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
+    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
+    x = new PriorityService({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
+    t.equal(x, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${x}`);
+    x = new PriorityService({email : types.nullgoodS.email, sid : types.nullgoodS.sid}).Priority;
+    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
+    x = new PriorityService({email : types.nullCase.email, sid : types.nullCase.sid}).Priority;
+    t.equal(x, PRIORITY.Tier1, `Expected ${PRIORITY.Tier1}, Actual ${x}`);
+    x = new PriorityService({email : types.undefCase.email, sid : types.undefCase.sid}).Priority;
+    t.equal(x, PRIORITY.Tier1, `Expected ${PRIORITY.Tier1}, Actual ${x}`);
+
+  });
+
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
+
+/**
  * Test ID with GasT
  */
 const _gasTIDServiceTesting = async () => {
@@ -111,7 +144,7 @@ const _gasTIDServiceTesting = async () => {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
   const test = new GasTap();
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
 
   await test(`GetNewID NON-STATIC`, t => {
     const j = new IDService().id;
@@ -151,7 +184,7 @@ const _gasTIDServiceTesting = async () => {
  * Test Logger and Message with GasT
  */
 const _gasTMessagingTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -247,7 +280,7 @@ const _gasTMessagingTesting = async () => {
  * Test Logging with GasT
  */
 const _gasTLoggerTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -273,7 +306,7 @@ const _gasTLoggerTesting = async () => {
  * Test Misc with GasT
  */
 const _gasTMiscTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -392,7 +425,7 @@ const _gasTMiscTesting = async () => {
  * Test Calculations with GasT
  */
 const _gasTCalculationTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -475,7 +508,7 @@ const _gasTTimeTesting = async () => {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
   const test = new GasTap();
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
 
   await test(`Format Timer GOOD`, (t) => {
     const x = TimeService.FormatTimerToString(15, 6, 35, 12);
@@ -532,7 +565,7 @@ const _gasTTimeTesting = async () => {
  * Test Shopify API with GasT
  */
 const _gasTShopifyTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -598,7 +631,7 @@ const _gasTShopifyTesting = async () => {
  * Test Ticket with GasT
  */
 const _gasTTicketTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -638,7 +671,7 @@ const _gasTTicketTesting = async () => {
  * Test Email Service with GasT
  */
 const _gasTEmailTesting = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -675,7 +708,7 @@ const _gasTEmailTesting = async () => {
  * Test Email Service with GasT
  */
 const _gasT_Statistics_Testing = async () => {
-  console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -2684,6 +2717,7 @@ const _gasT_Statistics_Testing = async () => {
 const _gasTTestAll = async () => {
   Promise.all([
     await _gasTMainTesting(),
+    await _gasTPriorityTesting(),
     await _gasTIDServiceTesting(),
     await _gasTMessagingTesting(),
     await _gasTLoggerTesting(),

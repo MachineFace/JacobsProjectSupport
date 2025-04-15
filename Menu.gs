@@ -108,7 +108,7 @@ const PopupCheckMissingAccessStudents = async () => {
   console.info(names);
   ui.alert(
     `${SERVICE_NAME}: ALERT!`,
-    `Checked Missing Access Students on All Sheets :\n ${names}`,
+    `Checked Missing Access Students on All Sheets:\n ${names}`,
     ui.ButtonSet.OK
   );
 }
@@ -207,37 +207,36 @@ const BillFromSelected = async () => {
     const ui = SpreadsheetApp.getUi();
     const shopify = await new ShopifyAPI(); 
     let thisSheet = SpreadsheetApp.getActiveSheet();
+    let thisRow = thisSheet.getActiveRange().getRow();
 
     if(!SheetService.IsValidSheet(thisSheet)) {
       const a = ui.alert(
         `${SERVICE_NAME}: Incorrect Sheet!`,
-        `Please select from a valid sheet (eg. Laser Cutter or Fablight). Select one cell in the row and a ticket will be created.`,
+        `Please select from a valid sheet (eg. Laser Cutter or Fablight).\nSelect one cell in the row and a ticket will be created.`,
         Browser.Buttons.OK,
       );
       if(a === ui.Button.OK) return;
     } 
 
-    let thisRow = thisSheet.getActiveRange().getRow();
-    let response;
-
-    const rowData = SheetService.GetRowData(thisSheet, thisRow);
+    let rowData = SheetService.GetRowData(thisSheet, thisRow);
     let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, 
       mat1quantity, mat1, mat2quantity, mat2, 
       mat3quantity, mat3, mat4quantity, mat4, 
       mat5quantity, mat5, affiliation, elapsedTime, estimate, 
       unit_cost1, unit_cost2, unit_cost3, unit_cost4, unit_cost5, printColor, printSize, printCount, sheetName, row, } = rowData;
 
+    let response;
+
     // Exit for Status
     if (status == STATUS.billed || status == STATUS.closed || status == STATUS.abandoned || status == STATUS.failed) {
       response = Browser.msgBox(
         `${SERVICE_NAME}: Error!`,
-        `You have already Generated a bill to this Student. Project status: ${status}.`,
+        `You have either already generated a bill to this user, or the project is closed.\nProject status: ${status}.\nChange the status to "Completed" and try again.`,
         Browser.Buttons.OK
       );
       if (response === ui.Button.OK) return;
     }
     
-
     // TODO: Fix this messy shit.
     if(sheetName == SHEETS.Plotter.getSheetName() || sheetName == SHEETS.GSI_Plotter.getSheetName()) {
       mat1 = rowData.material;
@@ -249,7 +248,7 @@ const BillFromSelected = async () => {
       estimate = BuildEstimate(thisSheet, thisRow);
     }
 
-    let quantityTotal = [ mat1quantity, mat2quantity, mat3quantity, mat4quantity, mat5quantity ]
+    let quantityTotal = [ mat1quantity || 0, mat2quantity || 0, mat3quantity || 0, mat4quantity || 0, mat5quantity || 0 ]
       .reduce((a, b) => Number(a) + Number(b));
     
     // Exit for No Materials
@@ -281,9 +280,9 @@ const BillFromSelected = async () => {
     let msg = `Would you like to Generate a Bill to:\n`
     + `Name: ${customer?.first_name} ${customer?.last_name}\n`
     + `Email: ${email}\n`
-    + `Job ID : ${id?.toString()}\n`
-    + `Shopify ID : ${customer.id?.toString()}\n`
-    + `For Materials : \n`
+    + `Job ID: ${id?.toString()}\n`
+    + `Shopify ID: ${customer.id?.toString()}\n`
+    + `Materials: \n`
     + `----- ${mat1quantity} of ${mat1}\n`
     if(mat2quantity) msg += `----- ${mat2quantity} of ${mat2}\n`;
     if(mat3quantity) msg += `----- ${mat3quantity} of ${mat3}\n`;

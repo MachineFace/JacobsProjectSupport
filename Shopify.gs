@@ -33,6 +33,7 @@ class ShopifyAPI {
       'contentType' : "application/json",
       'followRedirects' : true,
       'muteHttpExceptions' : true,
+      'timeout': 10000, // 10 seconds max wait
     };
   }
 
@@ -165,6 +166,7 @@ class ShopifyAPI {
         'payload' : JSON.stringify(order),
         'followRedirects' : true,
         'muteHttpExceptions' : false,
+        'timeout': 10000, // 10 seconds max wait
       }
 
       const response = await UrlFetchApp.fetch(url, params);
@@ -401,7 +403,8 @@ class ShopifyAPI {
         'contentType' : "application/json",
         'body' : JSON.stringify(payload),
         'followRedirects' : true,
-        'muteHttpExceptions' : true
+        'muteHttpExceptions' : true,
+        'timeout': 10000, // 10 seconds max wait
       }
     
       const response = await UrlFetchApp.fetch(url, params);

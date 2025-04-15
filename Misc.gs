@@ -152,6 +152,15 @@ const TitleCase = (str = ``) => {
   return str.join(' ');
 }
 
+/**
+ * Print Enclosing Function Name
+ */
+const PrintEnclosingFunctionName = () => {
+  const fname = new Error().stack.split('\n')[2].split(`at `)[1];
+  // console.warn(`Testing: ${fname}`);
+  return fname;
+}
+
 
 /**
  * Execute with Timeout
@@ -159,7 +168,7 @@ const TitleCase = (str = ``) => {
  * @param {function} some function to run
  * @param {number} timeout in seconds
  * @returns {Promise} race
- */
+ *
 const ExecuteWithTimeout = (fn, timeout = 2) => {
   timeout = timeout > 0 ? timeout * 1000 : 2000;
   const startTime = new Date().getTime();
@@ -184,6 +193,7 @@ const ExecuteWithTimeout = (fn, timeout = 2) => {
   
   return Promise.race([executionPromise, timeoutPromise]);  // Use Promise.race() to return whichever promise resolves or rejects first
 }
+*/
 
 
 
