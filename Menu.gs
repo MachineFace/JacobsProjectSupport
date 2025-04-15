@@ -205,6 +205,7 @@ const PopupCreateNewID = () => {
 const BillFromSelected = async () => {
   try {
     const ui = SpreadsheetApp.getUi();
+    const logger = new Log();
     const shopify = await new ShopifyAPI(); 
     let thisSheet = SpreadsheetApp.getActiveSheet();
     let thisRow = thisSheet.getActiveRange().getRow();
@@ -307,7 +308,8 @@ const BillFromSelected = async () => {
           { name : mat5, quantity : mat5quantity },
         ],
       });
-      console.info(JSON.stringify(order, null, 4));
+      
+      logger.Info(JSON.stringify(order, null, 4));
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
       ui.alert(
         boxTitle,

@@ -4,63 +4,67 @@
  */
 class Log {
   constructor() {
-    
+    /** @private */
+    this.sheet = OTHERSHEETS.Logger;
+    /** @private */
+    this.date = this._FormatDate();
+    /** @private */
+    this.ERROR_TYPE = {
+      Error : `ERROR!!`,
+      Warning : `WARNING!`,
+      Info : `INFO`,
+      Debug : `DEBUG`,
+    }
   }
+
+
 
   /**
    * Throw Error Message
    */
-  static Error(message = ``) {
-    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
-    const sheet = OTHERSHEETS.Logger;
-    const values = [ date, LOG_TYPE.Error, message, ];
-    console.error(values);
-    sheet.appendRow(values);
-    this.prototype._PopItem();
-    this.prototype._CleanupSheet();
-    return;
+  Error(message = ``) {
+    const text = [ this.date, this.ERROR_TYPE.Error, message, ];
+    console.error(text);
+    this.sheet.appendRow(text);
+    this._PopItem();
+    this._CleanupSheet();
+    return this;
   }
 
   /**
    * Throw Warning Message
    */
-  static Warning(message = ``) {
-    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
-    const sheet = OTHERSHEETS.Logger;
-    const values = [ date, LOG_TYPE.Warning, message, ];
-    console.warn(values);
-    sheet.appendRow(values);
-    this.prototype._PopItem();
-    this.prototype._CleanupSheet();
-    return;
+  Warning(message = ``) {
+    const text = [ this.date, this.ERROR_TYPE.Warning, message, ];
+    console.warn(text);
+    this.sheet.appendRow(text);
+    this._PopItem();
+    this._CleanupSheet();
+    return this;
   }
 
   /**
    * Throw Info Message
    */
-  static Info(message = ``) {
-    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
-    const sheet = OTHERSHEETS.Logger;
-    const values = [ date, LOG_TYPE.Info, message, ];
-    console.info(values);
-    sheet.appendRow(values);
-    this.prototype._PopItem();
-    this.prototype._CleanupSheet();
-    return;
+  Info(message = ``) {
+    const text = [ this.date, this.ERROR_TYPE.Info, message, ];
+    console.info(text);
+    this.sheet.appendRow(text);
+    this._PopItem();
+    this._CleanupSheet();
+    return this;
   }
 
   /**
    * Throw Debug Message
    */
-  static Debug(message = ``) {
-    const date = Utilities.formatDate(new Date(), "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
-    const sheet = OTHERSHEETS.Logger;
-    const values = [ date, LOG_TYPE.Debug, message, ];
-    console.log(values);
-    sheet.appendRow(values);
-    this.prototype._PopItem();
-    this.prototype._CleanupSheet();
-    return;
+  Debug(message = ``) {
+    const text = [ this.date, this.ERROR_TYPE.Debug, message, ];
+    console.log(text);
+    this.sheet.appendRow(text);
+    this._PopItem();
+    this._CleanupSheet();
+    return this;
   }
 
   /**
@@ -68,13 +72,13 @@ class Log {
    * @private
    */
   _PopItem() {
-    const sheet = OTHERSHEETS.Logger;
-    const maxRows = sheet.getMaxRows();
-    if(this.row > 100) {
-      sheet.deleteRows(2, 1);
-    } else {
-      sheet.insertRowAfter(maxRows - 1);
+    const row = this.sheet.getLastRow();
+    if(row < 100) {
+      this.sheet.insertRowAfter(sheet.getMaxRows() - 1);
+      return this;
     }
+    this.sheet.deleteRows(2, 1);
+    return this;
   }
 
   /**
@@ -82,16 +86,23 @@ class Log {
    * @private
    */
   _CleanupSheet() {
-    const sheet = OTHERSHEETS.Logger;
-    const lastRow = sheet.getLastRow();
-    if(lastRow < 2000) return;
-    sheet.deleteRows(2, 1999);
+    const row = this.sheet.getLastRow();
+    if(row < 2000) return this;
+    this.sheet.deleteRows(2, 1999);
+  }
+
+  /**
+   * Format Date
+   * @private
+   */
+  _FormatDate(date = new Date()) {
+    return Utilities.formatDate(date, "PST", "MM/dd/yyyy 'at' HH:mm:ss z").toString();
   }
 
   /**
    * Set Sheet Formatting
    * @private
-   */
+   *
   _SetFormatting() {
     try {
       const sheet = OTHERSHEETS.Logger;
@@ -130,17 +141,29 @@ class Log {
       return 1;
     }
   }
+  */
   
 }
 
-const _testWrite = () => {
-  // for(let i = 0; i < 2; i++) {
-  //   Log.Info(`${i} Some Info...`);
-  //   Log.Warning(`${i} Some Warning....`);
-  //   Log.Error(`${i} Some Error....`);
-  //   Log.Debug(`${i} Some Debug....`);
-  // }
-  const l = new Log();
-  l._SetFormatting();
+
+/**
+ * Testing for Logger Class
+ */
+const _testWriteLog = () => {
+  console.time(`EXECUTION TIMER`);
+  const log = new Log();
+  for (let i = 0; i < 5; i++) {
+    log
+      .Warning(`Ooopsies ----> Warning messaging.....`)
+      .Info(`Some Info messaging.....`)
+      .Error(`ERROR messaging....`)
+      .Debug(`Debugging messaging....`);
+  }
+  console.timeEnd(`EXECUTION TIMER`);
 }
+
+
+
+  
+
 

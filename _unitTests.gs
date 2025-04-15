@@ -181,7 +181,7 @@ const _gasTIDServiceTesting = async () => {
 }
 
 /**
- * Test Logger and Message with GasT
+ * Test Message with GasT
  */
 const _gasTMessagingTesting = async () => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -287,10 +287,11 @@ const _gasTLoggerTesting = async () => {
   const test = new GasTap();
 
   await test(`Log`, (t) => {
-    const x = Log.Warning(`Warning Test ----> Message`);
-    const y = Log.Info(`Info Test ----> Message`);
-    const z = Log.Error(`ERROR Test ----> Message`);
-    const w = Log.Debug(`Debugging Test ----> Message`);
+    const logger = new Log();
+    const x = logger.Warning(`Warning Test ----> Message`);
+    const y = logger.Info(`Info Test ----> Message`);
+    const z = logger.Error(`ERROR Test ----> Message`);
+    const w = logger.Debug(`Debugging Test ----> Message`);
     t.notThrow(() => x, `Warning SHOULD NOT throw error.`);
     t.notThrow(() => y, `Info SHOULD NOT throw error.`);
     t.notThrow(() => z, `Error SHOULD NOT throw error.`);
