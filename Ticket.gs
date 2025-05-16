@@ -117,7 +117,7 @@ class Ticket {
     if (otherNotes) tb.push([`Additional Notes`, otherNotes.toString()]);
     if (otherJobNotes) tb.push([`Additional Notes`, otherJobNotes.toString()]);
 
-    console.info(tb)
+    // console.info(tb)
 
     // Append Document with Info
     try {

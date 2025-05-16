@@ -228,8 +228,7 @@ const onChange = async (e) => {
   projectName = projectName ? projectName : `Your Project`;
 
   // Log submission info to sheet
-  const logger = new Log();
-  logger.Info(`Submission Time: ${timestamp}, Name: ${name}, Email: ${email}, Project: ${projectName}`);
+  console.info(`Submission Time: ${timestamp}, Name: ${name}, Email: ${email}, Project: ${projectName}`);
 
   // Ignore
   if(status == STATUS.closed || status == STATUS.billed) return;
