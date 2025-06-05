@@ -49,11 +49,13 @@ class HackyStoreAutomation {
           'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() 
         },
         "muteHttpExceptions" : true,
-      };
+      }
 
       const response = await UrlFetchApp.fetch(url, param);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
       const content = response.getContentText();
 
       const searchstring = 'og:price:amount';
@@ -147,7 +149,9 @@ class HackyStoreAutomation {
         .forEach( async (url, index) => {
           const response = await UrlFetchApp.fetch(url, params);
           const responseCode = response.getResponseCode();
-          if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+          if(![200, 201].includes(responseCode)) {
+            throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+          }
           const content = response.getContentText();
 
           const searchStart = content.search(start);
@@ -238,7 +242,9 @@ class HackySemesterDateLookup {
 
       const response = await UrlFetchApp.fetch(this.url, param);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode }---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode }---> ${RESPONSECODES[responseCode]}`);
+      }
 
       const content = response.getContentText();
       const index = content.search(`Key Dates`);

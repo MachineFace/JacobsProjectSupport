@@ -7,7 +7,7 @@ const gasT_URL = `https://raw.githubusercontent.com/huan/gast/master/src/gas-tap
 /**
  * Test with GasT
  */
-const _gasTMainTesting = async () => {
+const _gasTMainTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -70,7 +70,7 @@ const _gasTMainTesting = async () => {
 /**
  * Test with GasT
  */
-const _gasTPriorityTesting = async () => {
+const _gasTPriorityTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -139,7 +139,7 @@ const _gasTPriorityTesting = async () => {
 /**
  * Test ID with GasT
  */
-const _gasTIDServiceTesting = async () => {
+const _gasTIDServiceTesting = async() => {
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -183,7 +183,7 @@ const _gasTIDServiceTesting = async () => {
 /**
  * Test Message with GasT
  */
-const _gasTMessagingTesting = async () => {
+const _gasTMessagingTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -279,7 +279,7 @@ const _gasTMessagingTesting = async () => {
 /**
  * Test Logging with GasT
  */
-const _gasTLoggerTesting = async () => {
+const _gasTLoggerTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -302,11 +302,84 @@ const _gasTLoggerTesting = async () => {
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
+/**
+ * Test Common with GasT
+ */
+const _gasTCommonTesting = async() => {
+  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
+  if ((typeof GasTap) === 'undefined') {
+    eval(UrlFetchApp.fetch(gasT_URL).getContentText());
+  }
+  const test = new GasTap();
+
+  await test(`Common`, (t) => {
+
+    let x, y, a, b;
+
+    // Perfect match
+    x = `hello world`, y = `hello world`;
+    a = Common.ScoreStringSimilarity(x, y), b = 1;
+    t.equal(a, b, `Exact match ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Case insensitivity
+    x = `HELLO`, y = `hello`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.99;
+    t.ok(a > b, `Case insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Accent insensitivity
+    x = `café`, y = `cafe`;
+    a = Common.ScoreStringSimilarity(`café`, `cafe`), b = 0.95; 
+    t.ok(a > b, `Accent insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Punctuation removal
+    x = `hello, world!`, y = `hello world`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.95;
+    t.ok(a > b, `Ignore punctuation: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Word mismatch
+    x = `apple orange`, y = `banana pear`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.3;
+    t.ok(a < b, `Completely different words: ("${x}" =/= "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Partial overlap
+    x = `banana mango`, y = `banana apple`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.3;
+    t.ok(a < b, `Partial overlap: ("${x}" partial: "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Empty strings
+    t.equal(Common.ScoreStringSimilarity(``, ``), 0, `Both strings empty`);
+    t.equal(Common.ScoreStringSimilarity(`text`, ``), 0, `One string empty`);
+
+    // Extra whitespace
+    x = `   hello   world   `, y = `hello world`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.99;
+    t.ok(a > b, `Ignore extra whitespace: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Numbers and symbols
+    x = `abc123`, y = `abc 123`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.9;
+    t.ok(a < b, `Alphanumeric split: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Fuzzy match
+    x = `kitten`, y = `sitting`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.4;
+    t.ok(a < b, `Levenshtein fuzz match: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+    // Near match with different order
+    x = `world hello`, y = `hello world`;
+    a = Common.ScoreStringSimilarity(x, y), b = 0.95;
+    t.ok(a < b, `Word order shouldn't matter much: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
+
+  });
+
+  await test.finish();
+  if (test.totalFailed() > 0) throw "Some test(s) failed!";
+}
 
 /**
  * Test Misc with GasT
  */
-const _gasTMiscTesting = async () => {
+const _gasTMiscTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -421,11 +494,10 @@ const _gasTMiscTesting = async () => {
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
-
 /**
  * Test Calculations with GasT
  */
-const _gasTCalculationTesting = async () => {
+const _gasTCalculationTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -499,12 +571,11 @@ const _gasTCalculationTesting = async () => {
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
-
 /**
  * Test TimeService with GasT
  * @private
  */
-const _gasTTimeTesting = async () => {
+const _gasTTimeTesting = async() => {
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
@@ -561,11 +632,10 @@ const _gasTTimeTesting = async () => {
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
-
 /**
  * Test Shopify API with GasT
  */
-const _gasTShopifyTesting = async () => {
+const _gasTShopifyTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -626,12 +696,10 @@ const _gasTShopifyTesting = async () => {
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
-
-
 /**
  * Test Ticket with GasT
  */
-const _gasTTicketTesting = async () => {
+const _gasTTicketTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -667,11 +735,10 @@ const _gasTTicketTesting = async () => {
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
 
-
 /**
  * Test Email Service with GasT
  */
-const _gasTEmailTesting = async () => {
+const _gasTEmailTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -708,7 +775,7 @@ const _gasTEmailTesting = async () => {
 /**
  * Test Email Service with GasT
  */
-const _gasT_Statistics_Testing = async () => {
+const _gasT_Statistics_Testing = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
   if ((typeof GasTap) === 'undefined') {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
@@ -2715,7 +2782,7 @@ const _gasT_Statistics_Testing = async () => {
 /**
  * Test All with GasT
  */
-const _gasTTestAll = async () => {
+const _gasTTestAll = async() => {
   Promise.all([
     await _gasTMainTesting(),
     await _gasTPriorityTesting(),
@@ -2728,6 +2795,7 @@ const _gasTTestAll = async () => {
     await _gasTShopifyTesting(),
     await _gasTTicketTesting(),
     await _gasTEmailTesting(),
+    await _gasTCommonTesting(),
     // await _gasT_Statistics_Testing(),
   ])
   .then(console.info('Test Success.'))
@@ -2736,10 +2804,11 @@ const _gasTTestAll = async () => {
   });
 }
 
+
 // /**
 //  * Unit Test for Running Both 'OnEdit' & 'OnFormSubmit' Messages asynchronously. 
 //  */
-// const _testAllMessages = async () => {
+// const _testAllMessages = async() => {
 
 //     Promise.all([
 //         await _testOnEditMessages(),

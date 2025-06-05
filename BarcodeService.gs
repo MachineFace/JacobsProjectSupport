@@ -34,7 +34,9 @@ class BarcodeService {
       };
       const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
       const blob = Utilities.newBlob(response.getContent()).setName(`Barcode_${id}`);
       let barcode = await DriveApp.createFile(blob);
       barcode.setTrashed(true);

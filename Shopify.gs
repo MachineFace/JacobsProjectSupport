@@ -23,18 +23,6 @@ class ShopifyAPI {
     this.customerID;
     /** @private */
     this.totalprice;
-
-    /** @private */
-    this.getParams = {
-      'method' : `GET`,
-      'headers' : { 
-        "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
-      },
-      'contentType' : "application/json",
-      'followRedirects' : true,
-      'muteHttpExceptions' : true,
-      'timeout': 10000, // 10 seconds max wait
-    };
   }
 
 
@@ -90,15 +78,15 @@ class ShopifyAPI {
       let variantPrice = Number(info?.variants?.[0]?.price ?? info?.price ?? 0);
       let subtotal = Math.abs(Number(variantPrice * mat.quantity).toFixed(2));
       subTotals.push(subtotal);
-      console.info(`Variant: $${variantPrice}, Subtotal: $${subtotal}`);
+      // console.info(`Variant: $${variantPrice}, Subtotal: $${subtotal}`);
 
       shopifyPack.push({ 
-        'name' : mat.name,
-        'title' : info?.title,
-        'variant_id' : Number(info?.id),
-        'price' : variantPrice,
-        'quantity' : mat.quantity,
-        'subtotal' : subtotal,
+        name : mat.name,
+        title : info?.title,
+        variant_id : Number(info?.id),
+        price : variantPrice,
+        quantity : mat.quantity,
+        subtotal : subtotal,
         // discount_allocations : [{
         //   amount: "0.00",
         //   discount_application_index : 0,
@@ -113,8 +101,8 @@ class ShopifyAPI {
     }
     let total = Math.abs(Number(subTotals.reduce((a,b) => Number(a) + Number(b))).toFixed(2));
     this.totalprice = total;
-
-    console.info(`Total = $${this.totalprice}, PACKED:\n${JSON.stringify(shopifyPack, null, 3)}`);
+    console.info(`Total: $${this.totalprice}`);
+    // console.info(`Total: $${this.totalprice},\nPACKED:\n${JSON.stringify(shopifyPack, null, 3)}`);
     return shopifyPack;
   }
 
@@ -126,16 +114,16 @@ class ShopifyAPI {
    * @returns {object} order
    */
   async CreateOrder({
-    id : id = IDService.createId(),
-    email : email = this.api_email,
-    materials : materials = [ 
-      { name : `None`, quantity : 0 },
-      { name : `None`, quantity : 0 },
-      { name : `None`, quantity : 0 },
-      { name : `None`, quantity : 0 },
-      { name : `None`, quantity : 0 },
-      { name : `None`, quantity : 0 },
-    ],
+      id : id = IDService.createId(),
+      email : email = this.api_email,
+      materials : materials = [ 
+        { name : `None`, quantity : 0 },
+        { name : `None`, quantity : 0 },
+        { name : `None`, quantity : 0 },
+        { name : `None`, quantity : 0 },
+        { name : `None`, quantity : 0 },
+        { name : `None`, quantity : 0 },
+      ],
     }) {
     try {
       const url = `${this.root}/orders.json/`;
@@ -144,37 +132,39 @@ class ShopifyAPI {
       const pack = await this._PackageMaterials(materials);
 
       const order = {
-        'order': {
-          'line_items' : pack,
-          'customer' : { 
-            'id' : customer.id, 
+        order: {
+          line_items : pack,
+          customer : { 
+            id : customer.id, 
           },
-          'financial_status' : `paid`,
-          'fulfillment_status' : `fulfilled`,
-          'inventory_behaviour' : `decrement_ignoring_policy`,
-          'note' : `(JPS) Billing:\n${id}`,
+          financial_status : `paid`,
+          fulfillment_status : `fulfilled`,
+          inventory_behaviour : `decrement_ignoring_policy`,
+          note : `(JPS) Billing:\n${id}`,
         }
       }
-      console.info(`ORDER SUMMARY ----> ${JSON.stringify(order, null, 3)}`);
 
       const params = {
-        'method' : "POST",
-        'headers' : { 
-          'Authorization' : "Basic " + Utilities.base64EncodeWebSafe(this.api_key + ":" + this.api_pass) 
+        "method" : "POST",
+        "headers" : { 
+          "Authorization" : "Basic " + Utilities.base64EncodeWebSafe(this.api_key + ":" + this.api_pass) 
         },
-        'contentType' : "application/json",
-        'payload' : JSON.stringify(order),
-        'followRedirects' : true,
-        'muteHttpExceptions' : false,
-        'timeout': 10000, // 10 seconds max wait
+        "contentType" : "application/json",
+        "payload" : JSON.stringify(order),
+        "followRedirects" : true,
+        "muteHttpExceptions" : false,
+        "timeout": 10000, // 10 seconds max wait
       }
 
       const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}, ${response}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}, ${response}`);
+      }
 
       const content = JSON.parse(response.getContentText());
-      console.info(`Posted Order! : ${JSON.stringify(content, null, 3)}`);
+      console.info(`Posted Order!\nTo:${email}\nID: ${id}`);
+      // console.info(`Posted Order! : ${JSON.stringify(content, null, 3)}`);
       return content;
     } catch(err) {
       console.error(`"CreateOrder()" failed: ${err}`);
@@ -189,15 +179,27 @@ class ShopifyAPI {
    * Access individual properties by invoking GetShopifyCustomerByEmail(email).id or GetShopifyCustomerByEmail(email).name
    */
   async GetCustomerByEmail(email = ``) {
-
-    const scope = `customers/search.json?query=email:${email}`;
-    const fields = `&fields=id,first_name,last_name,total_spent`;
-    const url = `${this.root}/${scope}${fields}`;
-
     try {
-      const response = await UrlFetchApp.fetch(url, this.getParams);
+      const scope = `customers/search.json?query=email:${email}`;
+      const fields = `&fields=id,first_name,last_name,total_spent`;
+      const url = `${this.root}/${scope}${fields}`;
+
+      const params = {
+        "method" : `GET`,
+        "contentType" : "application/json",
+        "headers" : { 
+          "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
+        },
+        "followRedirects" : true,
+        "muteHttpExceptions" : true,
+        "timeout": 10000, // 10 seconds max wait
+      }
+
+      const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
 
       const user = JSON.parse(response.getContentText())[`customers`][0];
       if(!user) {
@@ -230,9 +232,22 @@ class ShopifyAPI {
       const fields = `&fields=id,title,price,variants`;
       const url = `${this.root}/products/${productID}.json?${status}${fields}`;
 
-      let response = await UrlFetchApp.fetch(url, this.getParams);
+      const params = {
+        "method" : `GET`,
+        "contentType" : "application/json",
+        "headers" : { 
+          "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
+        },
+        "followRedirects" : true,
+        "muteHttpExceptions" : true,
+        "timeout": 10000, // 10 seconds max wait
+      }
+
+      let response = await UrlFetchApp.fetch(url, params);
       let responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}, ${response}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}, ${response}`);
+      }
       let parsed = JSON.parse(response.getContentText())[`product`];
       if(!parsed) throw new Error(`Couldn't find Product!`);
 
@@ -264,14 +279,27 @@ class ShopifyAPI {
       const fields = `&fields=created_at,id,name,last_name,first_name,email,total-price`;
       const url = `${this.root}/orders.json?${status}${limit}${fields}`;
 
-      const response = await UrlFetchApp.fetch(url, this.getParams);
+      const params = {
+        "method" : `GET`,
+        "contentType" : "application/json",
+        "headers" : { 
+          "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
+        },
+        "followRedirects" : true,
+        "muteHttpExceptions" : true,
+        "timeout": 10000, // 10 seconds max wait
+      }
+
+      const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
-      console.info(response.getContentText());
-      if (responseCode != 200 && responseCode != 201) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      // console.info(response.getContentText());
+      if (![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
 
       const parsed = JSON.parse(response.getContentText());
       const orders = parsed[`orders`][0];
-      console.info(`ORDER PLACED ---->\n${JSON.stringify(orders, null, 3)}`);
+      console.info(`LAST ORDER:\n${JSON.stringify(orders, null, 3)}`);
       return orders;  
     } catch(err) {
       console.error(`"GetLastOrder()" failed: ${err}`);
@@ -287,9 +315,22 @@ class ShopifyAPI {
   async GetSpecificOrder(order = ``) {
     try {
       const url = `${this.root}/orders/${order}.json?`;
-      const response = await UrlFetchApp.fetch(url, this.getParams);
+      const params = {
+        "method" : `GET`,
+        "contentType" : "application/json",
+        "headers" : { 
+          "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
+        },
+        "followRedirects" : true,
+        "muteHttpExceptions" : true,
+        "timeout": 10000, // 10 seconds max wait
+      }
+
+      const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
 
       const content = JSON.parse(response.getContentText());
       const order = content ? content[`order`] : ``;
@@ -313,9 +354,22 @@ class ShopifyAPI {
       const fields = `&fields=name,total_price`;
       const url = `${this.root}/orders.json?${status}${limit}${fields}`;
 
-      const response = await UrlFetchApp.fetch(url, this.getParams);
+      const params = {
+        "method" : `GET`,
+        "contentType" : "application/json",
+        "headers" : { 
+          "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
+        },
+        "followRedirects" : true,
+        "muteHttpExceptions" : true,
+        "timeout": 10000, // 10 seconds max wait
+      }
+
+      const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
 
       const parsed = JSON.parse(response.getContentText())[`orders`];
 
@@ -352,9 +406,22 @@ class ShopifyAPI {
 
       const url = `${this.root}/orders.json?${status}${limit}${additionalFields}${fulfillment}${fields}`;
 
-      const response = await UrlFetchApp.fetch(url, this.getParams);
+      const params = {
+        "method" : `GET`,
+        "contentType" : "application/json",
+        "headers" : { 
+          "Authorization" : "Basic " + Utilities.base64Encode(this.api_key + ":" + this.api_pass) 
+        },
+        "followRedirects" : true,
+        "muteHttpExceptions" : true,
+        "timeout": 10000, // 10 seconds max wait
+      }
+
+      const response = await UrlFetchApp.fetch(url, params);
       let responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
 
       let parsed = JSON.parse(response.getContentText())[`orders`];
       parsed.forEach(item => {
@@ -409,7 +476,9 @@ class ShopifyAPI {
     
       const response = await UrlFetchApp.fetch(url, params);
       const responseCode = response.getResponseCode();
-      if(responseCode != 200) throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      if(![200, 201].includes(responseCode)) {
+        throw new Error(`Bad response from server: ${responseCode} ---> ${RESPONSECODES[responseCode]}`);
+      }
 
       const content = response.getContentText();
       return content;
@@ -470,7 +539,7 @@ const _testAPI = async () => {
     email : `pico@pico.com`,
     materials : materials,
   });
-  console.info(JSON.stringify(order, null, 4));
+  console.info(`ORDER:\n${JSON.stringify(order, null, 2)}`);
 
 }
 

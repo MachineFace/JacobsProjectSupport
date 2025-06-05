@@ -541,7 +541,9 @@ class StatisticsService {
    * normal distribution, and by extension, any normal distribution.
    */
   static get StandardNormalTable() {
-    const cumulativeDistribution = (z) => {
+
+    // Cumulative Distribution
+    function CumulativeDistribution(z = 0) {
       // 15 iterations are enough for 4-digit precision
       let sum = z;
       for (let i = 1; i < 15; i++) {
@@ -552,12 +554,18 @@ class StatisticsService {
       const SQRT_2PI = Math.sqrt(2 * Math.PI);
       return ( Math.round((0.5 + (sum / SQRT_2PI) * Math.exp((-z * z) / 2)) * 1e4) / 1e4 );
     }
-    const standardNormalTable = [];
-    for (let z = 0; z <= 3.09; z += 0.01) {
-      standardNormalTable.push(cumulativeDistribution(z));
+
+    try {
+      const standardNormalTable = [];
+      for (let z = 0; z <= 3.09; z += 0.01) {
+        standardNormalTable.push(CumulativeDistribution(z));
+      }
+      standardNormalTable.sort((a,b) => a - b);
+      return standardNormalTable;
+    } catch(err) {
+      console.error(`"StandardNormalTable()" failed: ${err}`);
+      return []
     }
-    standardNormalTable.sort((a,b) => a - b);
-    return standardNormalTable;
   }
 
   /**
@@ -630,7 +638,7 @@ class StatisticsService {
       else values = distribution;
 
       const mean = values.reduce((a, b) => a + b) / n;
-      console.warn(`ARITHMETIC MEAN: ${mean}`);
+      // console.warn(`ARITHMETIC MEAN: ${mean}`);
       return mean;
     } catch(err) {
       console.error(`"ArithmeticMean()" failed : ${err}`);
@@ -897,65 +905,98 @@ class StatisticsService {
    * //= [[-1, -1, -1, -1], [2, 2, 2], [4, 5, 6]]);
    */
   static CK_Means(numbers = [], nClusters = 2) {
-    // Function that generates incrementally computed values based on the sums and sums of squares for the data array
-    const ssq = (j, i, sums, sumsOfSquares) => {
-      let sji; // s(j, i)
-      if (j > 0) {
-        const muji = (sums[i] - sums[j - 1]) / (i - j + 1); // mu(j, i)
-        sji = sumsOfSquares[i] - sumsOfSquares[j - 1] - (i - j + 1) * muji * muji;
-      } else {
-        sji = sumsOfSquares[i] - (sums[i] * sums[i]) / (i + 1);
+
+    // Calculates the sum of squared deviations (s(j, i)) for a subarray [j, i] using precomputed sums.
+    function SumOfSquares(j, i, sums, sumsOfSquares) {
+      try {
+        // --- Input validation ---
+        if (!Number.isInteger(j) || !Number.isInteger(i)) throw new Error(`j and i must be integers`);
+        if (j < 0 || i < 0 || j > i) throw new Error(`Invalid range: j (${j}) must be <= i (${i}) and both >= 0`);
+        if (!Array.isArray(sums) || !Array.isArray(sumsOfSquares)) throw new Error(`sums and sumsOfSquares must be arrays`);
+        if (i >= sums.length || i >= sumsOfSquares.length) throw new Error(`Index out of bounds for sums or sumsOfSquares`);
+
+        const count = i - j + 1;
+
+        if (count <= 0) return 0; // nothing to compute
+
+        const sum = j > 0 ? sums[i] - sums[j - 1] : sums[i];
+        const sumSq = j > 0 ? sumsOfSquares[i] - sumsOfSquares[j - 1] : sumsOfSquares[i];
+
+        const mean = sum / count;
+        const variance = sumSq - count * mean * mean;
+
+        // Prevent very small negatives due to floating point errors
+        return Math.max(0, variance);
+
+      } catch (err) {
+        console.error(`SumOfSquares() failed: ${err.message}`);
+        return 0;
       }
-      if (sji < 0) return 0;
-      return sji;
     }
-    // Function that recursively divides and conquers computations for cluster j
-    const fillMatrixColumn = (iMin, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares) => {
-      if (iMin > iMax) return;
-      
-      const i = Math.floor((iMin + iMax) / 2); // Start at midpoint between iMin and iMax
 
-      matrix[cluster][i] = matrix[cluster - 1][i - 1];
-      backtrackMatrix[cluster][i] = i;
+    // Recursively fills a column of a dynamic programming matrix used in clustering optimization.
+    // Uses divide and conquer to minimize the within-cluster sum of squares.
+    function FillMatrixColumn(iMin, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares) {
+      try {
+        // --- Input validation ---
+        if (![iMin, iMax, cluster].every(Number.isInteger)) throw new Error("iMin, iMax, and cluster must be integers.");
+        if (!Array.isArray(matrix) || !Array.isArray(backtrackMatrix)) throw new Error("matrix and backtrackMatrix must be 2D arrays.");
+        if (!Array.isArray(sums) || !Array.isArray(sumsOfSquares)) throw new Error("sums and sumsOfSquares must be arrays.");
+        if (cluster <= 0 || iMin > iMax) return;
 
-      let jlow = cluster; // the lower end for j
+        const numPoints = matrix[0].length;
+        const midpoint = Math.floor((iMin + iMax) / 2);
+        const i = midpoint;
 
-      if (iMin > cluster) jlow = Math.max(jlow, backtrackMatrix[cluster][iMin - 1] || 0);
-      jlow = Math.max(jlow, backtrackMatrix[cluster - 1][i] || 0);
+        if (i <= 0 || cluster >= matrix.length || i >= numPoints) return;
 
-      let jhigh = i - 1; // the upper end for j
-      if (iMax < matrix[0].length - 1) jhigh = Math.min(jhigh, backtrackMatrix[cluster][iMax + 1] || 0);
+        // Initialize with a fallback value from previous cluster
+        matrix[cluster][i] = matrix[cluster - 1][i - 1];
+        backtrackMatrix[cluster][i] = i;
 
-      for (let j = jhigh; j >= jlow; --j) {
-        let sji = ssq(j, i, sums, sumsOfSquares);
-        if (sji + matrix[cluster - 1][jlow - 1] >= matrix[cluster][i]) break;
+        // Determine lower and upper bounds for j
+        let jLow = cluster;
+        if (iMin > cluster) jLow = Math.max(jLow, backtrackMatrix[cluster][iMin - 1] || cluster);
+        jLow = Math.max(jLow, backtrackMatrix[cluster - 1][i] || cluster);
 
-        // Examine the lower bound of the cluster border
-        let sjlowi = ssq(jlow, i, sums, sumsOfSquares);
-        let ssqjlow = sjlowi + matrix[cluster - 1][jlow - 1];
+        let jHigh = i - 1;
+        if (iMax < numPoints - 1) jHigh = Math.min(jHigh, backtrackMatrix[cluster][iMax + 1] || jHigh);
 
-        if (ssqjlow < matrix[cluster][i]) {
-          // Shrink the lower bound
-          matrix[cluster][i] = ssqjlow;
-          backtrackMatrix[cluster][i] = jlow;
+        // Search for optimal j in [jLow, jHigh]
+        for (let j = jHigh; j >= jLow; --j) {
+          const sji = SumOfSquares(j, i, sums, sumsOfSquares);
+
+          // Early termination if no better solution is possible
+          const lowerBound = matrix[cluster - 1][jLow - 1] + SumOfSquares(jLow, i, sums, sumsOfSquares);
+          if (sji + matrix[cluster - 1][jLow - 1] >= matrix[cluster][i]) break;
+
+          if (lowerBound < matrix[cluster][i]) {
+            matrix[cluster][i] = lowerBound;
+            backtrackMatrix[cluster][i] = jLow;
+          }
+
+          jLow++;
+
+          const total = sji + matrix[cluster - 1][j - 1];
+          if (total < matrix[cluster][i]) {
+            matrix[cluster][i] = total;
+            backtrackMatrix[cluster][i] = j;
+          }
         }
-        jlow++;
 
-        let ssqj = sji + matrix[cluster - 1][j - 1];
-        if (ssqj < matrix[cluster][i]) {
-          matrix[cluster][i] = ssqj;
-          backtrackMatrix[cluster][i] = j;
-        }
+        // Recursively divide and conquer
+        FillMatrixColumn(iMin, i - 1, cluster, matrix, backtrackMatrix, sums, sumsOfSquares);
+        FillMatrixColumn(i + 1, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares);
+        
+      } catch (err) {
+        console.error(`"FillMatrixColumn()" inside "CK_Means()" failed: ${err.message}`);
       }
-
-      fillMatrixColumn(iMin, i - 1, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
-      fillMatrixColumn(i + 1, iMax, cluster, matrix, backtrackMatrix, sums, sumsOfSquares );
     }
+
     // Initializes the main matrices used in Ckmeans and kicks off the divide and conquer cluster computation strategy
-    const fillMatrices = (data, matrix, backtrackMatrix) => {
+    function FillMatrices(data, matrix, backtrackMatrix) {
       const nValues = matrix[0].length;
       const shift = data[Math.floor(nValues / 2)];  // Shift values by the median to improve numeric stability
-
 
       const sums = [];
       const sumsOfSquares = [];
@@ -972,7 +1013,7 @@ class StatisticsService {
         }
 
         // Initialize for cluster = 0
-        matrix[0][i] = ssq(0, i, sums, sumsOfSquares);
+        matrix[0][i] = SumOfSquares(0, i, sums, sumsOfSquares);
         backtrackMatrix[0][i] = 0;
       }
 
@@ -982,7 +1023,7 @@ class StatisticsService {
         if (cluster < matrix.length - 1) iMin = cluster;
         else iMin = nValues - 1;  // No need to compute matrix[K-1][0] ... matrix[K-1][N-2]
 
-        fillMatrixColumn(
+        FillMatrixColumn(
           iMin,
           nValues - 1,
           cluster,
@@ -1001,14 +1042,14 @@ class StatisticsService {
       const uniqueCount = StatisticsService.CountUnique(sorted);
       if (uniqueCount === 1) return [sorted];  // if all of the input values are identical, there's one cluster with all of the input in it.
 
-      const matrix = StatisticsService.Matrix(nClusters, sorted.length);
-      const backtrackMatrix = StatisticsService.Matrix(nClusters, sorted.length);
+      let matrix = StatisticsService.Matrix(nClusters, sorted.length);
+      let backtrackMatrix = StatisticsService.Matrix(nClusters, sorted.length);
 
       // This is a dynamic programming way to solve the problem of minimizing
       // within-cluster sum of squares. It's similar to linear regression
       // in this way, and this calculation incrementally computes the
       // sum of squares that are later read.
-      fillMatrices(sorted, matrix, backtrackMatrix);
+      FillMatrices(sorted, matrix, backtrackMatrix);
 
       // The real work of Ckmeans clustering happens in the matrix generation:
       // the generated matrices encode all possible clustering combinations, and
@@ -1599,7 +1640,7 @@ class StatisticsService {
 
       const product = values.reduce((product, num) => product * num, 1);
       const geometricMean = Math.pow(product, 1 / values.length);
-      console.warn(`GEOMETRIC MEAN: ${geometricMean}`);
+      // console.warn(`GEOMETRIC MEAN: ${geometricMean}`);
       return geometricMean;
     } catch(err) {
       console.error(`"GeometricMean()" failed : ${err}`);
@@ -1657,7 +1698,7 @@ class StatisticsService {
       else values = numbers;
 
       const harmonicMean = values.length / values.reduce((a, b) => a + 1 / b, 0);
-      console.warn(`HERMONIC MEAN: ${harmonicMean}`);
+      // console.warn(`HARMONIC MEAN: ${harmonicMean}`);
       return harmonicMean;
     } catch(err) {
       console.error(`"HarmonicMean()" failed : ${err}`);
@@ -1706,7 +1747,7 @@ class StatisticsService {
   static Jenks(data = [], nClasses = 2) {
 
     // Pull Breaks Values for Jenks. the second part of the jenks recipe: take the calculated matrices and derive an array of n breaks.
-    const JenksBreaks = (data, lowerClassLimits, nClasses) => {
+    function JenksBreaks(data, lowerClassLimits, nClasses) {
       let k = data.length;
       let kclass = [];
       let countNum = nClasses;
@@ -1724,7 +1765,7 @@ class StatisticsService {
     }
 
     // Compute the matrices required for Jenks breaks. These matrices can be used for any classing of data with `classes <= nClasses`
-    const JenksMatrices = (data, nClasses) => {
+    function JenksMatrices(data, nClasses) {
       let lowerClassLimits = [];
       let varianceCombinations = [];
 
@@ -1830,10 +1871,18 @@ class StatisticsService {
    * kMeansCluster([[0.0, 0.5], [1.0, 0.5]], 2); // => {labels: [0, 1], centroids: [[0.0, 0.5], [1.0 0.5]]}
    */
   static K_Means_Cluster(points, numCluster = 2, randomSource = Math.random) {
+    if (!Array.isArray(points) || points.length === 0 || !Number.isInteger(numCluster) || numCluster <= 0) {
+      console.error('Invalid input to K_Means_Cluster');
+      return [];
+    }
     // const nonRNG = () => 1.0 - StatisticsService.Epsilon;
 
     // Label each point according to which centroid it is closest to.
-    const LabelPoints = (points, centroids) => {
+    function LabelPoints(points = [], centroids = []) {
+      if (!Array.isArray(points) || !Array.isArray(centroids) || points.length === 0 || centroids.length === 0) {
+        console.warn(`LabelPoints: Invalid points or centroids.`);
+        return [];
+      }
       return points.map((p) => {
         let minDist = Number.MAX_VALUE;
         let label = -1;
@@ -1849,41 +1898,47 @@ class StatisticsService {
     }
 
     // Calculate centroids for points given labels.
-    const CalculateCentroids = (points, labels, numCluster) => {
-      let dimension = points[0].length;
+    function CalculateCentroids(points = [], labels = [], numCluster = 2) {
+      if (!Array.isArray(points) || !Array.isArray(labels) || points.length !== labels.length || points.length === 0) {
+        console.error(`CalculateCentroids: Invalid or mismatched points and labels.`);
+        return [];
+      }
+      let dimension = (Array.isArray(points[0])) ? points[0].length : 1;
       let centroids = StatisticsService.Matrix(numCluster, dimension);
       let counts = Array(numCluster).fill(0);
 
-      // Add points to centroids' accumulators and count points per centroid.
-      let numPoints = points.length;
-      for (let i = 0; i < numPoints; i++) {
+      for (let i = 0; i < points.length; i++) {
         let point = points[i];
         let label = labels[i];
-        let current = centroids[label];
+        if (!Array.isArray(point) || label < 0 || label >= numCluster) continue;
+
         for (let j = 0; j < dimension; j++) {
-          current[j] += point[j];
+          centroids[label][j] += point[j];
         }
         counts[label] += 1;
       }
 
-      // Rescale centroids, checking for any that have no points.
       for (let i = 0; i < numCluster; i++) {
         if (counts[i] === 0) throw new Error(`Centroid ${i} has no friends`);
-        let centroid = centroids[i];
         for (let j = 0; j < dimension; j++) {
-          centroid[j] /= counts[i];
+          centroids[i][j] /= counts[i];
         }
       }
       return centroids;
     }
 
     // Calculate the difference between old centroids and new centroids.
-    const CalculateChange = (left, right) => {
-      let total = 0;
-      for (let i = 0; i < left.length; i++) {
-        total += StatisticsService.EuclideanDistance(left[i], right[i]);
+    function CalculateChange(left = [], right = []) {
+      try {
+        if(!left || !right) return;
+        let total = 0;
+        for (let i = 0; i < left.length; i++) {
+          total += StatisticsService.EuclideanDistance(left[i], right[i]);
+        }
+        return total;
+      } catch(err) {
+        console.error(`"CalculateChange()" in "K_Means_Cluster()" failed: ${err}`);
       }
-      return total;
     }
     
     try {
@@ -1921,7 +1976,7 @@ class StatisticsService {
     const gaussian_kernels = (u) => Math.exp(-0.5 * u * u) / Math.sqrt(2 * Math.PI);
     
     // Well known bandwidth selection methods
-    const NormalReferenceDistribution = (numbers = []) => {
+    function NormalReferenceDistribution(numbers = []) {
       let s = StatisticsService.StandardDeviation(numbers);
       let iqr = StatisticsService.InterquartileRange(numbers);
       let ds = Math.min(s, iqr / 1.34);
@@ -1989,8 +2044,7 @@ class StatisticsService {
    */
   static LinearRegression(data = []) {
     try {
-      let m;
-      let b;
+      let m, b;
       
       let regression = {}
       // Store data length in a local variable to reduce repeated object property lookups
@@ -2005,10 +2059,8 @@ class StatisticsService {
         return regression;
       }
 
-      let sumX = 0;
-      let sumY = 0;
-      let sumXX = 0;
-      let sumXY = 0;
+      let sumX = 0, sumY = 0;
+      let sumXX = 0, sumXY = 0;
 
       // Gather the sum of all x values, the sum of all y values, and the sum of x^2 and (x*y) for each value.
       // In math notation, these would be SS_x, SS_y, SS_xx, and SS_xy
@@ -2075,18 +2127,20 @@ class StatisticsService {
    */
   static LogAverage(numbers = []) {
     try {
-      if (numbers.length < 1) throw new Error("logAverage requires at least one data point");
-
-      let value = 0;
-      for (let i = 0; i < numbers.length; i++) {
-        if (numbers[i] < 0) throw new Error(`Requires only non-negative numbers as input`);
-        value += Math.log(numbers[i]);
+      if (!Array.isArray(numbers) || numbers.length === 0) {
+        console.error('Invalid input to LogAverage');
+        return null;
       }
 
+      let value = 0;
+      numbers.forEach(number => {
+        number = number > 0 ? number : StatisticsService.Epsilon; 
+        value += Math.log(number);
+      });
       return Math.exp(value / numbers.length);
     } catch(err) {
-      console.error(`"LogAverage()" failed : ${err}`);
-      return 1;
+      console.error(`"LogAverage()" failed: ${err}`);
+      return null;
     }
   }
 
@@ -2098,13 +2152,13 @@ class StatisticsService {
    * @param {number} p
    * @returns {number} logit
    */
-  static Logit(p = 2.0) {
+  static Logit(p = 0.75) {
     try {
-      if (p <= 0 || p >= 1) throw new Error("p must be strictly between zero and one");
+      p = Math.max(0, Math.min(1, p));
       return Math.log(p / (1 - p));
     } catch(err) {
-      console.error(`"Logit()" failed : ${err}`);
-      return 1;
+      console.error(`"Logit()" failed: ${err}`);
+      return null;
     }
   }
 
@@ -2154,7 +2208,7 @@ class StatisticsService {
           (sortedNumbers[middle - 1] + sortedNumbers[middle]) / 2 :
           sortedNumbers[middle];
 
-      console.warn(`MEDIAN: ${median}`);
+      // console.warn(`MEDIAN: ${median}`);
       return median;
     } catch(err) {
       console.error(`"Median()" failed : ${err}`);
@@ -2474,32 +2528,37 @@ class StatisticsService {
    * @returns {Array<Array>} array of permutations
    */
   static Permutations_Heap(elements = []) {
-    let indexes = new Array(elements.length);
-    let permutations = [elements.slice()];
+    try {
+      let indexes = new Array(elements.length);
+      let permutations = [elements.slice()];
 
-    for (let i = 0; i < elements.length; i++) {
-      indexes[i] = 0;
-    }
-
-    for (let i = 0; i < elements.length; ) {
-      if (indexes[i] < i) {
-        let swapFrom = 0; // At odd indexes, swap from indexes[i] instead of from the beginning of the array
-        if (i % 2 !== 0) swapFrom = indexes[i];
-
-        // swap between swapFrom and i, using a temporary variable as storage.
-        let temp = elements[swapFrom];
-        elements[swapFrom] = elements[i];
-        elements[i] = temp;
-        permutations.push(elements.slice());
-        indexes[i]++;
-        i = 0;
-      } else {
+      for (let i = 0; i < elements.length; i++) {
         indexes[i] = 0;
-        i++;
       }
-    }
 
-    return permutations;
+      for (let i = 0; i < elements.length; ) {
+        if (indexes[i] < i) {
+          let swapFrom = 0; // At odd indexes, swap from indexes[i] instead of from the beginning of the array
+          if (i % 2 !== 0) swapFrom = indexes[i];
+
+          // swap between swapFrom and i, using a temporary variable as storage.
+          let temp = elements[swapFrom];
+          elements[swapFrom] = elements[i];
+          elements[i] = temp;
+          permutations.push(elements.slice());
+          indexes[i]++;
+          i = 0;
+        } else {
+          indexes[i] = 0;
+          i++;
+        }
+      }
+
+      return permutations;
+    } catch(err) {
+      console.error(`"Permutations_Heap()" failed : ${err}`);
+      return 1;
+    }
   }
 
   /**
@@ -2517,7 +2576,7 @@ class StatisticsService {
       else values = numbers;
 
       const quadraticMean = Math.sqrt(values.reduce((a, b) => a + b * b, 0) / values.length);
-      console.warn(`QUADRATIC MEAN: ${quadraticMean}`);
+      // console.warn(`QUADRATIC MEAN: ${quadraticMean}`);
       return quadraticMean;
     } catch(err) {
       console.error(`"QuadraticMean()" failed : ${err}`);
@@ -2542,7 +2601,8 @@ class StatisticsService {
    * quantile([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
    */
   static Quantile(numbers = [], p) {
-    const QuantileIndex = (len, p) => {
+
+    function QuantileIndex(len, p) {
       const idx = len * p;
       if (p === 1) return len - 1;  // If p is 1, directly return the last index
       else if (p === 0) return 0;  // If p is 0, directly return the first index
@@ -2551,7 +2611,7 @@ class StatisticsService {
       else return idx;  // Finally, in the simple case of an integer index with an odd-length list, return the index
     }
 
-    const QuantileSelect = (arr, k, left, right) => {
+    function QuantileSelect(arr, k, left, right) {
       if (k % 1 === 0) StatisticsService.QuickSelect(arr, k, left, right);
       else {
         k = Math.floor(k);
@@ -2560,7 +2620,7 @@ class StatisticsService {
       }
     }
 
-    const MultiQuantileSelect = (arr, p) => {
+    function MultiQuantileSelect(arr, p) {
       let indices = [0];
       for (let i = 0; i < p.length; i++) {
         indices.push(QuantileIndex(arr.length, p[i]));
@@ -2686,7 +2746,7 @@ class StatisticsService {
     right = right ? right : arr.length - 1;
 
     // Swap Function
-    const Swap = (arr, i, j) => {
+    function Swap(arr, i, j) {
       let tmp = arr[i];
       arr[i] = arr[j];
       arr[j] = tmp;
@@ -3198,13 +3258,13 @@ class StatisticsService {
 
       // While there are still items to shuffle
       while(length > 0) {
-          // choose a random index within the subset of the array that is not yet shuffled
-          let index = Math.floor(randomSource() * length--);
-          let temporary = numbers[length];
+        // choose a random index within the subset of the array that is not yet shuffled
+        let index = Math.floor(randomSource() * length--);
+        let temporary = numbers[length];
 
-          // swap the value at `x[length]` with `x[index]`
-          numbers[length] = numbers[index];
-          numbers[index] = temporary;
+        // swap the value at `x[length]` with `x[index]`
+        numbers[length] = numbers[index];
+        numbers[index] = temporary;
       }
 
       return numbers;
@@ -3253,7 +3313,7 @@ class StatisticsService {
   static Silhouette(points, labels) {
 
     // Create a lookup table mapping group IDs to point IDs.
-    const CreateGroups = (labels) => {
+    function CreateGroups(labels = []) {
       const numGroups = 1 + StatisticsService.Max(labels);
       const result = Array(numGroups);
       for (let i = 0; i < labels.length; i++) {
@@ -3267,9 +3327,9 @@ class StatisticsService {
     }
 
     // Create a lookup table of all inter-point distances.
-    const CalculateAllDistances = (points) => {
-      const numPoints = points.length;
-      const result = StatisticsService.Matrix(numPoints, numPoints);
+    function CalculateAllDistances(points = []) {
+      let numPoints = points.length;
+      let result = StatisticsService.Matrix(numPoints, numPoints);
       for (let i = 0; i < numPoints; i++) {
         for (let j = 0; j < i; j++) {
           result[i][j] = StatisticsService.EuclideanDistance(points[i], points[j]);
@@ -3280,7 +3340,7 @@ class StatisticsService {
     }
 
     // Calculate the mean distance between a point and all the points in a group (possibly its own).
-    const MeanDistanceFromPointToGroup = (which, group, distances) => {
+    function MeanDistanceFromPointToGroup(which = 0, group = [], distances = []) {
       let total = 0;
       for (let i = 0; i < group.length; i++) {
         total += distances[which][group[i]];
@@ -3289,7 +3349,7 @@ class StatisticsService {
     }
 
     // Calculate the mean distance between this point and all the points in the nearest group (as determined by which point in another group is closest).
-    const MeanDistanceToNearestGroup = (which, labels, groupings, distances) => {
+    function MeanDistanceToNearestGroup(which = 0, labels = [], groupings = [], distances = []) {
       const label = labels[which];
       let result = Number.MAX_VALUE;
       for (let i = 0; i < groupings.length; i++) {
@@ -3302,7 +3362,7 @@ class StatisticsService {
     }
 
     try {
-      if (points.length !== labels.length) throw new Error("must have exactly as many labels as points");
+      if (points.length !== labels.length) throw new Error("Must have exactly as many labels as points");
       const groupings = CreateGroups(labels);
       const distances = CalculateAllDistances(points);
       const result = [];
@@ -3515,17 +3575,19 @@ class StatisticsService {
    * wilcoxonRankSum([1, 4, 8], [9, 12, 15]); // => 6
    */
   static WilcoxonRankSum(sampleX = [], sampleY = []) {
+
+    // Replace Ranks in Situ Function
+    function ReplaceRanksInPlace(pooledSamples = [], tiedRanks = []) {
+      const average = (tiedRanks[0] + tiedRanks[tiedRanks.length - 1]) / 2;
+      for (let i = 0; i < tiedRanks.length; i++) {
+        pooledSamples[tiedRanks[i]].rank = average;
+      }
+    }
+
     try {
       if (!sampleX.length || !sampleY.length) throw new Error("Neither sample can be empty");
 
-      const ReplaceRanksInPlace = (pooledSamples = [], tiedRanks = []) => {
-        const average = (tiedRanks[0] + tiedRanks[tiedRanks.length - 1]) / 2;
-        for (let i = 0; i < tiedRanks.length; i++) {
-          pooledSamples[tiedRanks[i]].rank = average;
-        }
-      }
-
-      const pooledSamples = sampleX
+      let pooledSamples = sampleX
         .map((x) => ({ label: "x", value: x }))
         .concat(sampleY.map((y) => ({ label: "y", value: y })))
         .sort((a, b) => a.value - b.value);
