@@ -3253,6 +3253,8 @@ class StatisticsService {
    */
   static Shuffle(numbers = [], randomSource = Math.random) {
     try {
+      if (!Array.isArray(numbers)) throw new Error("Input must be an array.");
+      if(!randomSource || typeof randomSource != typeof Function) randomSource = Math.random;
       let length = numbers.length;  // store the current length of the x to determine when no elements remain to shuffle.
       if(length < 1) return [];
 
