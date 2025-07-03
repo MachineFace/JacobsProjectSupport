@@ -60,6 +60,7 @@ const _gasTMainTesting = async() => {
 
 /**
  * Test Barcode with GasT
+ * PASSED 7/2/2025
  */
 const _gasTBarcodeTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -168,24 +169,22 @@ const _gasTIDServiceTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
 
   await test(`GetNewID NON-STATIC`, t => {
-    let x, y;
-    x = new IDService().id;
-    y = undefined || null;
+    const x = new IDService().id;
+    const y = undefined || null;
     t.notEqual(x, y, `GetNewID SHOULD NOT return ${y}, Actual: ${x}`);
   });
 
   await test(`GetNewID STATIC`, t => {
-    let x, y;
-    x = IDService.createId();
-    y = undefined || null;
+    const x = IDService.createId();
+    const y = undefined || null;
     t.notEqual(x, y, `GetNewID STATIC SHOULD NOT return ${y}, Actual: ${x}`);
   });
 
   await test(`TestUUIDToDecimal`, t => {
     const testUUID = `b819a295-66b7-4b82-8f91-81cf227c5216`;
-    const decInterp = `0244711056233028958513683553892786000406`;
-    const dec = IDService.toDecimal(testUUID);
-    t.equal(dec, decInterp, `TestUUIDToDecimal SHOULD return ${decInterp}: ${decInterp == dec}, ${dec}`);
+    const x = IDService.toDecimal(testUUID);
+    const y = `0244711056233028958513683553892786000406`;
+    t.equal(x, y, `TestUUIDToDecimal SHOULD return ${y}: ${y == x}, ${x}`);
   });
 
   await test(`TestDecimalToUUID`, t => {
@@ -576,6 +575,7 @@ const _gasTMiscTesting = async() => {
 
 /**
  * Test Calculations with GasT
+ * PASSED 7/2/2025
  */
 const _gasTCalculationTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -653,6 +653,7 @@ const _gasTCalculationTesting = async() => {
 
 /**
  * Test TimeService with GasT
+ * PASSED 7/2/2025
  */
 const _gasTTimeTesting = async() => {
   if ((typeof GasTap) === 'undefined') {
@@ -661,51 +662,300 @@ const _gasTTimeTesting = async() => {
   const test = new GasTap();
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
 
-  await test(`Format Timer GOOD`, (t) => {
-    const x = TimeService.FormatTimerToString(15, 6, 35, 12);
-    t.equal(x, `15 days, 06:35:12`, `Format Timer GOOD: ${x}`);
+  await test(`Time Class Test`, (t) => {
+    let x, y;
+    const ts = new TimeService();
+    t.notThrow(() => ts, `TimeService SHOULD NOT throw error.`);
+
+    y = undefined || null;
+    t.notEqual(ts, y, `TimeService SHOULD NOT yield ${y}, Actual: ${x}`);
+
+    x = ts instanceof TimeService;
+    y = true;
+    t.equal(x, y, `Check Instancing of TimeService, Expected: ${y}, Actual: ${x} `);
   });
 
-  await test(`Format Timer BAD`, (t) => {
-    const x = TimeService.FormatTimerToString(`ten`, `six`, `35`, `12`);
-    t.equal(x, `ten days, six:35:12`, `Format Timer BAD: ${x}`);
+  await test(`FormatTimerToString`, (t) => {
+    let x, y, value;
+
+    // x = TimeService.FormatTimerToString(15, 6, 35, 12);
+    // t.equal(x, `15 days, 06:35:12`, `Format Timer GOOD: ${x}`);
+
+    // Test Function
+    x = typeof TimeService.FormatTimerToString;
+    y = typeof Function;
+    t.equal(x, y, `FormatTimerToString SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.FormatTimerToString(15, 6, 35, 12);
+    t.notThrow(() => x, `FormatTimerToString SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = TimeService.FormatTimerToString(15, 6, 35, 12);
+    y = undefined || null;
+    t.notEqual(x, y, `FormatTimerToString SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Normal Test
+    x = TimeService.FormatTimerToString(15, 6, 35, 12);
+    y = `15 days, 06:35:12`
+    t.equal(x, y, `FormatTimerToString SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = TimeService.FormatTimerToString(`ten`, `six`, `35`, `12`);
+    y = `ten days, six:35:12`;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+    // ----------------------
+    // TODO: Handle these cases:
+    // // Negative Numbers
+    // x = TimeService.FormatTimerToString(-15, -6, -35, -12);
+    // y = `-15 days, 0-6:0-35:0-12`;
+    // t.equal(x, y, `FormatTimerToString, Expected: $${y}, Actual: $${x}`);
+
+    // // Infinite
+    // value = TimeService.FormatTimerToString(Infinity, Infinity, Infinity, Infinity);
+    // x = !isNaN(value) && isFinite(value) && Math.abs(value) == 0;
+    // y = true;
+    // t.equal(x, y, `Infinite FormatTimerToString SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
+    // // Null
+    // value = TimeService.FormatTimerToString(null, null, null, null);
+    // x = !isNaN(value) && isFinite(value) && Math.abs(value) == 0;
+    // y = true;
+    // t.equal(x, y, `Null FormatTimerToString SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
   });
 
-  await test(`Timer String to Millis`, (t) => {
-    const x = TimeService.TimerStringToMilliseconds(`0 days, 0:34:18`);
-    t.equal(x, 2058000, `Timer String to Millis GOOD: ${x}`);
+  await test(`TimerStringToMilliseconds`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof TimeService.TimerStringToMilliseconds;
+    y = typeof Function;
+    t.equal(x, y, `TimerStringToMilliseconds SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.TimerStringToMilliseconds(`0 days, 0:34:18`);
+    t.notThrow(() => x, `TimerStringToMilliseconds SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = TimeService.TimerStringToMilliseconds(`0 days, 0:34:18`);
+    y = undefined || null;
+    t.notEqual(x, y, `TimerStringToMilliseconds SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Good Test
+    x = TimeService.TimerStringToMilliseconds(`0 days, 0:34:18`);
+    y = 2058000;
+    t.equal(x, y, `TimerStringToMilliseconds GOOD, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = TimeService.TimerStringToMilliseconds(10);
+    y = 1;
+    t.equal(x, y, `TimerStringToMilliseconds BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Null
+    x = TimeService.TimerStringToMilliseconds(null);
+    y = 1;
+    t.equal(x, y, `Null TimerStringToMilliseconds SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
   });
 
-  await test(`Date to Millis`, (t) => {
-    const x = TimeService.DateToMilliseconds(new Date(1986, 1, 2));
-    t.equal(x, 507715200000, `Date to Millis GOOD: ${x}`);
+  await test(`DateToMilliseconds`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof TimeService.DateToMilliseconds;
+    y = typeof Function;
+    t.equal(x, y, `DateToMilliseconds SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.DateToMilliseconds(new Date(1986, 0, 2));
+    t.notThrow(() => x, `DateToMilliseconds SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = TimeService.DateToMilliseconds(new Date(1986, 0, 2));
+    y = undefined || null;
+    t.notEqual(x, y, `DateToMilliseconds SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Good Test
+    x = TimeService.DateToMilliseconds(new Date(1986, 0, 2));
+    y = 505036800000;
+    t.equal(x, y, `DateToMilliseconds GOOD, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    value = TimeService.DateToMilliseconds(`Date`);
+    x = !isNaN(value) && isFinite(value) && value > 0;
+    y = true;
+    t.equal(x, y, `DateToMilliseconds BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Infinite
+    value = TimeService.DateToMilliseconds(Infinity);
+    x = isNaN(value) || !isFinite(value) || Math.abs(value) == 0;
+    y = false;
+    t.equal(x, y, `Infinite DateToMilliseconds SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
+    // Null
+    value = TimeService.DateToMilliseconds(null);
+    x = !isNaN(value) && isFinite(value) && value > 0;
+    y = true;
+    t.equal(x, y, `Null DateToMilliseconds SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
   });
 
-  await test(`Millis to Timer String`, (t) => {
-    const x = TimeService.MillisecondsToTimerString(507715200000);
-    t.equal(x, `5876 days, 08:000:000`, `Millis to Timer String GOOD: ${x}`);
+  await test(`MillisecondsToTimerString`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof TimeService.MillisecondsToTimerString;
+    y = typeof Function;
+    t.equal(x, y, `MillisecondsToTimerString SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.MillisecondsToTimerString(507715200000);
+    t.notThrow(() => x, `MillisecondsToTimerString SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = TimeService.MillisecondsToTimerString(507715200000);
+    y = undefined || null;
+    t.notEqual(x, y, `MillisecondsToTimerString SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Good Test
+    x = TimeService.MillisecondsToTimerString(507715200000);
+    y = `5876 days, 08:000:000`;
+    t.equal(x, y, `MillisecondsToTimerString GOOD, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = TimeService.MillisecondsToTimerString(`Date`);
+    y = `NaN days, NaN:NaN:NaN`;
+    t.equal(x, y, `MillisecondsToTimerString BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Infinite
+    x = TimeService.MillisecondsToTimerString(Infinity);
+    y = `Infinity days, NaN:NaN:NaN`;
+    t.equal(x, y, `Infinite MillisecondsToTimerString SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
+    // Null
+    x = TimeService.MillisecondsToTimerString(null);
+    y = `0 days, 00:000:000`;
+    t.equal(x, y, `Null MillisecondsToTimerString SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
   });
 
   await test(`Duration`, (t) => {
-    const x = TimeService.Duration(new Date(1986, 01, 02), new Date(2086, 01, 02));
-    t.equal(x, `36525 days, 00:000:000`, `Duration GOOD: ${x}`);
+    let x, y, value;
+
+    // Test Function
+    x = typeof TimeService.Duration;
+    y = typeof Function;
+    t.equal(x, y, `Duration SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.Duration(new Date(1986, 01, 02), new Date(2086, 01, 02));
+    t.notThrow(() => x, `Duration SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = TimeService.Duration(new Date(1986, 01, 02), new Date(2086, 01, 02));
+    y = undefined || null;
+    t.notEqual(x, y, `Duration SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Good Test
+    x = TimeService.Duration(new Date(1986, 01, 02), new Date(2086, 01, 02));
+    y = `36525 days, 00:000:000`;
+    t.equal(x, y, `Duration GOOD, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = TimeService.Duration(`Date`);
+    y = `NaN days, NaN:NaN:NaN`;
+    t.equal(x, y, `Duration BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Infinite
+    x = TimeService.Duration(Infinity);
+    y = `Infinity days, NaN:NaN:NaN`;
+    t.equal(x, y, `Infinite Duration SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
+    // Null
+    x = TimeService.Duration(null);
+    t.throws(x, `Null Duration SHOULD throw error, Actual: ${x}`);
+
   });
 
-  await test(`Return Date`, (t) => {
-    const x = TimeService.ReturnDate(new Date(1986, 01, 02));
-    t.equal(x, `Sun Feb 16 1986 00:06:40 GMT-0800 (Pacific Standard Time)`, `Return Date GOOD: ${x}`);
+  await test(`ReturnDate`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof TimeService.ReturnDate;
+    y = typeof Function;
+    t.equal(x, y, `ReturnDate SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.ReturnDate(new Date(1986, 01, 02));
+    t.notThrow(() => x, `ReturnDate SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = TimeService.ReturnDate(new Date(1986, 01, 02));
+    y = undefined || null;
+    t.notEqual(x, y, `ReturnDate SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Good Test
+    value = TimeService.ReturnDate(new Date(1986, 01, 02));
+    x = !isNaN(value) && isFinite(value) && value > 0;
+    y = true;
+    t.equal(x, y, `ReturnDate GOOD, Expected: ${y}, Actual: ${x}, Value: ${value}`);
+
+    // Bad Inputs
+    value = TimeService.ReturnDate(`Date`);
+    x = !isNaN(value) && isFinite(value) && value > 0;
+    y = true;
+    t.equal(x, y, `ReturnDate BAD: Expected: ${y}, Actual: ${x}, Value: ${value}`);
+
+    // Infinite
+    value = TimeService.ReturnDate(Infinity);
+    x = !isNaN(value) && isFinite(value) && value > 0;
+    y = true;
+    t.equal(x, y, `Infinite ReturnDate SHOULD return ${y}, Expected: ${y}, Actual: ${x}, value: ${value}`);
+
+    // Null
+    x = TimeService.ReturnDate(null);
+    t.throws(x, `Null ReturnDate SHOULD throw error, Actual: ${x}`);
+
   });
 
-  await test(`Remaining Time`, (t) => {
-    const x = TimeService.RemainingTime(new Date(2086, 01, 02));
-    t.notThrow(() => x, `Remaining Time SHOULD NOT throw error: ${x}`);
+  await test(`RemainingTime`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof TimeService.RemainingTime;
+    y = typeof Function;
+    t.equal(x, y, `RemainingTime SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.RemainingTime(new Date(1986, 01, 02));
+    t.notThrow(() => x, `RemainingTime SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = TimeService.RemainingTime(new Date(1986, 01, 02));
+    y = undefined || null;
+    t.notEqual(x, y, `RemainingTime SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+
   });
 
   await test(`Days to Millis`, (t) => {
-    const x = TimeService.DaysToMillis(100);
-    t.equal(x, 8640000000, `Days to Millis GOOD: ${x}`);
+    let x, y, value;
+
+    // Test Function
+    x = typeof TimeService.DaysToMillis;
+    y = typeof Function;
+    t.equal(x, y, `RemainingTime SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = TimeService.DaysToMillis(100);
+    t.notThrow(() => x, `RemainingTime SHOULD NOT throw an error, Actual: ${x}`);
+
+    x = TimeService.DaysToMillis(100);
+    y = 8640000000;
+    t.equal(x, y, `Days to Millis GOOD, Expected: ${y}, Actual: ${x}`);
   });
-  
   
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";

@@ -2836,6 +2836,26 @@ class StatisticsService {
   }
 
   /**
+   * Returns a random integer between min and max, inclusive
+   * @param {number} min
+   * @param {number} max
+   * @returns {number} A random integer between min and max
+   */
+  static RandomWithinRange(min = 0, max = 10) {
+    try {
+      if (typeof min !== 'number' || typeof max !== 'number' || min > max) {
+        throw new Error('Invalid input: make sure min and max are numbers and min <= max.');
+      }
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    } catch(err) {
+      console.error(`"RandomWithinRange()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
    * Relative error.
    * This is more difficult to calculate than it first appears [1,2].  The usual
    * formula for the relative error between an actual value A and an expected

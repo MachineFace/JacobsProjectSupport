@@ -72,15 +72,40 @@ class SheetService {
    */
   static GetColumnDataByHeader(sheet, columnName = ``) {
     try {
+      if (!sheet || typeof sheet.getDataRange !== 'function') {
+        throw new Error('Invalid sheet object provided');
+      }
+
+      if (!columnName || typeof columnName !== 'string') {
+        throw new Error('Invalid or empty column name');
+      }
+
       const data = sheet.getDataRange().getValues();
-      const col = data[0].indexOf(columnName);
-      if (col == -1) throw new Error(`Column not found`);
-      let colData = data.map(d => d[col]); // Chaining isn't allowed here.
-      colData.splice(0, 1); // Pop first item out.
+      if (!data || data.length === 0) {
+        throw new Error('Sheet is empty');
+      }
+
+      const headerRow = data[0];
+      if (!Array.isArray(headerRow)) {
+        throw new Error('Header row is not an array');
+      }
+
+      const colIndex = headerRow.indexOf(columnName);
+      if (colIndex === -1) {
+        throw new Error(`Column "${columnName}" not found in header`);
+      }
+
+      // Collect column data starting from row 2 (index 1)
+      const colData = [];
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        colData.push(row[colIndex]);
+      }
+
       return colData;
     } catch (err) {
-      console.error(`"GetColumnDataByHeader()" failed : ${err}`);
-      return 1;
+      console.error(`"GetColumnDataByHeader" failed: ${err}`);
+      return [];  // Return empty array on failure — consistent with expected data type
     }
   }
 
