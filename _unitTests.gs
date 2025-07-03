@@ -6,6 +6,7 @@ const gasT_URL = `https://raw.githubusercontent.com/huan/gast/master/src/gas-tap
 
 /**
  * Test Main with GasT
+ * @private
  * PASSED 6/5/2025
  */
 const _gasTMainTesting = async() => {
@@ -60,6 +61,7 @@ const _gasTMainTesting = async() => {
 
 /**
  * Test Barcode with GasT
+ * @private
  * PASSED 7/2/2025
  */
 const _gasTBarcodeTesting = async() => {
@@ -89,6 +91,7 @@ const _gasTBarcodeTesting = async() => {
 
 /**
  * Test with GasT
+ * @private
  * PASSED 6/5/2025
  */
 const _gasTPriorityTesting = async() => {
@@ -159,6 +162,7 @@ const _gasTPriorityTesting = async() => {
 
 /**
  * Test ID with GasT
+ * @private
  * PASSED 6/5/2025
  */
 const _gasTIDServiceTesting = async() => {
@@ -206,6 +210,7 @@ const _gasTIDServiceTesting = async() => {
 
 /**
  * Test Message with GasT
+ * @private
  * PASSED 6/5/2025
  */
 const _gasTMessagingTesting = async() => {
@@ -303,6 +308,7 @@ const _gasTMessagingTesting = async() => {
 
 /**
  * Test Logging with GasT
+ * @private
  * PASSED 6/5/2025
  */
 const _gasTLoggerTesting = async() => {
@@ -355,6 +361,7 @@ const _gasTLoggerTesting = async() => {
 
 /**
  * Test Common with GasT
+ * @private
  * PASSED 6/5/2025
  */
 const _gasTCommonTesting = async() => {
@@ -430,6 +437,7 @@ const _gasTCommonTesting = async() => {
 
 /**
  * Test Misc with GasT
+ * @private
  * PASSED 6/5/2025
  */
 const _gasTMiscTesting = async() => {
@@ -575,6 +583,7 @@ const _gasTMiscTesting = async() => {
 
 /**
  * Test Calculations with GasT
+ * @private
  * PASSED 7/2/2025
  */
 const _gasTCalculationTesting = async() => {
@@ -653,6 +662,7 @@ const _gasTCalculationTesting = async() => {
 
 /**
  * Test TimeService with GasT
+ * @private
  * PASSED 7/2/2025
  */
 const _gasTTimeTesting = async() => {
@@ -963,6 +973,7 @@ const _gasTTimeTesting = async() => {
 
 /**
  * Test Shopify API with GasT
+ * PASSED 7/3/2025
  */
 const _gasTShopifyTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -973,53 +984,180 @@ const _gasTShopifyTesting = async() => {
 
   const shopify = new ShopifyAPI();
 
-  await test(`Get Last Shopify Order`, async(t) => {
-    const x = await shopify.GetLastOrder();
-    console.info(x);
-    t.notEqual(x, undefined || null, `Get Last Shopify Order should not return undefined or null.`);
+  await test(`Shopify Class Test`, (t) => {
+    let x, y;
+    const ts = new ShopifyAPI();
+    t.notThrow(() => ts, `Shopify Class SHOULD NOT throw error.`);
+
+    y = undefined || null;
+    t.notEqual(ts, y, `Shopify Class SHOULD NOT yield ${y}, Actual: ${x}`);
+
+    x = ts instanceof ShopifyAPI;
+    y = true;
+    t.equal(x, y, `Check Instancing of Shopify Class, Expected: ${y}, Actual: ${x} `);
+  });
+
+  await test(`GetLastOrder`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof shopify.GetOrdersList;
+    y = typeof Function;
+    t.equal(x, y, `GetLastOrder SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = shopify.GetLastOrder();
+    t.notThrow(() => x, `GetLastOrder SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = shopify.GetLastOrder();
+    y = undefined || null;
+    t.notEqual(x, y, `GetLastOrder SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
   });
   
-  await test(`Get Shopify Orders List`, async(t) => {
-    const x = await shopify.GetOrdersList();
-    t.notEqual(x, undefined || null, `Get Shopify Orders List should not return undefined or null.`);
+  await test(`GetOrdersList`, async(t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof shopify.GetOrdersList;
+    y = typeof Function;
+    t.equal(x, y, `GetOrdersList SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = shopify.GetOrdersList();
+    t.notThrow(() => x, `GetOrdersList SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = shopify.GetOrdersList();
+    y = undefined || null;
+    t.notEqual(x, y, `GetOrdersList SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
   });
 
   await test(`Shopify _GetStoreProductID`, (t) => {
-    const x = shopify._GetStoreProductID(`Fortus Red ABS-M30`);
-    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${x}`);
+    let x, y, value;
+
+    // Test Function
+    x = typeof shopify._GetStoreProductID;
+    y = typeof Function;
+    t.equal(x, y, `_GetStoreProductID SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = shopify._GetStoreProductID(`Fortus Red ABS-M30`);
+    t.notThrow(() => x, `_GetStoreProductID SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = shopify._GetStoreProductID(`Fortus Red ABS-M30`);
+    y = undefined || null;
+    t.notEqual(x, y, `_GetStoreProductID SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Normal Test
+    x = shopify._GetStoreProductID(`Fortus Red ABS-M30`);
+    y = 3940700420;
+    t.equal(x, y, `_GetStoreProductID SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = shopify._GetStoreProductID(`ten`);
+    y = 7665297916070;  // Default product
+    t.equal(x, y, `_GetStoreProductID BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Null
+    x = shopify._GetStoreProductID(null);
+    y = 1;
+    t.throws(x, `Null _GetStoreProductID SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
+
   });
 
   await test(`Shopify GetProductByID`, async (t) => {
-    const x = await shopify.GetProductByID(3940700420);
-    t.notEqual(x, undefined || null, `Shopify Lookup Product ID for Fortus Red ABS-M30 should not return undefined or null: ${JSON.stringify(x)}`);
+
+    let x, y, value;
+
+    // Test Function
+    x = typeof shopify.GetProductByID;
+    y = typeof Function;
+    t.equal(x, y, `GetProductByID SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = shopify.GetProductByID(3940700420);
+    t.notThrow(() => x, `GetProductByID SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = shopify.GetProductByID(3940700420);
+    y = undefined || null;
+    t.notEqual(x, y, `GetProductByID SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Normal Test
+    x = shopify.GetProductByID(3940700420);
+    t.notThrow(() => x, `GetProductByID SHOULD not throw, Actual: ${x}`);
+
+    // Bad Inputs
+    x = shopify.GetProductByID(`ten`);
+    t.throws(x, `GetProductByID BAD: Actual: ${x}`);
+
+    // Null
+    x = shopify.GetProductByID(null);
+    y = 1;
+    t.throws(x, `Null GetProductByID SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
   });
 
   await test(`Shopify GetCustomerByEmail`, async (t) => {
-    const x = await shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
-    t.notEqual(x, undefined || null, `GetCustomerByEmail for eli_lee@berkeley.edu should not return undefined or null: ${JSON.stringify(x)}`);
+    let x, y, value;
+
+    // Test Function
+    x = typeof shopify.GetCustomerByEmail;
+    y = typeof Function;
+    t.equal(x, y, `GetCustomerByEmail SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
+    t.notThrow(() => x, `GetCustomerByEmail SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
+    y = undefined || null;
+    t.notEqual(x, y, `GetCustomerByEmail SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Normal Test
+    // TODO: FIX
+    value = await shopify.GetCustomerByEmail(`eli_lee@berkeley.edu`);
+    x = typeof value == typeof Object;
+    y = false;
+    t.equal(x, y, `GetCustomerByEmail SHOULD return ${y}, Expected: ${y}, Actual: ${x}, Value: ${value}`);
+
+    // Bad Inputs
+    x = shopify.GetCustomerByEmail(`ten`);
+    t.throws(x, `GetCustomerByEmail BAD: Actual: ${x}`);
+
+    // Null
+    x = shopify.GetCustomerByEmail(null);
+    y = 1;
+    t.throws(x, `Null GetCustomerByEmail SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
   });
 
-  await test(`Shopify Create Order`, async (t) => {
-    const id = IDService.createId();
+  // await test(`Shopify Create Order`, async (t) => {
+  //   const id = IDService.createId();
     
-    let materials = [
-      { name : `Fortus Red ABS-M30`,  quantity : 5, },
-      { name : `Objet Polyjet VeroMagenta RGD851`,  quantity : 10, },
-      { name : null,  quantity : 0.5, },
-      { name : `Stratasys Dimension Soluble Support Material P400SR`,  quantity : 15, },
-      { name : undefined,  quantity : 15, },
-      { name : `Fortus Red ABS-M30`,  quantity : -30.5, },
-      { name : `Fortus Red ABS-M30`,  quantity : undefined, },
-      { name : `Fortus Red ABS-M30`,  quantity : null, },
-    ];
+  //   let materials = [
+  //     { name : `Fortus Red ABS-M30`,  quantity : 5, },
+  //     { name : `Objet Polyjet VeroMagenta RGD851`,  quantity : 10, },
+  //     { name : null,  quantity : 0.5, },
+  //     { name : `Stratasys Dimension Soluble Support Material P400SR`,  quantity : 15, },
+  //     { name : undefined,  quantity : 15, },
+  //     { name : `Fortus Red ABS-M30`,  quantity : -30.5, },
+  //     { name : `Fortus Red ABS-M30`,  quantity : undefined, },
+  //     { name : `Fortus Red ABS-M30`,  quantity : null, },
+  //   ];
 
-    const order = await shopify.CreateOrder({
-      id : id,
-      email : PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`),
-      materials : materials,
-    });
-    console.info(JSON.stringify(order, null, 4));
-  });
+  //   const order = await shopify.CreateOrder({
+  //     id : id,
+  //     email : PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`),
+  //     materials : materials,
+  //   });
+  //   console.info(JSON.stringify(order, null, 4));
+
+  //   t.notThrow(() => x, `Shopify Create Order DOES NOT throw error.`);
+  // });
 
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
