@@ -3,6 +3,7 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating an Employee
+ * Abstract Class
  */
 class Employee {
   constructor({
@@ -53,13 +54,15 @@ const _testEmployee = () => {
  * ----------------------------------------------------------------------------------------------------------------
  * Class for Creating a Design Specialist Employee
  */
-class DesignSpecialist {
+class DesignSpecialist extends Employee {
   constructor({
     name : name, 
     fullname : fullname, 
     email : email,
     areas : areas,
   }) {
+    // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
+    super(name, fullname, email, areas);
     this.id = IDService.createId();
     this.name = name ? name : `DS`;
     this.fullname = fullname ? fullname : `Design Specialist`;
@@ -121,7 +124,7 @@ class DesignSpecialist {
  * SS Class - child of DS Class
  * Note: In derived classes, super() must be called before you can use 'this'. Leaving this out will cause a reference error.
  */
-class StudentSupervisor extends DesignSpecialist {
+class StudentSupervisor extends Employee {
   constructor({
     name : name, 
     fullname : fullname, 
@@ -162,7 +165,7 @@ class StudentSupervisor extends DesignSpecialist {
  * ----------------------------------------------------------------------------------------------------------------
  * Manager Class - child of DS Class
  */
-class Manager extends DesignSpecialist { 
+class Manager extends Employee { 
   constructor({
     name : name, 
     fullname : fullname, 
@@ -304,7 +307,7 @@ const InvokeDS = (name, property) => {
  * ----------------------------------------------------------------------------------------------------------------
  * Create a Design Specialist from spreadsheet and return a list
  * @returns {[string]} DSList
- */
+ *
 const BuildStaff = () => {
   let staff = {};
   let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
@@ -347,16 +350,13 @@ const BuildStaff = () => {
   // console.info(JSON.stringify(staff));
   return staff;
 }
+*/
 
 
-const _testStaff = () => {
-  const staff = BuildStaff();
-  console.info(staff)
-}
 
 
 const MakeLink = (email) => {
-  if(!Emailer.ValidateEmail(email)) return undefined;
+  if(!EmailService.ValidateEmail(email)) return undefined;
   let link = `<a href="${email}">${email}</a>`;
   return link;    
 }

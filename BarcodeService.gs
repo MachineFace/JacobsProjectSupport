@@ -54,7 +54,7 @@ class BarcodeService {
    * Searches for id found in cell B2 of SearchByBarCode sheet and changes status to 'Picked Up'
    * @DEFUNCT
    * @private
-   */
+   *
   static PickupByBarcode() {
     try {
       const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
@@ -86,12 +86,13 @@ class BarcodeService {
       return 1;
     }
   }
+  */
 
   /**
    * Mark an id as abandoned and email student.
    * @DEFUNCT
    * @private
-   */
+   *
   static async MarkAsAbandonedByBarcode() {
     try {
       const text = OTHERSHEETS.Pickup.getRange(3,2).getValue();
@@ -126,7 +127,7 @@ class BarcodeService {
             rowData : rowData,
             designspecialist : ds,
           });
-          new Emailer({
+          new EmailService({
             email : email,
             name : name, 
             status : STATUS.abandoned,
@@ -134,7 +135,7 @@ class BarcodeService {
             id : id,
             material1Quantity : mat1quantity,
             message : message.abandonedMessage,
-          });
+          }).SendEmail();
           console.warn(`Student: ${name} emailed ABANDONED message.`)
           return;
         }
@@ -146,7 +147,7 @@ class BarcodeService {
       return 1;
     }
   }
-  
+  */
 }
 
 const _testBarcode = () => {

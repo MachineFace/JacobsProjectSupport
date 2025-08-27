@@ -29,7 +29,7 @@ const PopUpMarkAsAbandoned = async () => {
         id : id, 
         designspecialist : res.ds, 
       })
-      await new Emailer({
+      await new EmailService({
         email : email, 
         status : STATUS.abandoned,
         projectname : res.projectName,
@@ -133,7 +133,7 @@ const PopupGetSingleStudentPriority = async () => {
     SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     if(priority == PRIORITY.None) {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
-      new Emailer({ 
+      new EmailService({ 
         name : name, 
         status : STATUS.missingAccess,
         email : email,    
@@ -144,7 +144,7 @@ const PopupGetSingleStudentPriority = async () => {
           rowData : rowData,
           designspecialist : rowData.ds,
         }),
-      });
+      }).SendEmail();
     }
     ui.alert(
       SERVICE_NAME,

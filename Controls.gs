@@ -1,6 +1,5 @@
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Creates Time-Driven Triggers : ONLY RUN ONCE AFTER DELETING PREVIOUS TRIGGERS. DO NOT DELETE
  * Used in EnableJPS()
  */
@@ -76,11 +75,9 @@ const CreateTimeDrivenTrigger = () => {
     console.error(`"CreateTimeDrivenTrigger()" failed : ${err}`);
     return 1;
   }
-};
-
+}
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Remove Triggers when Disabling JPS - DO NOT DELETE
  * Used in 'DisableJPS()'
  */
@@ -134,9 +131,7 @@ const RemoveTimedTriggers = () => {
   }
 }
 
-
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Turn OFF JPS - DO NOT DELETE
  * Used in conjunction with 'EnableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
@@ -155,9 +150,7 @@ const DisableJPS = () => {
   }
 }
 
-
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Turn ON JPS - DO NOT DELETE
  * Used in conjunction with 'DisableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
@@ -176,8 +169,6 @@ const EnableJPS = () => {
     return 1;
   }
 }
-
-
 
 /**
  * Set Dropdowns for status
@@ -198,8 +189,6 @@ const SetStatusDropdowns = () => {
     return 1;
   }
 }
-
-
 
 /**
  * Set the Conditional Formatting for each page
@@ -228,8 +217,8 @@ const SetConditionalFormatting = () => {
         console.info(`Skipping ${SHEETS.Advancedlab.getSheetName()}`); 
         return;
       }
-      const last_row = sheet.getLastRow();
-      const last_column = sheet.getLastColumn();
+      const last_row = sheet.getMaxRows();
+      const last_column = sheet.getMaxColumns();
       const range = sheet.getRange(start_row, 1, last_row - start_row + 1, last_column);
       console.warn(`Setting Conditional Formatting for: ${sheet.getSheetName()}`);
 
@@ -252,7 +241,6 @@ const SetConditionalFormatting = () => {
   }
 }
 
-
 /**
  * Resize the Summary page Rows back to Default
  * @TRIGGERED
@@ -272,7 +260,6 @@ const SetSummaryPageRowHeight = () => {
     return 1;
   }
 }
-
 
 /**
  * Set Row Height
@@ -297,10 +284,6 @@ const SetRowHeight = () => {
   }
 }
 
-
-
-
-
 /**  
  * Delete Files older than some number of days
  * @param {number} RetentionPeriod
@@ -323,11 +306,9 @@ const DeleteOldFiles = () => {
     console.error(`"DeleteOldFiles()" failed: ${err}`);
     return 1;
   }
-};
-
+}
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
  * Format cell to fix overlap issue
  * @param {cell} cell
  */
@@ -340,9 +321,6 @@ const FormatCell = (cell) => {
     return 1;
   }
 }
-
-
-
 
 /**
  * Build Summary Equation:

@@ -9,9 +9,9 @@ const SERVICE_NAME = `Jacobs Project Support`;
 /** @private */
 const THIS_SPREADSHEET = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty(`SPREADSHEET_ID`));
 
-const DaysRetentionNumber = 15; //How many days to hold a file
-const RETENTION_PERIOD = DaysRetentionNumber * 24 * 60 * 60 * 1000; //Number of milliseconds in the retention period.
-const PICKUP_HOURS = `Monday - Friday: 11am - 1pm.`  //`Monday - Friday: 11am - 1pm & 4pm - 6pm.`
+const DAYS_RETENTION_NUMBER = 15; //How many days to hold a file
+const RETENTION_PERIOD = DAYS_RETENTION_NUMBER * 24 * 60 * 60 * 1000;       // Number of milliseconds in the retention period.
+const PICKUP_HOURS = `Monday - Friday: 11am - 1pm.`                         
 
 /**
  * Colors

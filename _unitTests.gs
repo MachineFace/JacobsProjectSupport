@@ -71,6 +71,19 @@ const _gasTBarcodeTesting = async() => {
   }
   const test = new GasTap();
 
+  await test(`BarcodeService Class Test`, (t) => {
+    let x, y;
+    const ts = new BarcodeService();
+    t.notThrow(() => ts, `BarcodeService SHOULD NOT throw error.`);
+
+    y = undefined || null;
+    t.notEqual(ts, y, `BarcodeService SHOULD NOT yield ${y}, Actual: ${x}`);
+
+    x = ts instanceof BarcodeService;
+    y = true;
+    t.equal(x, y, `Check Instancing of BarcodeService, Expected: ${y}, Actual: ${x} `);
+  });
+
   await test(`Generate Barcode: `, async (t) => {
     let x, y;
 
@@ -100,6 +113,19 @@ const _gasTPriorityTesting = async() => {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
   const test = new GasTap();
+
+  await test(`PriorityService Class Test`, (t) => {
+    let x, y;
+    const ts = new PriorityService({});
+    t.notThrow(() => ts, `PriorityService SHOULD NOT throw error.`);
+
+    y = undefined || null;
+    t.notEqual(ts, y, `PriorityService SHOULD NOT yield ${y}, Actual: ${x}`);
+
+    x = ts instanceof PriorityService;
+    y = true;
+    t.equal(x, y, `Check Instancing of PriorityService, Expected: ${y}, Actual: ${x} `);
+  });
 
   await test(`Priority Test`, (t) => {
     let types = {
@@ -136,23 +162,40 @@ const _gasTPriorityTesting = async() => {
         sid : undefined,
       }
     }
-    let x;
-    x = new PriorityService({email : types.staff.email, sid : types.staff.sid }).Priority;
-    t.equal(x, PRIORITY.Tier1, `DEFAULT priority for staff : Expected 1, Actual ${x}`);
-    x = new PriorityService({email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
-    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
-    x = new PriorityService({email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
-    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
-    x = new PriorityService({email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
-    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
-    x = new PriorityService({email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
-    t.equal(x, PRIORITY.None, `Expected ${PRIORITY.None}, Actual ${x}`);
-    x = new PriorityService({email : types.nullgoodS.email, sid : types.nullgoodS.sid}).Priority;
-    t.equal(x, PRIORITY.Tier4, `Expected ${PRIORITY.Tier4}, Actual ${x}`);
-    x = new PriorityService({email : types.nullCase.email, sid : types.nullCase.sid}).Priority;
-    t.equal(x, PRIORITY.Tier1, `Expected ${PRIORITY.Tier1}, Actual ${x}`);
-    x = new PriorityService({email : types.undefCase.email, sid : types.undefCase.sid}).Priority;
-    t.equal(x, PRIORITY.Tier1, `Expected ${PRIORITY.Tier1}, Actual ${x}`);
+
+    let x, y;
+
+    x = new PriorityService({ email : types.staff.email, sid : types.staff.sid }).Priority;
+    y = PRIORITY.Tier1;
+    t.equal(x, y, `DEFAULT priority for staff : Expected ${y}, Actual ${x}`);
+    
+    x = new PriorityService({ email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
+    y = PRIORITY.Tier4;
+    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
+    
+    x = new PriorityService({ email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
+    y = PRIORITY.Tier4;
+    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
+    
+    x = new PriorityService({ email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
+    y = PRIORITY.Tier4;
+    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
+    
+    x = new PriorityService({ email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
+    y = PRIORITY.None;
+    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
+    
+    x = new PriorityService({ email : types.nullgoodS.email, sid : types.nullgoodS.sid}).Priority;
+    y = PRIORITY.Tier4;
+    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
+    
+    x = new PriorityService({ email : types.nullCase.email, sid : types.nullCase.sid}).Priority;
+    y = PRIORITY.Tier1;
+    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
+    
+    x = new PriorityService({ email : types.undefCase.email, sid : types.undefCase.sid}).Priority;
+    y = PRIORITY.Tier1;
+    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
 
   });
 
@@ -211,7 +254,7 @@ const _gasTIDServiceTesting = async() => {
 /**
  * Test Message with GasT
  * @private
- * PASSED 6/5/2025
+ * PASSED 7/9/2025
  */
 const _gasTMessagingTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -220,29 +263,65 @@ const _gasTMessagingTesting = async() => {
   }
   const test = new GasTap();
 
+  await test(`MessageService Class Test`, (t) => {
+    let x, y;
+    const ts = new MessageService({});
+    t.notThrow(() => ts, `MessageService SHOULD NOT throw error.`);
+
+    y = undefined || null;
+    t.notEqual(ts, y, `MessageService SHOULD NOT yield ${y}, Actual: ${x}`);
+
+    x = ts instanceof MessageService;
+    y = true;
+    t.equal(x, y, `Check Instancing of MessageService, Expected: ${y}, Actual: ${x} `);
+  });
+
   await test(`MessageService DEFAULT`, (t) => {
     const message = new MessageService({});
 
-    const a = `DEFAULT ${message.defaultMessage}`;
-    t.notThrow(() => a, `DEFAULT SHOULD NOT throw error.`);
-    const b = `RECEIVED ${message.receivedMessage}`;
-    t.notThrow(() => b, `RECEIVED SHOULD NOT throw error.`);
-    const c = `PENDING ${message.pendingMessage}`;
-    t.notThrow(() => c, `PENDING SHOULD NOT throw error.`);
-    const d = `IN-PROGRESS ${message.inProgressMessage}`;
-    t.notThrow(() => d, `IN-PROGRESS SHOULD NOT throw error.`);
-    const e = `COMPLETED ${message.completedMessage}`;
-    t.notThrow(() => e, `COMPLETED SHOULD NOT throw error.`);
-    const f = `FAILED ${message.failedMessage}`;
-    t.notThrow(() => f, `FAILED SHOULD NOT throw error.`);
-    const g = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
-    t.notThrow(() => g, `REJECTED BY STUDENT SHOULD NOT throw error.`);
-    const h = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
-    t.notThrow(() => h, `REJECTED BY STAFF SHOULD NOT throw error.`);
-    const i = `BILLED ${message.billedMessage}`;
-    t.notThrow(() => i, `BILLED SHOULD NOT throw error.`);
-    const j = `PICKED UP ${message.pickedUpMessage}`;
-    t.notThrow(() => j, `PICKED UP SHOULD NOT throw error.`);
+    let x, y;
+
+    x = `DEFAULT ${message.defaultMessage}`;
+    t.notThrow(() => x, `DEFAULT SHOULD NOT throw error.`);
+
+    x = `RECEIVED ${message.receivedMessage}`;
+    t.notThrow(() => x, `RECEIVED SHOULD NOT throw error.`);
+
+    x = `PENDING ${message.pendingMessage}`;
+    t.notThrow(() => x, `PENDING SHOULD NOT throw error.`);
+
+    x = `IN-PROGRESS ${message.inProgressMessage}`;
+    t.notThrow(() => x, `IN-PROGRESS SHOULD NOT throw error.`);
+
+    x = `COMPLETED ${message.completedMessage}`;
+    t.notThrow(() => x, `COMPLETED SHOULD NOT throw error.`);
+
+    x = `FAILED ${message.failedMessage}`;
+    t.notThrow(() => x, `FAILED SHOULD NOT throw error.`);
+
+    x = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
+    t.notThrow(() => x, `REJECTED BY STUDENT SHOULD NOT throw error.`);
+
+    x = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
+    t.notThrow(() => x, `REJECTED BY STAFF SHOULD NOT throw error.`);
+
+    x = `BILLED ${message.billedMessage}`;
+    t.notThrow(() => x, `BILLED SHOULD NOT throw error.`);
+
+    x = `PICKED UP ${message.pickedUpMessage}`;
+    t.notThrow(() => x, `PICKED UP SHOULD NOT throw error.`);
+
+    x = `NO ACCESS ${message.noAccessMessage}`;
+    t.notThrow(() => x, `NO ACCESS SHOULD NOT throw error.`);
+
+    x = `INITIAL MISSING ACCESS ${message.initialMissingAccessMessage}`;
+    t.notThrow(() => x, `INITIAL MISSING ACCESS SHOULD NOT throw error.`);
+
+    x = `GSI PLOTTER ${message.gsiPlotterMessage}`;
+    t.notThrow(() => x, `GSI PLOTTER SHOULD NOT throw error.`);
+
+    x = `DS MESSAGE ${message.dsMessage}`;
+    t.notThrow(() => x, `DS MESSAGE SHOULD NOT throw error.`);
 
   });
 
@@ -258,49 +337,52 @@ const _gasTMessagingTesting = async() => {
       cost : 45.50,
     });
 
-    const a = `DEFAULT ${message.defaultMessage}`;
-    t.notEqual(a, undefined || null, `DEFAULT message should not return undefined or null. \n${a}`);
-    const b = `RECEIVED ${message.receivedMessage}`;
-    t.notEqual(b, undefined || null, `RECEIVED message should not return undefined or null. \n${b}`);
-    const c = `PENDING ${message.pendingMessage}`;
-    t.notEqual(c, undefined || null, `PENDING message should not return undefined or null. \n${c}`);
-    const d = `IN-PROGRESS ${message.inProgressMessage}`;
-    t.notEqual(d, undefined || null, `IN-PROGRESS message should not return undefined or null. \n${d}`);
-    const e = `COMPLETED ${message.completedMessage}`;
-    t.notEqual(e, undefined || null, `COMPLETED message should not return undefined or null. \n${e}`);
-    const f = `FAILED ${message.failedMessage}`;
-    t.notEqual(f, undefined || null, `FAILED message should not return undefined or null. \n${f}`);
-    const g = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
-    t.notEqual(g, undefined || null, `REJECTED BY STUDENT message should not return undefined or null. \n${g}`);
-    const h = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
-    t.notEqual(h, undefined || null, `REJECTED BY STAFF message should not return undefined or null. \n${h}`);
-    const i = `BILLED ${message.billedMessage}`;
-    t.notEqual(i, undefined || null, `BILLED message should not return undefined or null. \n${i}`);
-    const j = `PICKED UP ${message.pickedUpMessage}`;
-    t.notEqual(j, undefined || null, `PICKED UP message should not return undefined or null. \n${j}`);
+    let x, y;
+
+    x = `DEFAULT ${message.defaultMessage}`;
+    y = undefined || null;
+    t.notEqual(x, y, `DEFAULT message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+
+    x = `RECEIVED ${message.receivedMessage}`;
+    t.notEqual(x, y, `RECEIVED message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+
+    x = `PENDING ${message.pendingMessage}`;
+    t.notEqual(x, y, `PENDING message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+
+    x= `IN-PROGRESS ${message.inProgressMessage}`;
+    t.notEqual(x, y, `IN-PROGRESS message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+    
+    x = `COMPLETED ${message.completedMessage}`;
+    t.notEqual(x, y, `COMPLETED message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+    
+    x = `FAILED ${message.failedMessage}`;
+    t.notEqual(x, y, `FAILED message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+    
+    x = `REJECTED BY STUDENT ${message.rejectedByStudentMessage}`;
+    t.notEqual(x, y, `REJECTED BY STUDENT message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+    
+    x = `REJECTED BY STAFF ${message.rejectedByStaffMessage}`;
+    t.notEqual(x, y, `REJECTED BY STAFF message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+    
+    x = `BILLED ${message.billedMessage}`;
+    t.notEqual(x, y, `BILLED message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+    
+    x = `PICKED UP ${message.pickedUpMessage}`;
+    t.notEqual(x, y, `PICKED UP message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+
+    x = `NO ACCESS ${message.noAccessMessage}`;
+    t.notEqual(x, y, `NO ACCESS message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+
+    x = `INITIAL MISSING ACCESS ${message.initialMissingAccessMessage}`;
+    t.notEqual(x, y, `INITIAL MISSING ACCESS message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+
+    x = `GSI PLOTTER ${message.gsiPlotterMessage}`;
+    t.notEqual(x, y, `GSI PLOTTER message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
+
+    x = `DS MESSAGE ${message.dsMessage}`;
+    t.notEqual(x, y, `DS MESSAGE message SHOULD NOT return ${y}, Expected ${y}, Actual: \n${x}`);
 
   });
-
-  await test(`Submission DEFAULTS`, (t) => {
-    const message = new CreateSubmissionMessage({});
-    const w = `DS MESSAGE : ${message.dsMessage}`;
-    t.notThrow(() => w, `DS MESSAGE SHOULD NOT throw error.`);
-    const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
-    t.notThrow(() => y, `MISSING MESSAGE SHOULD NOT throw error.`);
-  });
-
-  await test(`Submission Messages`, (t) => {
-    const message = new CreateSubmissionMessage({ 
-      name : 'Cody', 
-      projectname : 'SomeProject', 
-      id : 102938471431,
-    } );
-    const w = `DS MESSAGE : ${message.dsMessage}`;
-    t.notEqual(w, undefined || null, `DS MESSAGE message should not return undefined or null. \n${w}`);
-    const y = `MISSING ACCESS : ${message.missingAccessMessage}`;
-    t.notEqual(y, undefined || null, `MISSING ACCESS message should not return undefined or null. \n${y}`);
-  });
-
   
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
@@ -318,9 +400,25 @@ const _gasTLoggerTesting = async() => {
   }
   const test = new GasTap();
 
+  await test(`Log Class Test`, (t) => {
+    let x, y;
+    const ts = new Log();
+    t.notThrow(() => ts, `Log SHOULD NOT throw error.`);
+
+    y = undefined || null;
+    t.notEqual(ts, y, `Log SHOULD NOT yield ${y}, Actual: ${x}`);
+
+    x = ts instanceof Log;
+    y = true;
+    t.equal(x, y, `Check Instancing of Log, Expected: ${y}, Actual: ${x} `);
+  });
+
   await test(`Logger`, (t) => {
-    const logger = new Log();
-    t.notThrow(() => logger, `Logger SHOULD NOT throw error.`);
+    let x, y;
+    x = new Log();
+    y = 1;
+    t.notThrow(() => x, `Logger SHOULD NOT throw error.`);
+    t.notEqual(x, y, `Logger SHOULD NOT return ${y}, Expected: ${y}, Actual: ${x}`);
   });
 
    await test(`Warning`, (t) => {
@@ -526,23 +624,23 @@ const _gasTMiscTesting = async() => {
   await test(`ValidateEmail`, (t) => {
     let x, y;
     
-    x = Emailer.ValidateEmail(`cparsell@berkeley.edu`);
+    x = EmailService.ValidateEmail(`cparsell@berkeley.edu`);
     y = true;
     t.equal(x, y, `ValidateEmail SHOULD return ${y}, Actual: ${x}`);
 
-    x = Emailer.ValidateEmail(`BAD NAME`);
+    x = EmailService.ValidateEmail(`BAD NAME`);
     y = false;
     t.equal(x, y, `ValidateEmail SHOULD return ${y}, Actual: ${x}`);
 
-    x = Emailer.ValidateEmail(`!#$%^%$123@berkeley.edu`);
+    x = EmailService.ValidateEmail(`!#$%^%$123@berkeley.edu`);
     y = false;
     t.equal(x, y, `ValidateEmail SHOULD return ${y}, Actual: ${x}`);
 
-    x = Emailer.ValidateEmail(`normalname@!#&^*^&*$%^)$!#$#!`);
+    x = EmailService.ValidateEmail(`normalname@!#&^*^&*$%^)$!#$#!`);
     y = false;
     t.equal(x, y, `ValidateEmail SHOULD return ${y}, Actual: ${x}`);
 
-    x = Emailer.ValidateEmail(`12345675645634599293487529384752938745923845293485729348572934875@berkeley.edu`);
+    x = EmailService.ValidateEmail(`12345675645634599293487529384752938745923845293485729348572934875@berkeley.edu`);
     y = true;
     t.equal(x, y, `ValidateEmail SHOULD return ${y}, Actual: ${x}`);
 
@@ -593,6 +691,7 @@ const _gasTCalculationTesting = async() => {
   }
   const test = new GasTap();
   const c = new Calculate();
+
   await test(`Calc Average Turnaround`, (t) => {
     const x = c.GetAverageTurnaround(SHEETS.Laser);
     t.ok(x, `Time string is ok.`);
@@ -1135,29 +1234,29 @@ const _gasTShopifyTesting = async() => {
     t.throws(x, `Null GetCustomerByEmail SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
   });
 
-  // await test(`Shopify Create Order`, async (t) => {
-  //   const id = IDService.createId();
+  await test(`Shopify Create Order`, async (t) => {
+    const id = IDService.createId();
     
-  //   let materials = [
-  //     { name : `Fortus Red ABS-M30`,  quantity : 5, },
-  //     { name : `Objet Polyjet VeroMagenta RGD851`,  quantity : 10, },
-  //     { name : null,  quantity : 0.5, },
-  //     { name : `Stratasys Dimension Soluble Support Material P400SR`,  quantity : 15, },
-  //     { name : undefined,  quantity : 15, },
-  //     { name : `Fortus Red ABS-M30`,  quantity : -30.5, },
-  //     { name : `Fortus Red ABS-M30`,  quantity : undefined, },
-  //     { name : `Fortus Red ABS-M30`,  quantity : null, },
-  //   ];
+    let materials = [
+      { name : `Fortus Red ABS-M30`,  quantity : 5, },
+      { name : `Objet Polyjet VeroMagenta RGD851`,  quantity : 10, },
+      { name : null,  quantity : 0.5, },
+      { name : `Stratasys Dimension Soluble Support Material P400SR`,  quantity : 15, },
+      { name : undefined,  quantity : 15, },
+      { name : `Fortus Red ABS-M30`,  quantity : -30.5, },
+      { name : `Fortus Red ABS-M30`,  quantity : undefined, },
+      { name : `Fortus Red ABS-M30`,  quantity : null, },
+    ];
 
-  //   const order = await shopify.CreateOrder({
-  //     id : id,
-  //     email : PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`),
-  //     materials : materials,
-  //   });
-  //   console.info(JSON.stringify(order, null, 4));
+    const order = await shopify.CreateOrder({
+      id : id,
+      email : PropertiesService.getScriptProperties().getProperty(`SHOPIFY_EMAIL`),
+      materials : materials,
+    });
+    console.info(JSON.stringify(order, null, 4));
 
-  //   t.notThrow(() => x, `Shopify Create Order DOES NOT throw error.`);
-  // });
+    t.notThrow(() => x, `Shopify Create Order DOES NOT throw error.`);
+  });
 
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
@@ -1204,6 +1303,7 @@ const _gasTTicketTesting = async() => {
 
 /**
  * Test Email Service with GasT
+ * PASSED 7/9/2025
  */
 const _gasTEmailTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -1212,7 +1312,108 @@ const _gasTEmailTesting = async() => {
   }
   const test = new GasTap();
 
-  await test(`Emailer`, async(t) => {
+  await test(`EmailService Class Test`, (t) => {
+    let x, y;
+    const ts = new EmailService({});
+    t.notThrow(() => ts, `EmailService SHOULD NOT throw error.`);
+
+    y = undefined || null;
+    t.notEqual(ts, y, `EmailService SHOULD NOT yield ${y}, Actual: ${x}`);
+
+    x = ts instanceof EmailService;
+    y = true;
+    t.equal(x, y, `Check Instancing of EmailService, Expected: ${y}, Actual: ${x} `);
+  });
+
+  await test(`ValidateEmail`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof EmailService.ValidateEmail;
+    y = typeof Function;
+    t.equal(x, y, `ValidateEmail SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = EmailService.ValidateEmail(`test@berkeley.edu`)
+    t.notThrow(() => x, `ValidateEmail SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = EmailService.ValidateEmail(`test@berkeley.edu`);
+    y = undefined || null;
+    t.notEqual(x, y, `ValidateEmail SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Normal Test
+    x = EmailService.ValidateEmail(`test@berkeley.edu`);
+    y = true;
+    t.equal(x, y, `ValidateEmail SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.ValidateEmail(`test@gmail.com`);
+    y = false;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.ValidateEmail(12345);
+    y = false;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.ValidateEmail(Infinity);
+    y = false;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.ValidateEmail(null);
+    y = false;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+  });
+
+  await test(`Email`, (t) => {
+    let x, y, value;
+
+    // Test Function
+    x = typeof EmailService.Email;
+    y = typeof Function;
+    t.equal(x, y, `Email SHOULD be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // No Throw
+    x = EmailService.Email(`test@berkeley.edu`)
+    t.notThrow(() => x, `Email SHOULD NOT throw an error, Actual: ${x}`);
+
+    // Function not null
+    x = EmailService.Email(`test@berkeley.edu`);
+    y = undefined || null;
+    t.notEqual(x, y, `Email SHOULD NOT be ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Normal Test
+    x = EmailService.Email(`test@berkeley.edu`);
+    y = 0;
+    t.equal(x, y, `Email SHOULD return ${y}, Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.Email(`test@gmail.com`);
+    y = 0;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.Email(12345);
+    y = 1;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.Email(Infinity);
+    y = 1;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+    // Bad Inputs
+    x = EmailService.Email(null);
+    y = 0;
+    t.equal(x, y, `Format Timer BAD: Expected: ${y}, Actual: ${x}`);
+
+  });
+
+  await test(`EmailService`, async(t) => {
     const name = `Dingus`; 
     const email = "codyglen@berkeley.edu";
     const id = new IDService().id;
@@ -1224,14 +1425,14 @@ const _gasTEmailTesting = async() => {
     });
     console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${id}`);
     Object.values(STATUS).forEach(async (status) => {
-      const x = await new Emailer({
+      const x = await new EmailService({
         name : name,
         status : status,
         email : email,
         designspecialistemail : `codyglen@berkeley.edu`,
         message : message, 
       })
-      t.notThrow(() => x, `Emailer SHOULD NOT throw error`);
+      t.notThrow(() => x, `EmailService SHOULD NOT throw error`);
     })
   });
 

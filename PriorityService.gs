@@ -31,7 +31,7 @@ class PriorityService {
   }
 
   /** @private */
-  _CheckViaEmail () {
+  _CheckViaEmail() {
     try {
       console.warn(`Checking priority via email for ${this.email}....`);
       let finder = OTHERSHEETS.Approved.createTextFinder(this.email).findNext();
@@ -50,7 +50,7 @@ class PriorityService {
   }
 
   /** @private */
-  _CheckViaSID () {
+  _CheckViaSID() {
     try {
       console.warn(`Checking priority via SID for ${this.email}....`);
       let finder = OTHERSHEETS.Approved.createTextFinder(this.sid).findNext();
@@ -69,7 +69,7 @@ class PriorityService {
 
   }
 
-  get Priority () {
+  get Priority() {
     // Try email first
     try {
       let priority = false;

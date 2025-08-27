@@ -59,22 +59,20 @@ const onSubmission = async (e) => {
 
   // Priority
   let priority = new PriorityService({ email : email, sid : sid }).Priority;
-  SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);  
 
-  // Create Messages
-  const message = await new CreateSubmissionMessage({ name : name, projectname : projectname, id : id });
+  // Submission Message
+  let message = new MessageService({ name : name, projectname : projectname, id : id });
 
   try {
     if (priority == PRIORITY.None) {
       // Set access to Missing Access
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, lastRow, STATUS.missingAccess);
-
-      // Email
-      Emailer.Email(email, SERVICE_EMAIL, `${SERVICE_NAME} : Missing Access`, message.missingAccessMessage, STATUS.missingAccess, staff.Cody.email );
-
+      EmailService.Email(email, SERVICE_EMAIL, `${SERVICE_NAME}: Missing Access`, message, STATUS.missingAccess, staff.Cody.email);
     } else {
       // Set Status to Received
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.status,  lastRow, STATUS.received); 
+      SheetService.SetByHeader(thisSheet, HEADERNAMES.status,  lastRow, STATUS.received);
+      EmailService.Email(email, SERVICE_EMAIL, `${SERVICE_NAME}: New Project Received`, message, STATUS.received, staff.Cody.email);
     }
   } catch(err) {
     console.error(`${err} : Couldn't determine student access`);
@@ -90,48 +88,41 @@ const onSubmission = async (e) => {
   }
   dsMessage += `</ul><div>`;
 
-  // Set the Staff member for the sheet.
-  let designspecialistemail;
-  switch (thisSheetName) {
-    case SHEETS.Advancedlab.getName():
-      designspecialistemail = staff.Chris.email;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Chris.name);
-      break;
-    case SHEETS.Plotter.getName():
-    case SHEETS.Fablight.getName():
-    case SHEETS.Vinyl.getName():
-    case SHEETS.GSI_Plotter.getName():
-      designspecialistemail = staff.Cody.email;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Cody.name);
-      break;
-    case SHEETS.Waterjet.getName():
-    case SHEETS.Othertools.getName():
-      designspecialistemail = staff.Gary.email;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, staff.Gary.name);
-      break;
-    case SHEETS.Laser.getName():
-    case SHEETS.Shopbot.getName():
-      designspecialistemail = staff.Staff.email;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
-      break;
-    case undefined:
-      designspecialistemail = staff.Staff.email;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
-      break;
-    default:
-      designspecialistemail = staff.Staff.email;
-      SheetService.SetByHeader(thisSheet, HEADERNAMES.ds,  lastRow, staff.Staff.name);
-      break;
-  }
+  // Map sheet names to staff keys
+  const sheetStaffMap = new Map([
+    [ SHEETS.Advancedlab.getName(), 'Chris' ],
+    [ SHEETS.Plotter.getName(), 'Cody' ],
+    [ SHEETS.Fablight.getName(), 'Cody' ],
+    [ SHEETS.Vinyl.getName(), 'Cody' ],
+    [ SHEETS.GSI_Plotter.getName(), 'Cody' ],
+    [ SHEETS.Waterjet.getName(), 'Gary' ],
+    [ SHEETS.Othertools.getName(), 'Gary' ],
+    [ SHEETS.Laser.getName(), 'Staff' ],
+    [ SHEETS.Shopbot.getName(), 'Staff' ],
+  ]);
+
+  // Get the staff key from the map or fallback to 'Staff'
+  const staffKey = sheetStaffMap.get(thisSheetName) || 'Staff';
+  const assignedStaff = staff?.[staffKey];
+
+  // Fallback if somehow undefined
+  const designspecialistemail = assignedStaff?.email || staff.Staff.email;
+  const specialistName = assignedStaff?.name || staff.Staff.name;
+
+  // Set the DS name into the sheet
+  SheetService.SetByHeader(thisSheet, HEADERNAMES.ds, lastRow, specialistName);
 
   // Email each DS
   try {
-    MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, {
-      htmlBody: dsMessage,
+    const options = {
+      htmlBody: String(dsMessage),
       from: SERVICE_EMAIL,
-      bcc: `"${staff.Chris.email}, ${staff.Cody.email}"`,
       name: SERVICE_NAME,
-    });
+      // cc: staffEmail,
+      bcc: staff.Cody.email,
+      noReply: true,
+    }
+    MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, options);
     console.info(`Design Specialist has been emailed.`);
   } catch(err) {
     console.error(`${err} : Couldn't email DS...`);
@@ -142,13 +133,17 @@ const onSubmission = async (e) => {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
       SheetService.SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.priority, lastRow, 1);
       SheetService.SetByHeader(SHEETS.GSI_Plotter, HEADERNAMES.status, lastRow, STATUS.received );
+
       // Email
-      MailApp.sendEmail(email, `${SERVICE_NAME} : GSI Plotter Instructions`, ``, {
-        htmlBody: message.gsiPlotterMessage,
+      const options = {
+        htmlBody: String(message.gsiPlotterMessage),
         from: SERVICE_EMAIL,
-        bcc: `"${staff.Chris.email}, ${staff.Cody.email}"`,
         name: SERVICE_NAME,
-      });
+        // cc: staffEmail,
+        bcc: staff.Cody.email,
+        noReply: true,
+      }
+      MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME}: GSI Plotter Instructions`, ``, options);
       console.info(`GSI Plotter instruction email sent.`);
     }
   } catch (err) {
@@ -170,10 +165,10 @@ const onSubmission = async (e) => {
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Trigger 2 - On Edit
- * Reserved word: onEdit() cannot be used here because it's reserved for simple triggers.
+ * Reserved word: (onEdit) and (onChange) cannot be used here because it's reserved for simple triggers.
  * @param {Event} e
  */
-const onChange = async (e) => {
+const handleChange = async (e) => {
 
   // Fetch Data from Sheets
   const thisSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -294,13 +289,13 @@ const onChange = async (e) => {
   });
 
   // Send email with appropriate response and cc Chris and Cody.
-  new Emailer({
+  new EmailService({
     name : name, 
     status : status,
     email : email,    
     designspecialistemail : designspecialistemail,
     message : message,
-  });
+  }).SendEmail();
 
   // Check priority one more time:
   if(priority == PRIORITY.None){

@@ -4,13 +4,13 @@
  * @required {string} Student Email
  * @required {string} Status
  */
-class Emailer {
+class EmailService {
   constructor({ 
     name : name = `Unknown Name`, 
     status : status = STATUS.received,
     email : email = `Unknown Email`,    
     designspecialistemail : designspecialistemail = SERVICE_EMAIL,
-    message : message = new MessageService(),
+    message : message = new MessageService({}),
   }) {
     /** @private */
     this.name = name;
@@ -23,166 +23,88 @@ class Emailer {
     /** @private */
     this.message = message;
 
-    this.SendEmail();
   }
 
+  /**
+   * Send Email Main
+   */
   SendEmail() {
     try {
-      switch (this.status) {
-        case STATUS.received:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.receivedMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.inProgress:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.inProgressMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.completed:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.completedMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.abandoned:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.abandonedMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.pickedUp:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.pickedUpMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.failed:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.failedMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.rejectedByStudent:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.rejectedByStudentMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.rejectedByStaff:
-        case STATUS.cancelled:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.rejectedByStaffMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.billed:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.billedMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.waitlist:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.waitlistMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;
-        case STATUS.missingAccess:
-          Emailer.Mail({
-            to : this.email,
-            status : this.status,
-            message : this.message.noAccessMessage,
-            ds_email : this.designspecialistemail,
-          });
-          break;   
-        case "":
-        case undefined:
-          break;
+      if (!this.status || !this.email) {
+        throw new Error(`Missing required fields: status or email`);
       }
+
+      const messageMap = {
+        [STATUS.received]: this.message?.receivedMessage,
+        [STATUS.inProgress]: this.message?.inProgressMessage,
+        [STATUS.completed]: this.message?.completedMessage,
+        [STATUS.abandoned]: this.message?.abandonedMessage,
+        [STATUS.pickedUp]: this.message?.pickedUpMessage,
+        [STATUS.failed]: this.message?.failedMessage,
+        [STATUS.rejectedByStudent]: this.message?.rejectedByStudentMessage,
+        [STATUS.rejectedByStaff]: this.message?.rejectedByStaffMessage,
+        [STATUS.cancelled]: this.message?.rejectedByStaffMessage, // same as above
+        [STATUS.billed]: this.message?.billedMessage,
+        [STATUS.waitlist]: this.message?.waitlistMessage,
+        [STATUS.missingAccess]: this.message?.noAccessMessage,
+      };
+
+      const message = messageMap[this.status];
+
+      if (!message) {
+        console.warn(`No email message mapped for status: "${this.status}"`);
+        return;
+      }
+      
+      EmailService.Email(this.email, SERVICE_EMAIL, `${SERVICE_NAME}: Project ${this.status}`, message, this.designspecialistemail);
+      console.info(`📨 Email to (${this.email}) sent for status "${this.status}"`);
+      return 0;
+      
     } catch(err) {
-      console.error(`"SendEmail()" failed : ${err}`);
+      console.error(`❌ "SendEmail()" failed: ${err}`);
       return 1;
     }
   }
 
   /**
-   * Mail
-   * @private
+   * Send an email using Google Apps Script's MailApp service.
+   *
+   * @param {string} toEmail - Recipient email address.
+   * @param {string} fromEmail - Sender email address.
+   * @param {string} subject - Email subject line.
+   * @param {string|Object} message - HTML body or message object (rendered).
+   * @param {string} status - Optional status string (e.g., "received").
+   * @param {string} staffEmail - Optional fallback staff email.
+   * @returns {boolean} true on success, false on failure.
    */
-  static Mail({
-    to : to = SERVICE_EMAIL,
-    status : status = STATUS.received,
-    message : message = new MessageService({}),
-    ds_email : ds_email = SERVICE_EMAIL,
-  }) {
+  static Email(
+    to_email = SERVICE_EMAIL, 
+    from_email = SERVICE_EMAIL, 
+    subject = ``, 
+    message = new MessageService({}), 
+    status = STATUS.received, 
+    staffEmail = SERVICE_EMAIL,
+  ) {
     try {
-      const staff = BuildStaff();
-      const subject = `${SERVICE_NAME}: Project ${status}`;
+      if (!to_email || typeof to_email !== 'string') throw new Error(`Invalid recipient email: ${to_email}`);
+      if (!message) throw new Error(`Missing message content`);
+
+      const resolvedSubject = subject || `${SERVICE_NAME}: ${status}`;
+
       const options = {
-        htmlBody: message,
-        from: SERVICE_EMAIL,
-        cc: `${ds_email}`,
-        bcc: `${staff.Chris.email}, ${staff.Cody.email}`,
+        htmlBody: String(message),
+        from: from_email || SERVICE_EMAIL,
         name: SERVICE_NAME,
+        // cc: staffEmail,
+        bcc: `codyglen@berkeley.edu` || staffEmail,
         noReply: true,
       }
-      MailApp.sendEmail(to, subject, ``, options);
-      console.warn(`User (${to}) emailed ${status} email.`);
-      return 0;
-    } catch(err) {
-      console.error(`"Mail()" failed: ${err}`);
-      return 1;
-    }
-  }
 
-  /**
-   * Send an email
-   * @param {string} to
-   * @param {string} from
-   * @param {string} subject
-   * @param {string} message
-   * @param {string} status
-   * @param {string} staff email
-   * @returns {bool} success
-   */
-  static Email(to_email = SERVICE_EMAIL, from_email = SERVICE_EMAIL, subject = ``, message = new MessageService({}), status = STATUS.received, staffEmail = SERVICE_EMAIL,) {
-    try {
-      subject = subject ? subject : `${SERVICE_NAME} : ${status}`;
-      const options = {
-        htmlBody: message,
-        from: from_email,
-        cc: staffEmail,
-        bcc: BuildStaff().Chris.email,
-        name: SERVICE_NAME,
-      }
-      MailApp.sendEmail(to_email, subject, ``, options);
-      console.warn(`User (${to_email}) sent ${status} email.`);
+      MailApp.sendEmail(to_email, resolvedSubject, ``, options);
+      console.warn(`📨 User (${to_email}) sent ${status} email.`);
       return 0;
     } catch (err) {
-      console.error(`"Email()" failed: ${err}`);
+      console.error(`❌ "Email()" failed: ${err}`);
       return 1;
     }
   }
@@ -273,7 +195,7 @@ const _testEmail = async() => {
       }),
     }
     console.warn(`Emailing: ${JSON.stringify(obj, null, 3)}`);
-    new Emailer(obj);
+    new EmailService(obj);
   });
 
   console.warn(`Email fucking sent...`);

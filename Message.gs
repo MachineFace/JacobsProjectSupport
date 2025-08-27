@@ -24,17 +24,23 @@ class MessageService {
     designspecialistemaillink : designspecialistemaillink, 
     cost : cost,
   }) {
+    /** @private */
     this.name = name ? name.toString() : `Unknown Name`;
+    /** @private */
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
+    /** @private */
     this.id = id ? id.toString() : IDService.createId();
-
+    /** @private */
     this.rowData = rowData;
-
+    /** @private */
     this.designspecialist = designspecialist ? designspecialist.toString() : `Staff`;
+    /** @private */
     this.designspecialistemaillink = designspecialistemaillink ? designspecialistemaillink : `<a href = "mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a>`;
+    /** @private */
     this.cost = cost ? Number(cost).toFixed(2) : 0;
+    /** @private */
     this.costFormatted = `$ ${this.cost.toString()}`;
-
+    // ----------------------------------------------------------------------------------
     /** @private */
     this.greetings = `Hi ${this.name},<br/><br/>`;
     /** @private */
@@ -258,77 +264,46 @@ class MessageService {
       message += this.not_monitored;
     return message;
   }
-}
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Class for Creating a Submission Response Message
- * @param {string} name
- * @param {string} projectname
- * @param {string} id
- */
-class CreateSubmissionMessage {
-  constructor({
-    name : name, 
-    projectname : projectname, 
-    id : id,
-  }) {
-    this.name = name ? name : `Unknown Name`;
-    this.projectname = projectname ? projectname : `Unknown Project Name`;
-    this.id = id ? id : IDService.createId();
+  // ----------------------------------------------------------------------------------------
 
-    /** @private */
-    this.greetings = `Hi ${this.name},`;
-    /** @private */
-    this.thanks = `Thank you for choosing ${SERVICE_NAME}.<br/>`;
-    /** @private */
-    this.help = `If you have questions or need assistance please email <a href = "mailto:codyglen@berkeley.edu">codyglen@berkeley.edu</a><br/>`;
-    /** @private */
-    this.salutations = `<p>Best,<br/>Jacobs Hall Staff</p>`;
-    /** @prvate */
-    this.not_monitored = `<br/><p style="color:grey"><small>This mailbox is not monitored. Please do not reply to this automated email.</small></p>`;
-
-  }
   get dsMessage() {
-    let message = `<p>Hello!</p> `;
-      message += `<p>`;
+    let message = `<p>`;
+      message += this.greetings;
       message += `You have a new submission to your area.<br/>`;
-      message += `Please assign yourself as the DS in the <a href = "https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/">Spreadsheet</a><br/>`;
-      message += `Reminder: Only changing the status of the submission will trigger emails to you and the student.<br/>`; 
+      message += `<a href = "https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/">Please assign yourself as the DS in the spreadsheet.</a><br/>`;
+      message += `Reminder: Changing the status of the submission will trigger emails to you and the student.<br/>`; 
       message += `Below is a summary of the student submission.<br/>`;
       message += `</p>`;
       message += this.salutations;
+      message += this.not_monitored;
       message += `<br/>`;
       message += `<b>SUMMARY:</b>`;
       message += `<br/>`;
-      message += this.not_monitored;
     return message;
   }
   get gsiPlotterMessage() {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `Large-format paper plotting has been requested for your course.<br/>`;
+      message += `Large-format paper plotting has been requested.<br/>`;
       message += `ID Number: <i>${this.id}</i><br/>`;
       message += `<br/>`;
-      message += `A staff member will begin plotting your courses prints as soon as possible. <br/><br/>`;
+      message += `A staff member will start plotting your prints as soon as possible. <br/><br/>`;
       message += `</p>`;
       message += `<p>`;
-      message += `<b>Pick-up Location:<br/>`;
-      message += `<a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby<br/>`; 
-      message += `2530 Ridge Rd, Berkeley, CA 94709</a><br/><br/></b>`;
-      message += `<b>Pick-up Hours:<br/>`;
-      message += `${PICKUP_HOURS}</b><br/><br/>`
+      message += this.location;
+      message += this.hours;
       message += this.help;
       message += `</p>`;
       message += this.salutations;
       message += this.not_monitored;
     return message;
   }
-  get missingAccessMessage() {
+  get initialMissingAccessMessage() {
     let message = `<p>`;
-      message += `Hi ${this.name},</p>`;
-      message += `<p>Thank you for choosing ${SERVICE_NAME}.<br/>`;
+      message += this.greetings;
+      message += this.thanks;
       message += `Your project: <b><i>${this.projectname}</i></b> has been prevented from advancing until we have received confirmation of your approval.<br/>`;
       message += `You may be receiving this message because:`;
       message += `<ol>`;
@@ -349,6 +324,7 @@ class CreateSubmissionMessage {
     return message;
   }
 }
+
 
 
 
