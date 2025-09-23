@@ -23,10 +23,10 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * Trigger 1 - On Submission
- * Reserved word: onFormSubmit() cannot be used here because it's reserved for simple triggers.
+ * Reserved word: (onFormSubmit) cannot be used here because it's reserved for simple triggers.
  * @param {Event} e
  */
-const onSubmission = async (e) => {
+const handleSubmit = async (e) => {
 
   const staff = new StaffService().Staff;
 

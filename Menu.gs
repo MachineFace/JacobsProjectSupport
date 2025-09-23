@@ -205,7 +205,6 @@ const PopupCreateNewID = () => {
 const BillFromSelected = async () => {
   try {
     const ui = SpreadsheetApp.getUi();
-    const logger = new Log();
     const shopify = await new ShopifyAPI(); 
     let thisSheet = SpreadsheetApp.getActiveSheet();
     let thisRow = thisSheet.getActiveRange().getRow();
@@ -309,19 +308,20 @@ const BillFromSelected = async () => {
         ],
       });
       
-      logger.Info(JSON.stringify(order, null, 4));
+      console.info(JSON.stringify(order, null, 4));
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.billed);
       ui.alert(
         boxTitle,
-        `Student has been successfully billed on Shopify for $${estimate?.toString()}`,
+        `User has been successfully billed on Shopify for $${estimate?.toString()}`,
         Browser.Buttons.OK,
       );
+      console.warn(`User has been billed.`);
     } else if(response === ui.Button.NO || response === ui.Button.CANCEL) {
       console.warn(`User clicked "No / Cancel"....\nOrder NOT Created.`);
     }
     return 0;
   } catch (err) {
-    console.error(`"BillFromSelected()" failed : ${err}`);
+    console.error(`"BillFromSelected()" failed: ${err}`);
     return 1;
   } 
 }

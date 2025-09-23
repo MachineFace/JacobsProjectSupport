@@ -7,6 +7,62 @@ class TimeService {
   }
 
   /**
+   * Compare two dates and return a Bernoullian-style confidence interval [0,1].
+   * Confidence drops by half for each multiple.
+   * 
+   * @param {Date|string} date1 - First date (Date object or parseable string).
+   * @param {Date|string} date2 - Second date (Date object or parseable string).
+   * @param {number} halfLifeMinutes - Optional: the "half-life" in minutes. 
+   * @returns {number} Confidence between 0.0 and 1.0
+   */
+  static DateComparison(date1 = new Date(), date2 = new Date(), halfLifeMinutes = 60) {
+    try {
+      // Ensure inputs are Date objects
+      const d1 = (date1 instanceof Date) ? date1 : new Date(date1);
+      const d2 = (date2 instanceof Date) ? date2 : new Date(date2);
+
+      if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
+        throw new Error("Invalid date input(s).");
+      }
+
+      // Absolute difference in minutes
+      const diffMs = Math.abs(d1.getTime() - d2.getTime());
+      const diffMinutes = diffMs / 60000.0;
+
+      // Exponential decay model:
+      // Confidence = exp(-ln(2) * diffMinutes / halfLifeMinutes)
+      const confidence = Number(Math.exp(-Math.log(2) * (diffMinutes / halfLifeMinutes))).toFixed(5);
+
+      // Clamp to [0,1]
+      return Math.max(0, Math.min(1, confidence));
+
+    } catch (err) {
+      console.error(`"DateComparison()" failed: ${err}`);
+      return 0; // fallback to lowest confidence
+    }
+  }
+
+  /**
+   * Compare two dates and return a Bernoullian-style confidence interval [0,1].
+   * Confidence drops by half for each multiple.
+   * 
+   * @param {Date|string} date1 - First date (Date object or parseable string).
+   * @param {Date|string} date2 - Second date (Date object or parseable string).
+   * @param {number} halfLifeMinutes - Optional: the "half-life" in minutes. 
+   * @returns {number} Confidence between 0.0 and 1.0
+   */
+  static BernoullianDateComparison(date1 = new Date(), date2 = new Date(), halfLifeMinutes = 60) {
+    try {
+      const cx = TimeService.DateComparison(date1, date2, halfLifeMinutes);
+      return StatisticsService.BernoulliDistribution(cx);
+
+    } catch (err) {
+      console.error(`"BernoullianDateComparison()" failed: ${err}`);
+      return 0; // fallback to lowest confidence
+    }
+  }
+
+  /**
    * Format Timer to String
    * @param {number} days
    * @param {number} hrs
@@ -306,11 +362,6 @@ class TimeService {
   }
 
 }
-
-
-
-
-
 
 
 
