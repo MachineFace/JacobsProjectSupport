@@ -51,7 +51,7 @@ const handleSubmit = async (e) => {
 
   // Set status to RECEIVED on new submission
   console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
-  console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, Student Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
+  console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, User Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
   let id = IDService.createId();

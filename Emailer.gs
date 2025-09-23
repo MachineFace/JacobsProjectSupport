@@ -1,7 +1,7 @@
 /**
  * -----------------------------------------------------------------------------------------------------------------
  * Send an Email
- * @required {string} Student Email
+ * @required {string} User Email
  * @required {string} Status
  */
 class EmailService {

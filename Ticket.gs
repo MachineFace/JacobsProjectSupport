@@ -72,7 +72,7 @@ class Ticket {
     let tb = [
       [`Design Specialist`, this.designspecialist ? this.designspecialist.toString() : `Staff`],
       [`ID Number`, this.id.toString()],
-      [`Student Name`, this.name?.toString()],
+      [`User Name`, this.name?.toString()],
       [`Project Name`, this.projectname?.toString()],
       [`Status`, status ? status.toString() : STATUS.received],
       [`Submitted On`, timestamp ? timestamp.toString() : new Date().toDateString()],

@@ -108,7 +108,7 @@ const PopupCheckMissingAccessStudents = async () => {
   console.info(names);
   ui.alert(
     `${SERVICE_NAME}: ALERT!`,
-    `Checked Missing Access Students on All Sheets:\n ${names}`,
+    `Checked Missing Access Users on All Sheets:\n ${names}`,
     ui.ButtonSet.OK
   );
 }
@@ -253,7 +253,7 @@ const BillFromSelected = async () => {
     
     // Exit for No Materials
     if (quantityTotal <= 0 || quantityTotal == undefined || quantityTotal == "") {
-      console.warn(`Cannot Bill Student - No Material quantity(s) recorded...`);
+      console.warn(`Cannot Bill User - No Material quantity(s) recorded...`);
       response = ui.alert(
         `${SERVICE_NAME}: Error!`,
         `No quantities entered for selected submission. Maybe add some materials first before billing...`,

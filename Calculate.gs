@@ -213,7 +213,7 @@ class Calculate {
       
       // Print
       let values = [
-        [ `Student Type`, `Count` ],
+        [ `User Type`, `Count` ],
         ...distribution,
       ];
       OTHERSHEETS.Data.getRange(1, 19, values.length, 2).setValues(values);

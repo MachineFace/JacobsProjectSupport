@@ -136,7 +136,7 @@ class BarcodeService {
             material1Quantity : mat1quantity,
             message : message.abandonedMessage,
           }).SendEmail();
-          console.warn(`Student: ${name} emailed ABANDONED message.`)
+          console.warn(`User: ${name} emailed ABANDONED message.`)
           return;
         }
       });
