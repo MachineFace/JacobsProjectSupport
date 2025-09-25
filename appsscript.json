@@ -31,6 +31,12 @@
         "version": "0",
         "libraryId": "1oHi7qNmFxmHkt5UCx-OEOiH6eJiSp4Mk9j6ixlK4M5JRYmIk_1SVEK5N",
         "developmentMode": true
+      },
+      {
+        "userSymbol": "IDService",
+        "version": "0",
+        "libraryId": "17ovDw4cwQ_ykMknpWnpha1J5UzAkjniZhFuhnC-UEytNCm9ZtjcUO2H2",
+        "developmentMode": true
       }
     ]
   },
