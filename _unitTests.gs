@@ -391,7 +391,7 @@ const _gasTMessagingTesting = async() => {
 /**
  * Test Logging with GasT
  * @private
- * PASSED 6/5/2025
+ * PASSED 9/26/2025
  */
 const _gasTLoggerTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -402,54 +402,46 @@ const _gasTLoggerTesting = async() => {
 
   await test(`Log Class Test`, (t) => {
     let x, y;
-    const ts = new Log();
+    const ts = Log;
     t.notThrow(() => ts, `Log SHOULD NOT throw error.`);
 
     y = undefined || null;
     t.notEqual(ts, y, `Log SHOULD NOT yield ${y}, Actual: ${x}`);
-
-    x = ts instanceof Log;
-    y = true;
-    t.equal(x, y, `Check Instancing of Log, Expected: ${y}, Actual: ${x} `);
   });
 
   await test(`Logger`, (t) => {
     let x, y;
-    x = new Log();
+    x = Log;
     y = 1;
     t.notThrow(() => x, `Logger SHOULD NOT throw error.`);
     t.notEqual(x, y, `Logger SHOULD NOT return ${y}, Expected: ${y}, Actual: ${x}`);
   });
 
    await test(`Warning`, (t) => {
-    const logger = new Log();
     let x, y;
-    x = logger.Warning(`Warning Test ----> Message`);
-    y = logger.Warning();
+    x = Log.Warning(`Warning Test ----> Message`);
+    y = Log.Warning();
     t.equal(typeof x, typeof y, `Warning returns ${y}, Actual: ${x}`);
   });
 
   await test(`Info`, (t) => {
-    const logger = new Log();
     let x, y;
-    x = logger.Info(`Info Test ----> Message`);
-    y = logger.Info();
+    x = Log.Info(`Info Test ----> Message`);
+    y = Log.Info();
     t.equal(typeof x, typeof y, `Info returns ${y}, Actual: ${x}`);
   });
 
   await test(`Error`, (t) => {
-    const logger = new Log();
     let x, y;
-    x = logger.Error(`Error Test ----> Message`);
-    y = logger.Error();
+    x = Log.Error(`Error Test ----> Message`);
+    y = Log.Error();
     t.equal(typeof x, typeof y, `Error returns ${y}, Actual: ${x}`);
   });
 
   await test(`Debug`, (t) => {
-    const logger = new Log();
     let x, y;
-    x = logger.Debug(`Debug Test ----> Message`);
-    y = logger.Debug();
+    x = Log.Debug(`Debug Test ----> Message`);
+    y = Log.Debug();
     t.equal(typeof x, typeof y, `Debug returns ${y}, Actual: ${x}`);
   });
 
@@ -475,56 +467,56 @@ const _gasTCommonTesting = async() => {
 
     // Perfect match
     x = `hello world`, y = `hello world`;
-    a = Common.ScoreStringSimilarity(x, y), b = 1;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 1;
     t.equal(a, b, `Exact match ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Case insensitivity
     x = `HELLO`, y = `hello`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.99;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
     t.ok(a > b, `Case insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Accent insensitivity
     x = `café`, y = `cafe`;
-    a = Common.ScoreStringSimilarity(`café`, `cafe`), b = 0.95; 
+    a = CommonService.ScoreStringSimilarity(`café`, `cafe`), b = 0.95; 
     t.ok(a > b, `Accent insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Punctuation removal
     x = `hello, world!`, y = `hello world`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.95;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
     t.ok(a > b, `Ignore punctuation: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Word mismatch
     x = `apple orange`, y = `banana pear`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.3;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
     t.ok(a < b, `Completely different words: ("${x}" =/= "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Partial overlap
     x = `banana mango`, y = `banana apple`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.3;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
     t.ok(a < b, `Partial overlap: ("${x}" partial: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Empty strings
-    t.equal(Common.ScoreStringSimilarity(``, ``), 0, `Both strings empty`);
-    t.equal(Common.ScoreStringSimilarity(`text`, ``), 0, `One string empty`);
+    t.equal(CommonService.ScoreStringSimilarity(``, ``), 0, `Both strings empty`);
+    t.equal(CommonService.ScoreStringSimilarity(`text`, ``), 0, `One string empty`);
 
     // Extra whitespace
     x = `   hello   world   `, y = `hello world`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.99;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
     t.ok(a > b, `Ignore extra whitespace: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Numbers and symbols
     x = `abc123`, y = `abc 123`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.9;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.9;
     t.ok(a < b, `Alphanumeric split: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Fuzzy match
     x = `kitten`, y = `sitting`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.4;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.4;
     t.ok(a < b, `Levenshtein fuzz match: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
 
     // Near match with different order
     x = `world hello`, y = `hello world`;
-    a = Common.ScoreStringSimilarity(x, y), b = 0.95;
+    a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
     t.ok(a < b, `Word order shouldn't matter much: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
 
   });
@@ -773,15 +765,12 @@ const _gasTTimeTesting = async() => {
 
   await test(`Time Class Test`, (t) => {
     let x, y;
-    const ts = new TimeService();
+    const ts = TimeService;
     t.notThrow(() => ts, `TimeService SHOULD NOT throw error.`);
 
     y = undefined || null;
     t.notEqual(ts, y, `TimeService SHOULD NOT yield ${y}, Actual: ${x}`);
 
-    x = ts instanceof TimeService;
-    y = true;
-    t.equal(x, y, `Check Instancing of TimeService, Expected: ${y}, Actual: ${x} `);
   });
 
   await test(`FormatTimerToString`, (t) => {
