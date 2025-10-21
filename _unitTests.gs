@@ -454,76 +454,76 @@ const _gasTLoggerTesting = async() => {
  * @private
  * PASSED 6/5/2025
  */
-const _gasTCommonTesting = async() => {
-  console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
-  if ((typeof GasTap) === 'undefined') {
-    eval(UrlFetchApp.fetch(gasT_URL).getContentText());
-  }
-  const test = new GasTap();
+// const _gasTCommonTesting = async() => {
+//   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
+//   if ((typeof GasTap) === 'undefined') {
+//     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
+//   }
+//   const test = new GasTap();
 
-  await test(`Common`, (t) => {
+//   await test(`Common`, (t) => {
 
-    let x, y, a, b;
+//     let x, y, a, b;
 
-    // Perfect match
-    x = `hello world`, y = `hello world`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 1;
-    t.equal(a, b, `Exact match ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Perfect match
+//     x = `hello world`, y = `hello world`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 1;
+//     t.equal(a, b, `Exact match ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Case insensitivity
-    x = `HELLO`, y = `hello`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
-    t.ok(a > b, `Case insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Case insensitivity
+//     x = `HELLO`, y = `hello`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
+//     t.ok(a > b, `Case insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Accent insensitivity
-    x = `café`, y = `cafe`;
-    a = CommonService.ScoreStringSimilarity(`café`, `cafe`), b = 0.95; 
-    t.ok(a > b, `Accent insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Accent insensitivity
+//     x = `café`, y = `cafe`;
+//     a = CommonService.ScoreStringSimilarity(`café`, `cafe`), b = 0.95; 
+//     t.ok(a > b, `Accent insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Punctuation removal
-    x = `hello, world!`, y = `hello world`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
-    t.ok(a > b, `Ignore punctuation: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Punctuation removal
+//     x = `hello, world!`, y = `hello world`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
+//     t.ok(a > b, `Ignore punctuation: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Word mismatch
-    x = `apple orange`, y = `banana pear`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
-    t.ok(a < b, `Completely different words: ("${x}" =/= "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Word mismatch
+//     x = `apple orange`, y = `banana pear`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
+//     t.ok(a < b, `Completely different words: ("${x}" =/= "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Partial overlap
-    x = `banana mango`, y = `banana apple`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
-    t.ok(a < b, `Partial overlap: ("${x}" partial: "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Partial overlap
+//     x = `banana mango`, y = `banana apple`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
+//     t.ok(a < b, `Partial overlap: ("${x}" partial: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Empty strings
-    t.equal(CommonService.ScoreStringSimilarity(``, ``), 0, `Both strings empty`);
-    t.equal(CommonService.ScoreStringSimilarity(`text`, ``), 0, `One string empty`);
+//     // Empty strings
+//     t.equal(CommonService.ScoreStringSimilarity(``, ``), 0, `Both strings empty`);
+//     t.equal(CommonService.ScoreStringSimilarity(`text`, ``), 0, `One string empty`);
 
-    // Extra whitespace
-    x = `   hello   world   `, y = `hello world`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
-    t.ok(a > b, `Ignore extra whitespace: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Extra whitespace
+//     x = `   hello   world   `, y = `hello world`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
+//     t.ok(a > b, `Ignore extra whitespace: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Numbers and symbols
-    x = `abc123`, y = `abc 123`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.9;
-    t.ok(a < b, `Alphanumeric split: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Numbers and symbols
+//     x = `abc123`, y = `abc 123`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.9;
+//     t.ok(a < b, `Alphanumeric split: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Fuzzy match
-    x = `kitten`, y = `sitting`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.4;
-    t.ok(a < b, `Levenshtein fuzz match: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Fuzzy match
+//     x = `kitten`, y = `sitting`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.4;
+//     t.ok(a < b, `Levenshtein fuzz match: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-    // Near match with different order
-    x = `world hello`, y = `hello world`;
-    a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
-    t.ok(a < b, `Word order shouldn't matter much: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
+//     // Near match with different order
+//     x = `world hello`, y = `hello world`;
+//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
+//     t.ok(a < b, `Word order shouldn't matter much: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
 
-  });
+//   });
 
-  await test.finish();
-  if (test.totalFailed() > 0) throw "Some test(s) failed!";
-}
+//   await test.finish();
+//   if (test.totalFailed() > 0) throw "Some test(s) failed!";
+// }
 
 /**
  * Test Misc with GasT
@@ -3461,7 +3461,7 @@ const _gasTTestAll = async() => {
     await _gasTShopifyTesting(),
     await _gasTTicketTesting(),
     await _gasTEmailTesting(),
-    await _gasTCommonTesting(),
+    // await _gasTCommonTesting(),
     // await _gasT_Statistics_Testing(),
   ])
   .then(console.info('Test Success.'))

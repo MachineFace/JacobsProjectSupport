@@ -28,35 +28,39 @@
     "libraries": [
       {
         "userSymbol": "StatisticsService",
-        "version": "0",
         "libraryId": "1oHi7qNmFxmHkt5UCx-OEOiH6eJiSp4Mk9j6ixlK4M5JRYmIk_1SVEK5N",
+        "version": "0",
         "developmentMode": true
       },
       {
         "userSymbol": "IDService",
-        "version": "0",
         "libraryId": "17ovDw4cwQ_ykMknpWnpha1J5UzAkjniZhFuhnC-UEytNCm9ZtjcUO2H2",
+        "version": "0",
         "developmentMode": true
       },
       {
         "userSymbol": "TimeService",
-        "version": "0",
         "libraryId": "1x4rqwpo0BkrJ5kIuaN4Q4mfxMytwwkWzsZcW9Tz5Av4AmyxB_3zT_FhX",
-        "developmentMode": true
-      },
-      {
-        "userSymbol": "CommonService",
         "version": "0",
-        "libraryId": "19WeqyKwFzJhxK-pRvPnZst97vgKmNODhxmtObCpOMcZxswbroX-JfxA4",
         "developmentMode": true
       },
       {
         "userSymbol": "Log",
-        "version": "0",
         "libraryId": "1Z1YXYpuN2j2owNQIYk4NeDEgzW9450Sts-y77VMFnnbw7gTMP96b3awX",
+        "version": "0",
+        "developmentMode": true
+      },
+      {
+        "userSymbol": "BarcodeService",
+        "libraryId": "1YX8BYZ_SHCXF-PgSoThB-KvbZboyPuRxtF7pSIvstcZn98j36OMXhktW",
+        "version": "0",
         "developmentMode": true
       }
     ]
+  },
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "DOMAIN"
   },
   "oauthScopes": [
     "https://www.googleapis.com/auth/forms",
@@ -69,9 +73,5 @@
     "https://www.googleapis.com/auth/script.external_request",
     "https://www.googleapis.com/auth/script.container.ui",
     "https://www.googleapis.com/auth/script.scriptapp"
-  ],
-  "webapp": {
-    "executeAs": "USER_DEPLOYING",
-    "access": "DOMAIN"
-  }
+  ]
 }

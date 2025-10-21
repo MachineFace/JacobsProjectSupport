@@ -9,6 +9,18 @@ class SheetService {
   }
 
   /**
+   * Get All Sheets
+   */
+  static GetAllSheets() {
+    try {
+      return SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    } catch(err) {
+      console.error(`"GetAllSheets()" failed: ${err}`);
+      return 1;
+    }
+  }
+
+  /**
    * Check if this sheet is forbidden
    * @param {sheet} sheet to check
    * @returns {bool} false if sheet is allowed
