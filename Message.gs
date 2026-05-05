@@ -44,7 +44,7 @@ class MessageService {
     /** @private */
     this.greetings = `Hi ${this.name},<br/><br/>`;
     /** @private */
-    this.thanks = `Thank you for applying to ${SERVICE_NAME}.<br/><br/>`;
+    this.thanks = `Thank you for choosing ${SERVICE_NAME}.<br/><br/>`;
     /** @private */
     this.location = `<b>Pick-Up & Drop-off Location:<br/>
         <a href="https://www.google.com/maps/d/edit?mid=19_zxiFYyxGysWTUDnMZl27gPX9b--2gz&usp=sharing">Jacobs Hall LeRoy Ave. Main Entrance - Room 234 / Lobby.<br/>
@@ -63,7 +63,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `A Design Specialist is reviewing you application, and will respond to you shortly.<br/><br/>`;
+      message += `A Design Specialist is reviewing you submission, and will respond to you shortly.<br/><br/>`;
       message += `</p>`;
       message += this.help;
       message += this.salutations; 
@@ -88,7 +88,7 @@ class MessageService {
       message += this.greetings;
       message += this.thanks;
       message += `Your project has started. <br/>`;
-      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> has been started by ${this.designspecialist}.<br/>`;
+      message += `The part or parts requested for your project, <b><i>(${this.projectname})</i></b> has been started by ${this.designspecialist}.<br/>`;
       message += `ID Number: <b><i>${this.id}.</i></b><br/>`;
       message += `Please email ${this.designspecialistemaillink} for further details.<br/><br/>`;
       message += `<b>We will update you when it is done.</b>`;
@@ -102,7 +102,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished.<br/>`;
+      message += `The part or parts requested for your project, <b><i>(${this.projectname})</i></b> are finished.<br/>`;
       message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += `<b>Your parts are now available for pickup.</b><br/>`;
       message += `</p>`;
@@ -137,7 +137,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> have been picked up and the project is now <b>CLOSED.</b><br/>`;
+      message += `The part or parts requested for your project, <b><i>(${this.projectname})</i></b> have been picked up and the project is now <b>CLOSED.</b><br/>`;
       message += `ID Number: <b><i>${this.id}</i></b><br/>`;
       message += this.help;
       message += `</p>`;
@@ -149,7 +149,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `The part or parts requested for your project, <b><i>${this.projectname}</i></b> are finished and have not been picked up yet.<br/>`;
+      message += `The part or parts requested for your project, <b><i>(${this.projectname})</i></b> are finished and have not been picked up yet.<br/>`;
       message += `ID Number: <b><i>${this.id}</i></b><br/>`;
       message += `<font style="color:#FF0000";><b>Please pick up your parts SOON before they are disposed of in the free-prints bin.</b></font><br/>`;
       message += `Completed projects can be picked up in-person.<br/><br/>`;
@@ -165,7 +165,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `Your project, <b><i>${this.projectname}</i></b> has unfortunately failed.<br/>`;
+      message += `Your project, <b><i>(${this.projectname})</i></b> has unfortunately failed.<br/>`;
       message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += this.help;
       message += `</p>`;
@@ -204,7 +204,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `Your project, <b><i>${this.projectname}</i></b> has been temporarily waitlisted. `;
+      message += `Your project, <b><i>(${this.projectname})</i></b> has been temporarily waitlisted. `;
       message += `You will be notified when your project starts.<br/>`; 
       message += `ID Number: <b><i>${this.id}</i></b><br/><br/>`;
       message += `Please contact ${this.designspecialist} for more information: ${this.designspecialistemaillink}.<br/>`;
@@ -219,7 +219,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `Your project <b><i>${this.projectname}</b></i> is now <b>CLOSED.</b><br/>`;
+      message += `Your project <b><i>(${this.projectname})</b></i> is now <b>CLOSED.</b><br/>`;
       message += `ID Number: <b><i>${this.id}.</i></b><br/><br/>`;
       message += `Your Jacobs Store account has been billed for: <br/> `;
       message += `</p>`;
@@ -246,7 +246,7 @@ class MessageService {
     let message = `<p>`;
       message += this.greetings;
       message += this.thanks;
-      message += `Your project: <b><i>${this.projectname}</i></b> has been prevented from advancing until we have received confirmation of your approval. <br/><br/>`;
+      message += `Your project: <b><i>(${this.projectname})</i></b> has been prevented from advancing until we have received confirmation of your approval. <br/><br/>`;
       message += `You may be receiving this message because:`;
       message += `<ol>`;
       message += `<li><b><a href="https://jacobsaccess.ist.berkeley.edu/jps/signup">You haven't registered for this service yet.</a></b></li>`;
@@ -272,7 +272,7 @@ class MessageService {
       message += this.greetings;
       message += `You have a new submission to your area.<br/>`;
       message += `<a href = "https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/">Please assign yourself as the DS in the spreadsheet.</a><br/>`;
-      message += `Reminder: Changing the status of the submission will trigger emails to you and the student.<br/>`; 
+      message += `Reminder: Changing the status of the submission will trigger emails to you and the student / user.<br/>`; 
       message += `Below is a summary of the student submission.<br/>`;
       message += `</p>`;
       message += this.salutations;

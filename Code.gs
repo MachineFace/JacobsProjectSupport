@@ -114,15 +114,7 @@ const handleSubmit = async (e) => {
 
   // Email each DS
   try {
-    const options = {
-      htmlBody: String(dsMessage),
-      from: SERVICE_EMAIL,
-      name: SERVICE_NAME,
-      // cc: staffEmail,
-      bcc: staff.Cody.email,
-      noReply: true,
-    }
-    MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME} Notification`, ``, options);
+    EmailService.Email(designspecialistemail, SERVICE_EMAIL, `${SERVICE_NAME} Notification`, dsMessage, STATUS.received);
     console.info(`Design Specialist has been emailed.`);
   } catch(err) {
     console.error(`${err} : Couldn't email DS...`);
@@ -143,7 +135,7 @@ const handleSubmit = async (e) => {
         bcc: staff.Cody.email,
         noReply: true,
       }
-      MailApp.sendEmail(designspecialistemail, `${SERVICE_NAME}: GSI Plotter Instructions`, ``, options);
+      EmailService.Email(designspecialistemail, SERVICE_EMAIL, `${SERVICE_NAME}: GSI Plotter Instructions`, message.gsiPlotterMessage, STATUS.received);
       console.info(`GSI Plotter instruction email sent.`);
     }
   } catch (err) {
@@ -289,13 +281,7 @@ const handleChange = async (e) => {
   });
 
   // Send email with appropriate response and cc Chris and Cody.
-  new EmailService({
-    name : name, 
-    status : status,
-    email : email,    
-    designspecialistemail : designspecialistemail,
-    message : message,
-  }).SendEmail();
+  EmailService.Email(email, SERVICE_EMAIL, `${SERVICE_NAME}: ${status}`, message, status, designspecialistemail);
 
   // Check priority one more time:
   if(priority == PRIORITY.None){

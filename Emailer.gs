@@ -5,65 +5,8 @@
  * @required {string} Status
  */
 class EmailService {
-  constructor({ 
-    name : name = `Unknown Name`, 
-    status : status = STATUS.received,
-    email : email = `Unknown Email`,    
-    designspecialistemail : designspecialistemail = SERVICE_EMAIL,
-    message : message = new MessageService({}),
-  }) {
-    /** @private */
-    this.name = name;
-    /** @private */
-    this.status = status;
-    /** @private */
-    this.email = email;
-    /** @private */
-    this.designspecialistemail = designspecialistemail;
-    /** @private */
-    this.message = message;
+  constructor() {
 
-  }
-
-  /**
-   * Send Email Main
-   */
-  SendEmail() {
-    try {
-      if (!this.status || !this.email) {
-        throw new Error(`Missing required fields: status or email`);
-      }
-
-      const messageMap = {
-        [STATUS.received]: this.message?.receivedMessage,
-        [STATUS.inProgress]: this.message?.inProgressMessage,
-        [STATUS.completed]: this.message?.completedMessage,
-        [STATUS.abandoned]: this.message?.abandonedMessage,
-        [STATUS.pickedUp]: this.message?.pickedUpMessage,
-        [STATUS.failed]: this.message?.failedMessage,
-        [STATUS.rejectedByStudent]: this.message?.rejectedByStudentMessage,
-        [STATUS.rejectedByStaff]: this.message?.rejectedByStaffMessage,
-        [STATUS.cancelled]: this.message?.rejectedByStaffMessage, // same as above
-        [STATUS.billed]: this.message?.billedMessage,
-        [STATUS.waitlist]: this.message?.waitlistMessage,
-        [STATUS.missingAccess]: this.message?.noAccessMessage,
-      };
-
-      const message = messageMap[this.status];
-
-      if (!message) {
-        console.warn(`No email message mapped for status: "${this.status}"`);
-        return;
-      }
-      
-      EmailService.Email(this.email, SERVICE_EMAIL, `${SERVICE_NAME}: Project ${this.status}`, message, this.designspecialistemail);
-      console.info(`📨 Email to (${this.email}) sent for status "${this.status}"`);
-      return 0;
-      
-    } catch(err) {
-      console.error(`❌ "SendEmail()" failed: ${err}`);
-      return 1;
-    }
   }
 
   /**
@@ -91,8 +34,31 @@ class EmailService {
 
       const resolvedSubject = subject || `${SERVICE_NAME}: ${status}`;
 
+      const messageMap = {
+        [STATUS.received]: message?.receivedMessage,
+        [STATUS.inProgress]: message?.inProgressMessage,
+        [STATUS.completed]: message?.completedMessage,
+        [STATUS.abandoned]: message?.abandonedMessage,
+        [STATUS.pickedUp]: message?.pickedUpMessage,
+        [STATUS.failed]: message?.failedMessage,
+        [STATUS.rejectedByStudent]: message?.rejectedByStudentMessage,
+        [STATUS.rejectedByStaff]: message?.rejectedByStaffMessage,
+        [STATUS.cancelled]: message?.rejectedByStaffMessage, 
+        [STATUS.billed]: message?.billedMessage,
+        [STATUS.waitlist]: message?.waitlistMessage,
+        [STATUS.missingAccess]: message?.noAccessMessage,
+      };
+
+      const msg = messageMap[status];
+      console.info(messageMap);
+
+      if (!msg) {
+        console.warn(`No email message mapped for status: "${status}"`);
+        return;
+      }
+
       const options = {
-        htmlBody: String(message),
+        htmlBody: msg,
         from: from_email || SERVICE_EMAIL,
         name: SERVICE_NAME,
         // cc: staffEmail,
@@ -195,7 +161,7 @@ const _testEmail = async() => {
       }),
     }
     console.warn(`Emailing: ${JSON.stringify(obj, null, 3)}`);
-    new EmailService(obj);
+    EmailService.Email(obj.email, obj.email, `${SERVICE_NAME}: ${obj.status}`, obj.message, obj.status, obj.email);
   });
 
   console.warn(`Email fucking sent...`);

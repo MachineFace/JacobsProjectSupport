@@ -1303,7 +1303,7 @@ const _gasTEmailTesting = async() => {
 
   await test(`EmailService Class Test`, (t) => {
     let x, y;
-    const ts = new EmailService({});
+    const ts = new EmailService();
     t.notThrow(() => ts, `EmailService SHOULD NOT throw error.`);
 
     y = undefined || null;
@@ -1407,6 +1407,7 @@ const _gasTEmailTesting = async() => {
     const email = "codyglen@berkeley.edu";
     const id = new IDService().id;
     const projectname = `Some Kinda Project`;
+    const designspecialistemail = `codyglen@berkeley.edu`;
     const message = new MessageService({
       name : name,
       id : id,
@@ -1414,13 +1415,8 @@ const _gasTEmailTesting = async() => {
     });
     console.warn(`Email to ${email} from ${SERVICE_EMAIL}, ${name}, ${id}`);
     Object.values(STATUS).forEach(async (status) => {
-      const x = await new EmailService({
-        name : name,
-        status : status,
-        email : email,
-        designspecialistemail : `codyglen@berkeley.edu`,
-        message : message, 
-      })
+      const subject = `${SERVICE_NAME}: ${status}`;
+      const x = await EmailService.Email(email, designspecialistemail, subject, message, status, designspecialistemail); 
       t.notThrow(() => x, `EmailService SHOULD NOT throw error`);
     })
   });

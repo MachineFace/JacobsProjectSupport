@@ -133,18 +133,17 @@ const PopupGetSingleStudentPriority = async () => {
     SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     if(priority == PRIORITY.None) {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
-      new EmailService({ 
-        name : name, 
-        status : STATUS.missingAccess,
-        email : email,    
-        message :  new MessageService({
-          name : name,
-          projectname : projectName, 
-          id : id,
-          rowData : rowData,
-          designspecialist : rowData.ds,
-        }),
-      }).SendEmail();
+
+      const message = new MessageService({
+        name : name,
+        projectname : projectName, 
+        id : id,
+        rowData : rowData,
+        designspecialist : rowData.ds,
+      });
+
+      EmailService.Email(email, SERVICE_EMAIL, `${SERVICE_NAME}: ${status}`, message, status);
+
     }
     ui.alert(
       SERVICE_NAME,
