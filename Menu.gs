@@ -419,8 +419,8 @@ const PopupCreateTicket = async () => {
   
   SheetService.SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
   response = ui.alert(
-    `${SERVICE_NAME} : Ticket Created!`,
-    `Ticket Created for : ${name}, Job Number : ${id}`,
+    `${SERVICE_NAME}: Ticket Created!`,
+    `Ticket Created for: ${name}, ID: ${id}`,
     ui.ButtonSet.OK
   );
   if(response === ui.Button.OK) return;

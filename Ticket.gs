@@ -155,7 +155,7 @@ class Ticket {
           [DocumentApp.Attribute.BORDER_WIDTH]: 0.5,
         });
     } catch (err) {
-      console.error(`${err} : Couldn't append info to ticket.`);
+      console.error(`${err}: Couldn't append info to ticket.`);
     }
 
     // Remove File from root and Add that file to a specific folder
@@ -164,7 +164,7 @@ class Ticket {
       docFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); //set sharing
       docFile.moveTo(folder)
     } catch (err) {
-      console.error(`Whoops : ${err}`);
+      console.error(`Whoops: ${err}`);
     }
     
     // console.info(JSON.stringify(this.doc));
@@ -189,7 +189,7 @@ class Ticket {
       r.getParent().asParagraph().insertInlineImage(0,imageBlob);
       return next;
     } catch (err) {
-      console.error(`"_ReplaceTextToImage()" failed : ${err}`);
+      console.error(`"_ReplaceTextToImage()" failed: ${err}`);
       return 1;
     }
   }

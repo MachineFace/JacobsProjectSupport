@@ -6,7 +6,7 @@
  * This project creates a project-tracking and notification system for remote project management.
  * This project notifies students automatically via email about the status of their projects as they are fabricated, as well as calculates metrics about fab lab usage.
  * Release 20200611 - Version 0.1
- * Last Updated: 20240827 - Version 2.7.0
+ * Last Updated: 20260605 - Version 2.9.0
  * URL for Spreadsheet: https://docs.google.com/spreadsheets/d/1xOPFKH3-gku_UrN7mMS4wynKcmvYH70FmhVihgHbSWQ/edit#gid=1063176066
  * =======================================================================================================================================================================
  * =======================================================================================================================================================================
@@ -119,6 +119,18 @@ const handleSubmit = async (e) => {
   } catch(err) {
     console.error(`${err} : Couldn't email DS...`);
   }
+
+  // Canon Plotter
+  try { 
+    if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.Plotter.getSheetName()) {
+      SheetService.SetByHeader(SHEETS.Plotter, HEADERNAMES.priority, lastRow, 1);
+      SheetService.SetByHeader(SHEETS.Plotter, HEADERNAMES.status, lastRow, STATUS.received );
+    }
+
+  } catch (err) {
+    console.error(`Whoops: Couldn't deal with Canon Plotter sheet I guess.. ${err}`);
+  }
+
 
   // GSI Plotter
   try {

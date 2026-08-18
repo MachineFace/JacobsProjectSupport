@@ -50,7 +50,6 @@ class EmailService {
       };
 
       const msg = messageMap[status];
-      console.info(messageMap);
 
       if (!msg) {
         console.warn(`No email message mapped for status: "${status}"`);

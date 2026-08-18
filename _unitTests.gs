@@ -7,7 +7,7 @@ const gasT_URL = `https://raw.githubusercontent.com/huan/gast/master/src/gas-tap
 /**
  * Test Main with GasT
  * @private
- * PASSED 6/5/2025
+ * PASSED 6/5/2026
  */
 const _gasTMainTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -15,13 +15,6 @@ const _gasTMainTesting = async() => {
     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
   }
   const test = new GasTap();
-
-  await test(`Generate QRCode: `, t => {
-    let x, y;
-    x = new QRCodeGenerator({ url : `http://www.codyglen.com/`, });
-    y = undefined || null;
-    t.notEqual(x, y, `Generate QRCode SHOULD NOT be ${y}: ${x}`);
-  });
   
   await test(`Design Specialist Creation`, (t) => {
     let x ,y;
@@ -62,7 +55,7 @@ const _gasTMainTesting = async() => {
 /**
  * Test Barcode with GasT
  * @private
- * PASSED 7/2/2025
+ * PASSED 5/6/2026
  */
 const _gasTBarcodeTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -73,15 +66,12 @@ const _gasTBarcodeTesting = async() => {
 
   await test(`BarcodeService Class Test`, (t) => {
     let x, y;
-    const ts = new BarcodeService();
+    const ts = BarcodeService;
     t.notThrow(() => ts, `BarcodeService SHOULD NOT throw error.`);
 
     y = undefined || null;
     t.notEqual(ts, y, `BarcodeService SHOULD NOT yield ${y}, Actual: ${x}`);
 
-    x = ts instanceof BarcodeService;
-    y = true;
-    t.equal(x, y, `Check Instancing of BarcodeService, Expected: ${y}, Actual: ${x} `);
   });
 
   await test(`Generate Barcode: `, async (t) => {
@@ -98,6 +88,14 @@ const _gasTBarcodeTesting = async() => {
     t.notEqual(x, y, `Barcode SHOULD NOT be ${y}: ${x}`);
   });
   
+  await test(`Generate QRCode: `, async (t) => {
+    let x, y;
+
+    x = await BarcodeService.GenerateQRCode(`cody_qr`,{ url: `http://www.codyglen.com/`, size: `1200x1200`, });
+    y = undefined || null;
+    t.notEqual(x, y, `Generate QRCode SHOULD NOT be ${y}: ${x}`);
+  });
+
   await test.finish();
   if (test.totalFailed() > 0) throw "Some test(s) failed!";
 }
@@ -105,7 +103,7 @@ const _gasTBarcodeTesting = async() => {
 /**
  * Test with GasT
  * @private
- * PASSED 6/5/2025
+ * PASSED 6/5/2026
  */
 const _gasTPriorityTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -206,7 +204,7 @@ const _gasTPriorityTesting = async() => {
 /**
  * Test ID with GasT
  * @private
- * PASSED 6/5/2025
+ * PASSED 6/5/2026
  */
 const _gasTIDServiceTesting = async() => {
   if ((typeof GasTap) === 'undefined') {
@@ -254,7 +252,7 @@ const _gasTIDServiceTesting = async() => {
 /**
  * Test Message with GasT
  * @private
- * PASSED 7/9/2025
+ * PASSED 6/5/2026
  */
 const _gasTMessagingTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -391,7 +389,7 @@ const _gasTMessagingTesting = async() => {
 /**
  * Test Logging with GasT
  * @private
- * PASSED 9/26/2025
+ * PASSED 6/5/2026
  */
 const _gasTLoggerTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -450,85 +448,9 @@ const _gasTLoggerTesting = async() => {
 }
 
 /**
- * Test Common with GasT
- * @private
- * PASSED 6/5/2025
- */
-// const _gasTCommonTesting = async() => {
-//   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
-//   if ((typeof GasTap) === 'undefined') {
-//     eval(UrlFetchApp.fetch(gasT_URL).getContentText());
-//   }
-//   const test = new GasTap();
-
-//   await test(`Common`, (t) => {
-
-//     let x, y, a, b;
-
-//     // Perfect match
-//     x = `hello world`, y = `hello world`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 1;
-//     t.equal(a, b, `Exact match ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Case insensitivity
-//     x = `HELLO`, y = `hello`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
-//     t.ok(a > b, `Case insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Accent insensitivity
-//     x = `café`, y = `cafe`;
-//     a = CommonService.ScoreStringSimilarity(`café`, `cafe`), b = 0.95; 
-//     t.ok(a > b, `Accent insensitivity: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Punctuation removal
-//     x = `hello, world!`, y = `hello world`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
-//     t.ok(a > b, `Ignore punctuation: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Word mismatch
-//     x = `apple orange`, y = `banana pear`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
-//     t.ok(a < b, `Completely different words: ("${x}" =/= "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Partial overlap
-//     x = `banana mango`, y = `banana apple`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.3;
-//     t.ok(a < b, `Partial overlap: ("${x}" partial: "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Empty strings
-//     t.equal(CommonService.ScoreStringSimilarity(``, ``), 0, `Both strings empty`);
-//     t.equal(CommonService.ScoreStringSimilarity(`text`, ``), 0, `One string empty`);
-
-//     // Extra whitespace
-//     x = `   hello   world   `, y = `hello world`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.99;
-//     t.ok(a > b, `Ignore extra whitespace: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Numbers and symbols
-//     x = `abc123`, y = `abc 123`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.9;
-//     t.ok(a < b, `Alphanumeric split: ("${x}" .: "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Fuzzy match
-//     x = `kitten`, y = `sitting`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.4;
-//     t.ok(a < b, `Levenshtein fuzz match: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//     // Near match with different order
-//     x = `world hello`, y = `hello world`;
-//     a = CommonService.ScoreStringSimilarity(x, y), b = 0.95;
-//     t.ok(a < b, `Word order shouldn't matter much: ("${x}" partial "${y}"), (Expected: ${b}, Actual: ${a})`);
-
-//   });
-
-//   await test.finish();
-//   if (test.totalFailed() > 0) throw "Some test(s) failed!";
-// }
-
-/**
  * Test Misc with GasT
  * @private
- * PASSED 6/5/2025
+ * PASSED 6/5/2026
  */
 const _gasTMiscTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -1253,6 +1175,7 @@ const _gasTShopifyTesting = async() => {
 
 /**
  * Test Ticket with GasT
+ * PASSED 6/5/2026
  */
 const _gasTTicketTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -1292,7 +1215,7 @@ const _gasTTicketTesting = async() => {
 
 /**
  * Test Email Service with GasT
- * PASSED 7/9/2025
+ * PASSED 6/5/2026
  */
 const _gasTEmailTesting = async() => {
   console.warn(`Testing: ${PrintEnclosingFunctionName()}`);  // Print Enclosing Function Name
@@ -1427,7 +1350,7 @@ const _gasTEmailTesting = async() => {
 
 /**
  * Test Email Service with GasT
- * PASSED 6/5/2025
+ * PASSED 6/5/2026
  */
 const _gasT_Statistics_Testing = async() => {
   console.warn(`Testing: ${new Error().stack.split('\n')[1].split(`at `)[1]}`);  // Print Enclosing Function Name
