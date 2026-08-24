@@ -321,7 +321,7 @@ const BillFromSelected = async () => {
     return 0;
   } catch (err) {
     console.error(`"BillFromSelected()" failed: ${err}`);
-    return 1;
+    return null;
   } 
 }
 
@@ -380,7 +380,7 @@ const PopupBuildEstimate = () => {
     return 0;
   } catch (err) {
     console.error(`"PopupBuildEstimate()" failed : ${err}`);
-    return 1;
+    return null;
   } 
 }
 

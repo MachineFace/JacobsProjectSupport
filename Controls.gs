@@ -73,7 +73,7 @@ const CreateTimeDrivenTrigger = () => {
     return 0;
   } catch (err) {
     console.error(`"CreateTimeDrivenTrigger()" failed : ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -127,7 +127,7 @@ const RemoveTimedTriggers = () => {
     return 0;
   } catch (err) {
     console.error(`"RemoveTimedTriggers()" failed : ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -146,7 +146,7 @@ const DisableJPS = () => {
     return 0;
   } catch (err) {
     console.error(`"DisableJPS()" failed : ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -166,7 +166,7 @@ const EnableJPS = () => {
     return 0;
   } catch(err) {
     console.error(`"EnableJPS()" failed : ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -186,7 +186,7 @@ const SetStatusDropdowns = () => {
     return 0;
   } catch(err) {
     console.error(`"SetStatusDropdowns()" failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -237,7 +237,7 @@ const SetConditionalFormatting = () => {
     return 0;
   } catch(err) {
     console.error(`"SetConditionalFormatting()" failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -257,7 +257,7 @@ const SetSummaryPageRowHeight = () => {
     return 0;
   } catch(err) {
     console.error(`"SetSummaryPageRowHeight()" failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -280,7 +280,7 @@ const SetRowHeight = () => {
     return 0;
   } catch(err) {
     console.error(`"SetRowHeight()" failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -304,7 +304,7 @@ const DeleteOldFiles = () => {
     return 0;
   } catch(err) {
     console.error(`"DeleteOldFiles()" failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -318,7 +318,7 @@ const FormatCell = (cell) => {
     return 0;
   } catch (err) {
     console.error(`"FormatCell()" failed : ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -350,7 +350,7 @@ const BuildSummaryEquation = () => {
     return 0;
   } catch(err) {
     console.error(`"BuildSummaryEquation()" failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 
@@ -367,7 +367,7 @@ const AuxillaryEquations = () => {
     return 0;
   } catch(err) {
     console.error(`"AuxillaryEquations()" failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 

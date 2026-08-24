@@ -54,7 +54,7 @@ class SummaryBuilder {
       return formattedObject;
     } catch(err) {
       console.error(`"_GetData()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -122,7 +122,7 @@ class SummaryBuilder {
       return 0;
     } catch(err) {
       console.error(`"SendEmail()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
 }

@@ -125,7 +125,7 @@ const BuildEstimate = (sheet, row = 2) => {
     return estimate;
   } catch(err) {
     console.error(`BuildEstimate() failed: ${err}`);
-    return 1;
+    return null;
   }
 }
 

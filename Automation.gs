@@ -25,7 +25,7 @@ class HackyStoreAutomation {
       return 0;
     } catch(err) {
       console.error(`"_Write_Unit_Cost()" failed : ${err}`);
-      return 1;
+      return null;
     }
 
   }
@@ -70,7 +70,7 @@ class HackyStoreAutomation {
       return price;
     } catch(err){
       console.error(`${err} : Couldn't fetch price.`);
-      return 1;
+      return null;
     }
   }
 
@@ -120,7 +120,7 @@ class HackyStoreAutomation {
       return 0;
     } catch(err) {
       console.error(`"Update_Product_IDs()" failed ${err}`);
-      return 1;
+      return null;
     }
 
   }
@@ -163,7 +163,7 @@ class HackyStoreAutomation {
       return 0;
     } catch(err) {
       console.error(`"Get_Product_ID_From_URL()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -198,7 +198,7 @@ class MaterialLookup {
       return url;
     } catch(err) {
       console.error(`${err} : Whoops, failed....`);
-      return 1;
+      return null;
     }
   }
 }
@@ -280,7 +280,7 @@ class HackySemesterDateLookup {
       };
     } catch(err){
       console.error(`"_GetDates()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 

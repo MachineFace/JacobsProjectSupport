@@ -29,7 +29,7 @@ class Calculate {
     }
     catch (err) {
       console.error(`"GetAverageTurnaround()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -49,7 +49,7 @@ class Calculate {
       return 0;
     } catch (err) {
       console.error(`"PrintTurnaroundTimes()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -85,7 +85,7 @@ class Calculate {
       return count;
     } catch(err) {
       console.error(`"CountActiveUsers()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -118,7 +118,7 @@ class Calculate {
       return data;
     } catch(err) {
       console.error(`"CountEachSubmission()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -181,7 +181,7 @@ class Calculate {
       OTHERSHEETS.Data.getRange(1, 24, values.length, 4).setValues(values);
     } catch(err) {
       console.error(`"CreateTopTen()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -220,7 +220,7 @@ class Calculate {
       return distribution;
     } catch(err) {
       console.error(`"CountTypes()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -248,7 +248,7 @@ class Calculate {
       return StatisticsService.Distribution(userList);
     } catch(err) {
       console.error(`"GetUserDistribution()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -263,7 +263,7 @@ class Calculate {
       return standardDeviation;
     } catch(err) {
       console.error(`"GetUserSubmissionStandardDeviation()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -277,7 +277,7 @@ class Calculate {
       return mean;
     } catch(err) {
       console.error(`"GetUserSubmissionArithmeticMean()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -322,7 +322,7 @@ class Calculate {
       return zScore;
     } catch(err) {
       console.error(`"UserSubmissionsZScores()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -343,7 +343,7 @@ class Calculate {
       return res;
     } catch(err) {
       console.error(`"UserSubmissionChiSquaredFit()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -363,7 +363,7 @@ class Calculate {
       return quartiles;
     } catch(err) {
       console.error(`"UserSubmissionsQuartiles()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -387,7 +387,7 @@ class Calculate {
       return cspList;
     } catch(err) {
       console.error(`"UserSubmissionsCumulativeStdNormalProbability()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -504,7 +504,7 @@ class Calculate {
       return fixed;
     } catch(err) {
       console.error(`"CountFunding()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -543,7 +543,7 @@ const Metrics = () => {
     return 0;
   } catch (err) {
     console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
-    return 1;
+    return null;
   }
 }
 

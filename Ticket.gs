@@ -190,7 +190,7 @@ class Ticket {
       return next;
     } catch (err) {
       console.error(`"_ReplaceTextToImage()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
   

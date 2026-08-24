@@ -93,7 +93,7 @@ class FormBuilderService {
       return url;
     } catch (err) {
       console.error(`${err} : Couldn't generate Approval Form`);
-      return 1;
+      return null;
     }
   }
 

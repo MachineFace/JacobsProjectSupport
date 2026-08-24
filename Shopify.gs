@@ -47,7 +47,7 @@ class ShopifyAPI {
       return productID;
     } catch(err) {
       console.error(`"_GetStoreProductID()" failed : ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -168,7 +168,7 @@ class ShopifyAPI {
       return content;
     } catch(err) {
       console.error(`"CreateOrder()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -212,7 +212,7 @@ class ShopifyAPI {
       return user;
     } catch(err) {
       console.error(`"GetCustomerByEmail()" failed: ${err}`);
-      return 1;
+      return null;
     } 
       
   
@@ -259,7 +259,7 @@ class ShopifyAPI {
       return parsed; 
     } catch(err) {
       console.error(`"GetProductByID()" failed: ${err}`);
-      return 1;
+      return null;
     }
       
       
@@ -303,7 +303,7 @@ class ShopifyAPI {
       return orders;  
     } catch(err) {
       console.error(`"GetLastOrder()" failed: ${err}`);
-      return 1;
+      return null;
     }
     
   }
@@ -337,7 +337,7 @@ class ShopifyAPI {
       return order;  
     } catch(err) {
       console.error(`"GetSpecificOrder(${order})" failed: ${err}`);
-      return 1;
+      return null;
     }
     
   }
@@ -386,7 +386,7 @@ class ShopifyAPI {
       return orderNums;  
     } catch(err) {
       console.error(`"GetOrdersList()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -434,7 +434,7 @@ class ShopifyAPI {
       return orders;
     } catch(err) {
       console.error(`"GetUnfulfilledOrders()" failed: ${err}`);
-      return 1;
+      return null;
     }
 
   }
@@ -484,7 +484,7 @@ class ShopifyAPI {
       return content;
     } catch(err) {
       console.error(`"CloseUnfulfilledOrder()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
   */

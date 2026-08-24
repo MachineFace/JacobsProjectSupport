@@ -70,7 +70,7 @@ class EmailService {
       return 0;
     } catch (err) {
       console.error(`❌ "Email()" failed: ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -100,7 +100,7 @@ class EmailService {
       return count;
     } catch (err) {
       console.error(`"CountTotalEmailsSent()" failed ----> ${err}`);
-      return 1;
+      return null;
     }
   }
 
@@ -127,7 +127,7 @@ class EmailService {
       return 0;
     } catch (err) {
       console.error(`"ListInboxSnippets()" failed ----> ${err}`);
-      return 1;
+      return null;
     }
   }
 
