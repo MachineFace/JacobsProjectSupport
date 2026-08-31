@@ -29,7 +29,7 @@ class MessageService {
     /** @private */
     this.projectname = projectname ? projectname.toString() : `Unknown Project Name`;
     /** @private */
-    this.id = id ? id.toString() : IDService.createId();
+    this.id = id ? id.toString() : IDService.CreateId();
     /** @private */
     this.rowData = rowData;
     /** @private */

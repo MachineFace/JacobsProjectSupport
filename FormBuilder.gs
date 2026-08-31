@@ -18,7 +18,7 @@ class FormBuilderService {
    */
   static CreateApprovalForm({
     name : name = `Some Name`,
-    id : id = IDService.createId(),
+    id : id = IDService.CreateId(),
     cost : cost = 0.0,
     title : title = `Approval Form`,
   }) {

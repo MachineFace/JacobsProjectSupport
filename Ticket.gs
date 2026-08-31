@@ -12,7 +12,7 @@
  */
 class Ticket {
   constructor({
-    id : id = IDService.createId(),
+    id : id = IDService.CreateId(),
     designspecialist : designspecialist = `Staff`,
     submissiontime : submissiontime = new Date(),
     name : name = `Unknown`,
@@ -193,6 +193,7 @@ class Ticket {
       return null;
     }
   }
+
   
 }
 

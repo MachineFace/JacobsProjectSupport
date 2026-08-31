@@ -169,7 +169,7 @@ const PopupCreateNewID = () => {
   const ui = SpreadsheetApp.getUi();
   const thisSheet = SpreadsheetApp.getActiveSheet();
   let thisRow = thisSheet.getActiveRange().getRow();
-  const newID = IDService.createId();
+  const newID = IDService.CreateId();
 
   if(!SheetService.IsValidSheet(thisSheet)) {
     const a = ui.alert(
@@ -180,7 +180,7 @@ const PopupCreateNewID = () => {
     if(a === ui.Button.OK) return;
   } 
   const { name, id } = SheetService.GetRowData(thisSheet, thisRow);
-  if(IDService.isValid(id)) {
+  if(IDService.IsValid(id)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Error!`,
       `ID for ${name} exists already!\n${id}`,

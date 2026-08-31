@@ -114,7 +114,7 @@ class ShopifyAPI {
    * @returns {object} order
    */
   async CreateOrder({
-      id : id = IDService.createId(),
+      id : id = IDService.CreateId(),
       email : email = this.api_email,
       materials : materials = [ 
         { name : `None`, quantity : 0 },
@@ -494,7 +494,7 @@ class ShopifyAPI {
 
 
 const _testAPI = async () => {
-  const id = IDService.createId();
+  const id = IDService.CreateId();
   const shopify = new ShopifyAPI();
 
   // let productID = await shopify._GetStoreProductID(`Fortus Red ABS-M30`);

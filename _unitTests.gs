@@ -217,7 +217,7 @@ const _gasTIDServiceTesting = async() => {
   });
 
   await test(`GetNewID STATIC`, t => {
-    const x = IDService.createId();
+    const x = IDService.CreateId();
     const y = undefined || null;
     t.notEqual(x, y, `GetNewID STATIC SHOULD NOT return ${y}, Actual: ${x}`);
   });
@@ -238,7 +238,7 @@ const _gasTIDServiceTesting = async() => {
 
   await test(`IDIsValid`, t => {
     const testUUID = `b819a295-66b7-4b82-8f91-81cf227c5216`;
-    const val = IDService.isValid(testUUID);
+    const val = IDService.IsValid(testUUID);
     t.equal(val, true, `IDIsValid SHOULD return true: ${val == true}, ${testUUID} is valid: ${val}`);
   });
 

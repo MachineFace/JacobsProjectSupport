@@ -12,7 +12,7 @@ class Employee {
     email : email = SERVICE_EMAIL,
     areas : areas = [],
   }) {
-    this.id = IDService.createId();
+    this.id = IDService.CreateId();
     this.name = name;
     this.fullname = fullname;
     this.email = email;
@@ -63,7 +63,7 @@ class DesignSpecialist extends Employee {
   }) {
     // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
     super(name, fullname, email, areas);
-    this.id = IDService.createId();
+    this.id = IDService.CreateId();
     this.name = name ? name : `DS`;
     this.fullname = fullname ? fullname : `Design Specialist`;
     this.email = email ? email : SERVICE_EMAIL;
@@ -133,7 +133,7 @@ class StudentSupervisor extends Employee {
   }) {
     // The reserved 'super' keyword is for making super-constructor calls and allows access to parent methods.
     super(name, fullname, email, areas);
-    this.id = IDService.createId();
+    this.id = IDService.CreateId();
     this.name = name ? name : `SS`;
     this.fullname = fullname ? fullname : `Student Supervisor`;
     this.email = email ? email : SERVICE_EMAIL;
@@ -174,7 +174,7 @@ class Manager extends Employee {
   }) 
   {
     super(name, fullname, email, areas);
-    this.id = IDService.createId();
+    this.id = IDService.CreateId();
     this.name = name ? name : `MA`;
     this.fullname = fullname ? fullname : `Manager`;
     this.email = email ? email : SERVICE_EMAIL;

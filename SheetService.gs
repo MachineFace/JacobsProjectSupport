@@ -548,7 +548,7 @@ const _testSetRow = () => {
     status: STATUS.received,
     ds: 'Cody',
     priority: PRIORITY.Tier1,
-    id: IDService.createId(),
+    id: IDService.CreateId(),
     timestamp: new Date().toDateString(),
     email: 'dingus@berkeley.edu',
     name: 'Testy Fiesty',

@@ -155,7 +155,7 @@ const _testEmail = async() => {
       email : `codyglen@berkeley.edu`,
       message : new MessageService({
         name : `Dingus`,
-        id : IDService.createId(),
+        id : IDService.CreateId(),
         projectname : `Some Kinda Project`,
       }),
     }

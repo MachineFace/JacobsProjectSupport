@@ -54,7 +54,7 @@ const handleSubmit = async (e) => {
   console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, User Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
 
   // Generate new Job number
-  let id = IDService.createId();
+  let id = IDService.CreateId();
   SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
@@ -155,8 +155,8 @@ const handleSubmit = async (e) => {
   }
 
   // Check again
-  if(IDService.isValid(id) == false) {
-    SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, IDService.createId());
+  if(IDService.IsValid(id) == false) {
+    SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, IDService.CreateId());
   }
 
   // Fix wrapping issues
@@ -223,7 +223,7 @@ const handleChange = async (e) => {
 
 
   ds = ds ? ds : `a Design Specialist`;
-  id = IDService.isValid(id) ? id : IDService.createId();
+  id = IDService.IsValid(id) ? id : IDService.CreateId();
   projectName = projectName ? projectName : `Your Project`;
 
   // Log submission info to sheet
@@ -233,7 +233,7 @@ const handleChange = async (e) => {
   if(status == STATUS.closed || status == STATUS.billed) return;
   else if (status == STATUS.received || status == STATUS.inProgress) {
     console.info(`ID is broken: ${id}`);
-    id = IDService.isValid(id) ? id : IDService.createId();
+    id = IDService.IsValid(id) ? id : IDService.CreateId();
     SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, id);
     console.warn(`ID was cured for ${email}`);
   }
