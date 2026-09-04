@@ -13,22 +13,31 @@ class Calculate {
    * @param {sheet} sheet
    * @returns {string} formatted average time
    */
-  GetAverageTurnaround(sheet = SHEETS.Laser) {
+  static GetAverageTurnaround(sheet = SHEETS.Laser) {
     let totals = [];
     try {
-      [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.elapsedTime)]
+      let times = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.elapsedTime)]
         .filter(Boolean)
+        .filter(x => x !== `NaN days, NaN:NaN:NaN`)
+        .filter(x => x !== undefined)
+        .filter(x => x !== `undefined`)
+        .filter(x => x !== null)
         .forEach(time => {
-          let t = Number(TimeService.TimeToMillis(time)) || 0;
-          totals.push(t);
-        });
+          if(time !== undefined || time !== null || time !== ``) {
+            let t = Number(TimeService.TimerStringToMilliseconds(time));
+            // console.info(t);
+            totals.push(t);
+          }
 
+        });
+      // console.info(totals);
       const average = totals && StatisticsService.ArithmeticMean(totals);  // Average the totals (a list of times in millis)
       const averageString = TimeService.MillisecondsToTimerString(average) || 0;
+      console.info(`Sheet: ${sheet.getSheetName()}, AVG: ${averageString}`);
       return averageString;
     }
     catch (err) {
-      console.error(`"GetAverageTurnaround()" failed : ${err}`);
+      console.error(`"GetAverageTurnaround()" failed: ${err}`);
       return null;
     }
   }
@@ -42,13 +51,14 @@ class Calculate {
         [`Turnaround Times`, `Days`],
       ];
       Object.values(SHEETS).forEach(sheet => {
-        let days = this.GetAverageTurnaround(sheet).split(`,`)[0];
-        data.push([`${sheet.getName()} Turnaround`, days]);
+        const time = Calculate.GetAverageTurnaround(sheet);
+        data.push([`${sheet.getName()} Turnaround`, time]);
       });
+      // console.info(`Total Turnaround: ${data}`);
       OTHERSHEETS.Data.getRange(1, 13, data.length, 2).setValues(data);
       return 0;
     } catch (err) {
-      console.error(`"PrintTurnaroundTimes()" failed : ${err}`);
+      console.error(`"PrintTurnaroundTimes()" failed: ${err}`);
       return null;
     }
   }
@@ -84,7 +94,7 @@ class Calculate {
 
       return count;
     } catch(err) {
-      console.error(`"CountActiveUsers()" failed : ${err}`);
+      console.error(`"CountActiveUsers()" failed: ${err}`);
       return null;
     }
   }
@@ -117,7 +127,7 @@ class Calculate {
       OTHERSHEETS.Data.getRange(1, 9, values.length, 3).setValues(values);
       return data;
     } catch(err) {
-      console.error(`"CountEachSubmission()" failed : ${err}`);
+      console.error(`"CountEachSubmission()" failed: ${err}`);
       return null;
     }
   }
@@ -180,7 +190,7 @@ class Calculate {
         });
       OTHERSHEETS.Data.getRange(1, 24, values.length, 4).setValues(values);
     } catch(err) {
-      console.error(`"CreateTopTen()" failed : ${err}`);
+      console.error(`"CreateTopTen()" failed: ${err}`);
       return null;
     }
   }
@@ -262,7 +272,7 @@ class Calculate {
       console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
       return standardDeviation;
     } catch(err) {
-      console.error(`"GetUserSubmissionStandardDeviation()" failed : ${err}`);
+      console.error(`"GetUserSubmissionStandardDeviation()" failed: ${err}`);
       return null;
     }
   }
@@ -276,7 +286,7 @@ class Calculate {
       const mean = StatisticsService.ArithmeticMean(this.userDistribution);
       return mean;
     } catch(err) {
-      console.error(`"GetUserSubmissionArithmeticMean()" failed : ${err}`);
+      console.error(`"GetUserSubmissionArithmeticMean()" failed: ${err}`);
       return null;
     }
   }
@@ -321,7 +331,7 @@ class Calculate {
       OTHERSHEETS.Data.getRange(1, 32, values.length, 3).setValues(values);
       return zScore;
     } catch(err) {
-      console.error(`"UserSubmissionsZScores()" failed : ${err}`);
+      console.error(`"UserSubmissionsZScores()" failed: ${err}`);
       return null;
     }
   }
@@ -342,7 +352,7 @@ class Calculate {
       OTHERSHEETS.Data.getRange(1, 37, values.length, 4).setValues(values);
       return res;
     } catch(err) {
-      console.error(`"UserSubmissionChiSquaredFit()" failed : ${err}`);
+      console.error(`"UserSubmissionChiSquaredFit()" failed: ${err}`);
       return null;
     }
   }
@@ -362,7 +372,7 @@ class Calculate {
       OTHERSHEETS.Data.getRange(1, 42, values.length, 2).setValues(values);
       return quartiles;
     } catch(err) {
-      console.error(`"UserSubmissionsQuartiles()" failed : ${err}`);
+      console.error(`"UserSubmissionsQuartiles()" failed: ${err}`);
       return null;
     }
   }
@@ -386,7 +396,7 @@ class Calculate {
       OTHERSHEETS.Data.getRange(1, 35, values.length, 1).setValues(values);
       return cspList;
     } catch(err) {
-      console.error(`"UserSubmissionsCumulativeStdNormalProbability()" failed : ${err}`);
+      console.error(`"UserSubmissionsCumulativeStdNormalProbability()" failed: ${err}`);
       return null;
     }
   }
@@ -503,7 +513,7 @@ class Calculate {
       OTHERSHEETS.Data.getRange(1, 22, 2, 1).setValues(values);
       return fixed;
     } catch(err) {
-      console.error(`"CountFunding()" failed : ${err}`);
+      console.error(`"CountFunding()" failed: ${err}`);
       return null;
     }
   }
@@ -556,8 +566,10 @@ const _testDist = () => {
   // c.UserSubmissionChiSquaredFit();
   // c.UserSubmissionsCumulativeStdNormalProbability();
   // c.CreateTopTen();
+  // c.PrintStatistics();
 
-  c.CountStatuses();
+  // c.CountStatuses();
+  c.PrintTurnaroundTimes();
 
   // let start = new Date().toDateString();
   // let end = new Date(3,10,2020,10,32,42);

@@ -69,7 +69,7 @@ class HackyStoreAutomation {
       console.info(`Price = $${price}`);
       return price;
     } catch(err){
-      console.error(`${err} : Couldn't fetch price.`);
+      console.error(`${err}: Couldn't fetch price.`);
       return null;
     }
   }
@@ -81,11 +81,16 @@ class HackyStoreAutomation {
    * @return {float} none
    */
   static async Update_All_Unit_Costs_With_ShopifyAPI() {
-    Object.values(STORESHEETS).forEach(sheet => {
-      console.info(`Updating (${sheet.getSheetName()}) Unit Costs`);
-      HackyStoreAutomation.Update_Unit_Costs_Per_Sheet(sheet);
-      Utilities.sleep(1000);
-    });
+    try {
+      Object.values(STORESHEETS).forEach(sheet => {
+        console.info(`Updating (${sheet.getSheetName()}) Unit Costs`);
+        HackyStoreAutomation.Update_Unit_Costs_Per_Sheet(sheet);
+        Utilities.sleep(1000);
+      });
+    } catch(err) {
+      console.error(`"Update_All_Unit_Costs_With_ShopifyAPI()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
@@ -174,148 +179,52 @@ const RunHackySheetUpdater = () => HackyStoreAutomation.Update_All_Unit_Costs_Wi
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Looking up a material's URL
+ * Look up a material's URL
+ * @private
+ * @param {string} material name
+ * @returns {string} url
  */
-class MaterialLookup {
-  constructor({
-    materialName : matertialName = `Canon Poster Printer: 36" wide (priced per foot)`,
-  }){
-    this.materialName = matertialName;
-  }
+const MaterialLookup = (materialName) => {
+  try {
+    if (!materialName || materialName === null || materialName === undefined) {
+      return null;
+    }
 
-  get URL(){
-    console.warn(`Getting URL for ${this.materialName}....`);
+    if (typeof value !== `string`) {
+      throw new Error(`Invalid Inputs: ${materialName}`);
+    }
+
+    console.warn(`Getting URL for ${materialName}....`);
     let url = ``;
-    try {
-      Object.values(STORESHEETS).forEach(sheet => {
-        let finder = sheet.createTextFinder(this.materialName).findNext();
-        if(finder) {
-          let row = finder.getRow();
-          url = SheetService.GetByHeader(sheet, `Link`, row);
-          console.info(`Name: ${this.materialName}, URL: ${url}`);
-        }
-      })
-      return url;
-    } catch(err) {
-      console.error(`${err} : Whoops, failed....`);
-      return null;
-    }
+
+    Object.values(STORESHEETS).forEach(sheet => {
+      let finder = sheet.createTextFinder(materialName).findNext();
+      if(finder) {
+        let row = finder.getRow();
+        url = SheetService.GetByHeader(sheet, `Link`, row);
+        console.info(`Name: ${materialName}, URL: ${url}`);
+      }
+    })
+    return url;
+  } catch(err) {
+    console.error(`"MaterialLookup()" failed: ${err}`);
+    return null;
   }
+
 }
+
 const _testURL = () => {
-  let m = new MaterialLookup({}).URL;
-  console.info(`Result ${m}`)
+  let m = MaterialLookup();
+  console.info(`Result: ${m}`)
 }
 
 
-/**
- * ----------------------------------------------------------------------------------------------------------------
- * Class for Updating the Semester Start and End Dates
- */
-class HackySemesterDateLookup {
-  constructor() {
-    this.url = `https://jacobsinstitute.berkeley.edu/making-at-jacobs/`;
-    this.startDate = ``;
-    this.endDate = ``;
-    this.nextDate = ``;
-  }
 
-  /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * DEFUNCT : Get Price From Shopify Store URL (NOT USING SHOPIFY API)
-   * Used in "WritePrice()" function
-   * @private
-   * @param {string} url
-   * @return {float} price
-   */
-  async _GetDates() {
-    try {
+const _testHacky = () => {
 
-      const param = {
-        'method': 'GET',
-        'contentType' : "application/json", 
-        'headers': { 
-          'Authorization': 'Bearer ' + ScriptApp.getOAuthToken(),
-        },
-        'muteHttpExceptions': true,
-      }
-
-      const response = await UrlFetchApp.fetch(this.url, param);
-      const responseCode = response.getResponseCode();
-      if(![200, 201].includes(responseCode)) {
-        throw new Error(`Bad response from server: ${responseCode }---> ${RESPONSECODES[responseCode]}`);
-      }
-
-      const content = response.getContentText();
-      const index = content.search(`Key Dates`);
-      if(index <= 0) throw new Error(`No content`);
-
-      let chunk = content
-        .substring(index, index + 1200)
-        .replace(/<\/?[^>]+(>|$)/g, "");
-
-      // Start Date
-      let serviceStartIdx = chunk.search(`JPS Service`);
-      if (serviceStartIdx >= 0) {
-        this.startDate = chunk
-          .substring(serviceStartIdx + 20, serviceStartIdx + 26) + `, ` + new Date().getFullYear();
-        console.info(this.startDate);
-      }
-
-      // End Date
-      let serviceEndIdx = chunk.search(`Last day to submit`);
-      if (serviceEndIdx >= 0) {
-        this.endDate = chunk
-          .substring(serviceEndIdx + 28, serviceEndIdx + 33) + `, ` + new Date().getFullYear();
-        console.info(this.endDate);
-      }
-
-      // Next
-      let end = new Date(this.endDate);
-      this.nextDate = new Date(end.getFullYear(), end.getMonth() + 3, end.getDay() + 20 ).toDateString();
-      return { 
-        start : this.startDate, 
-        end : this.endDate, 
-        next : this.nextDate, 
-      };
-    } catch(err){
-      console.error(`"_GetDates()" failed : ${err}`);
-      return null;
-    }
-  }
-
-  async PrintDates() {
-    const { start, end, next } = await this._GetDates();
-    console.info(start);
-    OTHERSHEETS.Summary.getRange(1, 6, 1, 1).setValue(`Start of JPS Service:\n ${start}`);
-    OTHERSHEETS.Summary.getRange(1, 8, 1, 1).setValue(`Last Day to Submit:\n ${end}`);
-    OTHERSHEETS.Summary.getRange(1, 10, 1, 1).setValue(`JPS Service Resumes: \n ${next}`);
-  }
+  HackyStoreAutomation.Update_All_Unit_Costs_With_ShopifyAPI();
 
 }
-const PrintServiceDates = () => {
-  let m = new HackySemesterDateLookup({});
-  m.PrintDates();
-}
-
-/**
- * <p><strong>Key Dates for Spring 2023:</strong></p>
-  <ul>
-    <li data-stringify-indent="1" data-stringify-border="0">Maker Pass &amp; JPS Registration opens: Jan 10</li>
-    <li data-stringify-indent="1" data-stringify-border="0">JPS Service begins: Jan 17</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Makerspace access begins: Jan 17</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Hands-on trainings begin: Jan 23</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Last day of hands-on trainings: Mar 3</li>
-    <li data-stringify-indent="1" data-stringify-border="0"><strong>Spring Recess (no makerspace access or JPS service):</strong> Mar 27-31</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Last day to submit JPS project: May 5</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Makerspace early closure (at 7pm): May 8-12</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Last day to pick up JPS projects: May 12</li>
-    <li data-stringify-indent="1" data-stringify-border="0">Last day to access Makerspace: May 12</li>
-  </ul>
-*/
-
-
-
 
 
 

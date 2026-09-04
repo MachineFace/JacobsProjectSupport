@@ -415,7 +415,6 @@ const PopupCreateTicket = async () => {
     rowData : rowData,
   });
   const t = await x.CreateTicket();
-  console.info(t);
   
   SheetService.SetByHeader(thisSheet, HEADERNAMES.ticket, thisRow, t.getUrl());
   response = ui.alert(

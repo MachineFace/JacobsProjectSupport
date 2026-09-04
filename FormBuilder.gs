@@ -27,9 +27,9 @@ class FormBuilderService {
       let url = ``;
       const destination = DriveApp.getFoldersByName(`Job Forms`);
       const form = FormApp.create(title);
-      const sendloc = "16oCqmnW9zCUhpQLo3TXsaUSxDcSv7aareEVSE9zYtVQ";
+      const sendloc = PropertiesService.getUserProperties().getProperty(`FORM_FOLDER`);
       form
-        .setDestination(FormApp.DestinationType.SPREADSHEET, sendloc )
+        .setDestination(FormApp.DestinationType.SPREADSHEET, sendloc)
         .setTitle(title)
         .setDescription(`Referrence Number: ${id}`)
         .setConfirmationMessage(`Thanks for responding!`)
@@ -89,10 +89,10 @@ class FormBuilderService {
       while(destination.hasNext()) {
         destination.next().addFile(docFile);
       }
-      console.info(`Form Successfully Created : ${url}`);
+      console.info(`Form Successfully Created: ${url}`);
       return url;
     } catch (err) {
-      console.error(`${err} : Couldn't generate Approval Form`);
+      console.error(`"CreateApprovalForm()" failed: ${err}`);
       return null;
     }
   }
