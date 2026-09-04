@@ -14,7 +14,7 @@ if ((typeof GasTap) === 'undefined') {
 
 
 /**
- * Test Main with GasT
+ * ## Test Main with GasT
  * @private
  * PASSED 6/5/2026
  */
@@ -59,7 +59,7 @@ const _gasTMainTesting = async() => {
 }
 
 /**
- * Test Barcode with GasT
+ * ## Test Barcode with GasT
  * @private
  * PASSED 5/6/2026
  */
@@ -104,7 +104,7 @@ const _gasTBarcodeTesting = async() => {
 }
 
 /**
- * Test with GasT
+ * ## Test with GasT
  * @private
  * PASSED 6/5/2026
  */
@@ -202,7 +202,7 @@ const _gasTPriorityTesting = async() => {
 }
 
 /**
- * Test ID with GasT
+ * ## Test ID with GasT
  * @private
  * PASSED 6/5/2026
  */
@@ -247,7 +247,7 @@ const _gasTIDServiceTesting = async() => {
 }
 
 /**
- * Test Message with GasT
+ * ## Test Message with GasT
  * @private
  * PASSED 6/5/2026
  */

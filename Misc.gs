@@ -6,7 +6,7 @@
 
 
 /**
- * Find an index in an array
+ * ## Find an index in an array
  * @param {any} search
  * @returns {int} index
  */
@@ -19,7 +19,7 @@ const FindIndexInArray = (array = [], search = ``) => {
 };
 
 /**
- * Find Missing Elements in Array
+ * ## Find Missing Elements in Array
  * @param {[]} array 1
  * @param {[]} array 2
  * @return {[]} array of indexes
@@ -35,7 +35,7 @@ const FindMissingElementsInArrays = (array1 = [], array2 = []) => {
 
 
 /**
- * Get All Project Names
+ * ## Get All Project Names
  * @returns {object} { sheetname : [...projectnames] }
  * @NOTIMPLEMENTED
  */
@@ -54,7 +54,7 @@ const GetAllProjectNames = () => {
 
 
 /**
- * Look up Item's Info in Store Sheet
+ * ## Look up Item's Info in Store Sheet
  * @param {sheet} sheet
  * @param {material} material
  * @param {object} row data
@@ -71,7 +71,7 @@ const GetStoreInfo = (sheet, material) => {
 
 
 /**
- * Build Estimate
+ * ## Build Estimate
  * [Replaces: =IFERROR(ARRAYFORMULA(TO_DOLLARS(((AQ2:AQ * P2:P)) * O2:O)),"")]
  */
 const BuildEstimate = (sheet, row = 2) => {
@@ -129,16 +129,14 @@ const BuildEstimate = (sheet, row = 2) => {
   }
 }
 
-/**
- * 
- */
+
 const _testEstimate = () => {
   BuildEstimate(SHEETS.Fablight, 2);
 }
 
 
 /**
- * Helper Method for TitleCasing Names
+ * ## Helper Method for TitleCasing Names
  * @param {string} string
  * @returns {string} titlecased
  */
@@ -153,7 +151,7 @@ const TitleCase = (str = ``) => {
 }
 
 /**
- * Print Enclosing Function Name
+ * ## Print Enclosing Function Name
  */
 const PrintEnclosingFunctionName = () => {
   const fname = new Error().stack.split('\n')[2].split(`at `)[1];
@@ -163,7 +161,7 @@ const PrintEnclosingFunctionName = () => {
 
 
 /**
- * Execute with Timeout
+ * ## Execute with Timeout
  * Note: Appscript is synchronous, so this function doesn't work....
  * @param {function} some function to run
  * @param {number} timeout in seconds

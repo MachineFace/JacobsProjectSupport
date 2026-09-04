@@ -1,6 +1,6 @@
 
 /**
- * Creates Time-Driven Triggers : ONLY RUN ONCE AFTER DELETING PREVIOUS TRIGGERS. DO NOT DELETE
+ * ## Creates Time-Driven Triggers : ONLY RUN ONCE AFTER DELETING PREVIOUS TRIGGERS. DO NOT DELETE
  * Used in EnableJPS()
  */
 const CreateTimeDrivenTrigger = () => {
@@ -78,7 +78,7 @@ const CreateTimeDrivenTrigger = () => {
 }
 
 /**
- * Remove Triggers when Disabling JPS - DO NOT DELETE
+ * ## Remove Triggers when Disabling JPS - DO NOT DELETE
  * Used in 'DisableJPS()'
  */
 const RemoveTimedTriggers = () => {
@@ -132,7 +132,7 @@ const RemoveTimedTriggers = () => {
 }
 
 /**
- * Turn OFF JPS - DO NOT DELETE
+ * ## Turn OFF JPS - DO NOT DELETE
  * Used in conjunction with 'EnableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
 const DisableJPS = () => {
@@ -151,7 +151,7 @@ const DisableJPS = () => {
 }
 
 /**
- * Turn ON JPS - DO NOT DELETE
+ * ## Turn ON JPS - DO NOT DELETE
  * Used in conjunction with 'DisableJPS()',  'RemoveTimedTriggers()', 'CreateTimeDrivenTrigger()'
  */
 const EnableJPS = () => {
@@ -171,7 +171,7 @@ const EnableJPS = () => {
 }
 
 /**
- * Set Dropdowns for status
+ * ## Set Dropdowns for status
  * @TRIGGERED
  */
 const SetStatusDropdowns = () => {
@@ -191,7 +191,7 @@ const SetStatusDropdowns = () => {
 }
 
 /**
- * Set the Conditional Formatting for each page
+ * ## Set the Conditional Formatting for each page
  * @TRIGGERED
  */
 const SetConditionalFormatting = () => {
@@ -242,7 +242,7 @@ const SetConditionalFormatting = () => {
 }
 
 /**
- * Resize the Summary page Rows back to Default
+ * ## Resize the Summary page Rows back to Default
  * @TRIGGERED
  */
 const SetSummaryPageRowHeight = () => {
@@ -262,7 +262,7 @@ const SetSummaryPageRowHeight = () => {
 }
 
 /**
- * Set Row Height
+ * ## Set Row Height
  */
 const SetRowHeight = () => {
   try {
@@ -285,7 +285,7 @@ const SetRowHeight = () => {
 }
 
 /**  
- * Delete Files older than some number of days
+ * ## Delete Files older than some number of days
  * @param {number} RetentionPeriod
  */
 const DeleteOldFiles = () => {
@@ -309,7 +309,7 @@ const DeleteOldFiles = () => {
 }
 
 /**
- * Format cell to fix overlap issue
+ * ## Format cell to fix overlap issue
  * @param {cell} cell
  */
 const FormatCell = (cell) => {
@@ -323,7 +323,7 @@ const FormatCell = (cell) => {
 }
 
 /**
- * Build Summary Equation:
+ * ## Build Summary Equation:
  * @TRIGGERED
  * FORMAT: `QUERY(${sheetName}!A2:U, "Select * Where A = 'Received' OR A = 'In-Progress' or A = '(INTERNAL) Status' or A = 'Pending Approval' or A = 'Waitlist' or A = 'Missing Access' LABEL A '${sheetName}' ")`
  */
@@ -355,7 +355,7 @@ const BuildSummaryEquation = () => {
 }
 
 /**
- * Auxillary Equations
+ * ## Auxillary Equations
  * @TRIGGERED
  */
 const AuxillaryEquations = () => {

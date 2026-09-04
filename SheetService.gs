@@ -9,7 +9,7 @@ class SheetService {
   }
 
   /**
-   * Get All Sheets
+   * ## Get All Sheets
    */
   static GetAllSheets() {
     try {
@@ -21,7 +21,7 @@ class SheetService {
   }
 
   /**
-   * Check if this sheet is forbidden
+   * ## Check if this sheet is forbidden
    * @param {sheet} sheet to check
    * @returns {bool} false if sheet is allowed
    * @returns {bool} true if forbidden
@@ -39,7 +39,7 @@ class SheetService {
   }
 
   /**
-   * Return the value of a cell by column name and row number
+   * ## Return the value of a cell by column name and row number
    * @param {sheet} sheet
    * @param {string} colName
    * @param {number} row
@@ -57,7 +57,7 @@ class SheetService {
   }
 
   /**
-   * Set the value of a cell by column name and row number
+   * ## Set the value of a cell by column name and row number
    * @param {sheet} sheet
    * @param {string} colName
    * @param {number} row
@@ -77,7 +77,7 @@ class SheetService {
   }
 
   /**
-   * Return the values of a column by the name
+   * ## Return the values of a column by the name
    * @param {sheet} sheet
    * @param {string} colName
    * @param {number} row
@@ -123,7 +123,7 @@ class SheetService {
 
 
   /**
-   * Return a dictionary of values from a whole row on a given sheet
+   * ## Return a dictionary of values from a whole row on a given sheet
    * @param {sheet} sheet
    * @param {number} row
    */
@@ -151,7 +151,7 @@ class SheetService {
   }
 
   /**
-   * Writes a row of data to a sheet. Input event data and it writes each value to the sheet with matching header name
+   * ## Writes a row of data to a sheet. Input event data and it writes each value to the sheet with matching header name
    * @param {sheet} sheet
    * @param {dict} data 
    * @returns {dict} {header, value}
@@ -176,7 +176,7 @@ class SheetService {
 
 
   /**
-   * Search Column for Value
+   * ## Search Column for Value
    * @param {sheet} sheet
    * @param {string} column name
    * @param {string} value to look for
@@ -199,7 +199,7 @@ class SheetService {
   }
 
   /**
-   * Find some data in the column
+   * ## Find some data in the column
    * @param {spreadsheet} sheet
    * @param {string} column
    * @param {any} data
@@ -217,7 +217,7 @@ class SheetService {
   }
 
   /**
-   * Find some data in the row
+   * ## Find some data in the row
    * @param {spreadsheet} sheet
    * @param {any} data
    * @returns {[int]} column indexes
@@ -235,7 +235,7 @@ class SheetService {
   }
 
   /**
-   * Search a Specific Sheets for a value
+   * ## Search a Specific Sheets for a value
    * @required {string} value
    * @returns {[sheet, [values]]} list of sheets with lists of indexes
    */
@@ -252,7 +252,7 @@ class SheetService {
   }
 
   /**
-   * Search all Sheets for a value
+   * ## Search all Sheets for a value
    * @required {string} value
    * @returns {[sheet, [values]]} list of sheets with lists of indexes
    */
@@ -278,7 +278,7 @@ class SheetService {
   }
 
   /**
-   * Search all Sheets for one specific value
+   * ## Search all Sheets for one specific value
    * @required {string} value
    * @returns {[sheet, [number]]} [sheetname, row]
    */
@@ -300,7 +300,7 @@ class SheetService {
   }
 
   /**
-   * Find Email
+   * ## Find Email
    * @param {string} name
    * @returns {string} email
    */
@@ -324,7 +324,7 @@ class SheetService {
   }
 
   /**
-   * Write Array to Column
+   * ## Write Array to Column
    * @param {array} array to write
    * @param {sheet} sheet
    * @param {number} column number
@@ -337,14 +337,14 @@ class SheetService {
   }
 
   /**
-   * Checks if array is all empty values.
+   * ## Checks if array is all empty values.
    */
   static IsRowEmpty(row = []) {
     return row.filter((value) => value !== '').length === 0;
   }
 
   /**
-   * Delete Empty Rows
+   * ## Delete Empty Rows
    * @param {sheet} sheet
    * @private
    */
@@ -388,7 +388,7 @@ class SheetService {
   }
 
   /**
-   * Add Array to Sheet
+   * ## Add Array to Sheet
    * @private
    */
   static AddArrayToSheet(sheet, column = 1, values = ``) {
@@ -404,7 +404,7 @@ class SheetService {
   }
 
   /**
-   * Removes blank columns in a selected range.
+   * ## Removes blank columns in a selected range.
    * Cells containing Space characters are treated as non-empty.
    * The entire column, including cells outside of the selected range,
    * must be empty to be deleted.
@@ -465,7 +465,7 @@ class SheetService {
   }
 
   /**
-   * Trims all of the unused rows and columns outside of selected data range.
+   * ## Trims all of the unused rows and columns outside of selected data range.
    * Called from menu option.
    * @private
    */
@@ -495,7 +495,7 @@ class SheetService {
   }
 
   /**
-   * Copies value of active cell to the blank cells beneath it. 
+   * ## Copies value of active cell to the blank cells beneath it. 
    * Stops at last row of the sheet's data range if only blank cells are encountered.
    * Called from menu option.
    * @private
@@ -565,7 +565,7 @@ const _testSetRow = () => {
 
 
 /**
- * Get Store Sheet Association
+ * ## Get Store Sheet Association
  * @param {sheet} sheet
  * @returns {sheet} store sheet
  */

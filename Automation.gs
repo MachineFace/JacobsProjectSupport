@@ -1,7 +1,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Updating Prices from Shopify and Updating ID's from StorePage.
+ * ## Class for Updating Prices from Shopify and Updating ID's from StorePage.
  */
 class HackyStoreAutomation {
   constructor() {
@@ -10,7 +10,7 @@ class HackyStoreAutomation {
 
 
   /**
-   * Write the price to sheet
+   * ## Write the price to sheet
    * Used in "UpdatePriced()" function
    * @private
    */
@@ -32,7 +32,7 @@ class HackyStoreAutomation {
 
 
   /**
-   * Get Price From Shopify Store URL (NOT USING SHOPIFY API)
+   * ## Get Price From Shopify Store URL (NOT USING SHOPIFY API)
    * Used in "WritePrice()" function
    * @private
    * @param {string} url
@@ -75,7 +75,7 @@ class HackyStoreAutomation {
   }
 
   /**
-   * AUTOMATION : Get Price From Shopify
+   * ## AUTOMATION : Get Price From Shopify
    * Used in "Update_Unit_Costs_Per_Sheet()" function
    * @param {string} none
    * @return {float} none
@@ -94,7 +94,7 @@ class HackyStoreAutomation {
   }
 
   /**
-   * AUTOMATION : Update Price Per Sheet
+   * ## AUTOMATION : Update Price Per Sheet
    * @param {sheet} sheet
    * @return {bool} true
    */
@@ -114,7 +114,7 @@ class HackyStoreAutomation {
   }
 
   /**
-   * AUTOMATION : Update Each Sheet with Product IDs : Uses Get_Product_ID_From_URL()
+   * ## AUTOMATION : Update Each Sheet with Product IDs : Uses Get_Product_ID_From_URL()
    */
   static Update_Product_IDs() {    
     try {
@@ -132,7 +132,7 @@ class HackyStoreAutomation {
 
 
   /**
-   * AUTOMATION : Parses html to find the Product ID. (NOT USING SHOPIFY API)
+   * ## AUTOMATION : Parses html to find the Product ID. (NOT USING SHOPIFY API)
    */
   async Get_Product_ID_From_URL(sheet) {
     const start = `"product":{"id":`;
@@ -178,8 +178,7 @@ const RunHackySheetUpdater = () => HackyStoreAutomation.Update_All_Unit_Costs_Wi
 
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
- * Look up a material's URL
+ * ## Look up a material's URL
  * @private
  * @param {string} material name
  * @returns {string} url

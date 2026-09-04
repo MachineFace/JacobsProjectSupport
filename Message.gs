@@ -1,6 +1,6 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Creating Response Messages
+ * ## Class for Creating Response Messages
  * Properties accessed via `this.receivedMessage` or `this.failedMessage`
  * @param {string} name
  * @param {string} projectname

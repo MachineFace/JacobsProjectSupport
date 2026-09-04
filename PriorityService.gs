@@ -1,6 +1,6 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Checking Priority
+ * ## Class for Checking Priority
  * @param {string} email
  * @param {string} sid
  */
@@ -69,6 +69,10 @@ class PriorityService {
 
   }
 
+  /**
+   * ## Get the Priority for a user.
+   * @returns {boolean} priority
+   */
   get Priority() {
     // Try email first
     try {
@@ -85,7 +89,7 @@ class PriorityService {
   }
 
   /**
-   * Check Users with Missing Access for their Priority Number if it exists.
+   * ## Check Users with Missing Access for their Priority Number if it exists.
    */
   static CheckMissingAccessStudents() {
     let list = [];
@@ -115,7 +119,7 @@ class PriorityService {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Check Students with Missing Access for their Priority Number if it exists.
+ * ## Check Students with Missing Access for their Priority Number if it exists.
  */
 const CheckMissingAccessStudents = () => PriorityService.CheckMissingAccessStudents();
 

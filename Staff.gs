@@ -2,7 +2,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Creating an Employee
+ * ## Class for Creating an Employee
  * Abstract Class
  */
 class Employee {
@@ -52,7 +52,7 @@ const _testEmployee = () => {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Creating a Design Specialist Employee
+ * ## Class for Creating a Design Specialist Employee
  */
 class DesignSpecialist extends Employee {
   constructor({
@@ -121,7 +121,7 @@ class DesignSpecialist extends Employee {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * SS Class - child of DS Class
+ * ## SS Class - child of DS Class
  * Note: In derived classes, super() must be called before you can use 'this'. Leaving this out will cause a reference error.
  */
 class StudentSupervisor extends Employee {
@@ -163,7 +163,7 @@ class StudentSupervisor extends Employee {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Manager Class - child of DS Class
+ * ## Manager Class - child of DS Class
  */
 class Manager extends Employee { 
   constructor({
@@ -205,7 +205,7 @@ class Manager extends Employee {
 
 
 /**
- * Staff Service
+ * ## Staff Service
  */
 class StaffService {
   constructor() {
@@ -260,7 +260,7 @@ class StaffService {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Return All Staff Email as a string.
+ * ## Return All Staff Email as a string.
  * @USED in Daily Email Summary
  */
 const StaffEmailAsString = () => {
@@ -273,7 +273,7 @@ const StaffEmailAsString = () => {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Invoke Design Specialist properties
+ * ## Invoke Design Specialist properties
  * @param {string} name
  * @param {string} property
  * @returns {string} fullname, email, or email link
@@ -305,7 +305,7 @@ const InvokeDS = (name, property) => {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Create a Design Specialist from spreadsheet and return a list
+ * ## Create a Design Specialist from spreadsheet and return a list
  * @returns {[string]} DSList
  *
 const BuildStaff = () => {

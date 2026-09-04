@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------------------------------------------
- * Send an Email
+ * ## Send an Email
  * @required {string} User Email
  * @required {string} Status
  */
@@ -10,7 +10,7 @@ class EmailService {
   }
 
   /**
-   * Send an email using Google Apps Script's MailApp service.
+   * ## Send an email using Google Apps Script's MailApp service.
    *
    * @param {string} toEmail - Recipient email address.
    * @param {string} fromEmail - Sender email address.
@@ -75,7 +75,7 @@ class EmailService {
   }
 
   /**
-   * Count Total Emails Sent
+   * ## Count Total Emails Sent
    * @NOTIMPLEMENTED
    * @private
    */
@@ -105,7 +105,7 @@ class EmailService {
   }
 
   /**
-   * Lists, for each thread in the user's Inbox, a snippet associated with that thread.
+   * ## Lists, for each thread in the user's Inbox, a snippet associated with that thread.
    * @NOTIMPLEMENTED
    * @private
    */
@@ -132,7 +132,7 @@ class EmailService {
   }
 
   /**
-   * Validate an email string
+   * ## Validate an email string
    * @param {string} email
    * @returns {bool} boolean
    */

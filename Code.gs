@@ -22,7 +22,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Trigger 1 - On Submission
+ * ## Trigger 1 - On Submission
  * Reserved word: (onFormSubmit) cannot be used here because it's reserved for simple triggers.
  * @param {Event} e
  */
@@ -168,7 +168,7 @@ const handleSubmit = async (e) => {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Trigger 2 - On Edit
+ * ## Trigger 2 - On Edit
  * Reserved word: (onEdit) and (onChange) cannot be used here because it's reserved for simple triggers.
  * @param {Event} e
  */

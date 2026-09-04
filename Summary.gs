@@ -2,7 +2,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class for Creating a Summary Email
+ * ## Class for Creating a Summary Email
  */
 class SummaryBuilder {
   constructor() {
@@ -10,8 +10,7 @@ class SummaryBuilder {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Get html template
+   * ## Get html template
    * @private
    * @param {dataRange} dataRange
    * @returns {html} htmlBody
@@ -24,8 +23,7 @@ class SummaryBuilder {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Get data and put into internal lists
+   * ## Get data and put into internal lists
    * This function is used in 'CreateSummaryEmail()' with 'tabletemplate.html'
    * @private
    * @param {any} values
@@ -59,8 +57,7 @@ class SummaryBuilder {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Get Google Doc as html string data : returns string
+   * ## Get Google Doc as html string data : returns string
    * @private
    * @param {string} docId
    * @return {string} text 
@@ -77,8 +74,7 @@ class SummaryBuilder {
 
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Summary Text
+   * ## Summary Text
    * @private
    */
   static _SummaryText() {
@@ -98,8 +94,7 @@ class SummaryBuilder {
 
 
   /**
-   * ----------------------------------------------------------------------------------------------------------------
-   * Send Summary Email
+   * ## Send Summary Email
    * This generates a summary email to all the Design Specialists (triggered daily at 6am)
    */
   async SendEmail () {
@@ -130,7 +125,7 @@ class SummaryBuilder {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Class Instance to be Triggered
+ * ## Class Instance to be Triggered
  * This generates a summary email to all the Design Specialists (triggered daily at 6am)
  */
 const CreateSummaryEmail = () => new SummaryBuilder();

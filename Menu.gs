@@ -1,5 +1,5 @@
 /**
- * Mark a job as abandoned and send an email to that student
+ * ## Mark a job as abandoned and send an email to that student
  * DEFUNCT
  *
 const PopUpMarkAsAbandoned = async () => {
@@ -49,7 +49,7 @@ const PopUpMarkAsAbandoned = async () => {
 */
 
 /**
- * Mark a job as abandoned and send an email to that student
+ * ## Mark a job as abandoned and send an email to that student
  * DEFUNCT
 const PopUpMarkAsPickedUp = async () => {
   let ui = SpreadsheetApp.getUi(); 
@@ -85,7 +85,7 @@ const PopUpMarkAsPickedUp = async () => {
 
 
 /** 
- * Creates a pop-up for counting users.
+ * ## Creates a pop-up for counting users.
  */
 const PopupCountUsers = () => {
   const ui = SpreadsheetApp.getUi();
@@ -100,7 +100,7 @@ const PopupCountUsers = () => {
 
 
 /**
- * Create a pop-up to check for ALL missing students
+ * ## Create a pop-up to check for ALL missing students
  */
 const PopupCheckMissingAccessStudents = async () => {
   const ui = SpreadsheetApp.getUi();
@@ -115,7 +115,7 @@ const PopupCheckMissingAccessStudents = async () => {
 
 
 /**
- * Create a pop-up to check for ONE missing students
+ * ## Create a pop-up to check for ONE missing students
  */
 const PopupGetSingleStudentPriority = async () => {
   try {
@@ -163,7 +163,7 @@ const PopupGetSingleStudentPriority = async () => {
 
 
 /**
- * Create a pop-up to make a new ID
+ * ## Create a pop-up to make a new ID
  */
 const PopupCreateNewID = () => {
   const ui = SpreadsheetApp.getUi();
@@ -199,7 +199,7 @@ const PopupCreateNewID = () => {
 
 
 /**
- * Bill from a selected line
+ * ## Bill from a selected line
  */
 const BillFromSelected = async () => {
   try {
@@ -327,7 +327,7 @@ const BillFromSelected = async () => {
 
 
 /**
- * Build Estimate
+ * ## Build Estimate
  */
 const PopupBuildEstimate = () => {
   const ui = SpreadsheetApp.getUi();
@@ -386,7 +386,7 @@ const PopupBuildEstimate = () => {
 
 
 /**
- * Create a pop-up to Create a new Ticket if one is missing.
+ * ## Create a pop-up to Create a new Ticket if one is missing.
  */
 const PopupCreateTicket = async () => {
   const thisSheet = SpreadsheetApp.getActiveSheet();
@@ -426,7 +426,7 @@ const PopupCreateTicket = async () => {
 }
 
 /**
- * Builds HTML file for the modal pop-up from the help list.
+ * ## Builds HTML file for the modal pop-up from the help list.
  */
 const BuildHTMLHELP = () => {
   let warning = [ 
@@ -469,7 +469,7 @@ const BuildHTMLHELP = () => {
 }
 
 /**
- * Creates a modal pop-up for the help text.
+ * ## Creates a modal pop-up for the help text.
  */
 const PopupHelp = async () => {
   let ui = await SpreadsheetApp.getUi();
@@ -480,7 +480,7 @@ const PopupHelp = async () => {
 }
 
 /**
- * Builds our JPS Menu and sets functions.
+ * ## Builds our JPS Menu and sets functions.
  */
 const BarMenu = () => {
   SpreadsheetApp.getUi()
@@ -524,7 +524,7 @@ const RunTopTen = () => new Calculate().CreateTopTen();
 
 
 /**
- * Open the Barcode Tab
+ * ## Open the Barcode Tab
  * @DEFUNCT
  *
 const OpenBarcodeTab = async () => SpreadsheetApp
