@@ -2,7 +2,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * ## Get the current Jacobs Project Support semester dates.
+ * ### Get the current Jacobs Project Support semester dates.
  *
  * Searches multiple Jacobs Institute pages because the website structure
  * changes periodically. Results are validated and the last known-good
@@ -130,7 +130,7 @@ const GetSemesterDates = () => {
 }
 
 /**
- * ## Clean HTML into reasonably searchable plain text.
+ * ### Clean HTML into reasonably searchable plain text.
  *
  * @param {string} html
  * @return {string}
@@ -155,7 +155,7 @@ const CleanSemesterPageText = (html) => {
 }
 
 /**
- * ## Find the semester heading.
+ * ### Find the semester heading.
  *
  * Example:
  * "Key Dates for Fall 2026"
@@ -170,7 +170,7 @@ const ExtractSemesterName = (text) => {
 }
 
 /**
- * ## Extract the year from a semester name.
+ * ### Extract the year from a semester name.
  *
  * @param {string} semester
  * @return {number|null}
@@ -185,7 +185,7 @@ const ExtractSemesterYear = (semester) => {
 }
 
 /**
- * ## Extract a date following one of several possible labels.
+ * ### Extract a date following one of several possible labels.
  *
  * The parser intentionally allows arbitrary whitespace and punctuation
  * between the label and date so minor website formatting changes do not
@@ -227,7 +227,7 @@ const ExtractLabeledDate = (text, labels, year) => {
 }
 
 /**
- * ## Parse a month/day string into a Date.
+ * ### Parse a month/day string into a Date.
  *
  * Handles:
  *   Aug 26
@@ -305,7 +305,7 @@ const ParseSemesterDate = (value, year) => {
 }
 
 /**
- * ## Select the strongest result from the pages we searched.
+ * ### Select the strongest result from the pages we searched.
  *
  * A valid result must contain both a start and end date, and the start
  * must occur before the end.
@@ -327,7 +327,7 @@ const SelectValidSemesterResult = (results) => {
 }
 
 /**
- * ## Determine the next service start.
+ * ### Determine the next service start.
  *
  * This deliberately does NOT attempt to invent a date from the current
  * semester's end date. If the next semester isn't explicitly known,
@@ -350,7 +350,7 @@ const GetNextSemesterDate = (start, end) => {
 }
 
 /**
- * ## Cache a successful result.
+ * ### Cache a successful result.
  *
  * Dates are serialized as ISO strings because Date objects cannot be
  * directly stored in PropertiesService.
@@ -379,7 +379,7 @@ const CacheSemesterDates = (key, result) => {
 }
 
 /**
- * ## Retrieve cached semester dates.
+ * ### Retrieve cached semester dates.
  *
  * @param {string} key
  * @return {Object|null}
@@ -418,7 +418,7 @@ const GetCachedSemesterDates = (key) => {
 }
 
 /**
- * ## Print the current JPS semester dates to the Summary sheet.
+ * ### Print the current JPS semester dates to the Summary sheet.
  * 
  * This function fetches the start and end dates for the JPS Service
  * and cross-references across multiple sites for accuracy and prints those

@@ -27,7 +27,7 @@ class ShopifyAPI {
 
 
   /**
-   * ## Get Store Product ID
+   * ### Get Store Product ID
    * @param {string} material name
    * @returns {[string, string]} productID, link, price
    * @private
@@ -52,7 +52,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Packages Materials
+   * ### Packages Materials
    * @param {[{name: string, quantity: number}]} materials - list of material objects
    * @returns {[{string}]} materials
    * @private
@@ -107,7 +107,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Create Shopify Order
+   * ### Create Shopify Order
    * @param {string} id
    * @param {string} email
    * @param {[{name: string, quantity: number}]} materials - list of material objects
@@ -173,7 +173,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Look up a Shopify Customer by Email
+   * ### Look up a Shopify Customer by Email
    * @param {string} email
    * @return {JSON} all customer data
    * Access individual properties by invoking GetShopifyCustomerByEmail(email).id or GetShopifyCustomerByEmail(email).name
@@ -219,7 +219,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Look up a Shopify Product by Name
+   * ### Look up a Shopify Product by Name
    * Fetch Product - GET /admin/api/2020-04/products.json?title=<searchString>&limit=250&fields=id,title
    * @param {string} productID
    * @return {JSON} all product data
@@ -267,7 +267,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Look up the last order
+   * ### Look up the last order
    * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
    * @return {string} order data
    */
@@ -308,7 +308,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Look up a specific order
+   * ### Look up a specific order
    * @return {string} order data
    */
   async GetSpecificOrder(order = ``) {
@@ -342,7 +342,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Retrieve list of orders
+   * ### Retrieve list of orders
    * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
    * @return {string} order data
    */
@@ -390,7 +390,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Retrieve list of open orders
+   * ### Retrieve list of open orders
    * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
    * @return {string} order data
    */
@@ -439,7 +439,7 @@ class ShopifyAPI {
   }
 
   /**
-   * ## Close Unfulfilled Order
+   * ### Close Unfulfilled Order
    * Fetch Orders - GET /admin/api/2021-01/orders.json?status=any
    * @return {string} order data
    * @private
@@ -544,7 +544,7 @@ const _testAPI = async () => {
 
 
 /**
- * ## Configure the service
+ * ### Configure the service
  * @private
 @NOTIMPLEMENTED
  *

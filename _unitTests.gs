@@ -1,5 +1,5 @@
 /**
- * Load GasT for Testing
+ * ### Load GasT for Testing
  * See : https://github.com/huan/gast for instructions
  */
 const gasT_URL = `https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js`;
@@ -14,7 +14,7 @@ if ((typeof GasTap) === 'undefined') {
 
 
 /**
- * ## Test Main with GasT
+ * ### Test Main with GasT
  * @private
  * PASSED 6/5/2026
  */
@@ -23,7 +23,7 @@ const _gasTMainTesting = async() => {
   const test = new GasTap();
   
   await test(`Design Specialist Creation`, (t) => {
-    let x ,y;
+    let x ,y, a, b;
     x = new DesignSpecialist({ name : `Testa`, fullname : `Testa Nama`, email: `some@thing.com` });
     y = `Testa Nama`;
     t.equal(x.fullname, y, `DS ${x.name} created.`);
@@ -50,7 +50,7 @@ const _gasTMainTesting = async() => {
   });
   
   await test(`Make Staff`, (t) => {
-    const staff = new StaffService().Staff;
+    const staff = GetStaff();
     t.equal(staff.Cody.name, `Cody`, `Staff member (${staff.Cody.name}) created successfully.`);
   });
   
@@ -59,7 +59,7 @@ const _gasTMainTesting = async() => {
 }
 
 /**
- * ## Test Barcode with GasT
+ * ### Test Barcode with GasT
  * @private
  * PASSED 5/6/2026
  */
@@ -104,7 +104,7 @@ const _gasTBarcodeTesting = async() => {
 }
 
 /**
- * ## Test with GasT
+ * ### Test with GasT
  * @private
  * PASSED 6/5/2026
  */
@@ -202,7 +202,7 @@ const _gasTPriorityTesting = async() => {
 }
 
 /**
- * ## Test ID with GasT
+ * ### Test ID with GasT
  * @private
  * PASSED 6/5/2026
  */
@@ -247,7 +247,7 @@ const _gasTIDServiceTesting = async() => {
 }
 
 /**
- * ## Test Message with GasT
+ * ### Test Message with GasT
  * @private
  * PASSED 6/5/2026
  */

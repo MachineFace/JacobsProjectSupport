@@ -10,20 +10,25 @@ class SummaryBuilder {
   }
 
   /**
-   * ## Get html template
+   * ### Get html template
    * @private
    * @param {dataRange} dataRange
    * @returns {html} htmlBody
    */
   static _GetEmailHtml(dataRange) {
-    let htmlTemplate = HtmlService.createTemplateFromFile("TableTemplate.html");
-    htmlTemplate.items = dataRange;
-    const htmlBody = htmlTemplate.evaluate().getContent();
-    return htmlBody;
+    try {
+      let htmlTemplate = HtmlService.createTemplateFromFile("TableTemplate.html");
+      htmlTemplate.items = dataRange;
+      const htmlBody = htmlTemplate.evaluate().getContent();
+      return htmlBody;
+    } catch(err) {
+      console.error(`"_GetEmailHtml()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
-   * ## Get data and put into internal lists
+   * ### Get data and put into internal lists
    * This function is used in 'CreateSummaryEmail()' with 'tabletemplate.html'
    * @private
    * @param {any} values
@@ -57,24 +62,32 @@ class SummaryBuilder {
   }
 
   /**
-   * ## Get Google Doc as html string data : returns string
+   * ### Get Google Doc as html string data : returns string
    * @private
    * @param {string} docId
    * @return {string} text 
    */
-  static async _DocToHtml(docId) {
-    let url = `https://docs.google.com/feeds/download/documents/export/Export?id=${docId}&exportFormat=html`;
-    let param = {
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
-      muteHttpExceptions: true,
-    };
-    return await UrlFetchApp.fetch(url, param).getContentText();
+  static _DocToHtml(docId) {
+    try {
+      if(!docId) {
+        throw new TypeError(`Missing Document ID to convert to html.`);
+      }
+      let url = `https://docs.google.com/feeds/download/documents/export/Export?id=${docId}&exportFormat=html`;
+      let param = {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+        muteHttpExceptions: true,
+      };
+      return UrlFetchApp.fetch(url, param).getContentText();
+    } catch(err) {
+      console.error(`"_DocToHtml()" failed: ${err}`);
+      return null;
+    }
   }
 
 
   /**
-   * ## Summary Text
+   * ### Summary Text
    * @private
    */
   static _SummaryText() {
@@ -94,16 +107,16 @@ class SummaryBuilder {
 
 
   /**
-   * ## Send Summary Email
+   * ### Send Summary Email
    * This generates a summary email to all the Design Specialists (triggered daily at 6am)
    */
-  async SendEmail () {
+  SendEmail () {
     try {
       console.warn(`Building Email...`)
       let dataRange = OTHERSHEETS.Summary.getRange(1, 1, OTHERSHEETS.Summary.getLastRow(), 22).getValues();
 
-      let items = await SummaryBuilder._GetData(dataRange);
-      let htmlBodyText = await SummaryBuilder._GetEmailHtml(items);
+      let items = SummaryBuilder._GetData(dataRange);
+      let htmlBodyText = SummaryBuilder._GetEmailHtml(items);
 
       // Email DS
       MailApp.sendEmail(SERVICE_EMAIL, `JPS: SUMMARY EMAIL`, ``, {
@@ -114,7 +127,6 @@ class SummaryBuilder {
         name: `JPS DAILY SUMMARY`,
       });
       console.warn(`DS Team Emailed with Summary for the day.`);
-      return 0;
     } catch(err) {
       console.error(`"SendEmail()" failed: ${err}`);
       return null;
@@ -125,7 +137,7 @@ class SummaryBuilder {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * ## Class Instance to be Triggered
+ * ### Class Instance to be Triggered
  * This generates a summary email to all the Design Specialists (triggered daily at 6am)
  */
 const CreateSummaryEmail = () => new SummaryBuilder();

@@ -41,7 +41,7 @@ class Ticket {
   }
 
   /**
-   * ## Create Ticket
+   * ### Create Ticket
    */
   async CreateTicket() {
     const barcode = await BarcodeService.GenerateBarCodeForTicketHeader(this.id);
@@ -173,7 +173,7 @@ class Ticket {
   }
 
   /**
-   * ## Replace table entries with an Image blob
+   * ### Replace table entries with an Image blob
    * @private
    * @param {DocumentApp.create(`doc`).getbody()} body
    * @param {string} text
@@ -198,7 +198,7 @@ class Ticket {
 }
 
 /**
- * ## Function for Creating missing tickets
+ * ### Function for Creating missing tickets
  */
 const GenerateMissingTickets = () => {
   Object.values(SHEETS).forEach(sheet => {

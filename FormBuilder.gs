@@ -10,7 +10,7 @@ class FormBuilderService {
   }
 
   /**
-   * ## Create Approval Form
+   * ### Create Approval Form
    * @param {string} name
    * @param {string} id
    * @param {float} cost 

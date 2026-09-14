@@ -1,6 +1,6 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * ## Class for Calculating Metrics
+ * ### Class for Calculating Metrics
  */
 class Calculate {
   constructor() {
@@ -9,7 +9,7 @@ class Calculate {
   }
 
   /**
-   * ## Calculate Average Turnaround Time
+   * ### Calculate Average Turnaround Time
    * @param {sheet} sheet
    * @returns {string} formatted average time
    */
@@ -42,7 +42,7 @@ class Calculate {
   }
 
   /**
-   * ## Print Turnaround Times
+   * ### Print Turnaround Times
    */
   PrintTurnaroundTimes() {
     try {
@@ -62,7 +62,7 @@ class Calculate {
   }
 
   /**
-   * ## Count Active Users
+   * ### Count Active Users
    * @returns {number} unique users
    */
   CountActiveUsers() {
@@ -98,7 +98,7 @@ class Calculate {
   }
 
   /**
-   * ## Count Each Submission
+   * ### Count Each Submission
    * @returns {object} counts per sheet
    */
   CountEachSubmission() {
@@ -131,7 +131,7 @@ class Calculate {
   }
 
   /**
-   * ## Print All Submissions
+   * ### Print All Submissions
    */
   PrintTotalSubmissions() {
     try {
@@ -157,7 +157,7 @@ class Calculate {
   }
 
   /**
-   * ## Find Email
+   * ### Find Email
    * 
    * Helper function for finding email
    * @private
@@ -183,7 +183,7 @@ class Calculate {
   }
 
   /**
-   * ## Create Top Ten List of Users
+   * ### Create Top Ten List of Users
    */
   CreateTopTen() {
     try {
@@ -206,7 +206,7 @@ class Calculate {
   }
 
   /**
-   * ## Count User Types
+   * ### Count User Types
    * @returns {[]} types, count
    */
   CountTypes() {
@@ -246,7 +246,7 @@ class Calculate {
 
 
   /**
-   * ## Calculate Distribution
+   * ### Calculate Distribution
    * @returns {[string, number]} sorted list of users
    */
   GetUserDistribution() {
@@ -273,7 +273,7 @@ class Calculate {
   }
 
   /**
-   * ## Calculate Standard Deviation
+   * ### Calculate Standard Deviation
    * @returns {number} Standard Deviation
    */
   GetUserSubmissionStandardDeviation() {
@@ -288,7 +288,7 @@ class Calculate {
   }
 
   /**
-   * ## Calculate Arithmetic Mean
+   * ### Calculate Arithmetic Mean
    * @returns {number} arithmetic mean
    */
   GetUserSubmissionArithmeticMean() {
@@ -302,7 +302,7 @@ class Calculate {
   }
 
   /**
-   * ## Print Statistics
+   * ### Print Statistics
    */
   PrintStatistics() {
     try {
@@ -331,7 +331,7 @@ class Calculate {
   }
 
   /**
-   * ## User Submissions Z Scores
+   * ### User Submissions Z Scores
    * @return {number} standard deviation
    */
   UserSubmissionsZScores() {
@@ -352,7 +352,7 @@ class Calculate {
   }
 
   /**
-   * ## User Submissions Chi Squared Goodness of Fit Test
+   * ### User Submissions Chi Squared Goodness of Fit Test
    * @returns {object} 
    */
   UserSubmissionChiSquaredFit() {
@@ -373,7 +373,7 @@ class Calculate {
   }
 
   /**
-   * ## User Submissions Quartiles
+   * ### User Submissions Quartiles
    * @return {number} quartiles
    */
   UserSubmissionsQuartiles() {
@@ -393,7 +393,7 @@ class Calculate {
   }
 
   /**
-   * ## User Submissions Cumulative Std Normal Probability
+   * ### User Submissions Cumulative Std Normal Probability
    */
   UserSubmissionsCumulativeStdNormalProbability() {
     try {
@@ -419,7 +419,7 @@ class Calculate {
   
 
   /**
-   * ## Count User Tiers
+   * ### Count User Tiers
    * @returns {[]} tiers
    */
   CountTiers() {
@@ -443,7 +443,7 @@ class Calculate {
   }
 
   /**
-   * ## Print User Tiers
+   * ### Print User Tiers
    */
   PrintTiers() {
     try {
@@ -462,7 +462,7 @@ class Calculate {
   }
 
   /**
-   * ## Count Project Statuses
+   * ### Count Project Statuses
    * @returns {[]} statuses
    */
   CountStatuses() {
@@ -494,7 +494,7 @@ class Calculate {
   }
 
   /**
-   * ## Print Statuses
+   * ### Print Statuses
    */
   PrintStatusCounts() {
     try {
@@ -521,7 +521,7 @@ class Calculate {
   }
 
   /**
-   * ## Count Funding
+   * ### Count Funding
    * @returns {number} funding
    */
   CountFunding() {
@@ -561,7 +561,7 @@ class Calculate {
 
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * ## Metrics - DO NOT DELETE
+ * ### Metrics - DO NOT DELETE
  * Used to Calculate Average Turnaround times and write to 'Data/Metrics' sheet
  */
 const Metrics = () => {

@@ -39,17 +39,6 @@ class Employee {
 
 }
 
-const _testEmployee = () => {
-  const e = new Employee({ 
-    name : `Fucking`, 
-    fullname : `Fucking Dickwad`, 
-    email : `fuckyou@fuckyou.com`,
-    areas : [ `Backyard`, `Frontyard`, `Basement`, ],
-  });
-  console.info(`Employee: ${JSON.stringify(e.ToString(), null, 3)}`)
-
-}
-
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * ## Class for Creating a Design Specialist Employee
@@ -118,7 +107,6 @@ class DesignSpecialist extends Employee {
 
 }
 
-
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * ## SS Class - child of DS Class
@@ -160,7 +148,6 @@ class StudentSupervisor extends Employee {
 
 }
 
-
 /**
  * ----------------------------------------------------------------------------------------------------------------
  * ## Manager Class - child of DS Class
@@ -201,30 +188,35 @@ class Manager extends Employee {
   
 }
 
-
+const _testEmployee = () => {
+  const e = new Employee({ 
+    name : `Dick`, 
+    fullname : `Dick Dickwad`, 
+    email : `dickwad@berkeley.edu`,
+    areas : [ `Backyard`, `Frontyard`, `Basement`, ],
+  });
+  console.info(`Employee: ${JSON.stringify(e.ToString(), null, 3)}`)
+}
 
 
 /**
- * ## Staff Service
+ * ## Get Staff 
  */
-class StaffService {
-  constructor() {
-    
-  }
-
-  get Staff() {
+const GetStaff = () => {
+  try {
     let staff = {};
-    let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
-    let culled = range.filter(Boolean);
+    let range = [...OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues()]
+      .filter(Boolean);
 
-    culled.forEach( (row, index) => {
+    range.forEach( (row, index) => {
+      if(!row) return;
       let name = row[0];
       let fullname = row[1];
       let email = row[2];
       let link = row[3];
       let type = row[4];
       if(email && !link) {
-        link = `<a href = "${email}">${email}</a>`;
+        link = MakeLink(email);
         OTHERSHEETS.Staff.getRange(OTHERSHEETS.Staff.getLastRow() - 1, 4).setValue(link);
       }
       switch(type) {
@@ -253,49 +245,64 @@ class StaffService {
     });
     // console.info(JSON.stringify(staff));
     return staff;
+  } catch(err) {
+    console.error(`"GetStaff()" failed: ${err}`);
+    return null;
   }
 }
 
 
 
+
 /**
- * ----------------------------------------------------------------------------------------------------------------
- * ## Return All Staff Email as a string.
- * @USED in Daily Email Summary
+ * ### Return All Staff Email as a string.
+ * USED in Daily Email Summary
+ * 
+ * @returns {string} email
  */
 const StaffEmailAsString = () => {
-  let emaillist = SheetService.GetColumnDataByHeader(OTHERSHEETS.Staff, `EMAIL`)
-    .filter(Boolean);
-  let f = [...new Set(emaillist)].toString();
-  return f;
+  try {
+    let emaillist = SheetService.GetColumnDataByHeader(OTHERSHEETS.Staff, `EMAIL`)
+      .filter(Boolean);
+    let f = [...new Set(emaillist)].toString();
+    return f;
+  } catch(err) {
+    console.error(`"StaffEmailAsString()" failed: ${err}`);
+    return null;
+  }
 }
 
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
- * ## Invoke Design Specialist properties
+ * ### Invoke Design Specialist properties
+ * 
  * @param {string} name
  * @param {string} property
  * @returns {string} fullname, email, or email link
  */
 const InvokeDS = (name, property) => {
-  let staff = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow(), 4).getValues();
+  try {
+    let staff = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow(), 4).getValues();
 
-  for (let i in staff) {
-    let _name = staff[i][0];
-    let _fullname = staff[i][1];
-    let _email = staff[i][2];
-    let _emailLink = staff[i][3];
-    // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
+    for (let i in staff) {
+      let _name = staff[i][0];
+      let _fullname = staff[i][1];
+      let _email = staff[i][2];
+      let _emailLink = staff[i][3];
+      // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
 
-    switch (property) {
-      case "fullname":
-        if (staff[i][0] == name) return _fullname;
-      case "email":
-        if (staff[i][0] == name) return _email;
-      case "emaillink":
-        if (staff[i][0] == name) return _emailLink;
+      switch (property) {
+        case "fullname":
+          if (staff[i][0] == name) return _fullname;
+        case "email":
+          if (staff[i][0] == name) return _email;
+        case "emaillink":
+          if (staff[i][0] == name) return _emailLink;
+      }
     }
+  } catch(err) {
+    console.error(`"InvokeDS()" failed: ${err}`);
+    return null;
   }
 }
 
@@ -304,61 +311,78 @@ const InvokeDS = (name, property) => {
 
 
 /**
- * ----------------------------------------------------------------------------------------------------------------
- * ## Create a Design Specialist from spreadsheet and return a list
+ * ### Create a Design Specialist from spreadsheet and return a list
+ * 
  * @returns {[string]} DSList
- *
-const BuildStaff = () => {
-  let staff = {};
-  let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
-  let culled = range.filter(Boolean);
+ */
+// const BuildStaff = () => {
+//   try {
+//     let staff = {};
+//     let range = OTHERSHEETS.Staff.getRange(2, 1, OTHERSHEETS.Staff.getLastRow() - 1, 5).getValues();
+//     let culled = range.filter(Boolean);
 
-  culled.forEach( (row, index) => {
-    let name = row[0];
-    let fullname = row[1];
-    let email = row[2];
-    let link = row[3];
-    let type = row[4];
-    // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
-    if(email && !link) {
-      link = `<a href = "${email}">${email}</a>`;
-      OTHERSHEETS.Staff.getRange(OTHERSHEETS.Staff.getLastRow() - 1, 4).setValue(link);
-    }
-    if(type == "DS") {
-      let ds = new DesignSpecialist({
-        name : name, 
-        fullname : fullname, 
-        email : email
-      });
-      staff[name] = ds;
-    } else if(type == "MA") {
-      let ma = new Manager({
-        name : name, 
-        fullname : fullname, 
-        email : email
-      });
-      staff[name] = ma;
-    } else if(type == "SS") {
-      let ss = new StudentSupervisor({
-        name : name, 
-        fullname : fullname, 
-        email : email
-      });
-      staff[name] = ss;
-    }
-  });
-  // console.info(JSON.stringify(staff));
-  return staff;
-}
-*/
+//     culled.forEach( (row, index) => {
+//       let name = row[0];
+//       let fullname = row[1];
+//       let email = row[2];
+//       let link = row[3];
+//       let type = row[4];
+//       // console.info(`Name : ${name}, Full : ${fullname}, Email : ${email}, Link : ${link}`);
+//       if(email && !link) {
+//         link = `<a href = "${email}">${email}</a>`;
+//         OTHERSHEETS.Staff.getRange(OTHERSHEETS.Staff.getLastRow() - 1, 4).setValue(link);
+//       }
+//       if(type == "DS") {
+//         let ds = new DesignSpecialist({
+//           name : name, 
+//           fullname : fullname, 
+//           email : email
+//         });
+//         staff[name] = ds;
+//       } else if(type == "MA") {
+//         let ma = new Manager({
+//           name : name, 
+//           fullname : fullname, 
+//           email : email
+//         });
+//         staff[name] = ma;
+//       } else if(type == "SS") {
+//         let ss = new StudentSupervisor({
+//           name : name, 
+//           fullname : fullname, 
+//           email : email
+//         });
+//         staff[name] = ss;
+//       }
+//     });
+//     // console.info(JSON.stringify(staff));
+//     return staff;
+//   } catch(err) {
+//     console.error(`"BuildStaff()" failed: ${err}`);
+//     return null;
+//   }
+// }
 
 
 
 
+/**
+ * ### Make Email Link
+ * Make an email link formatted like: 
+ * `<a href="name@email.edu">name@email.edu</a>`
+ * 
+ * @param {string} email
+ * @returns {string} link
+ */
 const MakeLink = (email) => {
-  if(!EmailService.ValidateEmail(email)) return undefined;
-  let link = `<a href="${email}">${email}</a>`;
-  return link;    
+  try {
+    if(!EmailService.ValidateEmail(email)) return null;
+    let link = `<a href="${email}">${email}</a>`;
+    return link;
+  } catch(err) {
+    console.error(`"MakeLink()" failed: ${err}`);
+    return null;
+  }
 }
 
 
