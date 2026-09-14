@@ -14,8 +14,8 @@ class Calculate {
    * @returns {string} formatted average time
    */
   static GetAverageTurnaround(sheet = SHEETS.Laser) {
-    let totals = [];
     try {
+      let totals = [];
       let times = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.elapsedTime)]
         .filter(Boolean)
         .filter(x => x !== `NaN days, NaN:NaN:NaN`)
@@ -35,8 +35,7 @@ class Calculate {
       const averageString = TimeService.MillisecondsToTimerString(average) || 0;
       console.info(`Sheet: ${sheet.getSheetName()}, AVG: ${averageString}`);
       return averageString;
-    }
-    catch (err) {
+    } catch (err) {
       console.error(`"GetAverageTurnaround()" failed: ${err}`);
       return null;
     }
@@ -56,7 +55,6 @@ class Calculate {
       });
       // console.info(`Total Turnaround: ${data}`);
       OTHERSHEETS.Data.getRange(1, 13, data.length, 2).setValues(data);
-      return 0;
     } catch (err) {
       console.error(`"PrintTurnaroundTimes()" failed: ${err}`);
       return null;
@@ -68,8 +66,8 @@ class Calculate {
    * @returns {number} unique users
    */
   CountActiveUsers() {
-    let persons = [];
     try {
+      let persons = [];
       Object.values(SHEETS).forEach(sheet => {
         let staff = SheetService.GetColumnDataByHeader(OTHERSHEETS.Staff, `FIRST LAST NAME`);
         [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.name)]
@@ -136,21 +134,26 @@ class Calculate {
    * ## Print All Submissions
    */
   PrintTotalSubmissions() {
-    let projects = [];
-    Object.values(SHEETS).forEach(sheet => {
-      const projectnames = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.projectName)]
-        .filter(Boolean)
-        .filter(name => name !== `FORMULA ROW`);
-      projects.push(...projectnames);
-    })
-    const projectSet = new Set(projects);
-    const size = projectSet.size;
-    console.info(`Size of Set --> ${size}`);
-    const values = [ 
-      [ `TOTAL PROJECTS SUBMISSIONS` ], 
-      [ size ], 
-    ];
-    OTHERSHEETS.Data.getRange(1, 3, 2, 1).setValues(values);
+    try {
+      let projects = [];
+      Object.values(SHEETS).forEach(sheet => {
+        const projectnames = [...SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.projectName)]
+          .filter(Boolean)
+          .filter(name => name !== `FORMULA ROW`);
+        projects.push(...projectnames);
+      })
+      const projectSet = new Set(projects);
+      const size = projectSet.size;
+      console.info(`Size of Set --> ${size}`);
+      const values = [ 
+        [ `TOTAL PROJECTS SUBMISSIONS` ], 
+        [ size ], 
+      ];
+      OTHERSHEETS.Data.getRange(1, 3, 2, 1).setValues(values);
+    } catch(err) {
+      console.error(`"PrintTotalSubmissions()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
@@ -162,16 +165,21 @@ class Calculate {
    * @returns {string} email
    */
   static _FindEmail(name) {
-    if (name) name.toString().replace(/\s+/g, "");
-    let email = ``;
-    Object.values(SHEETS).forEach(sheet => {
-      const finder = sheet.createTextFinder(name).findNext();
-      if (finder != null) {
-        let row = finder.getRow();
-        email = SheetService.GetByHeader(sheet, HEADERNAMES.email, row);
-      }
-    })
-    return email;
+    try {
+      if (name) name.toString().replace(/\s+/g, "");
+      let email = ``;
+      Object.values(SHEETS).forEach(sheet => {
+        const finder = sheet.createTextFinder(name).findNext();
+        if (finder != null) {
+          let row = finder.getRow();
+          email = SheetService.GetByHeader(sheet, HEADERNAMES.email, row);
+        }
+      })
+      return email;
+    } catch(err) {
+      console.error(`"_FindEmail()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
@@ -297,24 +305,29 @@ class Calculate {
    * ## Print Statistics
    */
   PrintStatistics() {
-    const am = Number(StatisticsService.ArithmeticMean(this.userDistribution)).toFixed(4) || 0;
-    const gm = Number(StatisticsService.GeometricMean(this.userDistribution)).toFixed(4) || 0;
-    const hm = Number(StatisticsService.HarmonicMean(this.userDistribution)).toFixed(4) || 0;
-    const qm = Number(StatisticsService.QuadraticMean(this.userDistribution)).toFixed(4) || 0;
-    const stdDev = Number(StatisticsService.StandardDeviation(this.userDistribution)).toFixed(4) || 0;
-    const kurtosis = Number(StatisticsService.Kurtosis(this.userDistribution, stdDev)).toFixed(4) || 0;
-    const skewness = Number(StatisticsService.Skewness(this.userDistribution, stdDev)).toFixed(4) || 0;
-    const values = [
-      [ `Statistics`, `Count`, ],
-      [ `Average # of Project Submissions Per User`, am ],
-      [ `Geometric Mean of Submissions Per User`, gm ],
-      [ `Harmonic Mean of Submissions Per User`, hm ],
-      [ `Quadratic Mean of Submissions Per User`, qm ],
-      [ `Std. Deviation for # of Project Submissions Per User: `, `+/- ${stdDev}` ],
-      [ `Kurtosis (High kurtosis means more outliers in data)`, kurtosis, ],
-      [ `Skewness (Measures the asymmetry of the data)`, skewness, ],
-    ];
-    OTHERSHEETS.Data.getRange(1, 29, values.length, 2).setValues(values);
+    try {
+      const am = Number(StatisticsService.ArithmeticMean(this.userDistribution)).toFixed(4) || 0;
+      const gm = Number(StatisticsService.GeometricMean(this.userDistribution)).toFixed(4) || 0;
+      const hm = Number(StatisticsService.HarmonicMean(this.userDistribution)).toFixed(4) || 0;
+      const qm = Number(StatisticsService.QuadraticMean(this.userDistribution)).toFixed(4) || 0;
+      const stdDev = Number(StatisticsService.StandardDeviation(this.userDistribution)).toFixed(4) || 0;
+      const kurtosis = Number(StatisticsService.Kurtosis(this.userDistribution, stdDev)).toFixed(4) || 0;
+      const skewness = Number(StatisticsService.Skewness(this.userDistribution, stdDev)).toFixed(4) || 0;
+      const values = [
+        [ `Statistics`, `Count`, ],
+        [ `Average # of Project Submissions Per User`, am ],
+        [ `Geometric Mean of Submissions Per User`, gm ],
+        [ `Harmonic Mean of Submissions Per User`, hm ],
+        [ `Quadratic Mean of Submissions Per User`, qm ],
+        [ `Std. Deviation for # of Project Submissions Per User: `, `+/- ${stdDev}` ],
+        [ `Kurtosis (High kurtosis means more outliers in data)`, kurtosis, ],
+        [ `Skewness (Measures the asymmetry of the data)`, skewness, ],
+      ];
+      OTHERSHEETS.Data.getRange(1, 29, values.length, 2).setValues(values);
+    } catch(err) {
+      console.error(`"PrintStatistics()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
@@ -410,32 +423,42 @@ class Calculate {
    * @returns {[]} tiers
    */
   CountTiers() {
-    let tiers = [...SheetService.GetColumnDataByHeader(OTHERSHEETS.Approved, `Tier`)]
-      .filter(Boolean);
-    const distribution = StatisticsService.Distribution(tiers);
-    const distSet = new Set(distribution.map(([key, _]) => key));
+    try {
+      let tiers = [...SheetService.GetColumnDataByHeader(OTHERSHEETS.Approved, `Tier`)]
+        .filter(Boolean);
+      const distribution = StatisticsService.Distribution(tiers);
+      const distSet = new Set(distribution.map(([key, _]) => key));
 
-    Object.values(PRIORITY).forEach(key => {
-      if (!distSet.has(`${key}`)) {
-        distribution.push([ `${key}`, 0 ]);
-      }
-    });
-    console.info(distribution)
-    return distribution;  
+      Object.values(PRIORITY).forEach(key => {
+        if (!distSet.has(`${key}`)) {
+          distribution.push([ `${key}`, 0 ]);
+        }
+      });
+      console.info(distribution)
+      return distribution;
+    } catch(err) {
+      console.error(`"CountTiers()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
    * ## Print User Tiers
    */
   PrintTiers() {
-    let tiers = [
-      [ `Applicant Tier`, `Count`],
-    ];
-    [...this.CountTiers()]
-      .forEach(( [ tier, count ], idx) => {
-        tiers.push([ `Tier ${tier} Users`, count ]);
-      });
-    OTHERSHEETS.Data.getRange(1, 16, tiers.length, 2,).setValues(tiers);
+    try {
+      let tiers = [
+        [ `Applicant Tier`, `Count`],
+      ];
+      [...this.CountTiers()]
+        .forEach(( [ tier, count ], idx) => {
+          tiers.push([ `Tier ${tier} Users`, count ]);
+        });
+      OTHERSHEETS.Data.getRange(1, 16, tiers.length, 2,).setValues(tiers);
+    } catch(err) {
+      console.error(`"PrintTiers()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
@@ -443,48 +466,58 @@ class Calculate {
    * @returns {[]} statuses
    */
   CountStatuses() {
-    let statuses = [];
-    Object.values(SHEETS).forEach(sheet => {
-      const stats = SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.status)
-        .filter(Boolean);
-      statuses.push(...stats);
-    });
+    try {
+      let statuses = [];
+      Object.values(SHEETS).forEach(sheet => {
+        const stats = SheetService.GetColumnDataByHeader(sheet, HEADERNAMES.status)
+          .filter(Boolean);
+        statuses.push(...stats);
+      });
 
-    const distribution = StatisticsService.Distribution(statuses);
-    const distSet = new Set(distribution.map(([key, _]) => key));
+      const distribution = StatisticsService.Distribution(statuses);
+      const distSet = new Set(distribution.map(([key, _]) => key));
 
-    // Add Back missing types with a 0
-    let list = Object.values(STATUS);
-    list.forEach(key => {
-      if (!distSet.has(key)) {
-        distribution.push([key, 0]);
-      }
-    });
+      // Add Back missing types with a 0
+      let list = Object.values(STATUS);
+      list.forEach(key => {
+        if (!distSet.has(key)) {
+          distribution.push([key, 0]);
+        }
+      });
 
-    console.info(distribution)
-    return distribution; 
+      console.info(distribution)
+      return distribution; 
+    } catch(err) {
+      console.error(`"CountStatuses()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
    * ## Print Statuses
    */
   PrintStatusCounts() {
-    const statuses = this.CountStatuses();
-    const total = statuses
-      .map(x => x[1])
-      .reduce((a, b) => a + b);
+    try {
+      const statuses = this.CountStatuses();
+      const total = statuses
+        .map(x => x[1])
+        .reduce((a, b) => a + b);
 
-    let stats = statuses.map(tuple => {
-      let percent = Number((Number(tuple[1]) / Number(total)) * 100).toFixed(2) || 0;
-      let percentString = `${percent}%`;
-      return [ TitleCase(tuple[0]), tuple[1], percentString ];
-    });
+      let stats = statuses.map(tuple => {
+        let percent = Number((Number(tuple[1]) / Number(total)) * 100).toFixed(2) || 0;
+        let percentString = `${percent}%`;
+        return [ TitleCase(tuple[0]), tuple[1], percentString ];
+      });
 
-    const values = [
-      [ `STATUS`, `COUNT`, `RATIO`, ],
-      ...stats,
-    ];
-    OTHERSHEETS.Data.getRange(1, 5, values.length, 3).setValues(values);
+      const values = [
+        [ `STATUS`, `COUNT`, `RATIO`, ],
+        ...stats,
+      ];
+      OTHERSHEETS.Data.getRange(1, 5, values.length, 3).setValues(values);
+    } catch(err) {
+      console.error(`"PrintStatusCounts()" failed: ${err}`);
+      return null;
+    }
   }
 
   /**
@@ -554,7 +587,7 @@ const Metrics = () => {
     console.timeEnd(`Metrics Timer `);
     return 0;
   } catch (err) {
-    console.error(`${err} : Couldn't generate Metrics for some dumb reason...`);
+    console.error(`"Metrics()" failed: ${err}`);
     return null;
   }
 }
