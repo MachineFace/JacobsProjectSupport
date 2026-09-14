@@ -155,11 +155,13 @@ class Calculate {
 
   /**
    * ## Find Email
+   * 
+   * Helper function for finding email
    * @private
    * @param {string} name
    * @returns {string} email
    */
-  _FindEmail(name) {
+  static _FindEmail(name) {
     if (name) name.toString().replace(/\s+/g, "");
     let email = ``;
     Object.values(SHEETS).forEach(sheet => {
@@ -184,7 +186,7 @@ class Calculate {
       this.userDistribution
         .slice(0, 11)
         .forEach(([ user, count ], idx) => {
-          let email = this._FindEmail(user) ? this._FindEmail(user) : `Email not found`;
+          let email = Calculate._FindEmail(user) ? Calculate._FindEmail(user) : `Email not found`;
           const entry = [ idx + 1, user, count, email ];
           values.push(entry);
         });

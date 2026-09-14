@@ -46,7 +46,7 @@ class ShopifyAPI {
       });
       return productID;
     } catch(err) {
-      console.error(`"_GetStoreProductID()" failed : ${err}`);
+      console.error(`"_GetStoreProductID()" failed: ${err}`);
       return null;
     }
   }

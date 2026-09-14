@@ -16,7 +16,7 @@ const FindIndexInArray = (array = [], search = ``) => {
     if (array[i].toString().indexOf(search) > -1) return i;
   }
   return -1;
-};
+}
 
 /**
  * ## Find Missing Elements in Array

@@ -25,7 +25,7 @@ class PriorityService {
       console.info(`Priority set to: 1`);
       return PRIORITY.Tier1;
     } catch (err) {
-      console.error(`"_CheckForStaff()" failed : ${err}`);
+      console.error(`"_CheckForStaff()" failed: ${err}`);
       return PRIORITY.None;
     } 
   }
@@ -44,7 +44,7 @@ class PriorityService {
       console.info(`${this.email} is registered. Priority: ${priority}`);
       return priority;
     } catch(err) {
-      console.error(`"_CheckViaEmail()" failed : ${err}`);
+      console.error(`"_CheckViaEmail()" failed: ${err}`);
       return PRIORITY.None;
     }
   }
@@ -83,7 +83,7 @@ class PriorityService {
       if(priority == false) priority = PRIORITY.None;
       return priority;      
     } catch (err) {
-      console.error(`"Priority()" failed : ${err}`);
+      console.error(`"Priority()" failed: ${err}`);
       return PRIORITY.None;
     }
   }

@@ -24,7 +24,7 @@ class HackyStoreAutomation {
         });
       return 0;
     } catch(err) {
-      console.error(`"_Write_Unit_Cost()" failed : ${err}`);
+      console.error(`"_Write_Unit_Cost()" failed: ${err}`);
       return null;
     }
 
@@ -167,7 +167,7 @@ class HackyStoreAutomation {
         });
       return 0;
     } catch(err) {
-      console.error(`"Get_Product_ID_From_URL()" failed : ${err}`);
+      console.error(`"Get_Product_ID_From_URL()" failed: ${err}`);
       return null;
     }
   }

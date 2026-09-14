@@ -72,7 +72,7 @@ const CreateTimeDrivenTrigger = () => {
       .create();
     return 0;
   } catch (err) {
-    console.error(`"CreateTimeDrivenTrigger()" failed : ${err}`);
+    console.error(`"CreateTimeDrivenTrigger()" failed: ${err}`);
     return null;
   }
 }
@@ -126,7 +126,7 @@ const RemoveTimedTriggers = () => {
     console.info(`Removed Triggers for Summary Emails`);
     return 0;
   } catch (err) {
-    console.error(`"RemoveTimedTriggers()" failed : ${err}`);
+    console.error(`"RemoveTimedTriggers()" failed: ${err}`);
     return null;
   }
 }
@@ -142,10 +142,10 @@ const DisableJPS = () => {
       console.warn(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
     }
     RemoveTimedTriggers();
-    console.warn(`Turned off JPS Form Response Collection : JPS is DISABLED. ENJOY THE BREAK.`);
+    console.warn(`Turned off JPS Form Response Collection: JPS is DISABLED. ENJOY THE BREAK.`);
     return 0;
   } catch (err) {
-    console.error(`"DisableJPS()" failed : ${err}`);
+    console.error(`"DisableJPS()" failed: ${err}`);
     return null;
   }
 }
@@ -165,7 +165,7 @@ const EnableJPS = () => {
     console.warn(`Created Daily Summary Email Triggers.`);
     return 0;
   } catch(err) {
-    console.error(`"EnableJPS()" failed : ${err}`);
+    console.error(`"EnableJPS()" failed: ${err}`);
     return null;
   }
 }
@@ -183,6 +183,7 @@ const SetStatusDropdowns = () => {
         .requireValueInList(Object.values(STATUS));
       sheet.getRange(start_row, 1, sheet.getLastRow(), 1).setDataValidation(rule);
     });
+    console.warn(`Status Dropdowns Reset to Default for ALL sheets.`);
     return 0;
   } catch(err) {
     console.error(`"SetStatusDropdowns()" failed: ${err}`);
@@ -253,7 +254,7 @@ const SetSummaryPageRowHeight = () => {
     const height = 21;
     sheet.setRowHeightsForced(3, max_rows - 3, height);
     sheet.getRange(3, 1, max_rows -1, max_cols).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-    console.info(`Set Row Height.`);
+    console.warn(`Reset Row Height to Default for SUMMARY sheet.`);
     return 0;
   } catch(err) {
     console.error(`"SetSummaryPageRowHeight()" failed: ${err}`);
@@ -315,9 +316,8 @@ const DeleteOldFiles = () => {
 const FormatCell = (cell) => {
   try {
     cell.setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-    return 0;
   } catch (err) {
-    console.error(`"FormatCell()" failed : ${err}`);
+    console.error(`"FormatCell()" failed: ${err}`);
     return null;
   }
 }

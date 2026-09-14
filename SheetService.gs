@@ -33,7 +33,7 @@ class SheetService {
       Object.values(NONITERABLESHEETS).forEach(sheet => forbiddenNames.push(sheet.getSheetName()));
       return !forbiddenNames.includes(thisSheetName);
     } catch(err) {
-      console.error(`"IsValidSheet()" failed : ${err}`);
+      console.error(`"IsValidSheet()" failed: ${err}`);
       return null;
     }
   }
@@ -51,7 +51,7 @@ class SheetService {
       if (col == -1) throw new Error(`Getting data by header failed.`);
       return data[row - 1][col];
     } catch (err) {
-      console.error(`"GetByHeader()" failed : ${err} @ Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
+      console.error(`"GetByHeader()" failed: ${err} @ Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
       return null;
     }
   }
@@ -71,7 +71,7 @@ class SheetService {
       sheet.getRange(row, col).setValue(val);
       return 0;
     } catch (err) {
-      console.error(`"SetByHeader()" failed : ${err} @ Sheet: ${sheet} Row: ${row}, Value: ${val}`);
+      console.error(`"SetByHeader()" failed: ${err} @ Sheet: ${sheet} Row: ${row}, Value: ${val}`);
       return null;
     }
   }
@@ -145,7 +145,7 @@ class SheetService {
       console.info(dict);
       return dict;
     } catch (err) {
-      console.error(`"GetRowData()" failed : ${err}`);
+      console.error(`"GetRowData()" failed: ${err}`);
       return null;
     }
   }
@@ -169,7 +169,7 @@ class SheetService {
       sheet.appendRow(values);
       return 0;
     } catch (err) {
-      console.error(`"SetRowData()" failed : ${err}`);
+      console.error(`"SetRowData()" failed: ${err}`);
       return null;
     }
   }
@@ -193,7 +193,7 @@ class SheetService {
       if (col == -1) return false;
       return range.some( row => row[0] === val);
     } catch (err) {
-      console.error(`"SearchColumn()" failed : ${err} @ Sheet: ${sheet} Col Name specified: ${columnName} value: ${val}`);
+      console.error(`"SearchColumn()" failed: ${err} @ Sheet: ${sheet} Col Name specified: ${columnName} value: ${val}`);
       return false;
     }
   }
@@ -246,7 +246,7 @@ class SheetService {
       if (!finder) return false;
       return finder.getRow();
     } catch(err) {
-      console.error(`"SearchSpecificSheet()" failed : ${err}`);
+      console.error(`"SearchSpecificSheet()" failed: ${err}`);
       return null;
     }
   }
@@ -272,7 +272,7 @@ class SheetService {
       // console.info(JSON.stringify(res));
       return res;
     } catch(err) {
-      console.error(`"Search()" failed : ${err}`);
+      console.error(`"Search()" failed: ${err}`);
       return null;
     }
   }
@@ -564,34 +564,38 @@ const _testSetRow = () => {
 */
 
 
+
 /**
  * ## Get Store Sheet Association
- * @param {sheet} sheet
- * @returns {sheet} store sheet
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
+ * @returns {GoogleAppsScript.Spreadsheet.Sheet}
  */
 const GetStoreSheet = (sheet) => {
-  const sheetName = sheet.getSheetName();
-  switch(sheetName) {
-    case SHEETS.Laser.getSheetName():
-      return STORESHEETS.LaserStoreItems;
-    case SHEETS.Fablight.getSheetName():
-      return STORESHEETS.FablightStoreItems;
-    case SHEETS.Waterjet.getSheetName():
-      return STORESHEETS.WaterjetStoreItems;
-    case SHEETS.Advancedlab.getSheetName():
-      return STORESHEETS.AdvLabStoreItems;
-    case SHEETS.Shopbot.getSheetName():
-      return STORESHEETS.ShopbotStoreItems;
-    case SHEETS.Vinyl.getSheetName():
-      return STORESHEETS.VinylCutterStoreItems;
-    case SHEETS.Othertools.getSheetName():
-      return STORESHEETS.OthermillStoreItems;
-    case SHEETS.Plotter.getSheetName():
-    case SHEETS.GSI_Plotter.getSheetName():
-      return STORESHEETS.VinylCutterStoreItems;
-    default:
-      return STORESHEETS.LaserStoreItems;
-  }  
+  try {
+    if (!sheet || typeof sheet.getSheetName !== `function`) {
+      throw new Error(`Invalid sheet.`);
+    }
+
+    const storeSheets = {
+      [SHEETS.Laser.getSheetName()]       : STORESHEETS.LaserStoreItems,
+      [SHEETS.Fablight.getSheetName()]    : STORESHEETS.FablightStoreItems,
+      [SHEETS.Waterjet.getSheetName()]    : STORESHEETS.WaterjetStoreItems,
+      [SHEETS.Advancedlab.getSheetName()] : STORESHEETS.AdvLabStoreItems,
+      [SHEETS.Shopbot.getSheetName()]     : STORESHEETS.ShopbotStoreItems,
+      [SHEETS.Vinyl.getSheetName()]       : STORESHEETS.VinylCutterStoreItems,
+      [SHEETS.Othertools.getSheetName()]  : STORESHEETS.OthermillStoreItems,
+      [SHEETS.Plotter.getSheetName()]     : STORESHEETS.VinylCutterStoreItems,
+      [SHEETS.GSI_Plotter.getSheetName()] : STORESHEETS.VinylCutterStoreItems,
+    }
+
+    return storeSheets[sheet.getSheetName()] ?? STORESHEETS.LaserStoreItems;
+  } catch (err) {
+    console.error(`"GetStoreSheet()" failed: ${err}`);
+    return null;
+  }
 }
+
+
+
 
 

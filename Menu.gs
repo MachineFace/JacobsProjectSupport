@@ -151,7 +151,7 @@ const PopupGetSingleStudentPriority = async () => {
       ui.ButtonSet.OK,
     );
   } catch(err) {
-    console.error(`"PopupGetSingleStudentPriority()" failed : ${err} : Couldn't set priority for ${name}`);
+    console.error(`"PopupGetSingleStudentPriority()" failed: ${err} : Couldn't set priority for ${name}`);
     ui.alert(
       `${SERVICE_NAME} : Error!`,
       `Whoops, couldn't set priority for ${name}`,
@@ -379,7 +379,7 @@ const PopupBuildEstimate = () => {
 
     return 0;
   } catch (err) {
-    console.error(`"PopupBuildEstimate()" failed : ${err}`);
+    console.error(`"PopupBuildEstimate()" failed: ${err}`);
     return null;
   } 
 }
