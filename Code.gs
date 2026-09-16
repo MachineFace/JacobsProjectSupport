@@ -34,35 +34,35 @@ const handleSubmit = async (e) => {
   const thisSheetName = e.range.getSheet().getSheetName();
 
   // Get last row and set status to received
-  let lastRow = [...SheetService.GetColumnDataByHeader(thisSheet, HEADERNAMES.timestamp)]
+  const lastRow = [...SheetService.GetColumnDataByHeader(thisSheet, HEADERNAMES.timestamp)]
     .filter(Boolean)
     .length + 1;
   console.info(`This Row: ${lastRow}`);
 
   // Parse variables
-  let values = e.namedValues;
-  let name = values[HEADERNAMES.name][0] ? TitleCase(values[HEADERNAMES.name][0]) : undefined;
+  const values = e.namedValues;
+  const name = values[HEADERNAMES.name][0] ? TitleCase(values[HEADERNAMES.name][0]) : undefined;
   SheetService.SetByHeader(thisSheet, HEADERNAMES.name, lastRow, name);
-  let email = values[HEADERNAMES.email][0] ? values[HEADERNAMES.email][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.email, lastRow);
-  let sid = values[HEADERNAMES.sid][0] ? values[HEADERNAMES.sid][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.sid, lastRow);
-  let studentType = values[HEADERNAMES.affiliation][0] ? values[HEADERNAMES.affiliation][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.affiliation, lastRow);
-  let projectname = values[HEADERNAMES.projectName][0] ? values[HEADERNAMES.projectName][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.projectName, lastRow);
-  let timestamp = values[HEADERNAMES.timestamp][0];
+  const email = values[HEADERNAMES.email][0] ? values[HEADERNAMES.email][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.email, lastRow);
+  const sid = values[HEADERNAMES.sid][0] ? values[HEADERNAMES.sid][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.sid, lastRow);
+  const studentType = values[HEADERNAMES.affiliation][0] ? values[HEADERNAMES.affiliation][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.affiliation, lastRow);
+  const projectname = values[HEADERNAMES.projectName][0] ? values[HEADERNAMES.projectName][0] : SheetService.GetByHeader(thisSheet, HEADERNAMES.projectName, lastRow);
+  const timestamp = values[HEADERNAMES.timestamp][0];
 
   // Set status to RECEIVED on new submission
   console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
   console.warn(`Name: ${name}, SID: ${sid}, Email: ${email}, User Type: ${studentType}, Project: ${projectname}, Timestamp: ${timestamp}`);
 
   // Generate new Job number
-  let id = IDService.CreateId();
+  const id = IDService.CreateId();
   SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
-  let priority = PriorityService.GetPriority(email, sid);
+  const priority = PriorityService.GetPriority(email, sid);
   SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);  
 
   // Submission Message
-  let message = new MessageService({ name : name, projectname : projectname, id : id });
+  const message = new MessageService({ name : name, projectname : projectname, id : id });
 
   try {
     if (priority == PRIORITY.None) {
@@ -79,9 +79,8 @@ const handleSubmit = async (e) => {
   }
 
   // Get DS-Specific Message
-  let dsMessage = message.dsMessage;
-
   // Create array summary of student's entry and append it to the message
+  let dsMessage = message.dsMessage;
   dsMessage += `<ul>`;
   for (let key in values) {
     dsMessage += `<li>${key}: ${values[key]}</li>`;
@@ -131,7 +130,6 @@ const handleSubmit = async (e) => {
     console.error(`Whoops: Couldn't deal with Canon Plotter sheet I guess.. ${err}`);
   }
 
-
   // GSI Plotter
   try {
     if (SpreadsheetApp.getActiveSheet().getSheetName() == SHEETS.GSI_Plotter.getSheetName()) {
@@ -151,16 +149,16 @@ const handleSubmit = async (e) => {
       console.info(`GSI Plotter instruction email sent.`);
     }
   } catch (err) {
-    console.error(`Whoops: Couldn't deal with GSI sheet I guess.. ${err}`);
+    console.error(`Couldn't deal with GSI sheet: ${err}`);
   }
 
   // Check again
-  if(IDService.IsValid(id) == false) {
+  if(!IDService.IsValid(id)) {
     SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, IDService.CreateId());
   }
 
   // Fix wrapping issues
-  let driveloc = thisSheet.getRange(`D` + lastRow);
+  const driveloc = thisSheet.getRange(`D` + lastRow);
   FormatCell(driveloc);
 }
 
