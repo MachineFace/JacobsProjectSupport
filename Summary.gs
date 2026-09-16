@@ -62,7 +62,8 @@ class SummaryBuilder {
   }
 
   /**
-   * ### Get Google Doc as html string data : returns string
+   * ### Get Google Doc as html string
+   * 
    * @private
    * @param {string} docId
    * @return {string} text 

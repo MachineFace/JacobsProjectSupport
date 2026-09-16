@@ -51,14 +51,14 @@ const handleSubmit = async (e) => {
 
   // Set status to RECEIVED on new submission
   console.info(`VALUES FROM FORM: ${JSON.stringify(values)}`);
-  console.warn(`Name : ${name}, SID : ${sid}, Email : ${email}, User Type : ${studentType}, Project : ${projectname}, Timestamp : ${timestamp}`);
+  console.warn(`Name: ${name}, SID: ${sid}, Email: ${email}, User Type: ${studentType}, Project: ${projectname}, Timestamp: ${timestamp}`);
 
   // Generate new Job number
   let id = IDService.CreateId();
   SheetService.SetByHeader(thisSheet, HEADERNAMES.id, lastRow, id);
 
   // Priority
-  let priority = new PriorityService({ email : email, sid : sid }).Priority;
+  let priority = PriorityService.GetPriority(email, sid);
   SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, lastRow, priority);  
 
   // Submission Message
@@ -75,7 +75,7 @@ const handleSubmit = async (e) => {
       EmailService.Email(email, SERVICE_EMAIL, `${SERVICE_NAME}: New Project Received`, message, STATUS.received, staff.Cody.email);
     }
   } catch(err) {
-    console.error(`${err} : Couldn't determine student access`);
+    console.error(`Access Determination failed: ${err}`);
   }
 
   // Get DS-Specific Message
@@ -117,7 +117,7 @@ const handleSubmit = async (e) => {
     EmailService.Email(designspecialistemail, SERVICE_EMAIL, `${SERVICE_NAME} Notification`, dsMessage, STATUS.received);
     console.info(`Design Specialist has been emailed.`);
   } catch(err) {
-    console.error(`${err} : Couldn't email DS...`);
+    console.error(`DS Email failed: ${err}`);
   }
 
   // Canon Plotter
@@ -199,7 +199,7 @@ const handleChange = async (e) => {
   // Ignore Edits on background sheets like Logger and StoreItems 
   if (!SheetService.IsValidSheet(thisSheet)) return;
 
-  // STATUS CHANGE TRIGGER : Only look at Column 1 for email trigger.....
+  // STATUS CHANGE TRIGGER: Only look at Column 1 for email trigger.....
   if (thisCol > 1 && thisCol != 3) return;
 
   // Parse Row Data
@@ -212,7 +212,7 @@ const handleChange = async (e) => {
 
   // Check Priority
   if(!priority) {
-    priority = new PriorityService({ email : email, sid : sid }).Priority;
+    priority = PriorityService.GetPriority(email = email, sid = sid);
     SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
   } else if (priority == PRIORITY.None && (status != STATUS.cancelled && status != STATUS.closed)) {
     SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);

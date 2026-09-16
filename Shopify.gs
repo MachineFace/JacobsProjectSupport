@@ -164,7 +164,7 @@ class ShopifyAPI {
 
       const content = JSON.parse(response.getContentText());
       console.info(`Posted Order!\nTo:${email}\nID: ${id}`);
-      // console.info(`Posted Order! : ${JSON.stringify(content, null, 3)}`);
+      // console.info(`Posted Order!: \n${JSON.stringify(content, null, 3)}`);
       return content;
     } catch(err) {
       console.error(`"CreateOrder()" failed: ${err}`);
@@ -427,7 +427,7 @@ class ShopifyAPI {
         if(item.fulfillment_status == `fulfilled`) {
           orders.push(item);
           // let id = Number.parseFloat(item.id);
-          // console.info(`${id} : ${JSON.stringify(item)}`);  
+          // console.info(`ID: ${id}, \n${JSON.stringify(item)}`);  
         }
       }); 
       return orders;

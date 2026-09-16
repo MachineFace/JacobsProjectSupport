@@ -1,20 +1,27 @@
 /**
  * ----------------------------------------------------------------------------------------------------------------
- * Code Enumerations
+ * ## Code Enumerations
  */
 
 const SERVICE_EMAIL = `jacobs-project-support@berkeley.edu`;
 const SERVICE_NAME = `Jacobs Project Support`;
 
-/** @private */
+/** 
+ * ### Spreadsheet
+ * @private 
+ */
 const THIS_SPREADSHEET = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty(`SPREADSHEET_ID`));
 
-const DAYS_RETENTION_NUMBER = 15; //How many days to hold a file
+/**
+ * ### Day Count to Retain Files
+ * How many days to hold a file
+ */
+const DAYS_RETENTION_NUMBER = 15;
 const RETENTION_PERIOD = DAYS_RETENTION_NUMBER * 24 * 60 * 60 * 1000;       // Number of milliseconds in the retention period.
 const PICKUP_HOURS = `Monday - Friday: 11am - 1pm.`                         
 
 /**
- * Colors
+ * ### Colors
  */
 const COLORS = Object.freeze({
   green_light : `#d9ead3`,
@@ -46,7 +53,7 @@ const COLORS = Object.freeze({
 });
 
 /**
- * All Colors
+ * ### All Colors
  */
 const ALLCOLORS = Object.freeze({
   black : `#000000`,
@@ -132,7 +139,7 @@ const ALLCOLORS = Object.freeze({
 });
 
 /**
- * Response Codes
+ * ### Response Codes
  */
 const RESPONSECODES = Object.freeze({
 	200 : `OK`,
@@ -204,7 +211,7 @@ const RESPONSECODES = Object.freeze({
 });
 
 /**
- * Status
+ * ### Status
  */
 const STATUS = Object.freeze({
   received : `Received`,
@@ -221,7 +228,7 @@ const STATUS = Object.freeze({
 });
 
 /**
- * Priority
+ * ### Priority
  */
 const PRIORITY = Object.freeze({
   None : `STUDENT NOT FOUND!`,
@@ -232,7 +239,7 @@ const PRIORITY = Object.freeze({
 });
 
 /**
- * Collection of Sheets : Dictionary of key / value pair.
+ * ### Collection of Sheets : Dictionary of key / value pair.
  * Example: Calling 'SHEETS.laser' returns value sheet.
  */
 const SHEETS = Object.freeze({
@@ -248,7 +255,7 @@ const SHEETS = Object.freeze({
 });
 
 /**
- * Collection of Sheet : NOT TO BE ITERATED THROUGH
+ * ### Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const OTHERSHEETS = Object.freeze({
   Summary :   THIS_SPREADSHEET.getSheetByName(`Summary`),
@@ -260,7 +267,7 @@ const OTHERSHEETS = Object.freeze({
 
 
 /**
- * Collection of Sheet : NOT TO BE ITERATED THROUGH
+ * ### Collection of Sheet : NOT TO BE ITERATED THROUGH
  */
 const STORESHEETS = Object.freeze({
   AdvLabStoreItems :      THIS_SPREADSHEET.getSheetByName('AdvLabStoreItems'),
@@ -274,7 +281,7 @@ const STORESHEETS = Object.freeze({
 });
 
 /**
- * DEFUNCT SHEETS
+ * ### DEFUNCT SHEETS
  */
 const DEFUNCT = Object.freeze({
   Ultimaker : `1ASokut0lfjLidzpSmCCfD2mg-yVSa_HR0tTATVzFpI8`, // Ultimaker Form
@@ -290,7 +297,7 @@ const DEFUNCT = Object.freeze({
 const NONITERABLESHEETS = Object.freeze({ ...OTHERSHEETS, ...STORESHEETS, });
 
 /**
- * Collection of Forms : Dictionary of key / value pair.
+ * ### Collection of Forms : Dictionary of key / value pair.
  * Example: Calling 'formDict.laser' returns value string.
  */
 const FORMS = Object.freeze({
@@ -306,7 +313,7 @@ const FORMS = Object.freeze({
 });
 
 /**
- * Drive Folder Locations
+ * ### Drive Folder Locations
  */
 const DRIVEFOLDERS = Object.freeze({
   tickets : `1xpjeqTju9ELRrQJ3GzFdv-nHYjoCfUjl`,
@@ -314,7 +321,7 @@ const DRIVEFOLDERS = Object.freeze({
 });
 
 /**
- * Student Types
+ * ### User Types
  */
 const TYPES = Object.freeze({
   researcher : `Researcher`,
@@ -332,7 +339,7 @@ const TYPES = Object.freeze({
 });
 
 /**
- * Headernames
+ * ### Headernames
  */
 const HEADERNAMES = Object.freeze({
   status : `(INTERNAL) Status`,	
@@ -393,7 +400,7 @@ const HEADERNAMES = Object.freeze({
 });
 
 /**
- * Page Sizes
+ * ### Page Sizes
  */
 const PAGESIZES = Object.freeze({
   letter: { width: 612.283, height: 790.866 },

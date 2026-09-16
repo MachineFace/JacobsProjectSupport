@@ -96,7 +96,7 @@ class EmailService {
         // }
         pageToken = threadList.nextPageToken;
       }
-      console.warn(`Total Emails Sent : ${count}`);
+      console.warn(`Total Emails Sent: ${count}`);
       return count;
     } catch (err) {
       console.error(`"CountTotalEmailsSent()" failed ----> ${err}`);
@@ -139,7 +139,7 @@ class EmailService {
   static ValidateEmail(email = ``) {
     const regex = new RegExp(/^[a-zA-Z0-9+_.-]+@[berkeley.edu]+$/);
     let match = regex.test(email);
-    console.warn(`Email is valid? : ${match}`);
+    console.warn(`Email is valid?: ${match}`);
     return match;
   }
   

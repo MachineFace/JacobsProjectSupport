@@ -1,6 +1,6 @@
 /**
  * ### Load GasT for Testing
- * See : https://github.com/huan/gast for instructions
+ * See: https://github.com/huan/gast for instructions
  */
 const gasT_URL = `https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js`;
 if ((typeof GasTap) === 'undefined') {
@@ -126,74 +126,64 @@ const _gasTPriorityTesting = async() => {
   });
 
   await test(`Priority Test`, (t) => {
-    let types = {
+    let testCases = {
       staff : {
+        name : `Test for Staff`,
         email : `codyglen@berkeley.edu`,
         sid : 91283741923,
+        expected : PRIORITY.Tier1,
       },
       goodEgoodS : {
+        name : `Valid Email AND Valid SID`,
         email : `anukala@berkeley.edu`,
-        sid : 3034682275
+        sid : 3034682275,
+        expected : PRIORITY.Tier4,
       },
       goodEbadS : {
+        name : `Valid Email and INVALID SID`,
         email : `anukala@berkeley.edu`,
         sid : 12938749123,
+        expected : PRIORITY.Tier4,
       },
       badEgoodS : {
+        name : `INVALID Email and Valid SID`,
         email : `ding@bat.edu`,
         sid : 1919304,
+        expected : PRIORITY.Tier4,
       },
       badEbadS : {
+        name : `INVALID Email and INVALID SID`,
         email : `ding@bat.edu`,
         sid : 2394872349587,
+        expected : PRIORITY.None,
       },
       nullgoodS : {
+        name : `Null Email and Valid SID`,
         email : null,
         sid : 1919304,
+        expected : PRIORITY.Tier4,
       },
       nullCase : {
+        name : `Null Case`,
         email : null,
         sid : null,
+        expected : PRIORITY.None,
       },
       undefCase : {
+        name : `Undefined Case`,
         email : undefined,
         sid : undefined,
+        expected : PRIORITY.None,
       }
     }
 
     let x, y;
 
-    x = new PriorityService({ email : types.staff.email, sid : types.staff.sid }).Priority;
-    y = PRIORITY.Tier1;
-    t.equal(x, y, `DEFAULT priority for staff : Expected ${y}, Actual ${x}`);
-    
-    x = new PriorityService({ email : types.goodEgoodS.email, sid : types.goodEgoodS.sid}).Priority;
-    y = PRIORITY.Tier4;
-    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
-    
-    x = new PriorityService({ email : types.goodEbadS.email, sid : types.goodEbadS.sid}).Priority;
-    y = PRIORITY.Tier4;
-    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
-    
-    x = new PriorityService({ email : types.badEgoodS.email, sid : types.badEgoodS.sid}).Priority;
-    y = PRIORITY.Tier4;
-    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
-    
-    x = new PriorityService({ email : types.badEbadS.email, sid : types.badEbadS.sid}).Priority;
-    y = PRIORITY.None;
-    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
-    
-    x = new PriorityService({ email : types.nullgoodS.email, sid : types.nullgoodS.sid}).Priority;
-    y = PRIORITY.Tier4;
-    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
-    
-    x = new PriorityService({ email : types.nullCase.email, sid : types.nullCase.sid}).Priority;
-    y = PRIORITY.Tier1;
-    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
-    
-    x = new PriorityService({ email : types.undefCase.email, sid : types.undefCase.sid}).Priority;
-    y = PRIORITY.Tier1;
-    t.equal(x, y, `Expected: ${y}, Actual: ${x}`);
+    Object.values(testCases).forEach(testCase => {
+      x = PriorityService.GetPriority(email = testCase.email, sid = testCase.sid);
+      y = testCase.expected;
+      t.equal(x, y, `CASE: (${testCase.name}), Expected: ${y}, Actual: ${x}`);
+    });
 
   });
 

@@ -1,6 +1,8 @@
 
 /**
- * ### Creates Time-Driven Triggers : ONLY RUN ONCE AFTER DELETING PREVIOUS TRIGGERS. DO NOT DELETE
+ * ### Creates Time-Driven Triggers
+ * ONLY RUN ONCE AFTER DELETING PREVIOUS TRIGGERS. 
+ * DO NOT DELETE
  * Used in EnableJPS()
  */
 const CreateTimeDrivenTrigger = () => {
@@ -78,7 +80,8 @@ const CreateTimeDrivenTrigger = () => {
 }
 
 /**
- * ### Remove Triggers when Disabling JPS - DO NOT DELETE
+ * ### Remove Triggers when Disabling JPS
+ * DO NOT DELETE
  * Used in 'DisableJPS()'
  */
 const RemoveTimedTriggers = () => {
@@ -139,7 +142,7 @@ const DisableJPS = () => {
   try {
     for (let name in FORMS) {
       FormApp.openById(FORMS[name]).setAcceptingResponses(false);
-      console.warn(`${name} : ${FORMS[name]} IS NOW DISABLED.`);
+      console.warn(`${name}: ${FORMS[name]} IS NOW DISABLED.`);
     }
     RemoveTimedTriggers();
     console.warn(`Turned off JPS Form Response Collection: JPS is DISABLED. ENJOY THE BREAK.`);
@@ -158,9 +161,9 @@ const EnableJPS = () => {
   try {
     for (let name in FORMS) {
       FormApp.openById(FORMS[name]).setAcceptingResponses(true);
-      console.warn(`${name} : ${FORMS[name]} IS NOW ENABLED.`);
+      console.warn(`${name}: ${FORMS[name]} IS NOW ENABLED.`);
     }
-    console.warn(`Turned ON JPS Form Response Collection : JPS is ENABLED. HERE COMES THE AVALANCH!!`);
+    console.warn(`Turned ON JPS Form Response Collection: JPS is ENABLED. HERE COMES THE AVALANCH!!`);
     CreateTimeDrivenTrigger();
     console.warn(`Created Daily Summary Email Triggers.`);
     return 0;

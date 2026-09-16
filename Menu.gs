@@ -5,7 +5,7 @@
 const PopUpMarkAsAbandoned = async () => {
   let ui = SpreadsheetApp.getUi(); 
   let response = ui.prompt(
-    `${SERVICE_NAME} : Mark Job as Abandoned`, 
+    `${SERVICE_NAME}: Mark Job as Abandoned`, 
     `Scan a ticket with this cell selected and press "OK".`, 
     ui.ButtonSet.OK_CANCEL
   );
@@ -121,14 +121,14 @@ const PopupGetSingleStudentPriority = async () => {
   try {
     const ui = SpreadsheetApp.getUi();
     const thisSheet = SpreadsheetApp.getActiveSheet();
-    let thisRow = thisSheet.getActiveRange().getRow();
+    const thisRow = thisSheet.getActiveRange().getRow();
 
     const rowData = SheetService.GetRowData(thisSheet, thisRow);
     let { status, ds, priority, ticket, id, timestamp, email, name, sid, projectName, sheetName, row, } = rowData;
     console.info(`Checking access for ${name}, ${email}, ${sid}, Row: ${thisRow}`);
 
     
-    priority = await new PriorityService({ email : email, sid : sid }).Priority;
+    priority = PriorityService.GetPriority(email = email, sid = sid);
     console.info(`Priority: ${priority}`);
     SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
     if(priority == PRIORITY.None) {
@@ -143,17 +143,16 @@ const PopupGetSingleStudentPriority = async () => {
       });
 
       EmailService.Email(email, SERVICE_EMAIL, `${SERVICE_NAME}: ${status}`, message, status);
-
     }
     ui.alert(
       SERVICE_NAME,
-      `Access for ${name} set to : "${priority}"`,
+      `Access for ${name} set to: "${priority}"`,
       ui.ButtonSet.OK,
     );
   } catch(err) {
-    console.error(`"PopupGetSingleStudentPriority()" failed: ${err} : Couldn't set priority for ${name}`);
+    console.error(`"PopupGetSingleStudentPriority()" failed: ${err}`);
     ui.alert(
-      `${SERVICE_NAME} : Error!`,
+      `${SERVICE_NAME}: Error!`,
       `Whoops, couldn't set priority for ${name}`,
       ui.ButtonSet.OK,
     );
@@ -265,7 +264,7 @@ const BillFromSelected = async () => {
 
     // Fetch Customer and Products
     const customer = await shopify.GetCustomerByEmail(email);
-    console.info(`CUSTOMER : ${JSON.stringify(customer)}`)
+    console.info(`CUSTOMER: ${JSON.stringify(customer)}`)
     if (customer == undefined || customer == null) {
       response = ui.alert(
         `${SERVICE_NAME}: Error!`,
@@ -452,9 +451,9 @@ const BuildHTMLHELP = () => {
     `'Missing Access' will be set automatically, and you should not choose this as an option.`,
   ];
   let html = `<h2 style="text-align:center"><b> HELP MENU </b></h2>`;
-  html += `<h3 style="font-family:Roboto">How to Use ${SERVICE_NAME} : </h3>`;
+  html += `<h3 style="font-family:Roboto">How to Use ${SERVICE_NAME}: </h3>`;
   html += `<hr>`;
-  html += `<p>Note : All status changes trigger an email to the student except for 'CLOSED' status</p>`;
+  html += `<p>Note: All status changes trigger an email to the student except for 'CLOSED' status</p>`;
   html += `<ol style="font-family:Roboto font-size:10">`;
   items.forEach(item => html += `<li>${item}</li>`);
   html += `</ol>`;

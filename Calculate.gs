@@ -81,7 +81,7 @@ class Calculate {
       // console.info(persons)
       let unique = new Set(persons);
       let count = unique.size;
-      console.info(`Active JPS Users : ${count}`);
+      console.info(`Active JPS Users: ${count}`);
 
       // Print
       const values = [ 
@@ -279,7 +279,7 @@ class Calculate {
   GetUserSubmissionStandardDeviation() {
     try {
       const standardDeviation = StatisticsService.StandardDeviation(this.userDistribution);
-      console.warn(`Standard Deviation for Mean number of Submissions : +/-${standardDeviation}`);
+      console.warn(`Standard Deviation for Mean number of Submissions: +/-${standardDeviation}`);
       return standardDeviation;
     } catch(err) {
       console.error(`"GetUserSubmissionStandardDeviation()" failed: ${err}`);
