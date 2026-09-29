@@ -31,7 +31,7 @@ class Calculate {
 
         });
       // console.info(totals);
-      const average = totals && StatisticsService.ArithmeticMean(totals);  // Average the totals (a list of times in millis)
+      const average = totals && StatisticsService.Mean(totals);  // Average the totals (a list of times in millis)
       const averageString = TimeService.MillisecondsToTimerString(average) || 0;
       console.info(`Sheet: ${sheet.getSheetName()}, AVG: ${averageString}`);
       return averageString;
@@ -293,7 +293,7 @@ class Calculate {
    */
   GetUserSubmissionArithmeticMean() {
     try {
-      const mean = StatisticsService.ArithmeticMean(this.userDistribution);
+      const mean = StatisticsService.Mean(this.userDistribution);
       return mean;
     } catch(err) {
       console.error(`"GetUserSubmissionArithmeticMean()" failed: ${err}`);
@@ -306,7 +306,7 @@ class Calculate {
    */
   PrintStatistics() {
     try {
-      const am = Number(StatisticsService.ArithmeticMean(this.userDistribution)).toFixed(4) || 0;
+      const am = Number(StatisticsService.Mean(this.userDistribution)).toFixed(4) || 0;
       const gm = Number(StatisticsService.GeometricMean(this.userDistribution)).toFixed(4) || 0;
       const hm = Number(StatisticsService.HarmonicMean(this.userDistribution)).toFixed(4) || 0;
       const qm = Number(StatisticsService.QuadraticMean(this.userDistribution)).toFixed(4) || 0;
