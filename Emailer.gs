@@ -142,6 +142,31 @@ class EmailService {
     console.warn(`Email is valid?: ${match}`);
     return match;
   }
+
+  /**
+   * ### Find Email
+   * 
+   * Helper function for finding email
+   * @param {string} name
+   * @returns {string} email
+   */
+  static FindEmail(name) {
+    try {
+      if (name) name.toString().replace(/\s+/g, "");
+      let email = ``;
+      Object.values(SHEETS).forEach(sheet => {
+        const finder = sheet.createTextFinder(name).findNext();
+        if (finder != null) {
+          let row = finder.getRow();
+          email = SheetService.GetByHeader(sheet, HEADERNAMES.email, row);
+        }
+      })
+      return email;
+    } catch(err) {
+      console.error(`"FindEmail()" failed: ${err}`);
+      return null;
+    }
+  }
   
 }
 
