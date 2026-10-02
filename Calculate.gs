@@ -645,8 +645,10 @@ const Metrics = () => {
     Calculate.PrintTurnaroundTimes();
     Calculate.CountFunding();
     Calculate.CreateTopTen();
+
     console.info(`Recalculated Metrics`);
     console.timeEnd(`Metrics Timer `);
+    
   } catch (err) {
     console.error(`"Metrics()" failed: ${err}`);
     return null;

@@ -83,14 +83,14 @@ const PopUpMarkAsPickedUp = async () => {
 }
 */
 
-
 /** 
  * ### Creates a pop-up for counting users.
  */
 const PopupCountUsers = () => {
   const ui = SpreadsheetApp.getUi();
-  const c = new Calculate();
-  const count = c.CountActiveUsers();
+
+  const count = Calculate.CountActiveUsers();
+
   ui.alert(
     SERVICE_NAME,
     `JPS User Count: ${count}`,
@@ -98,13 +98,12 @@ const PopupCountUsers = () => {
   );
 }
 
-
 /**
  * ### Create a pop-up to check for ALL missing students
  */
-const PopupCheckMissingAccessStudents = async () => {
+const PopupCheckMissingAccessStudents = () => {
   const ui = SpreadsheetApp.getUi();
-  const names = await CheckMissingAccessStudents().join(",\n");
+  const names = CheckMissingAccessStudents().join(",\n");
   console.info(names);
   ui.alert(
     `${SERVICE_NAME}: ALERT!`,
@@ -113,11 +112,10 @@ const PopupCheckMissingAccessStudents = async () => {
   );
 }
 
-
 /**
  * ### Create a pop-up to check for ONE missing students
  */
-const PopupGetSingleStudentPriority = async () => {
+const PopupGetSingleStudentPriority = () => {
   try {
     const ui = SpreadsheetApp.getUi();
     const thisSheet = SpreadsheetApp.getActiveSheet();
@@ -130,7 +128,9 @@ const PopupGetSingleStudentPriority = async () => {
     
     priority = PriorityService.GetPriority(email = email, sid = sid);
     console.info(`Priority: ${priority}`);
+
     SheetService.SetByHeader(thisSheet, HEADERNAMES.priority, thisRow, priority);
+
     if(priority == PRIORITY.None) {
       SheetService.SetByHeader(thisSheet, HEADERNAMES.status, thisRow, STATUS.missingAccess);
 
@@ -144,11 +144,13 @@ const PopupGetSingleStudentPriority = async () => {
 
       EmailService.Email(email, SERVICE_EMAIL, `${SERVICE_NAME}: ${status}`, message, status);
     }
+
     ui.alert(
       SERVICE_NAME,
       `Access for ${name} set to: "${priority}"`,
       ui.ButtonSet.OK,
     );
+
   } catch(err) {
     console.error(`"PopupGetSingleStudentPriority()" failed: ${err}`);
     ui.alert(
@@ -159,7 +161,6 @@ const PopupGetSingleStudentPriority = async () => {
   }
   
 }
-
 
 /**
  * ### Create a pop-up to make a new ID
@@ -178,7 +179,9 @@ const PopupCreateNewID = () => {
     );
     if(a === ui.Button.OK) return;
   } 
+
   const { name, id } = SheetService.GetRowData(thisSheet, thisRow);
+
   if(IDService.IsValid(id)) {
     const a = ui.alert(
       `${SERVICE_NAME}: Error!`,
@@ -187,7 +190,9 @@ const PopupCreateNewID = () => {
     );
     if(a === ui.Button.OK) return;
   }
+
   SheetService.SetByHeader(thisSheet, HEADERNAMES.id, thisRow, newID);
+
   const a = ui.alert(
     SERVICE_NAME,
     `Created a New ID for ${name}:\n${newID}`,
@@ -203,7 +208,8 @@ const PopupCreateNewID = () => {
 const BillFromSelected = async () => {
   try {
     const ui = SpreadsheetApp.getUi();
-    const shopify = await new ShopifyAPI(); 
+    const shopify = new ShopifyAPI(); 
+
     let thisSheet = SpreadsheetApp.getActiveSheet();
     let thisRow = thisSheet.getActiveRange().getRow();
 
@@ -265,6 +271,7 @@ const BillFromSelected = async () => {
     // Fetch Customer and Products
     const customer = await shopify.GetCustomerByEmail(email);
     console.info(`CUSTOMER: ${JSON.stringify(customer)}`)
+
     if (customer == undefined || customer == null) {
       response = ui.alert(
         `${SERVICE_NAME}: Error!`,
@@ -329,10 +336,9 @@ const BillFromSelected = async () => {
  * ### Build Estimate
  */
 const PopupBuildEstimate = () => {
-  const ui = SpreadsheetApp.getUi();
-  let thisSheet = SpreadsheetApp.getActiveSheet();
-
   try {
+    const ui = SpreadsheetApp.getUi();
+    let thisSheet = SpreadsheetApp.getActiveSheet();
 
     if(!SheetService.IsValidSheet(thisSheet)) {
       const a = ui.alert(
@@ -376,7 +382,6 @@ const PopupBuildEstimate = () => {
       if (response === ui.Button.OK) return;
     }
 
-    return 0;
   } catch (err) {
     console.error(`"PopupBuildEstimate()" failed: ${err}`);
     return null;
@@ -516,8 +521,8 @@ const BarMenu = () => {
       .addToUi();
 }
 
-const RunStandardDeviation = () => new Calculate().GetUserSubmissionStandardDeviation();
-const RunTopTen = () => new Calculate().CreateTopTen();
+const RunStandardDeviation = () => Calculate.GetUserSubmissionStandardDeviation();
+const RunTopTen = () => Calculate.CreateTopTen();
 
 
 
