@@ -324,7 +324,7 @@ const BillFromSelected = async () => {
     } else if(response === ui.Button.NO || response === ui.Button.CANCEL) {
       console.warn(`User clicked "No / Cancel"....\nOrder NOT Created.`);
     }
-    return 0;
+    
   } catch (err) {
     console.error(`"BillFromSelected()" failed: ${err}`);
     return null;

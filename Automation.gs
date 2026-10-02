@@ -22,7 +22,7 @@ class HackyStoreAutomation {
           const price = await this.GetPriceFromStore(link);
           sheet.getRange(index + 2, 6, 1, 1).setValue(price);
         });
-      return 0;
+      
     } catch(err) {
       console.error(`"_Write_Unit_Cost()" failed: ${err}`);
       return null;
@@ -123,7 +123,7 @@ class HackyStoreAutomation {
         HackyStoreAutomation.Get_Product_ID_From_URL(sheet);
       });
       console.info('Product IDs have been updated and written to each Store Sheet');
-      return 0;
+      
     } catch(err) {
       console.error(`"Update_Product_IDs()" failed ${err}`);
       return null;
@@ -166,7 +166,7 @@ class HackyStoreAutomation {
           sheet.getRange(2 + index, 4, 1, 1).setValue(id);
           
         });
-      return 0;
+      
     } catch(err) {
       console.error(`"Get_Product_ID_From_URL()" failed: ${err}`);
       return null;

@@ -51,7 +51,7 @@ class SheetService {
       if (col == -1) throw new Error(`Getting data by header failed.`);
       return data[row - 1][col];
     } catch (err) {
-      console.error(`"GetByHeader()" failed: ${err} @ Sheet: ${sheet} Col Name specified: ${columnName} Row: ${row}`);
+      console.error(`"GetByHeader()" failed: ${err}`);
       return null;
     }
   }
@@ -69,9 +69,9 @@ class SheetService {
       let col = data[0].indexOf(columnName) + 1;
       if(col == -1) return false;
       sheet.getRange(row, col).setValue(val);
-      return 0;
+      
     } catch (err) {
-      console.error(`"SetByHeader()" failed: ${err} @ Sheet: ${sheet} Row: ${row}, Value: ${val}`);
+      console.error(`"SetByHeader()" failed: ${err}`);
       return null;
     }
   }
@@ -167,7 +167,7 @@ class SheetService {
       });
       console.info(values);
       sheet.appendRow(values);
-      return 0;
+      
     } catch (err) {
       console.error(`"SetRowData()" failed: ${err}`);
       return null;
@@ -190,7 +190,9 @@ class SheetService {
       let col = data[0].indexOf(columnName);
       let range = sheet.getRange(2,col+1,lastRow,1).getValues();
       // console.info(range);
-      if (col == -1) return false;
+      if (col == -1) {
+        return false;
+      }
       return range.some( row => row[0] === val);
     } catch (err) {
       console.error(`"SearchColumn()" failed: ${err} @ Sheet: ${sheet} Col Name specified: ${columnName} value: ${val}`);
@@ -210,9 +212,15 @@ class SheetService {
     let values = sheet.getRange(column + ":" + column).getValues(); // like A:A
     let row = 2;
 
-    while (values[row] && values[row][0] !== data) row++;
-    if (values[row][0] === data) indexes.push(row + 1);
-    else return -1;
+    while (values[row] && values[row][0] !== data) {
+      row++;
+    }
+    if (values[row][0] === data) {
+      indexes.push(row + 1);
+    }
+    else {
+      return -1;
+    }
     return indexes;
   }
 
@@ -241,9 +249,13 @@ class SheetService {
    */
   static SearchSpecificSheet(sheet, value = ``) { 
     try {
-      if (value && value != undefined) value.toString().replace(/\s+/g, "");
+      if (value && value != undefined) {
+        value.toString().replace(/\s+/g, "");
+      }
       const finder = sheet.createTextFinder(value).findNext();
-      if (!finder) return false;
+      if (!finder) {
+        return false;
+      }
       return finder.getRow();
     } catch(err) {
       console.error(`"SearchSpecificSheet()" failed: ${err}`);
@@ -258,7 +270,10 @@ class SheetService {
    */
   static Search(value = ``) {
     try {
-      if (value === null || value === undefined) throw new Error(`Bad inputs to function. Value: ${value}`);
+      if (value === null || value === undefined) {
+        throw new Error(`Bad inputs to function. Value: ${value}`);
+      }
+
       value = value.toString().replace(/\s+/g, "");
       let res = {};
       Object.values(SHEETS).forEach(sheet => {
@@ -288,7 +303,9 @@ class SheetService {
       let res = {};
       for(const [key, sheet] of Object.entries(SHEETS)) {
         const finder = sheet.createTextFinder(value).findNext();
-        if (finder == null) return false;
+        if (finder == null) {
+          return false;
+        }
         // res[key] = finder.getRow();
         res = SheetService.GetRowData(sheet, finder.getRow());
       }
@@ -311,7 +328,9 @@ class SheetService {
       const finder = SpreadsheetApp.getActiveSpreadsheet()
         .createTextFinder(name)
         .findAll()[0];
-      if (finder == null) return false;
+      if (finder == null) {
+        return false;
+      }
       const row = finder.getRow();
       const sheet = finder.getSheet();
       // console.info(`SH: ${sheet}, R: ${row}`);
@@ -333,7 +352,7 @@ class SheetService {
     array.forEach( (entry, idx) => {
       sheet.getRange(sheet.getLastRow() + 1 + idx, col, 1, 1).setValues(entry);
     });
-    return 0;
+    
   }
 
   /**
@@ -396,7 +415,7 @@ class SheetService {
       const range = [column, `1:`, column, values.length]
         .join(``);
       sheet.getRange(range).setValues(values.map((v) => [ v ]));
-      return 0;
+      
     } catch(err) {
       console.error(`"AddArrayToSheet()" failed: ${err}`);
       return null;
@@ -457,7 +476,7 @@ class SheetService {
       // Deletes the columns using REVERSE order to ensure proper indexing is used.
       rangesToDelete.reverse().forEach(([start, end]) => sheet.deleteColumns(start, end - start + 1));
       SpreadsheetApp.flush();
-      return 0;
+      
     } catch(err) {
       console.error(`"DeleteEmptyColumns()" failed: ${err}`);
       return null;

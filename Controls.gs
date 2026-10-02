@@ -72,7 +72,7 @@ const CreateTimeDrivenTrigger = () => {
       .onWeekDay(ScriptApp.WeekDay.MONDAY)
       .atHour(5)
       .create();
-    return 0;
+    
   } catch (err) {
     console.error(`"CreateTimeDrivenTrigger()" failed: ${err}`);
     return null;
@@ -127,7 +127,7 @@ const RemoveTimedTriggers = () => {
     //   .atHour(5)
     //   .create();
     console.info(`Removed Triggers for Summary Emails`);
-    return 0;
+    
   } catch (err) {
     console.error(`"RemoveTimedTriggers()" failed: ${err}`);
     return null;
@@ -146,7 +146,7 @@ const DisableJPS = () => {
     }
     RemoveTimedTriggers();
     console.warn(`Turned off JPS Form Response Collection: JPS is DISABLED. ENJOY THE BREAK.`);
-    return 0;
+    
   } catch (err) {
     console.error(`"DisableJPS()" failed: ${err}`);
     return null;
@@ -166,7 +166,7 @@ const EnableJPS = () => {
     console.warn(`Turned ON JPS Form Response Collection: JPS is ENABLED. HERE COMES THE AVALANCH!!`);
     CreateTimeDrivenTrigger();
     console.warn(`Created Daily Summary Email Triggers.`);
-    return 0;
+    
   } catch(err) {
     console.error(`"EnableJPS()" failed: ${err}`);
     return null;
@@ -187,7 +187,7 @@ const SetStatusDropdowns = () => {
       sheet.getRange(start_row, 1, sheet.getLastRow(), 1).setDataValidation(rule);
     });
     console.warn(`Status Dropdowns Reset to Default for ALL sheets.`);
-    return 0;
+    
   } catch(err) {
     console.error(`"SetStatusDropdowns()" failed: ${err}`);
     return null;
@@ -238,7 +238,7 @@ const SetConditionalFormatting = () => {
 
       sheet.setConditionalFormatRules(rules);
     });
-    return 0;
+    
   } catch(err) {
     console.error(`"SetConditionalFormatting()" failed: ${err}`);
     return null;
@@ -258,7 +258,7 @@ const SetSummaryPageRowHeight = () => {
     sheet.setRowHeightsForced(3, max_rows - 3, height);
     sheet.getRange(3, 1, max_rows -1, max_cols).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
     console.warn(`Reset Row Height to Default for SUMMARY sheet.`);
-    return 0;
+    
   } catch(err) {
     console.error(`"SetSummaryPageRowHeight()" failed: ${err}`);
     return null;
@@ -281,7 +281,7 @@ const SetRowHeight = () => {
         .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
       console.info(`Set Row Height for ${sheet.getSheetName()}`);
     });
-    return 0;
+    
   } catch(err) {
     console.error(`"SetRowHeight()" failed: ${err}`);
     return null;
@@ -305,7 +305,7 @@ const DeleteOldFiles = () => {
         }
       }
     }
-    return 0;
+    
   } catch(err) {
     console.error(`"DeleteOldFiles()" failed: ${err}`);
     return null;
@@ -350,7 +350,7 @@ const BuildSummaryEquation = () => {
     query += `}`;
     console.info(query);
     OTHERSHEETS.Summary.getRange(3, 1, 1, 1).setValue(query);
-    return 0;
+    
   } catch(err) {
     console.error(`"BuildSummaryEquation()" failed: ${err}`);
     return null;
@@ -367,7 +367,7 @@ const AuxillaryEquations = () => {
     const eq1 = `=SUM(COUNTIF(A2:A, "${STATUS.received}"), COUNTIF(A2:A, "${STATUS.inProgress}"), COUNTIF(A2:A, "${STATUS.waitlist}"), COUNTIF(A2:A, "(INTERNAL) Status"), 0)`;
     const eq2 = `=IF(B2=0,"  <-- Party on Dude! Let's go to the beach!", "")`;
     OTHERSHEETS.Summary.getRange(start_row, 2, 1, 2).setValues([[ eq1, eq2 ]]);
-    return 0;
+    
   } catch(err) {
     console.error(`"AuxillaryEquations()" failed: ${err}`);
     return null;

@@ -11,7 +11,9 @@
  * @returns {int} index
  */
 const FindIndexInArray = (array = [], search = ``) => {
-  if (search == ``) return false;
+  if (search == ``) {
+    return false;
+  }
   for (let i = 0; i < array.length; i++) {
     if (array[i].toString().indexOf(search) > -1) return i;
   }

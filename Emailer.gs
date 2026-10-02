@@ -67,7 +67,7 @@ class EmailService {
 
       MailApp.sendEmail(to_email, resolvedSubject, ``, options);
       console.warn(`📨 User (${to_email}) sent ${status} email.`);
-      return 0;
+      
     } catch (err) {
       console.error(`❌ "Email()" failed: ${err}`);
       return null;
@@ -124,7 +124,7 @@ class EmailService {
         }
         pageToken = threadList.nextPageToken;
       }
-      return 0;
+      
     } catch (err) {
       console.error(`"ListInboxSnippets()" failed ----> ${err}`);
       return null;
